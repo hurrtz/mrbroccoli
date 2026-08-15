@@ -118,6 +118,7 @@ export function PremiumBand({
         accessibilityLabel={actionLabel}
         accessibilityRole="button"
         onPress={onPress}
+        testID={testID ? `${testID}-action` : undefined}
         style={({ pressed }) => [
           styles.actionTarget,
           pressed ? styles.pressed : null,

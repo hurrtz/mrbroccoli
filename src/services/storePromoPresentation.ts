@@ -28,7 +28,12 @@ const STORE_PROMO_APPLICATION_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
 export const STORE_PROMO_SCENE_STORAGE_KEY = "@mrbroccoli/store-promo-scene";
 export const STORE_PROMO_ORB_STORAGE_KEY = "@mrbroccoli/store-promo-orb";
 
-export const STORE_PROMO_SCENES = ["premium", "free", "onboarding"] as const;
+export const STORE_PROMO_SCENES = [
+  "premium",
+  "free",
+  "onboarding",
+  "onboarding-ready",
+] as const;
 export type StorePromoScene = (typeof STORE_PROMO_SCENES)[number];
 
 export interface StorePromoOrbPresentation {
@@ -234,7 +239,11 @@ export function applyStorePromoFreeOfflineController(
   scene: StorePromoScene | null,
   platform: LocalDeviceSnapshot["platform"],
 ): FreeOfflineModeController {
-  if (scene !== "free" && scene !== "onboarding") {
+  if (
+    scene !== "free" &&
+    scene !== "onboarding" &&
+    scene !== "onboarding-ready"
+  ) {
     return controller;
   }
 
@@ -257,7 +266,9 @@ export function applyStorePromoFreeOfflineController(
     },
     selection.profile,
   );
-  const ready = scene === "free" && !controller.setupVisible;
+  const ready =
+    (scene === "free" && !controller.setupVisible) ||
+    scene === "onboarding-ready";
   const readiness: OfflineProfileReadiness = {
     ready,
     installed: ready,

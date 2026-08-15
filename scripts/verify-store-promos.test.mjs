@@ -20,13 +20,44 @@ test("the checked-in store-promo setup is complete", () => {
   assert.deepEqual(result.errors, []);
   assert.equal(result.languages.length, 19);
   assert.deepEqual(result.screenshotNames, STORE_PROMO_SCREENSHOT_NAMES);
-  assert.ok(result.screenshotNames.android.includes("07-automatic-setup"));
-  assert.ok(result.screenshotNames.ios.includes("09-automatic-setup"));
+  for (const platform of ["android", "ios"]) {
+    assert.ok(
+      result.screenshotNames[platform].includes("02-transcript-drawer"),
+    );
+    assert.ok(
+      result.screenshotNames[platform].includes("11-premium-speaking"),
+    );
+    assert.ok(
+      result.screenshotNames[platform].includes("12-automatic-setup"),
+    );
+  }
   assert.ok(
     Object.values(result.screenshotNames)
       .flat()
       .every((name) => !name.includes("on-device-ai")),
   );
+});
+
+test("both platforms capture the deterministic priced Premium sheet", () => {
+  for (const [platform, flows] of Object.entries(STORE_PROMO_FLOWS)) {
+    const combinedFlow = flows
+      .map((flow) => fs.readFileSync(path.join(process.cwd(), flow), "utf8"))
+      .join("\n");
+
+    assert.match(combinedFlow, /premium-upgrade-scroll/, platform);
+    assert.match(combinedFlow, /premium-value-card/, platform);
+    assert.match(combinedFlow, /premium-price/, platform);
+    assert.ok(
+      combinedFlow.indexOf("free-conversation") <
+        combinedFlow.indexOf("premium-price"),
+      platform,
+    );
+    assert.ok(
+      combinedFlow.indexOf("premium-price") <
+        combinedFlow.indexOf("onboarding-welcome"),
+      platform,
+    );
+  }
 });
 
 test("screenshot name extraction preserves capture order", () => {
@@ -92,7 +123,7 @@ test("store captures wait for the conversation drawer to dismiss before Settings
       flow.includes("conversation-drawer-close"),
     );
     const withoutDismissWait = flowSources[drawerFlowIndex].replace(
-      /- waitForAnimationToEnd\n- assertNotVisible:\n {4}id: conversation-drawer-close\n/,
+      /\s*- waitForAnimationToEnd\n\s*- assertNotVisible:\n\s+id: conversation-drawer-close\n/,
       "",
     );
     const mutatedFlows = [...flowSources];
@@ -116,9 +147,13 @@ test("store-promo flows reseed a deterministic localized onboarding proposal", (
       "store-promo-fixture-ready-premium",
       "store-promo-fixture-ready-free",
       "store-promo-fixture-ready-onboarding",
+      "store-promo-fixture-ready-onboarding-ready",
       "intro-banner",
+      "intro-welcome-step",
       "intro-stepper-dot-1",
+      "intro-stepper-dot-2",
       "intro-setup-step",
+      "intro-try-step",
       "auto-setup-card",
       "auto-setup-proposal",
       "stopApp",
@@ -129,7 +164,7 @@ test("store-promo flows reseed a deterministic localized onboarding proposal", (
     }
     assert.doesNotMatch(
       combinedFlow,
-      /free-edition-status|intro-close|intro-stepper-dot-2/,
+      /free-edition-status|intro-close/,
       platform,
     );
 
@@ -142,8 +177,12 @@ test("store-promo flows reseed a deterministic localized onboarding proposal", (
     const introBanner = combinedFlow.indexOf("intro-banner", onboardingReady);
     const setupDot = combinedFlow.indexOf("intro-stepper-dot-1", introBanner);
     const proposal = combinedFlow.indexOf("auto-setup-proposal", setupDot);
+    const welcomeScreenshot = combinedFlow.indexOf(
+      "onboarding-welcome",
+      introBanner,
+    );
     const onboardingScreenshot = combinedFlow.indexOf(
-      "free-onboarding",
+      "onboarding-setup",
       proposal,
     );
     const stopAfterScreenshot = combinedFlow.indexOf(
@@ -152,13 +191,14 @@ test("store-promo flows reseed a deterministic localized onboarding proposal", (
     );
     const nextPremium = combinedFlow.indexOf(
       "store-promo-fixture-ready-premium",
-      stopAfterScreenshot,
+      combinedFlow.indexOf("store-promo-fixture-ready-onboarding-ready"),
     );
     const onboardingSegment = combinedFlow.slice(stopBeforeSeed, nextPremium);
 
     assert.ok(freeConversation < stopBeforeSeed, platform);
     assert.ok(stopBeforeSeed < onboardingReady, platform);
     assert.ok(onboardingReady < introBanner, platform);
+    assert.ok(introBanner < welcomeScreenshot, platform);
     assert.ok(introBanner < setupDot, platform);
     assert.ok(setupDot < proposal, platform);
     assert.ok(proposal < onboardingScreenshot, platform);
@@ -166,7 +206,7 @@ test("store-promo flows reseed a deterministic localized onboarding proposal", (
     assert.ok(stopAfterScreenshot < nextPremium, platform);
     assert.equal(
       combinedFlow.match(/id:\s*\^app-locale-\$\{LOCALE\}\$/g)?.length,
-      4,
+      5,
       platform,
     );
     assert.doesNotMatch(

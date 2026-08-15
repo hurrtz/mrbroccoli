@@ -42,9 +42,16 @@ export function findStorePromoDrawerBoundaryErrors(platform, flowTexts) {
     ];
   }
 
-  const serializedBoundary =
-    /^- tapOn:\r?\n {4}id: conversation-drawer-close\r?\n- waitForAnimationToEnd\r?\n- assertNotVisible:\r?\n {4}id: conversation-drawer-close\r?\n- tapOn:\r?\n {4}id: main-settings-button$/m;
-  return serializedBoundary.test(flow)
+  const close = flow.indexOf("id: conversation-drawer-close");
+  const wait = flow.indexOf("- waitForAnimationToEnd", close);
+  const hidden = flow.indexOf("- assertNotVisible:", wait);
+  const hiddenClose = flow.indexOf("id: conversation-drawer-close", hidden);
+  const settings = flow.indexOf("id: main-settings-button", hiddenClose);
+  return close >= 0 &&
+    wait > close &&
+    hidden > wait &&
+    hiddenClose > hidden &&
+    settings > hiddenClose
     ? []
     : [
         `${platform} store-promo flow must wait for the conversation drawer to dismiss before opening Settings`,
@@ -122,7 +129,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     const expectedScenes = STORE_PROMO_ANDROID_FLOW_SCENES;
     const sceneReadiness = [
       ...combinedFlow.matchAll(
-        /store-promo-fixture-ready-(premium|free|onboarding)/g,
+        /store-promo-fixture-ready-(premium|free|onboarding-ready|onboarding)/g,
       ),
     ];
     const actualScenes = sceneReadiness.map((match) => match[1]);
@@ -155,7 +162,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     }
     if (JSON.stringify(actualScenes) !== JSON.stringify(expectedScenes)) {
       errors.push(
-        `${platform} store screenshot fixtures must load premium, free, onboarding, premium in order`,
+        `${platform} store screenshot fixtures must load ${expectedScenes.join(", ")} in order`,
       );
     }
     const allowedInitialClearState =
@@ -200,11 +207,15 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "voice-stage-thinking",
       "voice-stage-idle",
       "intro-banner",
+      "intro-welcome-step",
       "intro-stepper-dot-1",
+      "intro-stepper-dot-2",
       "intro-setup-step",
+      "intro-try-step",
       "auto-setup-card",
       "auto-setup-proposal",
       "store-promo-fixture-ready-onboarding",
+      "store-promo-fixture-ready-onboarding-ready",
       "transcript-handle",
       "conversation-drawer-item-promo-branch",
       "settings-page-thinking",
@@ -223,8 +234,8 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     }
     if (
       platform === "ios" &&
-      (!combinedFlow.includes("selectable-message-promo-assistant-2") ||
-        !combinedFlow.includes("uber-audit-toggle-promo-assistant-2") ||
+      (!combinedFlow.includes("chat-transcript-list") ||
+        !combinedFlow.includes("transcript-message-promo-assistant-2") ||
         !combinedFlow.includes("settings-page-speaking"))
     ) {
       errors.push(
@@ -239,7 +250,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     if (
       platform === "ios" &&
       combinedFlow.indexOf("transcript-handle") >
-        combinedFlow.indexOf("selectable-message-promo-assistant-2")
+        combinedFlow.indexOf("transcript-message-promo-assistant-2")
     ) {
       errors.push(
         "iOS store screenshot flow must open the transcript before using message actions",
@@ -251,7 +262,10 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       );
     }
   }
-  if (!route.includes("seedStorePromoFixture")) {
+  if (
+    !route.includes("seedStorePromoFixture") ||
+    !route.includes("isStorePromoColorScheme")
+  ) {
     errors.push("Store screenshot route does not seed the fixture");
   }
   if (
@@ -265,16 +279,24 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
   }
   if (
     !presentation.includes("applyStorePromoAutoSetupJob") ||
-    !presentation.includes('scene !== "onboarding"')
+    !presentation.includes('scene !== "onboarding"') ||
+    !presentation.includes('scene !== "onboarding-ready"')
   ) {
     errors.push(
       "Store screenshot presentation does not own a guarded onboarding proposal",
     );
   }
-  if (!runner.includes('artifacts", "store-promos", platform')) {
+  if (
+    !runner.includes('artifacts", "store-promos", platform') ||
+    !runner.includes('options.colorScheme === "both"') ||
+    !runner.includes("display, colorScheme, locale")
+  ) {
     errors.push(
-      "Store screenshot runner does not use platform-specific output",
+      "Store screenshot runner does not use platform and color-scheme-specific output",
     );
+  }
+  if (!fs.readFileSync(path.join(cwd, STORE_PROMO_FLOWS.ios[0]), "utf8").includes("COLOR_SCHEME")) {
+    errors.push("iOS store screenshot flow does not seed the requested color scheme");
   }
   if (
     !runner.includes('"android.intent.action.VIEW"') ||
@@ -288,17 +310,29 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     STORE_PROMO_ANDROID_FLOW_SCENES.length !==
       STORE_PROMO_FLOWS.android.length ||
     JSON.stringify(STORE_PROMO_ANDROID_FLOW_SCENES) !==
-      JSON.stringify(["premium", "free", "onboarding", "premium"])
+      JSON.stringify([
+        "premium",
+        "free",
+        "onboarding",
+        "onboarding-ready",
+        "premium",
+      ])
   ) {
     errors.push(
       "Android store screenshot flows do not have deterministic scenes",
     );
   }
-  if (!Object.hasOwn(STORE_PROMO_IOS_DISPLAYS, "6.8")) {
-    errors.push("Store screenshot display matrix is missing 6.8");
+  for (const display of ["6.9", "6.5", "6.3", "6.1", "4.7", "ipad"]) {
+    if (!Object.hasOwn(STORE_PROMO_IOS_DISPLAYS, display)) {
+      errors.push(`Store screenshot display matrix is missing ${display}`);
+    }
   }
-  if (!Object.hasOwn(STORE_PROMO_ANDROID_DISPLAYS, "phone")) {
-    errors.push("Store screenshot Android display matrix is missing phone");
+  for (const display of ["phone", "tablet"]) {
+    if (!Object.hasOwn(STORE_PROMO_ANDROID_DISPLAYS, display)) {
+      errors.push(
+        `Store screenshot Android display matrix is missing ${display}`,
+      );
+    }
   }
   if (languages.length !== 19) {
     errors.push(`Expected 19 registered locales, found ${languages.length}`);

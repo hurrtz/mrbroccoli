@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
+import { fireEvent } from "@testing-library/react-native";
 
 import { PremiumUpgradeModal } from "../../src/components/PremiumUpgradeModal";
 import { usePremiumEntitlement } from "../../src/context/PremiumEntitlementContext";
@@ -171,6 +172,38 @@ describe("PremiumUpgradeModal", () => {
     expect(StyleSheet.flatten(scroll.props.style)).toMatchObject({
       flexShrink: 1,
     });
+  });
+
+  it("keeps the deterministic automation purchase actionable without a store product", () => {
+    const purchasePremium = jest.fn(async () => undefined);
+    mockedUsePremiumEntitlement.mockReturnValue({
+      status: "free",
+      isPremium: false,
+      developmentEntitlementMode: "free",
+      setDevelopmentEntitlementMode: jest.fn(async () => undefined),
+      busy: false,
+      error: null,
+      storeConnected: false,
+      storeProduct: null,
+      storeProductLoading: false,
+      displayPrice: "€14.99",
+      purchasePremium,
+      restorePremium: jest.fn(async () => undefined),
+      refreshPremium: jest.fn(async () => undefined),
+      clearError: jest.fn(),
+    });
+
+    const screen = renderWithProviders(
+      <PremiumUpgradeModal visible onClose={jest.fn()} />,
+    );
+    const buy = screen.getByRole("button", {
+      name: "Buy Premium · €14.99",
+    });
+
+    fireEvent.press(buy);
+
+    expect(purchasePremium).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("button", { name: "Retry" })).toBeNull();
   });
 
   it("presents the upgrade surface as a bottom sheet in portrait", () => {

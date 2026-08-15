@@ -24,7 +24,8 @@ function usage() {
     "Usage: node scripts/run-store-promos.mjs --platform <ios|android> --locale <locale|all> [options]",
     "",
     "Options:",
-    "  --display <label>  Output/device class (iOS: 6.8, Android: phone)",
+    "  --display <label>  Output/device class (iOS: 6.9, 6.5, 6.3, 6.1, 4.7, ipad; Android: phone, tablet)",
+    "  --color-scheme <light|dark|both>  Capture one scheme or both (default: both)",
     "  --udid <udid>      Use an existing compatible simulator/emulator",
     "  --skip-build       Reuse the existing isolated Release app",
   ].join("\n");
@@ -32,6 +33,7 @@ function usage() {
 
 export function parseStorePromoArguments(arguments_) {
   const options = {
+    colorScheme: "both",
     display: null,
     locale: null,
     platform: null,
@@ -44,6 +46,9 @@ export function parseStorePromoArguments(arguments_) {
     const value = arguments_[index + 1];
     if (argument === "--platform" && value) {
       options.platform = value;
+      index += 1;
+    } else if (argument === "--color-scheme" && value) {
+      options.colorScheme = value;
       index += 1;
     } else if (argument === "--display" && value) {
       options.display = value;
@@ -71,7 +76,10 @@ export function parseStorePromoArguments(arguments_) {
   if (options.platform !== "ios" && options.platform !== "android") {
     throw new Error(`--platform must be ios or android\n${usage()}`);
   }
-  options.display ??= options.platform === "ios" ? "6.8" : "phone";
+  if (!["light", "dark", "both"].includes(options.colorScheme)) {
+    throw new Error("--color-scheme must be light, dark, or both");
+  }
+  options.display ??= options.platform === "ios" ? "6.9" : "phone";
   const displays =
     options.platform === "ios"
       ? STORE_PROMO_IOS_DISPLAYS
@@ -337,7 +345,25 @@ export function parseConnectedAndroidDevices(adbOutput) {
     });
 }
 
-function ensureAndroidEmulator({ cwd, requestedUdid, run = runCommand }) {
+export function parseAndroidDisplayDimensions(sizeOutput) {
+  const override = sizeOutput.match(/Override size:\s*(\d+)x(\d+)/);
+  const physical = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
+  const match = override ?? physical;
+  if (!match) {
+    throw new Error(
+      `Unable to read Android emulator dimensions: ${sizeOutput.trim()}`,
+    );
+  }
+  return { height: Number(match[2]), width: Number(match[1]) };
+}
+
+function ensureAndroidEmulator({
+  cwd,
+  display,
+  requestedUdid,
+  run = runCommand,
+}) {
+  const target = STORE_PROMO_ANDROID_DISPLAYS[display];
   const devices = parseConnectedAndroidDevices(
     run("adb", ["devices", "-l"], { capture: true, cwd }),
   );
@@ -364,6 +390,34 @@ function ensureAndroidEmulator({ cwd, requestedUdid, run = runCommand }) {
     allowFailure: true,
     cwd,
   });
+  if (target.overrideSize) {
+    run(
+      "adb",
+      [
+        "-s",
+        selected.udid,
+        "shell",
+        "wm",
+        "size",
+        `${target.overrideSize[0]}x${target.overrideSize[1]}`,
+      ],
+      { cwd },
+    );
+  }
+  if (target.overrideDensity) {
+    run(
+      "adb",
+      [
+        "-s",
+        selected.udid,
+        "shell",
+        "wm",
+        "density",
+        String(target.overrideDensity),
+      ],
+      { cwd },
+    );
+  }
   run("adb", ["-s", selected.udid, "shell", "cmd", "uimode", "night", "no"], {
     allowFailure: true,
     cwd,
@@ -450,21 +504,16 @@ function ensureAndroidEmulator({ cwd, requestedUdid, run = runCommand }) {
     capture: true,
     cwd,
   });
-  const match = sizeOutput.match(/Physical size:\s*(\d+)x(\d+)/);
-  if (!match) {
-    throw new Error(
-      `Unable to read Android emulator dimensions: ${sizeOutput.trim()}`,
-    );
-  }
+  const dimensions = parseAndroidDisplayDimensions(sizeOutput);
   return {
     ...selected,
-    height: Number(match[2]),
+    height: dimensions.height,
     name: run(
       "adb",
       ["-s", selected.udid, "shell", "getprop", "ro.product.model"],
       { capture: true, cwd },
     ).trim(),
-    width: Number(match[1]),
+    width: dimensions.width,
   };
 }
 
@@ -484,6 +533,42 @@ function exitAndroidDemoMode({ cwd, udid }) {
       "exit",
     ],
     { allowFailure: true, cwd },
+  );
+  runCommand("adb", ["-s", udid, "shell", "wm", "size", "reset"], {
+    allowFailure: true,
+    cwd,
+  });
+  runCommand("adb", ["-s", udid, "shell", "wm", "density", "reset"], {
+    allowFailure: true,
+    cwd,
+  });
+}
+
+export function setStorePromoColorScheme({
+  colorScheme,
+  cwd,
+  platform,
+  run = runCommand,
+  udid,
+}) {
+  if (platform === "ios") {
+    run("xcrun", ["simctl", "ui", udid, "appearance", colorScheme], {
+      cwd,
+    });
+    return;
+  }
+  run(
+    "adb",
+    [
+      "-s",
+      udid,
+      "shell",
+      "cmd",
+      "uimode",
+      "night",
+      colorScheme === "dark" ? "yes" : "no",
+    ],
+    { cwd },
   );
 }
 
@@ -624,7 +709,25 @@ function getArtifactMetadata(artifactPath) {
   return { bytes, sha256: hash.digest("hex") };
 }
 
-function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
+export function findDuplicateScreenshotGroups(screenshots) {
+  const filesByHash = new Map();
+  for (const { file, sha256: hash } of screenshots) {
+    const files = filesByHash.get(hash) ?? [];
+    files.push(file);
+    filesByHash.set(hash, files);
+  }
+  return [...filesByHash.values()].filter((files) => files.length > 1);
+}
+
+function captureMaestroFlow({
+  colorScheme,
+  cwd,
+  deviceClass,
+  locale,
+  outputDirectory,
+  platform,
+  udid,
+}) {
   const configuredLocales = readAppLocaleOptions(cwd);
   const localeIndex = configuredLocales.findIndex(
     ({ value }) => value === locale,
@@ -669,7 +772,7 @@ function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
               "android.intent.category.BROWSABLE",
               "-d",
               quoteAndroidShellArgument(
-                `mrbroccoli://store-promos?locale=${locale}&scene=${scene}`,
+                `mrbroccoli://store-promos?locale=${locale}&scene=${scene}&colorScheme=${colorScheme}`,
               ),
               "-p",
               STORE_PROMO_APP_ID,
@@ -689,7 +792,11 @@ function captureMaestroFlow({ cwd, locale, outputDirectory, platform, udid }) {
             "-e",
             `APP_ID=${STORE_PROMO_APP_ID}`,
             "-e",
+            `COLOR_SCHEME=${colorScheme}`,
+            "-e",
             `LOCALE=${locale}`,
+            "-e",
+            `DEVICE_CLASS=${deviceClass}`,
             "-e",
             `LOCALE_NEEDS_SAFE_SCROLL=${localeNeedsSafeScroll(platform, localeIndex) ? "true" : "false"}`,
             "--test-output-dir",
@@ -761,6 +868,7 @@ export function readArtifactVersion({
 
 async function collectScreenshots({
   artifactPath,
+  colorScheme,
   cwd,
   device,
   display,
@@ -770,7 +878,7 @@ async function collectScreenshots({
   sourceProvenance,
 }) {
   const outputRoot = path.join(cwd, "artifacts", "store-promos", platform);
-  const destination = path.join(outputRoot, display, locale);
+  const destination = path.join(outputRoot, display, colorScheme, locale);
   const target =
     platform === "ios"
       ? STORE_PROMO_IOS_DISPLAYS[display]
@@ -824,9 +932,17 @@ async function collectScreenshots({
       height: metadata.height,
     });
   }
+  const duplicateGroups = findDuplicateScreenshotGroups(screenshots);
+  if (duplicateGroups.length > 0) {
+    throw new Error(
+      `Duplicate store screenshots for ${locale}: ${duplicateGroups
+        .map((files) => files.join(" = "))
+        .join("; ")}`,
+    );
+  }
   const artifact = getArtifactMetadata(artifactPath);
   const manifest = {
-    schemaVersion: 2,
+    schemaVersion: 3,
     platform,
     applicationId: STORE_PROMO_APP_ID,
     version: readArtifactVersion({ artifactPath, cwd, platform }),
@@ -837,6 +953,7 @@ async function collectScreenshots({
       sha256: artifact.sha256,
     },
     locale,
+    colorScheme,
     outputDisplayLabel: display,
     ...(platform === "ios"
       ? { appleDisplayClass: target.appleDisplayClass }
@@ -864,7 +981,7 @@ async function collectScreenshots({
     .join("\n");
   fs.writeFileSync(
     path.join(destination, "review-gallery.html"),
-    `<!doctype html><html><head><meta charset="utf-8"><title>Mr Broccoli ${locale} store promos</title><style>body{background:#eee;color:#222;font:14px -apple-system,sans-serif;margin:24px}main{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}figure{background:white;border-radius:16px;margin:0;padding:12px;box-shadow:0 2px 14px #0002}img{display:block;height:auto;width:100%}figcaption{line-height:1.5;padding-top:10px;word-break:break-all}</style></head><body><h1>Mr Broccoli · ${locale} · ${display}</h1><p>Review all ${screenshots.length} images for localization, clipping, state accuracy and store suitability.</p><main>${cards}</main></body></html>`,
+    `<!doctype html><html><head><meta charset="utf-8"><title>Mr Broccoli ${locale} ${colorScheme} store promos</title><style>body{background:#eee;color:#222;font:14px -apple-system,sans-serif;margin:24px}main{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}figure{background:white;border-radius:16px;margin:0;padding:12px;box-shadow:0 2px 14px #0002}img{display:block;height:auto;width:100%}figcaption{line-height:1.5;padding-top:10px;word-break:break-all}</style></head><body><h1>Mr Broccoli · ${locale} · ${display} · ${colorScheme}</h1><p>Review all ${screenshots.length} images for localization, clipping, state accuracy and store suitability.</p><main>${cards}</main></body></html>`,
   );
 
   fs.rmSync(rawOutput, { recursive: true, force: true });
@@ -889,6 +1006,8 @@ function buildIsolatedApp({ cwd, derivedData, target, udid }) {
       derivedData,
       "MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.maestro",
       "MR_BROCCOLI_LOCAL_DISPLAY_SUFFIX= Store Promos",
+      "ARCHS=arm64",
+      "ONLY_ACTIVE_ARCH=YES",
       "build",
     ],
     {
@@ -968,6 +1087,10 @@ export async function runStorePromos({
     options.locale === "all"
       ? configuredLocales.map(({ value }) => value)
       : [options.locale];
+  const colorSchemes =
+    options.colorScheme === "both"
+      ? ["light", "dark"]
+      : [options.colorScheme];
   for (const locale of locales) {
     if (!configuredLocales.some(({ value }) => value === locale)) {
       throw new Error(`Unknown locale: ${locale}`);
@@ -989,7 +1112,7 @@ export async function runStorePromos({
       "store-promos",
       ".build",
       "ios",
-      options.display,
+      "arm64",
     );
     const iosApp = path.join(
       derivedData,
@@ -1027,6 +1150,7 @@ export async function runStorePromos({
   } else {
     const emulator = ensureAndroidEmulator({
       cwd,
+      display: options.display,
       requestedUdid: options.udid,
     });
     const target = STORE_PROMO_ANDROID_DISPLAYS[options.display];
@@ -1061,36 +1185,52 @@ export async function runStorePromos({
   }
 
   try {
-    for (const locale of locales) {
-      const rawOutput = path.join(
+    for (const colorScheme of colorSchemes) {
+      setStorePromoColorScheme({
+        colorScheme,
         cwd,
-        "artifacts",
-        "store-promos",
-        ".maestro-runs",
-        options.platform,
-        options.display,
-        locale,
-      );
-      captureMaestroFlow({
-        cwd,
-        locale,
-        outputDirectory: rawOutput,
         platform: options.platform,
         udid: device.udid,
       });
-      const result = await collectScreenshots({
-        artifactPath,
-        cwd,
-        device,
-        display: options.display,
-        locale,
-        platform: options.platform,
-        rawOutput,
-        sourceProvenance,
-      });
-      process.stdout.write(
-        `Store promos complete: ${result.destination} (${result.manifest.screenshotCount} screenshots).\n`,
-      );
+      for (const locale of locales) {
+        const rawOutput = path.join(
+          cwd,
+          "artifacts",
+          "store-promos",
+          ".maestro-runs",
+          options.platform,
+          options.display,
+          colorScheme,
+          locale,
+        );
+        captureMaestroFlow({
+          colorScheme,
+          cwd,
+          deviceClass:
+            (options.platform === "ios"
+              ? STORE_PROMO_IOS_DISPLAYS[options.display]
+              : STORE_PROMO_ANDROID_DISPLAYS[options.display]
+            ).deviceClass ?? "phone",
+          locale,
+          outputDirectory: rawOutput,
+          platform: options.platform,
+          udid: device.udid,
+        });
+        const result = await collectScreenshots({
+          artifactPath,
+          colorScheme,
+          cwd,
+          device,
+          display: options.display,
+          locale,
+          platform: options.platform,
+          rawOutput,
+          sourceProvenance,
+        });
+        process.stdout.write(
+          `Store promos complete: ${result.destination} (${result.manifest.screenshotCount} screenshots).\n`,
+        );
+      }
     }
   } finally {
     cleanup();

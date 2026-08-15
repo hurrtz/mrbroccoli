@@ -34,6 +34,8 @@ import {
 } from "../services/developmentEntitlement";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
 
+const DEVELOPMENT_PREMIUM_DISPLAY_PRICE = "€14.99";
+
 export type PremiumEntitlementStatus = "loading" | "free" | "premium";
 export type PremiumStoreError =
   "cancelled" | "pending" | "store-unavailable" | "purchase-failed" | null;
@@ -622,7 +624,11 @@ export function PremiumEntitlementProvider({
       storeConnected: developmentEntitlementMode === null && connected,
       storeProduct,
       storeProductLoading,
-      displayPrice: storeProduct?.displayPrice ?? null,
+      displayPrice:
+        storeProduct?.displayPrice ??
+        (developmentEntitlementMode === "free"
+          ? DEVELOPMENT_PREMIUM_DISPLAY_PRICE
+          : null),
       busy,
       error,
       developmentEntitlementMode,

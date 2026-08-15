@@ -56,8 +56,11 @@ export function PremiumUpgradeModal({
   const purchaseLabel = premium.displayPrice
     ? t("premiumBuyPrice", { price: premium.displayPrice })
     : t("premiumBuy");
+  const simulatedFreePurchase = premium.developmentEntitlementMode === "free";
   const purchaseUnavailable =
-    !premium.storeProductLoading && !premium.storeProduct;
+    !simulatedFreePurchase &&
+    !premium.storeProductLoading &&
+    !premium.storeProduct;
   const benefits = [
     { icon: "key" as const, label: t("premiumBenefitProviders") },
     { icon: "redo" as const, label: t("premiumBenefitModes") },
@@ -90,7 +93,7 @@ export function PremiumUpgradeModal({
                 disabled:
                   premium.busy ||
                   premium.storeProductLoading ||
-                  !premium.storeProduct,
+                  (!premium.storeProduct && !simulatedFreePurchase),
                 onPress: () => void premium.purchasePremium(),
               },
               ...(purchaseUnavailable

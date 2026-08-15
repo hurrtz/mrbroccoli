@@ -18,4 +18,14 @@ tags:
     id: transcript-handle
 - takeScreenshot:
     path: 01-premium-active-conversation
+- tapOn:
+    id: transcript-handle
+- assertVisible:
+    id: chat-transcript-list
+- assertVisible:
+    id: transcript-message-promo-user-1
+- assertVisible:
+    id: transcript-message-promo-assistant-2
+- takeScreenshot:
+    path: 02-transcript-drawer
 - stopApp

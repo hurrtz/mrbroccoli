@@ -50,11 +50,16 @@ fixture/presentation services is the authority; the existence of a route alone
 must never enable fixtures. Every orb fraction is validated within zero and one
 before it can replace the live presentation clock.
 
-The route owns three scene values: `premium`, `free`, and `onboarding`.
+The route owns four scene values: `premium`, `free`, `onboarding`, and
+`onboarding-ready`.
 `onboarding` seeds the requested locale, a Free entitlement, and an incomplete
 first-run introduction. It may present only a deterministic recommendation
 derived from the checked-in device snapshot; it must not probe the simulator,
 download or benchmark a model, or call a provider.
+`onboarding-ready` projects that same profile as installed so the final Try
+step can be captured without starting a download, microphone, or provider
+request. Every scene accepts only an explicit light or dark fixture theme; the
+device chrome is set to the same scheme by the capture runner.
 
 Evidence:
 

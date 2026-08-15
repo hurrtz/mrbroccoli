@@ -426,6 +426,7 @@ export function ConnectionsSettingsPage({
             copy={t("premiumBenefitProviders")}
             onPress={onOpenPremium}
             premiumLabel={t("premium")}
+            testID="connections-premium-upgrade-band"
           />
         ) : null}
       </SettingsGroup>

@@ -76,6 +76,9 @@ The Free/Premium selector is a test facility, not a store substitute.
 - Store purchase events are ignored while an override is active.
 - The override is persisted separately from real store ownership.
 - Production identity must never interpret a stored development value.
+- Free automation presents the deterministic EUR 14.99 baseline price and an
+  enabled simulated purchase action so localized store screenshots exercise
+  the real purchase sheet without contacting either platform store.
 
 ## Evidence
 

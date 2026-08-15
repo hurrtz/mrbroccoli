@@ -85,6 +85,9 @@ function Probe() {
       <Text testID="store-product">
         {entitlement.storeProduct?.id ?? "none"}
       </Text>
+      <Text testID="premium-display-price">
+        {entitlement.displayPrice ?? "none"}
+      </Text>
       <Pressable
         testID="restore-premium"
         onPress={() => void entitlement.restorePremium()}
@@ -168,6 +171,9 @@ describe("PremiumEntitlementProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("entitlement-status").props.children).toBe(
         "free",
+      );
+      expect(screen.getByTestId("premium-display-price").props.children).toBe(
+        "€14.99",
       );
     });
     await expect(

@@ -5,6 +5,7 @@ import { NativeModules } from "react-native";
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 import {
   buildStorePromoConversations,
+  isStorePromoColorScheme,
   seedStorePromoFixture,
   STORE_PROMO_FIXTURE_MARKER_KEY,
 } from "../../src/services/storePromoFixtures";
@@ -73,7 +74,7 @@ describe("store promo fixtures", () => {
         parentConversationId: "promo-root",
         branchMessageId: "promo-branch-user",
       });
-      expect(conversations[2].isPrivate).toBe(true);
+      expect(conversations[2].title).toBeTruthy();
     }
   });
 
@@ -163,6 +164,24 @@ describe("store promo fixtures", () => {
     await expect(loadStorePromoScene()).resolves.toBe("free");
   });
 
+  it("seeds the requested screenshot color scheme", async () => {
+    getApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.mrbroccoli.maestro",
+    );
+
+    expect(isStorePromoColorScheme("light")).toBe(true);
+    expect(isStorePromoColorScheme("dark")).toBe(true);
+    expect(isStorePromoColorScheme("system")).toBe(false);
+    await expect(
+      seedStorePromoFixture("de", "premium", null, "dark"),
+    ).resolves.toBe(true);
+
+    const storedSettings = JSON.parse(
+      (await AsyncStorage.getItem(STORAGE_KEY)) ?? "{}",
+    ) as Record<string, unknown>;
+    expect(storedSettings.theme).toBe("dark");
+  });
+
   it("seeds a localized first-run onboarding scene for Maestro only", async () => {
     getApplicationId.mockResolvedValue(
       "com.tobiaswinkler.app.mrbroccoli.maestro",
@@ -183,6 +202,7 @@ describe("store promo fixtures", () => {
       }),
     );
     expect(isStorePromoScene("onboarding")).toBe(true);
+    expect(isStorePromoScene("onboarding-ready")).toBe(true);
     await expect(loadStorePromoScene()).resolves.toBe("onboarding");
     await expect(
       AsyncStorage.getItem(DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY),
@@ -260,9 +280,33 @@ describe("store promo fixtures", () => {
     });
   });
 
+  it("projects an offline-ready final onboarding step without live setup", () => {
+    const controller = {
+      effectiveSettings: DEFAULT_SETTINGS,
+      freeRuntimeReady: false,
+      setupVisible: true,
+    } as unknown as FreeOfflineModeController;
+
+    const projected = applyStorePromoFreeOfflineController(
+      controller,
+      DEFAULT_SETTINGS,
+      "onboarding-ready",
+      "ios",
+    );
+
+    expect(projected.freeRuntimeReady).toBe(true);
+    expect(projected.effectiveSettings).not.toBe(controller.effectiveSettings);
+    expect(projected.readiness).toMatchObject({
+      ready: true,
+      installed: true,
+      failedModelId: null,
+    });
+  });
+
   it("holds only the Premium fixture in a stable non-idle CTA phase", () => {
     expect(getStorePromoPipelinePhase("premium", "idle")).toBe("thinking");
     expect(getStorePromoPipelinePhase("free", "idle")).toBe("idle");
+    expect(getStorePromoPipelinePhase("onboarding-ready", "idle")).toBe("idle");
     expect(getStorePromoPipelinePhase(null, "searching")).toBe("searching");
   });
 

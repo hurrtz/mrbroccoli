@@ -16,7 +16,7 @@ tags:
 
 # Premium story: a deterministic completed exchange with the next turn held
 # in a stable thinking phase. No provider call is made.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium&colorScheme=${COLOR_SCHEME}"
 - tapOn:
     text: Open
     optional: true
@@ -35,15 +35,15 @@ tags:
 - tapOn:
     id: transcript-handle
 - assertVisible:
-    id: selectable-message-promo-assistant-2
-- tapOn:
-    id: uber-audit-toggle-promo-assistant-2
+    id: chat-transcript-list
+- assertVisible:
+    id: transcript-message-promo-assistant-2
 - takeScreenshot:
-    path: 02-uber-mode-audit
+    path: 02-transcript-drawer
 - stopApp
 
 # Free story: two complete exchanges at rest.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=free"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=free&colorScheme=${COLOR_SCHEME}"
 - tapOn:
     text: Open
     optional: true
@@ -59,11 +59,45 @@ tags:
     id: transcript-handle
 - takeScreenshot:
     path: 03-free-conversation
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - tapOn:
+          id: main-settings-button
+      - assertVisible:
+          id: settings-page-overview
+      - scrollUntilVisible:
+          element:
+            id: settings-premium-upgrade-band-action
+          direction: DOWN
+      - tapOn:
+          id: settings-premium-upgrade-band-action
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: conversation-drawer-settings
+      - assertVisible:
+          id: settings-page-connections
+      - scrollUntilVisible:
+          element:
+            id: connections-premium-upgrade-band-action
+          direction: DOWN
+      - tapOn:
+          id: connections-premium-upgrade-band-action
+- assertVisible:
+    id: premium-upgrade-scroll
+- assertVisible:
+    id: premium-value-card
+- takeScreenshot:
+    path: 04-premium-price
 - stopApp
 
 # Reseed a genuine first-run intro in the same locale. The fixture projects a
 # fixed proposal from the checked-in device profile; it never starts a scan.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding&colorScheme=${COLOR_SCHEME}"
 - tapOn:
     text: Open
     optional: true
@@ -81,6 +115,10 @@ tags:
     id: intro-banner
 - assertVisible:
     id: intro-flow-content
+- assertVisible:
+    id: intro-welcome-step
+- takeScreenshot:
+    path: 05-onboarding-welcome
 - tapOn:
     id: intro-stepper-dot-1
 - assertVisible:
@@ -89,12 +127,44 @@ tags:
     id: auto-setup-card
 - assertVisible:
     id: auto-setup-proposal
+- scrollUntilVisible:
+    element:
+      id: auto-setup-install
+    direction: DOWN
 - takeScreenshot:
-    path: 04-free-onboarding
+    path: 06-onboarding-setup
+- stopApp
+
+# Reseed the same first-run flow with a deterministic offline-ready profile.
+# This unlocks the final try step without downloads or provider calls.
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding-ready&colorScheme=${COLOR_SCHEME}"
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-onboarding-ready
+- stopApp
+- launchApp
+- assertVisible:
+    id: main-screen
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: intro-banner
+- tapOn:
+    id: intro-banner
+- assertVisible:
+    id: intro-flow-content
+- tapOn:
+    id: intro-stepper-dot-2
+- assertVisible:
+    id: intro-try-step
+- takeScreenshot:
+    path: 07-onboarding-try
 - stopApp
 
 # Return to Premium for organization and configuration surfaces.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium&colorScheme=${COLOR_SCHEME}"
 - tapOn:
     text: Open
     optional: true
@@ -106,33 +176,73 @@ tags:
     id: ^app-locale-${LOCALE}$
 - assertVisible:
     id: voice-stage-thinking
-- tapOn:
-    id: main-conversations-button
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - tapOn:
+          id: main-conversations-button
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - assertVisible:
+          id: ipad-regular-shell
 - assertVisible:
     id: conversation-drawer-item-promo-root
-- tapOn:
-    id: conversation-branch-toggle-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: conversation-drawer-item-promo-branch
+      - assertVisible:
+          id: transcript-handle
 - takeScreenshot:
-    path: 05-conversation-branches
-- tapOn:
-    id: conversation-drawer-close
-- waitForAnimationToEnd
-- assertNotVisible:
-    id: conversation-drawer-close
-- tapOn:
-    id: main-settings-button
-- assertVisible:
-    id: settings-page-overview
+    path: 08-conversation-branches
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - tapOn:
+          id: conversation-drawer-close
+      - waitForAnimationToEnd
+      - assertNotVisible:
+          id: conversation-drawer-close
+      - tapOn:
+          id: main-settings-button
+      - assertVisible:
+          id: settings-page-overview
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: conversation-drawer-settings
+      - assertVisible:
+          id: settings-ipad-category-nav
+      - assertVisible:
+          id: settings-page-connections
 - takeScreenshot:
-    path: 06-premium-settings
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-thinking
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-thinking
+    path: 09-premium-settings
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - scrollUntilVisible:
+          element:
+            id: settings-overview-row-thinking
+          direction: DOWN
+      - tapOn:
+          id: settings-overview-row-thinking
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: settings-ipad-category-row-thinking
 - assertVisible:
     id: settings-page-thinking
 - assertVisible:
@@ -140,15 +250,25 @@ tags:
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 07-premium-thinking
-- tapOn:
-    id: settings-back-button
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-speaking
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-speaking
+    path: 10-premium-thinking
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - tapOn:
+          id: settings-back-button
+      - scrollUntilVisible:
+          element:
+            id: settings-overview-row-speaking
+          direction: DOWN
+      - tapOn:
+          id: settings-overview-row-speaking
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: settings-ipad-category-row-speaking
 - assertVisible:
     id: settings-page-speaking
 - assertVisible:
@@ -156,15 +276,25 @@ tags:
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 08-premium-speaking
-- tapOn:
-    id: settings-back-button
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-app
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-app
+    path: 11-premium-speaking
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - tapOn:
+          id: settings-back-button
+      - scrollUntilVisible:
+          element:
+            id: settings-overview-row-app
+          direction: DOWN
+      - tapOn:
+          id: settings-overview-row-app
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - tapOn:
+          id: settings-ipad-category-row-app
 - assertVisible:
     id: settings-page-app
 - assertVisible:
@@ -178,7 +308,7 @@ tags:
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 09-automatic-setup
+    path: 12-automatic-setup
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
@@ -192,4 +322,4 @@ tags:
 - assertVisible:
     id: conversation-settings-drawer
 - takeScreenshot:
-    path: 10-conversation-settings
+    path: 13-conversation-settings

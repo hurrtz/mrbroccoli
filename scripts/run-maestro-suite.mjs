@@ -2,9 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import { createHash } from "node:crypto";
 
 import {
   MAESTRO_ACCESSIBILITY_FLOW,
+  MAESTRO_COLOR_SCHEMES,
   MAESTRO_LOCALIZED_FLOW,
   MAESTRO_LAYOUT_FLOW,
   MAESTRO_MINIMUM_VERSION,
@@ -17,9 +19,10 @@ import {
 
 const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli";
 
-function parseArguments(argv) {
+export function parseMaestroArguments(argv) {
   const options = {
     appId: DEFAULT_APP_ID,
+    colorScheme: "both",
     outputDirectory: "artifacts/maestro",
     platform: null,
     suite: "all",
@@ -33,6 +36,9 @@ function parseArguments(argv) {
 
     if (argument === "--platform" && value) {
       options.platform = value;
+      index += 1;
+    } else if (argument === "--color-scheme" && value) {
+      options.colorScheme = value;
       index += 1;
     } else if (argument === "--app-id" && value) {
       options.appId = value;
@@ -68,6 +74,9 @@ function parseArguments(argv) {
   }
   if (!options.udid) {
     throw new Error("--udid is required");
+  }
+  if (![...MAESTRO_COLOR_SCHEMES, "both"].includes(options.colorScheme)) {
+    throw new Error("--color-scheme must be light, dark, or both");
   }
   if (
     options.locale &&
@@ -162,6 +171,35 @@ function countCapturedScreenshots(directory) {
         entry.name.endsWith(".png") &&
         entry.parentPath.split(path.sep).includes("takeScreenshot"),
     ).length;
+}
+
+export function findExactDuplicateScreenshotGroups(directory) {
+  if (!fs.existsSync(directory)) {
+    return [];
+  }
+
+  const byHash = new Map();
+  for (const entry of fs.readdirSync(directory, {
+    recursive: true,
+    withFileTypes: true,
+  })) {
+    if (
+      !entry.isFile() ||
+      !entry.name.endsWith(".png") ||
+      !entry.parentPath.split(path.sep).includes("takeScreenshot")
+    ) {
+      continue;
+    }
+    const filePath = path.join(entry.parentPath, entry.name);
+    const hash = createHash("sha256")
+      .update(fs.readFileSync(filePath))
+      .digest("hex");
+    const matches = byHash.get(hash) ?? [];
+    matches.push(path.relative(directory, filePath));
+    byHash.set(hash, matches);
+  }
+
+  return [...byHash.values()].filter((files) => files.length > 1);
 }
 
 function waitForRetry(milliseconds) {
@@ -337,12 +375,82 @@ export function configureAccessibilityDisplay({
   };
 }
 
+export function configureColorScheme({
+  colorScheme,
+  cwd,
+  platform,
+  run = runCommand,
+  udid,
+}) {
+  if (platform === "ios") {
+    const previous = captureTrimmed(
+      run,
+      "xcrun",
+      ["simctl", "ui", udid, "appearance"],
+      cwd,
+    );
+    if (!MAESTRO_COLOR_SCHEMES.includes(previous)) {
+      throw new Error(
+        `Could not capture restorable iOS color scheme for ${udid}: ${previous}`,
+      );
+    }
+    run("xcrun", ["simctl", "ui", udid, "appearance", colorScheme], {
+      cwd,
+    });
+    return () => {
+      run("xcrun", ["simctl", "ui", udid, "appearance", previous], { cwd });
+    };
+  }
+
+  const nightOutput = captureTrimmed(
+    run,
+    "adb",
+    ["-s", udid, "shell", "cmd", "uimode", "night"],
+    cwd,
+  );
+  const previous = nightOutput.match(/night mode:\s*(yes|no|auto)/i)?.[1];
+  if (!previous) {
+    throw new Error(
+      `Could not capture restorable Android color scheme for ${udid}: ${nightOutput}`,
+    );
+  }
+  run(
+    "adb",
+    [
+      "-s",
+      udid,
+      "shell",
+      "cmd",
+      "uimode",
+      "night",
+      colorScheme === "dark" ? "yes" : "no",
+    ],
+    { cwd },
+  );
+  return () => {
+    run(
+      "adb",
+      [
+        "-s",
+        udid,
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        previous.toLowerCase(),
+      ],
+      { cwd },
+    );
+  };
+}
+
 export function runFlow({
   cwd,
   environment,
   expectedScreenshotCount,
   flow,
   outputDirectory,
+  rejectExactDuplicates = false,
   run = runCommand,
   stderr = process.stderr,
   udid,
@@ -381,6 +489,17 @@ export function runFlow({
           `Expected ${expectedScreenshotCount} screenshots from ${flow}, found ${actualScreenshotCount}`,
         );
       }
+      if (rejectExactDuplicates) {
+        const duplicateGroups =
+          findExactDuplicateScreenshotGroups(outputDirectory);
+        if (duplicateGroups.length > 0) {
+          throw new Error(
+            `Exact duplicate screenshots from ${flow}: ${duplicateGroups
+              .map((files) => files.join(", "))
+              .join("; ")}`,
+          );
+        }
+      }
       return;
     } catch (error) {
       if (attempt === 2) {
@@ -396,7 +515,7 @@ export function runFlow({
 
 function main() {
   const cwd = process.cwd();
-  const options = parseArguments(process.argv.slice(2));
+  const options = parseMaestroArguments(process.argv.slice(2));
   const verification = validateMaestroSuite(cwd);
 
   if (verification.errors.length > 0) {
@@ -419,19 +538,55 @@ function main() {
     options.outputDirectory,
     options.platform,
   );
+  const colorSchemes =
+    options.colorScheme === "both"
+      ? MAESTRO_COLOR_SCHEMES
+      : [options.colorScheme];
+
+  const runSchemedFlow = ({
+    environment,
+    expectedScreenshotCount,
+    flow,
+    outputParts,
+    rejectExactDuplicates = false,
+  }) => {
+    for (const colorScheme of colorSchemes) {
+      const restoreColorScheme = configureColorScheme({
+        colorScheme,
+        cwd,
+        platform: options.platform,
+        udid: options.udid,
+      });
+      try {
+        runFlow({
+          cwd,
+          environment: { ...environment, COLOR_SCHEME: colorScheme },
+          expectedScreenshotCount,
+          flow,
+          outputDirectory: path.join(
+            platformOutput,
+            colorScheme,
+            ...outputParts,
+          ),
+          rejectExactDuplicates,
+          udid: options.udid,
+        });
+      } finally {
+        restoreColorScheme();
+      }
+    }
+  };
 
   if (options.suite === "all" || options.suite === "smoke") {
     const smokeText = fs.readFileSync(
       path.join(cwd, MAESTRO_SMOKE_FLOW),
       "utf8",
     );
-    runFlow({
-      cwd,
+    runSchemedFlow({
       environment: { APP_ID: options.appId, PLATFORM: options.platform },
       expectedScreenshotCount: countScreenshots(smokeText),
       flow: MAESTRO_SMOKE_FLOW,
-      outputDirectory: path.join(platformOutput, "smoke"),
-      udid: options.udid,
+      outputParts: ["smoke"],
     });
   }
 
@@ -440,13 +595,11 @@ function main() {
       path.join(cwd, MAESTRO_LAYOUT_FLOW),
       "utf8",
     );
-    runFlow({
-      cwd,
+    runSchemedFlow({
       environment: { APP_ID: options.appId, PLATFORM: options.platform },
       expectedScreenshotCount: countScreenshots(layoutText),
       flow: MAESTRO_LAYOUT_FLOW,
-      outputDirectory: path.join(platformOutput, "layout"),
-      udid: options.udid,
+      outputParts: ["layout"],
     });
   }
 
@@ -494,8 +647,7 @@ function main() {
       process.stdout.write(
         `Running ${options.platform} localized coverage: ${language}\n`,
       );
-      runFlow({
-        cwd,
+      runSchemedFlow({
         environment: {
           APP_ID: options.appId,
           LOCALE: language,
@@ -509,8 +661,8 @@ function main() {
         },
         expectedScreenshotCount: verification.localizedScreenshotCount,
         flow: MAESTRO_LOCALIZED_FLOW,
-        outputDirectory: path.join(platformOutput, "locales", language),
-        udid: options.udid,
+        outputParts: ["locales", language],
+        rejectExactDuplicates: true,
       });
     }
   }

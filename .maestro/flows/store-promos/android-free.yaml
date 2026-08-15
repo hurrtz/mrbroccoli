@@ -17,5 +17,21 @@ tags:
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
-    path: 02-free-conversation
+    path: 03-free-conversation
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- scrollUntilVisible:
+    element:
+      id: settings-premium-upgrade-band-action
+    direction: DOWN
+- tapOn:
+    id: settings-premium-upgrade-band-action
+- assertVisible:
+    id: premium-upgrade-scroll
+- assertVisible:
+    id: premium-value-card
+- takeScreenshot:
+    path: 04-premium-price
 - stopApp

@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { readAppLanguages } from "./verify-maestro-suite.mjs";
+import {
+  MAESTRO_COLOR_SCHEMES,
+  readAppLanguages,
+} from "./verify-maestro-suite.mjs";
 import { verifyMaestroArtifacts } from "./verify-maestro-artifacts.mjs";
 
 function writePng(filePath) {
@@ -63,18 +66,42 @@ test("verifies every locale and emits a review manifest and gallery", () => {
         path.join(screenReaderRoot, "hierarchy.json"),
         JSON.stringify({ attributes: {}, children: [] }),
       );
-      writePng(
-        path.join(
-          releaseRoot,
-          platform,
-          "smoke",
-          "takeScreenshot",
-          "smoke.png",
-        ),
-      );
-      writePng(
-        path.join(releaseRoot, platform, "layout", "takeScreenshot", "layout.png"),
-      );
+      for (const colorScheme of MAESTRO_COLOR_SCHEMES) {
+        writePng(
+          path.join(
+            releaseRoot,
+            platform,
+            colorScheme,
+            "smoke",
+            "takeScreenshot",
+            "smoke.png",
+          ),
+        );
+        writePng(
+          path.join(
+            releaseRoot,
+            platform,
+            colorScheme,
+            "layout",
+            "takeScreenshot",
+            "layout.png",
+          ),
+        );
+
+        for (const language of languages) {
+          writePng(
+            path.join(
+              releaseRoot,
+              platform,
+              colorScheme,
+              "locales",
+              language,
+              "takeScreenshot",
+              `${language}.png`,
+            ),
+          );
+        }
+      }
       writePng(
         path.join(
           releaseRoot,
@@ -84,39 +111,30 @@ test("verifies every locale and emits a review manifest and gallery", () => {
           "accessibility.png",
         ),
       );
-
-      for (const language of languages) {
-        writePng(
-          path.join(
-            releaseRoot,
-            platform,
-            "locales",
-            language,
-            "takeScreenshot",
-            `${language}.png`,
-          ),
-        );
-      }
     }
 
-    writePng(
-      path.join(
-        cwd,
-        "artifacts",
-        "maestro",
-        "release-physical",
-        "android",
-        "smoke",
-        "takeScreenshot",
-        "physical.png",
-      ),
-    );
+    for (const colorScheme of MAESTRO_COLOR_SCHEMES) {
+      writePng(
+        path.join(
+          cwd,
+          "artifacts",
+          "maestro",
+          "release-physical",
+          "android",
+          colorScheme,
+          "smoke",
+          "takeScreenshot",
+          "physical.png",
+        ),
+      );
+    }
 
     const result = verifyMaestroArtifacts(cwd);
 
     assert.deepEqual(result.errors, []);
-    assert.equal(result.expectedPlatformCount, languages.length + 3);
-    assert.equal(result.files.length, (languages.length + 3) * 2 + 1);
+    const expectedPlatformCount = (languages.length + 2) * 2 + 1;
+    assert.equal(result.expectedPlatformCount, expectedPlatformCount);
+    assert.equal(result.files.length, expectedPlatformCount * 2 + 2);
     assert.ok(
       fs.existsSync(path.join(releaseRoot, "review-manifest.json")),
     );

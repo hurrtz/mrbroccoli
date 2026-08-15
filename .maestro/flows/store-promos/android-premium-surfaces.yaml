@@ -19,12 +19,10 @@ tags:
     id: main-conversations-button
 - assertVisible:
     id: conversation-drawer-item-promo-root
-- tapOn:
-    id: conversation-branch-toggle-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
 - takeScreenshot:
-    path: 04-conversation-branches
+    path: 08-conversation-branches
 - tapOn:
     id: conversation-drawer-close
 - waitForAnimationToEnd
@@ -35,7 +33,7 @@ tags:
 - assertVisible:
     id: settings-page-overview
 - takeScreenshot:
-    path: 05-premium-settings
+    path: 09-premium-settings
 - scrollUntilVisible:
     element:
       id: settings-overview-row-thinking
@@ -49,7 +47,23 @@ tags:
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 06-premium-thinking
+    path: 10-premium-thinking
+- tapOn:
+    id: settings-back-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-speaking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
+- assertVisible:
+    id: settings-modal-title
+- assertVisible:
+    id: settings-close-button
+- takeScreenshot:
+    path: 11-premium-speaking
 - tapOn:
     id: settings-back-button
 - scrollUntilVisible:
@@ -71,7 +85,7 @@ tags:
 - assertVisible:
     id: settings-close-button
 - takeScreenshot:
-    path: 07-automatic-setup
+    path: 12-automatic-setup
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
@@ -85,4 +99,4 @@ tags:
 - assertVisible:
     id: conversation-settings-drawer
 - takeScreenshot:
-    path: 08-conversation-settings
+    path: 13-conversation-settings

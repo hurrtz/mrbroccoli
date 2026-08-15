@@ -4,6 +4,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import {
+  MAESTRO_COLOR_SCHEMES,
   MAESTRO_ACCESSIBILITY_FLOW,
   MAESTRO_LAYOUT_FLOW,
   MAESTRO_LOCALIZED_FLOW,
@@ -97,10 +98,9 @@ export function verifyMaestroArtifacts(cwd = process.cwd()) {
     fs.readFileSync(path.join(cwd, MAESTRO_ACCESSIBILITY_FLOW), "utf8"),
   );
   const expectedPlatformCount =
-    smokeCount +
-    layoutCount +
-    accessibilityCount +
-    languages.length * localizedCount;
+    MAESTRO_COLOR_SCHEMES.length *
+      (smokeCount + layoutCount + languages.length * localizedCount) +
+    accessibilityCount;
   const errors = [];
 
   for (const platform of ["android", "ios"]) {
@@ -115,25 +115,43 @@ export function verifyMaestroArtifacts(cwd = process.cwd()) {
 
     errors.push(...validateScreenReaderEvidence(releaseRoot, platform));
 
-    for (const language of languages) {
-      const localeRoot = path.join(platformRoot, "locales", language);
-      const localeCount = findPngFiles(localeRoot).length;
-
-      if (localeCount !== localizedCount) {
-        errors.push(
-          `${platform}/${language}: expected ${localizedCount} screenshots, found ${localeCount}`,
+    for (const colorScheme of MAESTRO_COLOR_SCHEMES) {
+      for (const surface of ["smoke", "layout"]) {
+        const expected = surface === "smoke" ? smokeCount : layoutCount;
+        const actual = findPngFiles(
+          path.join(platformRoot, colorScheme, surface),
+        ).length;
+        if (actual !== expected) {
+          errors.push(
+            `${platform}/${colorScheme}/${surface}: expected ${expected} screenshots, found ${actual}`,
+          );
+        }
+      }
+      for (const language of languages) {
+        const localeRoot = path.join(
+          platformRoot,
+          colorScheme,
+          "locales",
+          language,
         );
+        const localeCount = findPngFiles(localeRoot).length;
+
+        if (localeCount !== localizedCount) {
+          errors.push(
+            `${platform}/${colorScheme}/${language}: expected ${localizedCount} screenshots, found ${localeCount}`,
+          );
+        }
       }
     }
   }
 
-  const physicalScreenshots = findPngFiles(
-    path.join(physicalRoot, "android", "smoke"),
+  const physicalScreenshots = MAESTRO_COLOR_SCHEMES.flatMap((colorScheme) =>
+    findPngFiles(path.join(physicalRoot, "android", colorScheme, "smoke")),
   );
 
-  if (physicalScreenshots.length !== smokeCount) {
+  if (physicalScreenshots.length !== smokeCount * MAESTRO_COLOR_SCHEMES.length) {
     errors.push(
-      `physical Android smoke screenshots: expected ${smokeCount}, found ${physicalScreenshots.length}`,
+      `physical Android smoke screenshots: expected ${smokeCount * MAESTRO_COLOR_SCHEMES.length}, found ${physicalScreenshots.length}`,
     );
   }
 
@@ -152,7 +170,7 @@ export function verifyMaestroArtifacts(cwd = process.cwd()) {
   const manifest = {
     generatedAt: new Date().toISOString(),
     platformScreenshotCount: expectedPlatformCount,
-    physicalScreenshotCount: smokeCount,
+    physicalScreenshotCount: physicalScreenshots.length,
     totalScreenshotCount: files.length,
     files,
   };

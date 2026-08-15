@@ -7,6 +7,8 @@ import { deflateSync } from "node:zlib";
 
 import {
   createSourceProvenance,
+  findDuplicateScreenshotGroups,
+  parseAndroidDisplayDimensions,
   parseConnectedAndroidDevices,
   parseStorePromoArguments,
   quoteAndroidShellArgument,
@@ -14,6 +16,7 @@ import {
   readPngMetadata,
   resolveApkAnalyzerPath,
   selectLatestIosRuntime,
+  setStorePromoColorScheme,
 } from "./run-store-promos.mjs";
 import {
   STORE_PROMO_ANDROID_FLOW_SCENES,
@@ -25,6 +28,7 @@ test("Android maps its split flows to deterministic fixture scenes", () => {
     "premium",
     "free",
     "onboarding",
+    "onboarding-ready",
     "premium",
   ]);
   assert.equal(
@@ -39,6 +43,17 @@ test("Android fixture URLs remain one device-shell argument", () => {
       "mrbroccoli://store-promos?locale=de&scene=premium",
     ),
     "'mrbroccoli://store-promos?locale=de&scene=premium'",
+  );
+});
+
+test("duplicate screenshots are grouped by exact pixel hash", () => {
+  assert.deepEqual(
+    findDuplicateScreenshotGroups([
+      { file: "01.png", sha256: "one" },
+      { file: "02.png", sha256: "two" },
+      { file: "03.png", sha256: "one" },
+    ]),
+    [["01.png", "03.png"]],
   );
 });
 
@@ -121,7 +136,8 @@ test("store promo arguments require an explicit locale", () => {
   assert.deepEqual(
     parseStorePromoArguments(["--platform", "ios", "--locale", "de"]),
     {
-      display: "6.8",
+      colorScheme: "both",
+      display: "6.9",
       help: false,
       locale: "de",
       platform: "ios",
@@ -131,10 +147,24 @@ test("store promo arguments require an explicit locale", () => {
   );
 });
 
+test("Android display dimensions prefer an active tablet override", () => {
+  assert.deepEqual(
+    parseAndroidDisplayDimensions(
+      "Physical size: 1080x2400\nOverride size: 1600x2560\n",
+    ),
+    { height: 2560, width: 1600 },
+  );
+  assert.deepEqual(parseAndroidDisplayDimensions("Physical size: 1080x2400"), {
+    height: 2400,
+    width: 1080,
+  });
+});
+
 test("Android store promo arguments default to the phone profile", () => {
   assert.deepEqual(
     parseStorePromoArguments(["--platform", "android", "--locale", "de"]),
     {
+      colorScheme: "both",
       display: "phone",
       help: false,
       locale: "de",
@@ -143,6 +173,64 @@ test("Android store promo arguments default to the phone profile", () => {
       udid: null,
     },
   );
+});
+
+test("store promo arguments can select one color scheme", () => {
+  assert.equal(
+    parseStorePromoArguments([
+      "--platform",
+      "ios",
+      "--locale",
+      "de",
+      "--color-scheme",
+      "dark",
+    ]).colorScheme,
+    "dark",
+  );
+});
+
+test("store promo device chrome follows the captured color scheme", () => {
+  const calls = [];
+  const run = (command, args, options) => {
+    calls.push({ command, args, options });
+    return "";
+  };
+
+  setStorePromoColorScheme({
+    colorScheme: "dark",
+    cwd: "/repo",
+    platform: "ios",
+    run,
+    udid: "IOS-UDID",
+  });
+  setStorePromoColorScheme({
+    colorScheme: "light",
+    cwd: "/repo",
+    platform: "android",
+    run,
+    udid: "emulator-5554",
+  });
+
+  assert.deepEqual(calls, [
+    {
+      command: "xcrun",
+      args: ["simctl", "ui", "IOS-UDID", "appearance", "dark"],
+      options: { cwd: "/repo" },
+    },
+    {
+      command: "adb",
+      args: [
+        "-s",
+        "emulator-5554",
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "no",
+      ],
+      options: { cwd: "/repo" },
+    },
+  ]);
 });
 
 test("store promo arguments reject unsupported display labels", () => {

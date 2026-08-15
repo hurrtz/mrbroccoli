@@ -6,6 +6,7 @@ import ts from "typescript";
 import { parseAllDocuments } from "yaml";
 
 export const MAESTRO_MINIMUM_VERSION = "2.7.0";
+export const MAESTRO_COLOR_SCHEMES = Object.freeze(["light", "dark"]);
 export const MAESTRO_LOCALIZED_FLOW =
   ".maestro/templates/localized-coverage.yaml";
 export const MAESTRO_SMOKE_FLOW = ".maestro/flows/smoke/home-and-settings.yaml";
@@ -21,6 +22,22 @@ export const MAESTRO_ANDROID_AUTO_SETUP_FLOW =
   ".maestro/flows/runtime/android-low-memory-auto-setup.yaml";
 export const MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW =
   ".maestro/flows/runtime/android-eligible-auto-setup.yaml";
+export const MAESTRO_LOCALIZED_SCREENSHOTS = Object.freeze([
+  "language-picker",
+  "settings-app-01",
+  "settings-app-02",
+  "theme-picker",
+  "settings-overview-01",
+  "settings-connections-01",
+  "settings-thinking-01",
+  "settings-listening-01",
+  "settings-speaking-01",
+  "settings-search-01",
+  "settings-data-01",
+  "home-portrait",
+  "conversation-drawer",
+  "home-landscape",
+]);
 
 export const RETIRED_MAESTRO_SELECTORS = Object.freeze([
   "Playing — tap to stop",
@@ -520,10 +537,15 @@ export function validateMaestroSuite(cwd = process.cwd()) {
 
   const localizedScreenshotCount = countScreenshots(localizedFlow);
 
-  if (localizedScreenshotCount < 30) {
+  if (localizedScreenshotCount !== MAESTRO_LOCALIZED_SCREENSHOTS.length) {
     errors.push(
-      `Localized flow must capture at least 30 surfaces, found ${localizedScreenshotCount}`,
+      `Localized flow must capture ${MAESTRO_LOCALIZED_SCREENSHOTS.length} non-redundant surfaces, found ${localizedScreenshotCount}`,
     );
+  }
+  for (const screenshot of MAESTRO_LOCALIZED_SCREENSHOTS) {
+    if (!localizedFlow.includes(`/locales/\${LOCALE}/${screenshot}`)) {
+      errors.push(`Localized Maestro coverage is missing ${screenshot}`);
+    }
   }
 
   return {

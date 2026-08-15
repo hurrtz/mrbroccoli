@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
 
 import {
+  isStorePromoColorScheme,
   isStorePromoLanguage,
   seedStorePromoFixture,
 } from "../src/services/storePromoFixtures";
@@ -15,7 +16,8 @@ import {
 type FixtureState = "loading" | "ready" | "denied" | "error";
 
 export default function StorePromosFixtureRoute() {
-  const { locale, overtime, phase, phaseProgress, scene, turnProgress } = useLocalSearchParams<{
+  const { colorScheme, locale, overtime, phase, phaseProgress, scene, turnProgress } = useLocalSearchParams<{
+    colorScheme?: string | string[];
     locale?: string | string[];
     overtime?: string | string[];
     phase?: string | string[];
@@ -26,6 +28,7 @@ export default function StorePromosFixtureRoute() {
   const first = (value: string | string[] | undefined) =>
     Array.isArray(value) ? value[0] : value;
   const requestedLocale = first(locale);
+  const requestedColorScheme = first(colorScheme) ?? "light";
   const requestedScene = first(scene);
   const requestedPhase = first(phase);
   const requestedPhaseProgress = first(phaseProgress);
@@ -39,7 +42,8 @@ export default function StorePromosFixtureRoute() {
     void (async () => {
       if (
         !isStorePromoLanguage(requestedLocale) ||
-        !isStorePromoScene(requestedScene)
+        !isStorePromoScene(requestedScene) ||
+        !isStorePromoColorScheme(requestedColorScheme)
       ) {
         setState("error");
         return;
@@ -73,6 +77,7 @@ export default function StorePromosFixtureRoute() {
           requestedLocale,
           requestedScene,
           requestedOrb,
+          requestedColorScheme,
         );
         if (!cancelled) {
           setState(seeded ? "ready" : "denied");
@@ -88,6 +93,7 @@ export default function StorePromosFixtureRoute() {
       cancelled = true;
     };
   }, [
+    requestedColorScheme,
     requestedLocale,
     requestedOvertime,
     requestedPhase,

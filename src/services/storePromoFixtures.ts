@@ -37,6 +37,10 @@ const STORE_PROMO_FIXTURE_NOW_MS = Date.parse("2026-08-05T06:09:00.000Z");
 export const STORE_PROMO_FIXTURE_MARKER_KEY =
   "@mrbroccoli/store-promo-fixture-locale";
 
+export const STORE_PROMO_COLOR_SCHEMES = ["light", "dark"] as const;
+export type StorePromoColorScheme =
+  (typeof STORE_PROMO_COLOR_SCHEMES)[number];
+
 type StorePromoCopy = {
   rootTitle: string;
   openingPrompt: string;
@@ -430,6 +434,15 @@ export function isStorePromoLanguage(value: unknown): value is AppLanguage {
   );
 }
 
+export function isStorePromoColorScheme(
+  value: unknown,
+): value is StorePromoColorScheme {
+  return (
+    typeof value === "string" &&
+    STORE_PROMO_COLOR_SCHEMES.includes(value as StorePromoColorScheme)
+  );
+}
+
 export function buildStorePromoConversations(
   language: AppLanguage,
   nowMs = STORE_PROMO_FIXTURE_NOW_MS,
@@ -591,7 +604,6 @@ export function buildStorePromoConversations(
         timestampMs: nowMs - 54 * minute,
       }),
     ],
-    isPrivate: true,
   };
 
   return [root, branch, recent] as const;
@@ -608,6 +620,7 @@ export async function seedStorePromoFixture(
   language: AppLanguage,
   scene: StorePromoScene = "premium",
   orb: StorePromoOrbPresentation | null = null,
+  colorScheme: StorePromoColorScheme = "light",
 ) {
   const applicationId = await getApplicationId();
   if (!isStorePromoApplicationId(applicationId)) {
@@ -621,14 +634,14 @@ export async function seedStorePromoFixture(
     ? (JSON.parse(storedSettingsRaw) as Partial<Settings>)
     : {};
   const speechLanguage = getStorePromoSpeechLanguage(language);
-  const onboarding = scene === "onboarding";
+  const onboarding = scene === "onboarding" || scene === "onboarding-ready";
   const nextSettings: Settings = {
     ...DEFAULT_SETTINGS,
     ...storedSettings,
     apiKeys: DEFAULT_SETTINGS.apiKeys,
     language,
     freeOnboardingLanguageInitialized: true,
-    freeOfflineSetupCompleted: !onboarding,
+    freeOfflineSetupCompleted: scene !== "onboarding",
     localLanguages: [speechLanguage],
     activeResponseMode: "mode-1",
     responseModes: [
@@ -655,7 +668,7 @@ export async function seedStorePromoFixture(
     showDebugLogButton: false,
     spokenRepliesEnabled: false,
     sttLanguage: speechLanguage,
-    theme: "light",
+    theme: colorScheme,
     ttsListenLanguages: [speechLanguage],
     ulraModeActive: true,
     ulraModeEnabled: true,

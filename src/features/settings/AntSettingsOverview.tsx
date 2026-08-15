@@ -399,6 +399,7 @@ export function AntSettingsOverview({
             copy={t("premiumDescription")}
             onPress={onOpenPremium}
             premiumLabel={t("premium")}
+            testID="settings-premium-upgrade-band"
           />
         </View>
       ) : null}

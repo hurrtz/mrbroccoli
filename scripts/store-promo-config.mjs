@@ -5,6 +5,7 @@ export const STORE_PROMO_FLOWS = Object.freeze({
     ".maestro/flows/store-promos/android-premium-home.yaml",
     ".maestro/flows/store-promos/android-free.yaml",
     ".maestro/flows/store-promos/android-onboarding.yaml",
+    ".maestro/flows/store-promos/android-onboarding-ready.yaml",
     ".maestro/flows/store-promos/android-premium-surfaces.yaml",
   ]),
   ios: Object.freeze([STORE_PROMO_FLOW]),
@@ -13,31 +14,40 @@ export const STORE_PROMO_ANDROID_FLOW_SCENES = Object.freeze([
   "premium",
   "free",
   "onboarding",
+  "onboarding-ready",
   "premium",
 ]);
 
 export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
   android: Object.freeze([
     "01-premium-active-conversation",
-    "02-free-conversation",
-    "03-free-onboarding",
-    "04-conversation-branches",
-    "05-premium-settings",
-    "06-premium-thinking",
-    "07-automatic-setup",
-    "08-conversation-settings",
+    "02-transcript-drawer",
+    "03-free-conversation",
+    "04-premium-price",
+    "05-onboarding-welcome",
+    "06-onboarding-setup",
+    "07-onboarding-try",
+    "08-conversation-branches",
+    "09-premium-settings",
+    "10-premium-thinking",
+    "11-premium-speaking",
+    "12-automatic-setup",
+    "13-conversation-settings",
   ]),
   ios: Object.freeze([
     "01-premium-active-conversation",
-    "02-uber-mode-audit",
+    "02-transcript-drawer",
     "03-free-conversation",
-    "04-free-onboarding",
-    "05-conversation-branches",
-    "06-premium-settings",
-    "07-premium-thinking",
-    "08-premium-speaking",
-    "09-automatic-setup",
-    "10-conversation-settings",
+    "04-premium-price",
+    "05-onboarding-welcome",
+    "06-onboarding-setup",
+    "07-onboarding-try",
+    "08-conversation-branches",
+    "09-premium-settings",
+    "10-premium-thinking",
+    "11-premium-speaking",
+    "12-automatic-setup",
+    "13-conversation-settings",
   ]),
 });
 
@@ -47,7 +57,7 @@ export const STORE_PROMO_SCREENSHOT_COUNTS = Object.freeze({
 });
 
 export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
-  6.8: {
+  6.9: {
     appleDisplayClass: "6.9",
     deviceName: "iPhone 17 Pro Max",
     deviceType: "com.apple.CoreSimulator.SimDeviceType.iPhone-17-Pro-Max",
@@ -101,11 +111,26 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
       "com.apple.CoreSimulator.SimDeviceType.iPhone-SE-3rd-generation",
     acceptedPortraitDimensions: [[750, 1334]],
   },
+  ipad: {
+    appleDisplayClass: "13-inch iPad",
+    deviceClass: "ipad",
+    deviceName: "iPad Pro 13-inch (M5) (12GB)",
+    deviceType: "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB",
+    acceptedPortraitDimensions: [[2064, 2752]],
+  },
 });
 
 export const STORE_PROMO_ANDROID_DISPLAYS = Object.freeze({
   phone: {
+    deviceClass: "phone",
     deviceName: "Pixel 7",
     acceptedPortraitDimensions: [[1080, 2400]],
+  },
+  tablet: {
+    deviceClass: "tablet",
+    deviceName: "Android 10-inch tablet",
+    overrideDensity: 320,
+    overrideSize: [1600, 2560],
+    acceptedPortraitDimensions: [[1600, 2560]],
   },
 });

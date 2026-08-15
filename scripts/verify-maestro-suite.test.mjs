@@ -10,6 +10,7 @@ import {
   findRetiredMaestroSelectors,
   findUnsettledNativeModalDismissals,
   MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW,
+  MAESTRO_LOCALIZED_SCREENSHOTS,
   MAESTRO_SMOKE_FLOW,
   readAppLanguages,
   readAppLocaleOptions,
@@ -17,7 +18,10 @@ import {
 } from "./verify-maestro-suite.mjs";
 import {
   configureAccessibilityDisplay,
+  configureColorScheme,
+  findExactDuplicateScreenshotGroups,
   localeNeedsSafeScroll,
+  parseMaestroArguments,
   runFlow,
 } from "./run-maestro-suite.mjs";
 import {
@@ -54,6 +58,89 @@ test("counts only explicit screenshot commands", () => {
     path: two
 `),
     2,
+  );
+});
+
+test("visual suites default to both color schemes", () => {
+  assert.equal(
+    parseMaestroArguments([
+      "--platform",
+      "ios",
+      "--suite",
+      "locales",
+      "--udid",
+      "IOS-UDID",
+    ]).colorScheme,
+    "both",
+  );
+  assert.equal(
+    parseMaestroArguments([
+      "--platform",
+      "android",
+      "--suite",
+      "smoke",
+      "--udid",
+      "emulator-5554",
+      "--color-scheme",
+      "dark",
+    ]).colorScheme,
+    "dark",
+  );
+});
+
+test("configures and restores an iOS color scheme", () => {
+  const calls = [];
+  const run = (command, args, options = {}) => {
+    calls.push({ command, args, options });
+    return options.capture ? "light\n" : "";
+  };
+  const restore = configureColorScheme({
+    colorScheme: "dark",
+    cwd: "/repo",
+    platform: "ios",
+    run,
+    udid: "IOS-UDID",
+  });
+  restore();
+
+  assert.deepEqual(
+    calls.filter(({ options }) => !options.capture).map(({ args }) => args),
+    [
+      ["simctl", "ui", "IOS-UDID", "appearance", "dark"],
+      ["simctl", "ui", "IOS-UDID", "appearance", "light"],
+    ],
+  );
+});
+
+test("configures and restores an Android color scheme", () => {
+  const calls = [];
+  const run = (command, args, options = {}) => {
+    calls.push({ command, args, options });
+    return options.capture ? "Night mode: auto\n" : "";
+  };
+  const restore = configureColorScheme({
+    colorScheme: "light",
+    cwd: "/repo",
+    platform: "android",
+    run,
+    udid: "emulator-5554",
+  });
+  restore();
+
+  assert.deepEqual(
+    calls.filter(({ options }) => !options.capture).map(({ args }) => args),
+    [
+      ["-s", "emulator-5554", "shell", "cmd", "uimode", "night", "no"],
+      [
+        "-s",
+        "emulator-5554",
+        "shell",
+        "cmd",
+        "uimode",
+        "night",
+        "auto",
+      ],
+    ],
   );
 });
 
@@ -406,7 +493,28 @@ test("verifies the repository Maestro matrix", () => {
   const result = validateMaestroSuite();
 
   assert.deepEqual(result.errors, []);
-  assert.ok(result.localizedScreenshotCount >= 30);
+  assert.equal(
+    result.localizedScreenshotCount,
+    MAESTRO_LOCALIZED_SCREENSHOTS.length,
+  );
+});
+
+test("finds exact duplicate localized screenshots", () => {
+  const directory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mrbroccoli-maestro-screenshots-"),
+  );
+  const screenshots = path.join(directory, "takeScreenshot", "en");
+  fs.mkdirSync(screenshots, { recursive: true });
+  fs.writeFileSync(path.join(screenshots, "one.png"), "same");
+  fs.writeFileSync(path.join(screenshots, "two.png"), "same");
+  fs.writeFileSync(path.join(screenshots, "three.png"), "different");
+
+  assert.deepEqual(findExactDuplicateScreenshotGroups(directory), [
+    [
+      path.join("takeScreenshot", "en", "one.png"),
+      path.join("takeScreenshot", "en", "two.png"),
+    ],
+  ]);
 });
 
 test("rejects a locale registry that cannot be derived", () => {

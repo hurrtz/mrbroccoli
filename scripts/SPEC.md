@@ -88,12 +88,25 @@ removed playing caption, and step dots outside the current three-step
 introduction. It also rejects controls, screenshots, and titles owned by the
 retired seven-step walkthrough. Android automatic-setup runtime flows select
 the Setup dot and start the setup scan before waiting for its result card.
+Localized coverage captures exactly fourteen non-redundant frames per language
+in both light and dark schemes:
+the language picker, both genuinely distinct App and overview positions, all
+six Settings detail pages, the empty home and sessions drawer, and landscape.
+It navigates to stable bottom selectors instead of blindly repeating swipes,
+because a page that already fits on a tall phone must not produce duplicate
+frames that imply missing content.
 Store-promo onboarding stops after the seeded Free conversation, reseeds the
 identity-guarded onboarding scene in the same locale, relaunches into its real
-first-run banner, and captures a deterministic proposal selected from the
-fixed device snapshot. Every later fixture scene stops the app before reseeding;
-the flow never clears the seeded locale, starts a live scan, or leaves the Intro
-modal open before the next fixture deep link.
+first-run banner, and captures both the welcome and deterministic proposal
+selected from the fixed device snapshot. A second guarded offline-ready scene
+unlocks the final live-test screen without starting a microphone, download,
+benchmark, or provider request. Every later fixture scene stops the app before
+reseeding; the flow never clears the seeded locale or leaves the Intro modal
+open before the next fixture deep link. Before onboarding, the Free scene also
+captures the real purchase sheet with the deterministic development price; the
+automation identity never contacts a platform store. The supported capture
+matrix includes the five requested iPhone display classes, a regular-width
+iPad, and Android phone and tablet profiles.
 
 ## Living-Spec Review
 
@@ -130,12 +143,17 @@ the architectural answer for the author.
   and failure.
 - Generated evidence belongs under ignored `artifacts/`; checked-in source
   files remain the configuration authority.
+- The iOS store-promo build targets the arm64 Simulator architecture used by
+  the local Apple-silicon capture host; one secret-scanned app is reusable
+  across every configured iPhone and iPad simulator.
 - Store-promo capture accepts a PNG only after chunk/CRC validation, full pixel
   decoding, approved dimensions, and proof that no alpha channel or indexed
-  transparency is present. Its schema-2 manifest records the exact artifact
-  hash and version, actual device/runtime, source commit, dirty-source
-  fingerprint, and whether the artifact was built or reused. A reused artifact
-  is never attributed to the current source fingerprint without build evidence.
+  transparency is present. Exact duplicate image hashes within a locale,
+  display, and color scheme fail collection. Its schema-3 manifest records the
+  explicit light/dark scheme, exact artifact hash and version, actual
+  device/runtime, source commit, dirty-source fingerprint, and whether the
+  artifact was built or reused. A reused artifact is never attributed to the
+  current source fingerprint without build evidence.
 - The espeak-free installer also applies the reviewed iOS archive-helper patch:
   it skips only empty, `.`, or `./` tar-root records, then permits only relative
   regular files or directories without traversal or links; direct validation
