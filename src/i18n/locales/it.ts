@@ -461,7 +461,7 @@ export const it = {
     "Questo provider attualmente utilizza la sua voce predefinita per l'anteprima e le risposte vocali.",
   listenLanguages: "Lingue di ascolto",
   listenLanguagesHint:
-    "Scegli le lingue di risposta che vuoi far suonare bene. Le provo in questo ordine quando instrada l'output vocale.",
+    "Scegli le lingue in cui vuoi che suoni bene. Le provo in questo ordine quando instrada l'output vocale.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 lingua selezionata" : `${count} lingue selezionate`,
   localVoicePacks: "Pacchetti vocali locali",
@@ -741,7 +741,7 @@ export const it = {
   notNow: "Non adesso",
   setupGuideIntroTitle: "Come funziono",
   setupGuideIntroBody:
-    "Inizio vuoto. Aggiungi le credenziali per i servizi esterni che già utilizzi, quindi scegli come instradare le risposte, l'input vocale, l'output vocale e il contesto web opzionale.",
+    "Parto da zero. Aggiungi le credenziali per i servizi esterni che già utilizzi, quindi scegli come instradare le risposte, l'input vocale, l'output vocale e il contesto web opzionale.",
   setupGuideIntroNote:
     "Dopo la configurazione, utilizza il controllo vocale principale per avviare e interrompere una conversazione. La trascrizione corrente rimane disponibile nella schermata principale e ogni percorso può essere modificato successivamente in Impostazioni.",
   setupGuideProviderTitle: "Aggiungi credenziali",

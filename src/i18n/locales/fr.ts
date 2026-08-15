@@ -734,7 +734,7 @@ export const fr = {
   notNow: "Pas maintenant",
   setupGuideIntroTitle: "Comment je fonctionne",
   setupGuideIntroBody:
-    "Je démarre vide. Ajoute des informations d'identification pour les services externes que tu utilises déjà, puis choisis la manière dont les réponses, la saisie vocale, la sortie vocale et le contexte Web facultatif sont acheminés.",
+    "Je pars de zéro. Ajoute des informations d'identification pour les services externes que tu utilises déjà, puis choisis la manière dont les réponses, la saisie vocale, la sortie vocale et le contexte Web facultatif sont acheminés.",
   setupGuideIntroNote:
     "Après la configuration, utilise la commande vocale principale pour démarrer et arrêter une conversation. La transcription actuelle reste disponible sur l'écran d'accueil et chaque route peut être modifiée ultérieurement dans Paramètres.",
   setupGuideProviderTitle: "Ajouter des informations d'identification",

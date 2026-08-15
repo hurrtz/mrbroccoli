@@ -752,7 +752,7 @@ export const hu = {
   notNow: "Most nem",
   setupGuideIntroTitle: "Hogyan működöm",
   setupGuideIntroBody:
-    "Üresen indulok. Adj hozzá hitelesítő adatokat a már használt külső szolgáltatásokhoz, majd válassza ki a válaszok, a beszédbevitel, a szóbeli kimenet és az opcionális webkontextus továbbításának módját.",
+    "Tiszta lappal indulok. Adj hozzá hitelesítő adatokat a már használt külső szolgáltatásokhoz, majd válassza ki a válaszok, a beszédbevitel, a szóbeli kimenet és az opcionális webkontextus továbbításának módját.",
   setupGuideIntroNote:
     "A beállítás után használd a fő hangvezérlést a beszélgetés indításához és leállításához. Az aktuális átirat elérhető marad a kezdőképernyőn, és minden útvonal később módosítható a Beállításokban.",
   setupGuideProviderTitle: "Hitelesítő adatok hozzáadása",

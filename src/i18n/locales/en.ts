@@ -733,7 +733,7 @@ export const en = {
   notNow: "Not now",
   setupGuideIntroTitle: "How I work",
   setupGuideIntroBody:
-    "I start blank. Add credentials for external services you already use, then choose how replies, speech input, spoken output, and optional web context are routed.",
+    "I start from scratch. Add credentials for external services you already use, then choose how replies, speech input, spoken output, and optional web context are routed.",
   setupGuideIntroNote:
     "After setup, use the main voice control to start and stop a conversation. The current transcript stays available on the home screen, and every route can be changed later in Settings.",
   setupGuideProviderTitle: "Add Credentials",

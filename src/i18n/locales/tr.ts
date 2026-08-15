@@ -739,7 +739,7 @@ export const tr = {
   notNow: "Şimdi değil",
   setupGuideIntroTitle: "Nasıl çalışırım?",
   setupGuideIntroBody:
-    "Boş başlarım. Halihazırda kullanmakta olduğun harici hizmetler için kimlik bilgilerini ekle, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seç.",
+    "Sıfırdan başlıyorum. Halihazırda kullanmakta olduğun harici hizmetler için kimlik bilgilerini ekle, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seç.",
   setupGuideIntroNote:
     "Kurulumdan sonra konuşmayı başlatmak ve durdurmak için ana ses kontrolünü kullan. Geçerli transkript ana ekranda kalır ve her rota daha sonra Ayarlar'dan değiştirilebilir.",
   setupGuideProviderTitle: "Kimlik Bilgilerini Ekle",

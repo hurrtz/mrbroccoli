@@ -747,7 +747,7 @@ export const cs = {
   notNow: "Teď ne",
   setupGuideIntroTitle: "Jak funguji",
   setupGuideIntroBody:
-    "Začínám prázdný. Přidej přihlašovací údaje pro externí služby, které již používáš, a poté vyber, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
+    "Začínám od nuly. Přidej přihlašovací údaje pro externí služby, které již používáš, a poté vyber, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
   setupGuideIntroNote:
     "Po nastavení zahaj a zastav konverzaci pomocí hlavního hlasového ovládání. Aktuální přepis zůstává k dispozici na domovské obrazovce a každou trasu lze později změnit v Nastavení.",
   setupGuideProviderTitle: "Přidat přihlašovací údaje",

@@ -737,7 +737,7 @@ export const sv = {
   notNow: "Inte nu",
   setupGuideIntroTitle: "Så fungerar jag",
   setupGuideIntroBody:
-    "Jag börjar tom. Lägg till autentiseringsuppgifter för externa tjänster som du redan använder och välj sedan hur svar, talinmatning, talad utdata och valfri webbkontext dirigeras.",
+    "Jag börjar med ett blankt blad. Lägg till autentiseringsuppgifter för externa tjänster som du redan använder och välj sedan hur svar, talinmatning, talad utdata och valfri webbkontext dirigeras.",
   setupGuideIntroNote:
     "Efter installationen använder du huvudröstkontrollen för att starta och stoppa en konversation. Den aktuella utskriften förblir tillgänglig på startskärmen och varje rutt kan ändras senare i Inställningar.",
   setupGuideProviderTitle: "Lägg till autentiseringsuppgifter",

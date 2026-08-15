@@ -750,7 +750,7 @@ export const de = {
   notNow: "Jetzt nicht",
   setupGuideIntroTitle: "So funktioniere ich",
   setupGuideIntroBody:
-    "Ich starte leer. Füge Zugangsdaten für externe Dienste ein, die du bereits nutzt, und wähle danach aus, wie Antworten, Spracheingabe, Sprachausgabe und optionaler Web-Kontext geroutet werden.",
+    "Ich fange bei null an. Füge Zugangsdaten für externe Dienste ein, die du bereits nutzt, und wähle danach aus, wie Antworten, Spracheingabe, Sprachausgabe und optionaler Web-Kontext geroutet werden.",
   setupGuideIntroNote:
     "Nach der Einrichtung startest und stoppst du Gespräche über die Sprachsteuerung auf der Hauptseite. Das aktuelle Gespräch bleibt dort sichtbar, und jede Route lässt sich später in den Einstellungen ändern.",
   setupGuideProviderTitle: "Zugangsdaten hinzufügen",

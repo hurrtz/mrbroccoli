@@ -732,7 +732,7 @@ export const zhCN = {
   notNow: "暂时不用",
   setupGuideIntroTitle: "我的工作原理",
   setupGuideIntroBody:
-    "我初始为空。请为你已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
+    "我从零开始。请为你已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
   setupGuideIntroNote:
     "设置完成后，使用主语音控制来开始和停止对话。当前文字记录会保留在主屏幕上，每条路由以后都可以在“设置”中更改。",
   setupGuideProviderTitle: "添加凭据",

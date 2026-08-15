@@ -737,7 +737,7 @@ export const pt = {
   notNow: "Agora não",
   setupGuideIntroTitle: "Como funciono",
   setupGuideIntroBody:
-    "Começo em branco. Adiciona credenciais para serviços externos que já utiliza e escolhe como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
+    "Começo do zero. Adiciona credenciais para serviços externos que já utiliza e escolhe como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
   setupGuideIntroNote:
     "Após a configuração, utiliza o controlo de voz principal para iniciar e interromper uma conversa. A transcrição atual permanece disponível no ecrã inicial e cada rota pode ser alterada posteriormente nas Definições.",
   setupGuideProviderTitle: "Adicionar credenciais",
