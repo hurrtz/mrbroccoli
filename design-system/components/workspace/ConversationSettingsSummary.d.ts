@@ -1,6 +1,6 @@
 /** The conversation's settings as one line of muted text, with a control beside it. */
 export interface ConversationSettingsSummaryProps {
-  /** Noun phrases joined by middots, e.g. "Balanced · Brief · Heart". No trailing stop. */
+  /** Labelled fields joined by the standard separator dot, e.g. "Length: Brief · Tone: Balanced · Voice: Heart". Longer is fine — it truncates at the end rather than wrapping. */
   summary: string;
   onPress?: () => void;
   /** Landscape: the sentence is dropped and only the control remains, so the orb gets the height. */

@@ -123,8 +123,9 @@ function TranscriptSheet({ visible, title, messages, onClose }) {
       <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: "85%", display: "flex", flexDirection: "column",
         borderRadius: "var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0", background: "var(--mb-color-background)",
         border: "1px solid var(--mb-color-surface-raised-border)", borderBottom: "none", boxShadow: "var(--mb-shadow-sheet)", overflow: "hidden" }}>
-        <div role="button" aria-label="Pull down or tap the backdrop to close" onClick={onClose} style={{ flexShrink: 0, minHeight: "var(--mb-touch-target)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "grab" }}>
-          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, margin: "0 auto", background: "var(--mb-color-border-strong)" }} />
+        <div role="button" aria-label="Pull down or tap the backdrop to close" onClick={onClose} style={{ flexShrink: 0, minHeight: "var(--mb-touch-target)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, cursor: "grab", paddingBottom: 8 }}>
+          <span style={{ display: "block", width: 38, height: 4, borderRadius: 2, background: "var(--mb-color-border-strong)" }} />
+          <span style={{ fontFamily: "var(--mb-font-headline)", fontSize: 17, letterSpacing: "-0.2px", color: "var(--mb-color-text)" }}>Transcript</span>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "6px 16px 20px" }}>
           {messages.map((message, index) => (
@@ -191,7 +192,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
         <AutoSetupIndicator auto={auto} onOpen={onOpenLocalModels} />
 
         <Byline conversation={conversation} />
-        <ConversationSettingsSummary summary="Balanced · Brief · Heart" onPress={onOpenSettings} />
+        <ConversationSettingsSummary summary="Length: Brief · Tone: Balanced · Voice: Heart" onPress={onOpenSettings} />
 
         <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
           <div ref={stageRef} style={{ flex: "1 1 auto", minHeight: 0, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
@@ -231,9 +232,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
 
       </div>
 
-      <TranscriptHandle messageCount={conversation.messages.length}
-        meta={last ? conversation.active.modelLabel + " · 2 min ago" : null}
-        preview={last ? last.text : null} onPress={() => setTranscript(true)} />
+      <TranscriptHandle messageCount={conversation.messages.length} onPress={() => setTranscript(true)} />
 
       <RoutePicker visible={conversation.picking} onClose={() => conversation.setPicking(false)}
         routes={window.MB_DATA.modes} selected={conversation.mode} onSelect={conversation.setMode} assetBase={ASSETS} />
@@ -309,7 +308,7 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
             and the control row and centres in it. */}
         <div ref={landscapeStageRef} style={{ position: "relative", flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10 }}>
           <div style={{ position: "absolute", top: 0, right: 0, zIndex: 1 }}>
-            <ConversationSettingsSummary iconOnly summary="Balanced · Brief · Heart" onPress={onOpenSettings} />
+            <ConversationSettingsSummary iconOnly summary="Length: Brief · Tone: Balanced · Voice: Heart" onPress={onOpenSettings} />
           </div>
           <div style={{ flexShrink: 0 }}>
             <VoiceOrb size={landscapeOrb} phase={turn.current ? turn.current.phase : "idle"}

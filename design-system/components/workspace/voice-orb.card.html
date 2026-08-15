@@ -32,9 +32,8 @@ function VoiceOrbSpecimen(){
       <OrbSatellite icon="council" label="Council" kind="toggle" accessibilityLabel="Model Council" />
       <OrbSatellite icon="search" label="Web" kind="toggle" active accessibilityLabel="Web search" />
     </div>
-    <ConversationSettingsSummary summary="Balanced · Brief · Heart" />
-    <TranscriptHandle messageCount={12} meta="GPT-5 · 2 min ago"
-      preview="High water is at 15:40 today, and the tide turns roughly every six hours after that." />
+    <ConversationSettingsSummary summary="Length: Brief · Tone: Balanced · Voice: Heart" />
+    <TranscriptHandle messageCount={12} />
   </>;
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<VoiceOrbSpecimen />);

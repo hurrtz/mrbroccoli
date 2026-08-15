@@ -8,9 +8,9 @@ import { IconButton } from "../core/IconButton";
  */
 export function ConversationSettingsSummary({ summary, onPress, accessibilityLabel = "Conversation settings", iconOnly = false, style }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: iconOnly ? "flex-end" : "flex-start", gap: 8, minHeight: 44, ...style }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: iconOnly ? "flex-end" : "flex-start", gap: 10, minHeight: 44, ...style }}>
       {iconOnly ? null : <span style={{
-        flex: 1, minWidth: 0, fontFamily: "var(--mb-font-body)", fontSize: 13, lineHeight: "19px",
+        flex: 1, minWidth: 0, textAlign: "center", fontFamily: "var(--mb-font-body)", fontSize: 13, lineHeight: "19px",
         color: "var(--mb-color-text-secondary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
       }}>{summary}</span>}
       <IconButton icon="control" accessibilityLabel={accessibilityLabel} onPress={onPress} />

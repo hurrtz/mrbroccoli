@@ -1,11 +1,7 @@
-/** The peeking top edge of the transcript drawer, pinned to the bottom of the workspace. */
+/** The peeking top edge of the transcript drawer, pinned to the bottom of the workspace. States "Transcript" and nothing else — the byline above already names the conversation and its model. */
 export interface TranscriptHandleProps {
-  /** 0 shows the empty state and suppresses the preview. */
+  /** Only used for the accessible name ("Show transcript. N messages"); not rendered. */
   messageCount?: number;
-  /** Provenance of the last reply, e.g. "GPT-5 · 2 min ago". */
-  meta?: string;
-  /** One line of the last reply. Truncates; never wraps. */
-  preview?: string;
   onPress?: () => void;
   style?: React.CSSProperties;
 }

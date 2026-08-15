@@ -26,7 +26,7 @@ The model list the byline opens: a bottom sheet listing the configured routes **
 
 ## Settings sentence (`ConversationSettingsSummary`)
 
-The conversation's settings as one line of muted text ("Balanced · Brief · Heart") with one icon button beside it, in a 44pt row. It replaces the strip of chips: settings are state, not actions, so they read as a sentence, and the single control is the only target.
+The conversation's settings as one line of muted text — every quick setting worth stating, not trimmed to two or three, as "Label: value" pairs ("Length: Brief · Tone: Balanced · Voice: Heart") — with one icon button at the trailing edge, in a 44pt row. Longer is fine: it truncates at the end rather than wrapping, so a narrow screen simply shows less. It replaces the strip of chips: settings are state, not actions, so they read as a sentence, and the single control is the only target.
 
 ## The orb (`VoiceOrb`)
 
@@ -57,9 +57,9 @@ Voice and text input are two pager pages.
 
 ## Transcript handle (`TranscriptHandle`)
 
-The transcript demoted to a peeking card above the bottom edge. Three treatments were explored — a message count, a one-line last reply, and the peeking card — and the card won: it names the model and the age, gives one line of the answer, and reads as the top edge of a drawer rather than a control.
+The transcript demoted to a peeking card above the bottom edge, reduced to a grip and the single word “Transcript” — no model, no age, no preview of the last reply. The route byline above the orb already names the conversation; repeating any of it on the handle read as noise once both existed on screen together, so the handle states only what it does (opens the transcript), not what is in it.
 
-What it opens is a **sheet over the workspace**, not a new screen: the route and settings stay visible above it and dismissing returns you to the orb. The sheet header carries only the conversation name and a close control.
+What it opens is a **sheet over the workspace**, not a new screen: the route and settings stay visible above it and dismissing returns you to the orb. The sheet header carries the same headline, “Transcript,” and nothing else — dismiss by pulling it down or tapping the backdrop.
 
 ## Landscape
 
