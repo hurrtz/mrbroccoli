@@ -30,13 +30,13 @@ export const cs = {
   ...sessionLockTranslations.cs,
   ...autoSetupTranslations.cs,
   appName: "Pan Brokolice",
-  retry: "Zkuste to znovu",
+  retry: "Zkus to znovu",
   dismiss: "Zavřít",
   done: "Hotovo",
   aboutSetting: ({ setting }) => `O ${setting}`,
   unavailable: "Není k dispozici",
   selection: "Výběr",
-  chooseCompatibleProviderFirst: "Nejprve vyberte kompatibilního poskytovatele",
+  chooseCompatibleProviderFirst: "Nejprve vyber kompatibilního poskytovatele",
   settings: "Nastavení",
   settingsReleaseVersion: ({ version }) => `Verze ${version}`,
   all: "Vše",
@@ -64,7 +64,7 @@ export const cs = {
   settingsAppDiagnostics: "Aplikace a diagnostika",
   settingsGuidedSetup: "Řízené nastavení",
   settingsGuidedSetupSummary:
-    "Zkontrolujte připojení a otestujte kompletní hlasovou trasu.",
+    "Zkontroluj připojení a otestuj kompletní hlasovou trasu.",
   setupGuideShowInSettings: "Zobrazit řízené nastavení v Nastavení",
   setupGuideShowInSettingsSummary:
     "Zobrazit nebo skrýt zástupce řízeného nastavení v přehledu Nastavení.",
@@ -78,12 +78,12 @@ export const cs = {
   settingsAppDiagnosticsSummary:
     "Téma, jazyk, použití, protokoly ladění a nedávná aktivita.",
   settingsBackToOverview: "Zpět na přehled",
-  settingsOpenSection: ({ section }) => `Otevřete ${section}`,
+  settingsOpenSection: ({ section }) => `Otevři ${section}`,
   theme: "Motiv",
   language: "Jazyk",
   recognitionLanguage: "Jazyk rozpoznávání",
   recognitionLanguageHint:
-    "Vyberte jazyk pro zlepšení rozpoznávání, nebo jej ponechte automaticky pro detekci zařízení nebo poskytovatele.",
+    "Vyber jazyk pro zlepšení rozpoznávání, nebo jej ponech automaticky pro detekci zařízení nebo poskytovatele.",
   automaticLanguage: "Automaticky",
   speechLanguageUnsupportedByProvider: ({ provider, language }) =>
     `${provider} oficiálně nepodporuje ${language} pro tuto řečovou cestu.`,
@@ -135,22 +135,22 @@ export const cs = {
   speechTranscriptionAction: "přepis řeči",
   speechSynthesisAction: "syntéza řeči",
   instructionsTabDescription:
-    "Vytvářejte skryté pokyny, které řídí asistenta dříve, než jakýkoli poskytovatel uvidí požadavek.",
+    "Vytvářej skryté pokyny, které řídí asistenta dříve, než jakýkoli poskytovatel uvidí požadavek.",
   providersTabDescription:
-    "Uložte přihlašovací údaje externích služeb na zařízení a nakonfigurujte režimy odpovědí, které chcete používat.",
+    "Ulož přihlašovací údaje externích služeb na zařízení a nakonfiguruj režimy odpovědí, které chceš používat.",
   webSearchTabDescription:
-    "Před odpověďmi nakonfigurujte volitelný živý webový kontext.",
+    "Před odpověďmi nakonfiguruj volitelný živý webový kontext.",
   responseModes: "Výběr modelu",
   aboutModelSelection: "O výběru modelu",
   modelSelectionInfo:
-    "Každá karta modelu se stane volbou na domovské obrazovce. Nakonfigurujte jejího poskytovatele, model a volitelnou úroveň náročnosti a poté přepínáním karet vyberte, který model bude odpovídat jako další.",
+    "Každá karta modelu se stane volbou na domovské obrazovce. Nakonfiguruj jejího poskytovatele, model a volitelnou úroveň náročnosti a poté přepínáním karet vyber, který model bude odpovídat jako další.",
   responseModeItemTitle: ({ index }) => `Model ${index}`,
   addResponseMode: "Přidat model",
   removeResponseMode: "Odebrat model",
   responseModesNoConfiguredProviders:
-    "Nejprve přidejte přihlašovací údaje. Ovládací prvky trasy zůstanou skryté, dokud nebude nakonfigurována alespoň jedna kompatibilní služba.",
-  useResponseMode: ({ mode }) => `Použijte ${mode}`,
-  chooseResponseModel: "Vyberte si model",
+    "Nejprve přidej přihlašovací údaje. Ovládací prvky trasy zůstanou skryté, dokud nebude nakonfigurována alespoň jedna kompatibilní služba.",
+  useResponseMode: ({ mode }) => `Použij ${mode}`,
+  chooseResponseModel: "Vyber si model",
   responseModelCount: ({ count }) =>
     `K dispozici: ${count} ${Number(count) === 1 ? "model" : Number(count) < 5 ? "modely" : "modelů"}`,
   ulraMode: "Superrežim",
@@ -178,43 +178,43 @@ export const cs = {
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interních volání modelů selhalo; konečná odpověď využila ${succeeded} úspěšných příspěvků.`,
   sttTabDescription:
-    "Kontrolujte, jak je řeč zachycována a který backend převádí zvuk na text, než se dostane do modelu.",
+    "Kontroluj, jak je řeč zachycována a který backend převádí zvuk na text, než se dostane do modelu.",
   ttsTabDescription:
-    "Určete, kdy začnou mluvit odpovědi a který backend zpracovává mluvený výstup.",
+    "Urči, kdy začnou mluvit odpovědi a který backend zpracovává mluvený výstup.",
   brief: "Stručný",
   briefDescription:
-    "Držte odpověď stručnou. Použijte co nejméně vět, které stačí k úplnému zodpovězení dotazu uživatele.",
+    "Držte odpověď stručnou. Použij co nejméně vět, které stačí k úplnému zodpovězení dotazu uživatele.",
   normal: "Normální",
   normalDescription:
-    "Zaměřte se na vyváženou délku odpovědi. Pokryjte důležité body, aniž byste odpověď zbytečně natahovali.",
+    "Zaměř se na vyváženou délku odpovědi. Pokryj důležité body, aniž byste odpověď zbytečně natahovali.",
   thorough: "Důkladně",
   thoroughDescription:
-    "Jděte do hloubky a buďte komplexní. Zahrňte nuance, detaily, kompromisy a zdůvodnění, na kterém záleží.",
+    "Jděte do hloubky a buďte komplexní. Zahrň nuance, detaily, kompromisy a zdůvodnění, na kterém záleží.",
   professional: "Profesionální",
   professionalDescription:
-    "Mluvte jako zkušený konzultant, který informuje klienta. Precizní jazyk, žádný slang, věcný a autoritativní tón.",
+    "Mluv jako zkušený konzultant, který informuje klienta. Precizní jazyk, žádný slang, věcný a autoritativní tón.",
   casual: "Neformální",
   casualDescription:
-    "Mluvte jako chytrý kamarád v kavárně. Uvolněně, přirozeně, konverzačně. Hovorové obraty jsou v pořádku, odbočky od tématu také.",
+    "Mluv jako chytrý kamarád v kavárně. Uvolněně, přirozeně, konverzačně. Hovorové obraty jsou v pořádku, odbočky od tématu také.",
   nerdy: "Nerdovský",
   nerdyDescription:
-    "Mluvte jako nadšený odborník, který rád jde do hloubky. Používejte odbornou terminologii bez zábran, s nadšením rozebírejte detaily a předpokládejte, že uživatel udrží krok.",
+    "Mluv jako nadšený odborník, který rád jde do hloubky. Používej odbornou terminologii bez zábran, s nadšením rozebírej detaily a předpokládej, že uživatel udrží krok.",
   concise: "Stručné",
   conciseDescription:
-    "Buďte co nejstručnější a přitom úplní. Žádná preambule, žádná výplň, jen odpověď. Myslete ve stylu telegramu.",
+    "Buďte co nejstručnější a přitom úplní. Žádná preambule, žádná výplň, jen odpověď. Mysli ve stylu telegramu.",
   socratic: "Sokratovský",
   socraticDescription:
-    "Zpochybňujte uvažování uživatele. Pokládejte protiotázky, nabízejte alternativní pohledy a jen nepotvrzujte, co uživatel řekl. Buďte sparingpartnerem, ne strojem na přitakávání.",
+    "Zpochybňuj uvažování uživatele. Pokládej protiotázky, nabízej alternativní pohledy a jen nepotvrzuj, co uživatel řekl. Buďte sparingpartnerem, ne strojem na přitakávání.",
   eli5: "ELI5",
   eli5Description:
-    "Vysvětlete vše co nejjednodušeji. Používejte analogie, každodenní jazyk, nulový žargon. Nepředpokládejte žádné předchozí znalosti o žádném tématu.",
-  useProvider: ({ provider }) => `Použijte ${provider}`,
+    "Vysvětli vše co nejjednodušeji. Používej analogie, každodenní jazyk, nulový žargon. Nepředpokládej žádné předchozí znalosti o žádném tématu.",
+  useProvider: ({ provider }) => `Použij ${provider}`,
   createApiKey: "Pověření",
   apiKey: "API klíč",
   aboutThisProvider: "O tomto poskytovateli",
   openRouterOnboardingTitle: "Jeden klíč, více poskytovatelů",
   openRouterOnboardingDescription:
-    "Vytvořte vyhrazený klíč OpenRouter, vložte jej níže a používejte modely se zálohou snímků od několika poskytovatelů, aniž byste nahradili jakékoli přímé připojení.",
+    "Vytvoř vyhrazený klíč OpenRouter, vlož jej níže a používej modely se zálohou snímků od několika poskytovatelů, aniž byste nahradili jakékoli přímé připojení.",
   openRouterOnboardingRoute:
     "Cesta požadavku: toto zařízení → OpenRouter → vybraný upstream poskytovatel",
   openRouterKeys: "Klíče OpenRouter",
@@ -224,7 +224,7 @@ export const cs = {
   providerStatusWorking: "Funkční",
   providerStatusNotTested: "Netestováno",
   providerStatusNotSetup: "Není nastaveno",
-  expandProvider: ({ provider }) => `Rozbalte ${provider}`,
+  expandProvider: ({ provider }) => `Rozbal ${provider}`,
   collapseProvider: ({ provider }) => `Sbalit ${provider}`,
   testProviderKey: "Otestovat klíč",
   testAllCapabilities: "Otestovat vše",
@@ -238,7 +238,7 @@ export const cs = {
   providerCapability_search: "Vyhledávání na webu",
   providerCapability_voices: "Hlasová knihovna",
   providerValidationUnavailable:
-    "Ověření v reálném čase pro tohoto poskytovatele zatím není k dispozici. Uložte klíč zde a ověřte jej při skutečném používání.",
+    "Ověření v reálném čase pro tohoto poskytovatele zatím není k dispozici. Ulož klíč zde a ověř jej při skutečném používání.",
   providerNeedsAttention: "potřebuje pozornost",
   catalogProviderLimitsSummary: ({ summary }) => `Limity: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Oblast: ${summary}`,
@@ -249,55 +249,55 @@ export const cs = {
   systemPrompt: "Systémová výzva",
   aboutSystemPrompt: "O systémové výzvě",
   assistantInstructionsIntro:
-    "Upravte skryté pokyny, které model dostane před každou odpovědí.",
+    "Uprav skryté pokyny, které model dostane před každou odpovědí.",
   baseInstructions: "Základní pokyny",
-  assistantInstructionsPlaceholder: "Definujte, jak se má asistent chovat.",
+  assistantInstructionsPlaceholder: "Definuj, jak se má asistent chovat.",
   assistantInstructionsHint:
     "Toto se vždy vloží před zvolenou délku odpovědi a tón.",
   adaptiveLength: "Adaptivní délka",
   responseTone: "Tón odpovědí",
   homeStyleChipLabel: ({ tone, length }) => `Styl — ${tone} · ${length}`,
   styleSheetTitle: "Nastavení konverzace",
-  styleSheetSubtitle: "Upravte odpovědi a řeč pouze pro tuto konverzaci.",
-  openStyleSheet: "Otevřete nastavení konverzace",
+  styleSheetSubtitle: "Uprav odpovědi a řeč pouze pro tuto konverzaci.",
+  openStyleSheet: "Otevři nastavení konverzace",
   conversationThinkingInstructions: "Pokyny pro přemýšlení",
   conversationThinkingInstructionsDescription:
-    "Pro tuto konverzaci přidejte pokyny za globální systémovou výzvu.",
+    "Pro tuto konverzaci přidej pokyny za globální systémovou výzvu.",
   conversationThinkingInstructionsPlaceholder:
-    "Například: Zpochybňujte mé předpoklady a používejte konkrétní příklady.",
+    "Například: Zpochybňuj mé předpoklady a používej konkrétní příklady.",
   ttsInstructions: "Pokyny pro přednes řeči",
   ttsInstructionsDescription:
     "Řídit tón, tempo, přízvuk nebo přednes používané kompatibilními modely řeči.",
   conversationTtsInstructionsDescription:
-    "Pro tuto konverzaci přidejte pokyny k přednesu za globální hlasové pokyny.",
+    "Pro tuto konverzaci přidej pokyny k přednesu za globální hlasové pokyny.",
   ttsInstructionsPlaceholder:
-    "Například: Mluvte vřele, jasně a uvolněným tempem.",
+    "Například: Mluv vřele, jasně a uvolněným tempem.",
   ttsInstructionsUnsupported:
     "Aktuální trasa řeči nepodporuje pokyny k přednesu.",
   conversationVoiceDescription: ({ route }) =>
-    `Vyberte hlas používaný ${route} v této konverzaci.`,
-  scrollToLatest: "Přejděte na nejnovější zprávu",
+    `Vyber hlas používaný ${route} v této konverzaci.`,
+  scrollToLatest: "Přejdi na nejnovější zprávu",
   conversationTitleGenerate: "Automaticky vygenerovat název",
   conversationTitleGenerating: "Generování názvu…",
   conversationTitleGenerated: "Konverzace přejmenována.",
-  conversationTitleNeedsContent: "Před vygenerováním názvu zahajte konverzaci.",
+  conversationTitleNeedsContent: "Před vygenerováním názvu zahaj konverzaci.",
   conversationTitleNeedsProvider:
-    "Před vygenerováním názvu nakonfigurujte vybraný model.",
+    "Před vygenerováním názvu nakonfiguruj vybraný model.",
   conversationTitleGenerationFailed:
     "Název konverzace se nepodařilo vygenerovat.",
   conversationTitleGenerationTimedOut:
-    "Generování názvu trvalo příliš dlouho. Zkuste to prosím znovu.",
+    "Generování názvu trvalo příliš dlouho. Zkus to prosím znovu.",
   inputMode: "Režim vstupu",
   voiceInput: "Hlasový vstup",
   pushToTalk: "Podržet pro mluvení",
   pushToTalkDescription:
-    "Při mluvení podržte hlavní tlačítko a poté jej uvolněte pro odeslání.",
+    "Při mluvení podrž hlavní tlačítko a poté jej uvolni pro odeslání.",
   toggleToTalk: "Klepnutím spustit mluvení",
   toggleToTalkDescription:
-    "Jedním klepnutím spustíte nahrávání a po dokončení klepněte znovu.",
+    "Jedním klepnutím spustíš nahrávání a po dokončení klepni znovu.",
   driveSession: "Relace řízení",
   driveSessionDescription:
-    "Když je zapnuté automatické pokračování, nahrávání se spustí po každé vyslovené odpovědi. Až domluvíte, klepněte na hlavní tlačítko.",
+    "Když je zapnuté automatické pokračování, nahrávání se spustí po každé vyslovené odpovědi. Až domluvíš, klepni na hlavní tlačítko.",
   stopDriveSession: "Pozastavit automatiku",
   repeatDriveReply: "Zopakovat poslední",
   continueDriveSession: "Obnovit automatiku",
@@ -305,26 +305,26 @@ export const cs = {
   speechToText: "Řeč na text",
   appNative: "Rozpoznávání systému",
   nativeSttDescription:
-    "Použijte rozpoznávač řeči operačního systému.",
+    "Použij rozpoznávač řeči operačního systému.",
   provider: "Poskytovatel",
   webSearchProvider: "Poskytovatel vyhledávání na webu",
   webSearchProviderMissingHint:
-    "Nakonfigurujte v sekci Pověření alespoň jednu službu s podporou vyhledávání, abyste zde mohli zapnout doplňování webového kontextu.",
+    "Nakonfiguruj v sekci Pověření alespoň jednu službu s podporou vyhledávání, abys zde mohli zapnout doplňování webového kontextu.",
   webSearchModelHint: ({ model }) =>
     `Na pozadí používá ${model} k doplnění aktuálního webového kontextu.`,
   webSearchHomeHint:
-    "Pomocí přepínače na domovské obrazovce zapněte nebo vypněte webový kontext pro toto vlákno.",
+    "Pomocí přepínače na domovské obrazovce zapni nebo vypni webový kontext pro toto vlákno.",
   settingsWebSearchCompactHint:
-    "Volitelně před odpovědí hlavního modelu přidejte čerstvý webový kontext.",
+    "Volitelně před odpovědí hlavního modelu přidej čerstvý webový kontext.",
   webSearchAdvanced: "Pokročilé ovládací prvky vyhledávání",
-  expandAdvancedSearch: "Rozbalte pokročilé ovládací prvky vyhledávání",
+  expandAdvancedSearch: "Rozbal pokročilé ovládací prvky vyhledávání",
   collapseAdvancedSearch: "Sbalit pokročilé ovládací prvky vyhledávání",
   webSearchSetupNeeded:
-    "Chcete-li používat živé vyhledávání na webu, přidejte přihlašovací údaje.",
+    "Chceš-li používat živé vyhledávání na webu, přidej přihlašovací údaje.",
   webSearchEnabledDescription:
     "Před odpovědí modelu je přidán nový webový kontext.",
   webSearchDisabledDescription:
-    "Pokud jsou aktuální fakta důležitá, použijte pro toto vlákno živý webový kontext.",
+    "Pokud jsou aktuální fakta důležitá, použij pro toto vlákno živý webový kontext.",
   webSearchNobodyDescription:
     "Žádné webové požadavky. Odpovídá z toho, co model zná.",
   webSearchQualityControls: "Kvalita vyhledávání",
@@ -341,17 +341,17 @@ export const cs = {
   webSearchNoExtraControls: ({ provider }) =>
     `${provider} zatím v této aplikaci nevystavuje další ovládací prvky kvality vyhledávání.`,
   setWebSearchMode: ({ mode }) =>
-    `Nastavte režim vyhledávání na webu na ${mode}`,
-  openWebSearchSettings: "Otevřete nastavení vyhledávání na webu",
+    `Nastav režim vyhledávání na webu na ${mode}`,
+  openWebSearchSettings: "Otevři nastavení vyhledávání na webu",
   providerSttDescription:
-    "Použijte nakonfigurovanou externí službu k přepisu vašeho hlasu, než se odešle do trasy odpovědí.",
+    "Použij nakonfigurovanou externí službu k přepisu tvého hlasu, než se odešle do trasy odpovědí.",
   sttProvider: "Poskytovatel STT",
   sttProviderEnabledHint:
     "Zde se zobrazují pouze povolení poskytovatelé s podporou přepisu.",
   sttProviderMissingHint:
-    "Přidejte přihlašovací údaje pro službu s podporou STT, abyste ji zde mohli vybrat.",
+    "Přidej přihlašovací údaje pro službu s podporou STT, abys ji zde mohli vybrat.",
   nativeSttHint:
-    "Rozpoznávání systému funguje nezávisle na klíčích vašeho poskytovatele a může být zpracováno v zařízení nebo hlasovou službou operačního systému.",
+    "Rozpoznávání systému funguje nezávisle na klíčích tvého poskytovatele a může být zpracováno v zařízení nebo hlasovou službou operačního systému.",
   replyPlayback: "Přehrávání odpovědí",
   sentencesArrive: "Přicházejí odstavce",
   sentencesArriveDescription:
@@ -364,11 +364,11 @@ export const cs = {
   spokenRepliesEnabledDescription:
     "Číst odpovědi asistenta nahlas, když je k dispozici hlasová trasa.",
   spokenRepliesDisabledDescription:
-    "Ponechat odpovědi zatím pouze textové. Vaše preferovaná trasa TTS zůstane uložena na později.",
+    "Ponechat odpovědi zatím pouze textové. Tvá preferovaná trasa TTS zůstane uložena na později.",
   nativeTtsDescription:
-    "Pro mluvené odpovědi a hlasový náhled použijte modul řeči zařízení.",
+    "Pro mluvené odpovědi a hlasový náhled použij modul řeči zařízení.",
   kokoroTtsDescription:
-    "Použijte mnohem přirozenější neuronový hlas zcela na tomto zařízení. Text mluvené odpovědi je syntetizován lokálně, bez klíče poskytovatele řeči nebo poplatku za použití.",
+    "Použij mnohem přirozenější neuronový hlas zcela na tomto zařízení. Text mluvené odpovědi je syntetizován lokálně, bez klíče poskytovatele řeči nebo poplatku za použití.",
   kokoroVoices: "Kokoro Hlasy na zařízení",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `Vícejazyčný model stáhne přibližně ${size} MB a po instalaci zabere přibližně ${installedSize} MB.`,
@@ -379,31 +379,31 @@ export const cs = {
   kokoroVerifying: "Ověřování hlasového modulu…",
   kokoroInstalled: "Nainstalované a připravené na tomto zařízení.",
   kokoroNotInstalled:
-    "Před výběrem nebo použitím Kokoro model stáhněte a ověřte. Není vyžadován žádný klíč poskytovatele.",
+    "Před výběrem nebo použitím Kokoro model stáhni a ověř. Není vyžadován žádný klíč poskytovatele.",
   kokoroLanguageFallback:
-    "Kokoro zde aktuálně mluví anglicky a zjednodušenou čínštinou. U ostatních vybraných jazyků odpovědí přidejte explicitní záložní trasu nebo se řeč zastaví s chybou.",
+    "Kokoro zde aktuálně mluví anglicky a zjednodušenou čínštinou. U ostatních vybraných jazyků odpovědí přidej explicitní záložní trasu nebo se řeč zastaví s chybou.",
   kokoroRemoveTitle: "Odebrat model Kokoro?",
   kokoroRemoveBody: ({ installedSize }) =>
-    `Tím se uvolní přibližně ${installedSize} MB. Model si můžete kdykoli znovu stáhnout.`,
+    `Tím se uvolní přibližně ${installedSize} MB. Model si můžeš kdykoli znovu stáhnout.`,
   removeKokoroModel: "Odebrat model Kokoro",
   downloadKokoroModel: "Stáhnout model Kokoro",
   kokoroFallbackNeeded: ({ languages }) =>
     `Explicitní záložní trasa je vyžadována pro: ${languages}.`,
   kokoroNoSelectedLanguages:
-    "Chcete-li nakonfigurovat hlas Kokoro, vyberte v části Jazyky poslechu angličtinu nebo zjednodušenou čínštinu.",
-  expandVoiceSettings: ({ language }) => `Rozbalte nastavení hlasu ${language}`,
+    "Chceš-li nakonfigurovat hlas Kokoro, vyber v části Jazyky poslechu angličtinu nebo zjednodušenou čínštinu.",
+  expandVoiceSettings: ({ language }) => `Rozbal nastavení hlasu ${language}`,
   collapseVoiceSettings: ({ language }) => `Sbalit nastavení hlasu ${language}`,
   remove: "Odebrat",
   voiceOutputDescription:
-    "Vyberte modul řeči, jazyky poslechu a hlasové náhledy pro mluvené odpovědi.",
+    "Vyber modul řeči, jazyky poslechu a hlasové náhledy pro mluvené odpovědi.",
   localTts: "Místní",
   localTtsDescription:
-    "Pro mluvené odpovědi použijte odpovídající stažený místní hlas.",
+    "Pro mluvené odpovědi použij odpovídající stažený místní hlas.",
   providerTtsDescription:
     "Použít vybranou nakonfigurovanou službu pro mluvené odpovědi.",
   ttsFallbackRoutes: "Záložní trasy",
   ttsFallbackRoutesHint:
-    "Volitelné. Přidejte pouze trasy, které chcete, v pořadí, v jakém se mají vyzkoušet. Jakmile trasa začne mluvit, zůstanu na ní po zbytek odpovědi.",
+    "Volitelné. Přidej pouze trasy, které chceš, v pořadí, v jakém se mají vyzkoušet. Jakmile trasa začne mluvit, zůstanu na ní po zbytek odpovědi.",
   ttsFallbackNone:
     "Není nakonfigurována žádná záložní trasa. Místo toho se zobrazí chyba hlasu.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -415,7 +415,7 @@ export const cs = {
   ttsProviderEnabledHint:
     "Zde se zobrazují pouze povolení poskytovatelé s podporou mluvené odpovědi.",
   ttsProviderMissingHint:
-    "Přidejte přihlašovací údaje pro službu s podporou TTS, abyste ji zde mohli vybrat.",
+    "Přidej přihlašovací údaje pro službu s podporou TTS, abys ji zde mohli vybrat.",
   localTtsOrderHint:
     "Zkoušejí se pouze explicitně nakonfigurované záložní trasy.",
   providerTtsOrderHint:
@@ -427,26 +427,26 @@ export const cs = {
   ttsVoice: "Hlas TTS",
   refresh: "Obnovit",
   providerVoiceDirectory: ({ provider }) => `Hlasová knihovna ${provider}`,
-  refreshProviderVoices: ({ provider }) => `Obnovte hlasy ${provider}`,
+  refreshProviderVoices: ({ provider }) => `Obnov hlasy ${provider}`,
   providerVoicesAvailable: ({ count, provider }) =>
     `${provider}: k dispozici ${count} ${Number(count) === 1 ? "hlas" : Number(count) < 5 ? "hlasy" : "hlasů"}`,
   providerVoicesLoadFailed:
-    "Hlasy se nepodařilo obnovit. Váš aktuální výběr se nezměnil; stále můžete zadat hlasové ID ručně.",
+    "Hlasy se nepodařilo obnovit. Váš aktuální výběr se nezměnil; stále můžeš zadat hlasové ID ručně.",
   providerVoicesLoadFailedWithFallback:
     "Hlasy účtu nelze načíst. Vestavěný hlas zůstává k dispozici.",
   providerVoicesErrorDetail: ({ detail }) => `Důvod: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
-    "V ElevenLabs upravte tento klíč API a povolte Hlasy → Číst a poté zde obnovte.",
+    "V ElevenLabs uprav tento klíč API a povol Hlasy → Číst a poté zde obnov.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Automaticky načtu dostupné hlasy od poskytovatele ${provider}.`,
   providerVoiceId: "Hlasové ID",
-  providerVoiceIdPlaceholder: "Zadejte hlasové ID",
+  providerVoiceIdPlaceholder: "Zadej hlasové ID",
   providerVoiceIdFallbackHint:
     "Pokud nelze načíst hlasovou knihovnu, zůstává k dispozici ruční zadávání.",
   providerVoiceIdRequired: ({ provider }) =>
-    `Před použitím hlasového výstupu aktualizujte hlasovou knihovnu ${provider} nebo zadejte hlasové ID.`,
+    `Před použitím hlasového výstupu aktualizuj hlasovou knihovnu ${provider} nebo zadej hlasové ID.`,
   qwenSpeechUnavailableInUs:
-    "Mé aktuální hlasové trasy Qwen nejsou v regionu USA dostupné. Pro řeč Qwen vyberte Singapur nebo Peking.",
+    "Mé aktuální hlasové trasy Qwen nejsou v regionu USA dostupné. Pro řeč Qwen vyber Singapur nebo Peking.",
   qwenApiRegion: "Oblast API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginie)",
@@ -459,7 +459,7 @@ export const cs = {
     "Tento poskytovatel aktuálně používá svůj výchozí hlas pro náhled a mluvené odpovědi.",
   listenLanguages: "Jazyky poslechu",
   listenLanguagesHint:
-    "Vyberte jazyky odpovědí, které chcete, aby zněly dobře. Zkouším je v tomto pořadí při směrování hlasového výstupu.",
+    "Vyber jazyky odpovědí, které chceš, aby zněly dobře. Zkouším je v tomto pořadí při směrování hlasového výstupu.",
   listenLanguagesSelected: ({ count }) =>
     Number(count) === 1
       ? "Vybrán 1 jazyk"
@@ -468,14 +468,14 @@ export const cs = {
         : `Vybráno ${count} jazyků`,
   localVoicePacks: "Místní hlasové balíčky",
   localVoicePacksHint:
-    "Každý jazyk si zachovává svůj vlastní místní hlas. Vyberte si hlas, který chcete pro daný jazyk, a poté si stáhněte pouze balíčky, na kterých vám skutečně záleží.",
+    "Každý jazyk si zachovává svůj vlastní místní hlas. Vyber si hlas, který chceš pro daný jazyk, a poté si stáhni pouze balíčky, na kterých ti skutečně záleží.",
   localVoiceForLanguage: ({ languageLabel }) => `Hlas pro ${languageLabel}`,
   providerVoicePreviews: "Hlasové náhledy poskytovatele",
   providerVoicePreviewsHint:
-    "Zde otestujte aktuálně vybranou trasu TTS se samostatným textem náhledu pro každý jazyk odpovědi.",
+    "Zde otestuj aktuálně vybranou trasu TTS se samostatným textem náhledu pro každý jazyk odpovědi.",
   nativeVoicePreviewSection: "Náhled nativního hlasu",
   nativeVoicePreviewSectionHint:
-    "Hovoří přímo prostřednictvím vestavěného syntezátoru řeči v telefonu, takže jej můžete porovnat s hlasy nakonfigurovaných poskytovatelů.",
+    "Hovoří přímo prostřednictvím vestavěného syntezátoru řeči v telefonu, takže jej můžeš porovnat s hlasy nakonfigurovaných poskytovatelů.",
   nativeVoiceUnavailable:
     "Toto zařízení nenahlásilo žádné nativní systémové hlasy pro náhled.",
   runtimeCompatibilityOverrides: "Kompatibilita za běhu",
@@ -491,7 +491,7 @@ export const cs = {
     "Zobrazuje nejnovější požadavky na řeč, trasu, o kterou požádali, trasu, kterou skutečně použili, a jakýkoli záložní důvod.",
   clearSpeechDiagnostics: "Vymazat nedávnou řečovou aktivitu",
   speechDiagnosticsEmpty:
-    "Zatím žádné nedávné žádosti o řeč. Zde si můžete prohlédnout náhled hlasu nebo přehrát odpověď a zobrazit podrobnosti o směrování.",
+    "Zatím žádné nedávné žádosti o řeč. Zde si můžeš prohlédnout náhled hlasu nebo přehrát odpověď a zobrazit podrobnosti o směrování.",
   clearSpeechDiagnosticsConfirmationTitle: "Vymazat nedávnou řečovou aktivitu?",
   clearSpeechDiagnosticsConfirmationMessage:
     "To odstraní veškerou zachycenou diagnostiku směrování řeči. Tuto akci nelze vrátit zpět.",
@@ -508,9 +508,9 @@ export const cs = {
   speechDiagnosticVoiceLine: ({ voice }) => `Hlas: ${voice}`,
   localTtsPackReady: "Instalováno na tomto zařízení.",
   localTtsPackBroken:
-    "Staženo, ale místní ověření tohoto hlasu na tomto zařízení se nezdařilo. Znovu si jej stáhněte nebo vyberte jiný hlas.",
+    "Staženo, ale místní ověření tohoto hlasu na tomto zařízení se nezdařilo. Znovu si jej stáhni nebo vyber jiný hlas.",
   localTtsPackMissing:
-    "Zatím není nainstalováno. Cloud TTS nebo systémový hlas bude používán, dokud si jej nestáhnete.",
+    "Zatím není nainstalováno. Cloud TTS nebo systémový hlas bude používán, dokud si jej nestáhneš.",
   localTtsUnsupportedLanguageFallback:
     "Pro tento jazyk zatím není k dispozici místní balíček. Cloud TTS nebo systémový hlas to zvládne.",
   downloadingLocalTtsPack: ({ progress }) =>
@@ -518,7 +518,7 @@ export const cs = {
   download: "Stáhnout",
   downloadingShort: "Načítání...",
   voicePreviewText: "Text hlasového náhledu",
-  voicePreviewPlaceholder: "Chcete-li tento hlas slyšet, zadejte frázi.",
+  voicePreviewPlaceholder: "Chceš-li tento hlas slyšet, zadej frázi.",
   voicePreviewHint:
     "Použije aktuálně vybraný hlasový backend odpovědi bez odeslání čehokoli do jazykového modelu.",
   previewVoice: "Náhled hlasu",
@@ -533,10 +533,10 @@ export const cs = {
   couldntShareText: "Tento text se nepodařilo sdílet.",
   couldntReplayReply: "Tuto odpověď se nepodařilo přehrát.",
   replyFailed: "Odpověď se nezdařila",
-  retryReply: "Zkuste odpovědět znovu",
-  replyFailedHint: "Než to zkusíte znovu, můžete si výše vybrat jiný model.",
+  retryReply: "Zkus odpovědět znovu",
+  replyFailedHint: "Než to zkusíš znovu, můžeš si výše vybrat jiný model.",
   spokenReplyFailed: "Odpověď byla uložena, ale nebylo možné ji vyslovit.",
-  retrySpeech: "Zkuste řeč znovu",
+  retrySpeech: "Zkus řeč znovu",
   openSpeakingSettings: "Nastavení mluvení",
   messageCopied: "Zpráva zkopírována.",
   noConversationToCopyYet: "Zatím žádná konverzace ke kopírování.",
@@ -547,11 +547,11 @@ export const cs = {
   threadPinned: "Vlákno připnuto.",
   threadUnpinned: "Vlákno odepnuto.",
   addProviderKeyToUseProvider: ({ provider }) =>
-    `Před použitím této trasy přidejte přihlašovací údaje pro ${provider} v Nastavení.`,
+    `Před použitím této trasy přidej přihlašovací údaje pro ${provider} v Nastavení.`,
   configureCredentialsBeforeVoiceSession:
-    "Před zahájením hlasové relace přidejte přihlašovací údaje v Nastavení.",
+    "Před zahájením hlasové relace přidej přihlašovací údaje v Nastavení.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `Pro ${provider} zadejte základní adresu URL poskytovatele a klíč API jako https://your-endpoint.example.com|your-api-key.`,
+    `Pro ${provider} zadej základní adresu URL poskytovatele a klíč API jako https://your-endpoint.example.com|your-api-key.`,
   speechRecognitionUnavailableOnDevice:
     "Na tomto zařízení není rozpoznávání řeči k dispozici.",
   debugLogLabel: "LOG",
@@ -566,26 +566,26 @@ export const cs = {
     `Obnoven předchozí protokol ladění ${fileName} (počet záznamů: ${entryCount}).`,
   debugLogCaptureFailed: "Protokol ladění se nepodařilo uložit.",
   chooseSttBeforeVoiceSession:
-    "Před zahájením hlasové relace vyberte v Nastavení nakonfigurovanou trasu STT.",
+    "Před zahájením hlasové relace vyber v Nastavení nakonfigurovanou trasu STT.",
   chooseTtsBeforeSpokenReplies:
-    "Před použitím mluvených odpovědí vyberte nakonfigurovanou trasu TTS v Nastavení.",
+    "Před použitím mluvených odpovědí vyber nakonfigurovanou trasu TTS v Nastavení.",
   stopSessionBeforeReplay:
-    "Před přehráním poslední odpovědi zastavte aktivní hlasovou relaci.",
-  couldntCatchThatTryAgain: "Nepodařilo se mi to zachytit, zkuste to znovu.",
+    "Před přehráním poslední odpovědi zastav aktivní hlasovou relaci.",
+  couldntCatchThatTryAgain: "Nepodařilo se mi to zachytit, zkus to znovu.",
   couldntStartVoiceInput: "Hlasový vstup nelze spustit.",
   couldntProcessVoiceInput: "Hlasový vstup se nepodařilo zpracovat.",
   maxRecordingLengthReached:
     "Dosažena maximální délka záznamu – odesílám, co mám.",
   sttRecordingTooLarge: ({ provider, limit }) =>
-    `Tento záznam je příliš dlouhý pro převod řeči na text ${provider} (max. ${limit}). Zkuste kratší zprávu nebo přepněte převod řeči na text na Rozpoznávání systému.`,
+    `Tento záznam je příliš dlouhý pro převod řeči na text ${provider} (max. ${limit}). Zkus kratší zprávu nebo přepni převod řeči na text na Rozpoznávání systému.`,
   addProviderKeyToEnableProvider: ({ provider }) =>
-    `Před použitím této trasy přidejte přihlašovací údaje pro ${provider} v Nastavení.`,
+    `Před použitím této trasy přidej přihlašovací údaje pro ${provider} v Nastavení.`,
   stopSessionBeforePreview:
-    "Před zobrazením náhledu hlasu zastavte aktivní hlasovou relaci.",
+    "Před zobrazením náhledu hlasu zastav aktivní hlasovou relaci.",
   chooseTtsToPreviewVoices:
-    "Chcete-li zobrazit náhled hlasů, vyberte v Nastavení nakonfigurovanou trasu TTS.",
+    "Chceš-li zobrazit náhled hlasů, vyber v Nastavení nakonfigurovanou trasu TTS.",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
-    `Nejprve si stáhněte vybraný místní hlas ${languageLabel}.`,
+    `Nejprve si stáhni vybraný místní hlas ${languageLabel}.`,
   couldntPreviewVoice: "Náhled hlasu se nepodařilo zobrazit.",
   spokenRepliesDisabled: "Mluvené odpovědi jsou vypnuty v Nastavení.",
   providerVoiceFallback:
@@ -604,15 +604,15 @@ export const cs = {
   speechReplayCacheCleared: "Uložené zvukové soubory byly odstraněny.",
   speechReplayCacheClearFailed: "Mezipaměť řeči se nepodařilo vymazat.",
   listeningToYourVoice: "Poslouchám váš hlas",
-  parsingYourVoiceInput: "Přeměna vašeho hlasu na text",
-  preparingRequest: "Příprava vaší žádosti",
+  parsingYourVoiceInput: "Přeměna tvého hlasu na text",
+  preparingRequest: "Příprava tvé žádosti",
   searchingTheWeb: "Hledání nového kontextu na webu",
   waitingForProvider: ({ provider }) => `Čekání na ${provider}`,
   preparingVoiceWithProvider: ({ provider }) =>
     `Příprava hlasu pomocí ${provider}`,
   deepThinkingReassurance: "Dobré odpovědi zaberou chvilku…",
   thinkingElapsed: ({ detail, seconds }) => `${detail} · ${seconds}s`,
-  speakingBackToYou: "Mluvím k vám",
+  speakingBackToYou: "Mluvím k tobě",
   freshSession: "Nová relace",
   messageCount: ({ count }) =>
     Number(count) === 1
@@ -624,33 +624,33 @@ export const cs = {
   conversationActions: "Konverzační akce",
   statusDetails: "Podrobnosti o stavu",
   persistenceFailure:
-    "Nemohl jsem uložit data do tohoto zařízení. Nechte aplikaci otevřenou a zkuste to znovu; nedávné změny mohou být po restartu ztraceny.",
+    "Nemohl jsem uložit data do tohoto zařízení. Nech aplikaci otevřenou a zkus to znovu; nedávné změny mohou být po restartu ztraceny.",
   show: "Zobrazit",
   showTranscript: "Zobrazit přepis",
   hide: "Skrýt",
   copyThread: "Kopírovat vlákno",
   shareThread: "Sdílet vlákno",
   reportResponse: "Nahlásit tuto odpověď",
-  reportResponseIntro: "Hlášení odpovědi AI z Mr Broccoli. Zkontrolujte obsah níže, popište problém a odešlete toto hlášení vývojáři.",
+  reportResponseIntro: "Hlášení odpovědi AI z Mr Broccoli. Zkontroluj obsah níže, popiš problém a odešli toto hlášení vývojáři.",
   repeatReply: "Opakovat odpověď",
   renameThread: "Přejmenovat vlákno",
   renameThreadHint:
-    "Dejte této konverzaci název, který později rychle najdete.",
+    "Dejte této konverzaci název, který později rychle najdeš.",
   threadTitle: "Název vlákna",
   noTranscriptYet: "Zatím bez přepisu",
   previewTranscriptEmptyDescription:
-    "Začněte pomocí hlasu nebo textu. Zde se zobrazí vaše konverzace.",
+    "Začni pomocí hlasu nebo textu. Zde se zobrazí tvá konverzace.",
   noConversationYet: "Zatím žádná konverzace",
   expandedTranscriptEmptyDescription:
-    "Začněte pomocí hlasu nebo textu. Pokud se chcete vrátit na hlavní scénu, zavřete tuto obrazovku.",
+    "Začni pomocí hlasu nebo textu. Pokud se chceš vrátit na hlavní scénu, zavři tuto obrazovku.",
   transcriptSelectionHint:
-    "Vyberte libovolný text zprávy přímo nebo sdílejte a zkopírujte jednotlivé zprávy níže.",
-  textMessagePlaceholder: "Napište zprávu",
+    "Vyber libovolný text zprávy přímo nebo sdílej a zkopíruj jednotlivé zprávy níže.",
+  textMessagePlaceholder: "Napiš zprávu",
   sendTextMessage: "Odeslat zprávu",
   showVoiceInput: "Zobrazit hlasový vstup",
   showTextInput: "Zobrazit textový vstup",
   usageStatsHiddenDescription:
-    "Udržujte odhady tokenů mimo uživatelské rozhraní přepisu.",
+    "Udržuj odhady tokenů mimo uživatelské rozhraní přepisu.",
   usageStatsVisibleDescription:
     "Zobrazit odhadované využití tokenů pro odpovědi a souhrny za konverzaci.",
   debugLogButton: "Tlačítko protokolu ladění",
@@ -659,7 +659,7 @@ export const cs = {
   debugLogButtonVisibleDescription:
     "Zobrazit tlačítko LOG na domovské obrazovce pro spouštění a zastavování zachycování ladění.",
   debugLogButtonUsageDescription:
-    "Jak používat tlačítko: jeho zapnutím se začnou zaznamenávat protokoly. Vypnutím přestanete zaznamenávat protokoly a ty zachycené přesunete do schránky.",
+    "Jak používat tlačítko: jeho zapnutím se začnou zaznamenávat protokoly. Vypnutím přestaneš zaznamenávat protokoly a ty zachycené přesuneš do schránky.",
   estimatedUsageTitle: "Odhadované využití",
   estimatedUsageCounts: ({ replies, summaries }) =>
     `Odpovědi ${replies} · Aktualizace paměti ${summaries}`,
@@ -715,91 +715,91 @@ export const cs = {
   turnReceiptTimingTotal: "celkem",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `Tokeny: ${tokens}`,
   unknownUsageRoute: "Neznámá trasa",
-  setupGuideConnectProviderTitle: "Nakonfigurujte přihlašovací údaje",
+  setupGuideConnectProviderTitle: "Nakonfiguruj přihlašovací údaje",
   setupGuideConnectProviderDescription:
-    "Přidejte přihlašovací údaje v Nastavení a poté vyberte trasy, které chcete použít.",
+    "Přidej přihlašovací údaje v Nastavení a poté vyber trasy, které chceš použít.",
   idle: "Nečinný",
-  yourConversationAppearsHere: "Zde se zobrazí vaše konverzace",
+  yourConversationAppearsHere: "Zde se zobrazí tvá konverzace",
   defaultTranscriptEmptyDescription:
-    "Začněte pomocí hlasu nebo textu. Ponechám vlákno a odpovím zde.",
+    "Začni pomocí hlasu nebo textu. Ponechám vlákno a odpovím zde.",
   delete: "Smazat",
   deleteConversationConfirmationTitle: ({ title }) => `Smazat „${title}“?`,
   deleteConversationConfirmationMessage:
-    "Tím trvale smažete konverzaci a všechny její zprávy. Tuto akci nelze vrátit zpět.",
+    "Tím trvale smažeš konverzaci a všechny její zprávy. Tuto akci nelze vrátit zpět.",
   conversations: "Konverzace",
-  drawerSubtitle: "Přecházejte mezi živými vlákny nebo otevřete novou místnost.",
+  drawerSubtitle: "Přecházej mezi živými vlákny nebo otevři novou místnost.",
   newSession: "Nová relace",
   noSavedConversationsYet: "Zatím žádné uložené konverzace",
   drawerEmptyDescription:
-    "Začněte mluvit z hlavního zobrazení a automaticky vytvořím relaci.",
-  setupGuideTitle: "Nakonfigurujte aplikaci",
+    "Začni mluvit z hlavního zobrazení a automaticky vytvořím relaci.",
+  setupGuideTitle: "Nakonfiguruj aplikaci",
   setupGuideSubtitle:
-    "Přidejte přihlašovací údaje a vyberte trasy v Nastavení.",
+    "Přidej přihlašovací údaje a vyber trasy v Nastavení.",
   fastestStartPreset: "Minimální nastavení",
   fastestStartDescription:
-    "Pokud je to možné, použijte řeč zařízení a nakonfigurujte pouze trasu odpovědi, kterou potřebujete.",
+    "Pokud je to možné, použij řeč zařízení a nakonfiguruj pouze trasu odpovědi, kterou potřebuješ.",
   fullVoicePreset: "Nakonfigurovaný hlas",
   fullVoiceDescription:
-    "Když si je vyberete, použijte nakonfigurované služby pro odpovědi, přepis a mluvený výstup.",
+    "Když si je vybereš, použij nakonfigurované služby pro odpovědi, přepis a mluvený výstup.",
   setupGuideNote:
-    "Jako další otevřeme Nastavení, abyste mohli vložit a ověřit přihlašovací údaje.",
-  useThisSetup: "Použijte toto nastavení",
+    "Jako další otevřeme Nastavení, abys mohli vložit a ověřit přihlašovací údaje.",
+  useThisSetup: "Použij toto nastavení",
   notNow: "Teď ne",
   setupGuideIntroTitle: "Jak funguji",
   setupGuideIntroBody:
-    "Začínám prázdný. Přidejte přihlašovací údaje pro externí služby, které již používáte, a poté vyberte, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
+    "Začínám prázdný. Přidej přihlašovací údaje pro externí služby, které již používáš, a poté vyber, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
   setupGuideIntroNote:
-    "Po nastavení zahajte a zastavte konverzaci pomocí hlavního hlasového ovládání. Aktuální přepis zůstává k dispozici na domovské obrazovce a každou trasu lze později změnit v Nastavení.",
+    "Po nastavení zahaj a zastav konverzaci pomocí hlavního hlasového ovládání. Aktuální přepis zůstává k dispozici na domovské obrazovce a každou trasu lze později změnit v Nastavení.",
   setupGuideProviderTitle: "Přidat přihlašovací údaje",
   setupGuideProviderBody:
-    "Vyberte externí službu, kterou chcete nakonfigurovat, a poté vložte přihlašovací údaje s přístupem k odpovědi.",
+    "Vyber externí službu, kterou chceš nakonfigurovat, a poté vlož přihlašovací údaje s přístupem k odpovědi.",
   setupGuideProviderPickerLabel: "Služba odpovědí",
-  setupGuideSelectProvider: "Vyberte poskytovatele",
-  setupGuideSelectProviderFirst: "Nejprve vyberte poskytovatele.",
+  setupGuideSelectProvider: "Vyber poskytovatele",
+  setupGuideSelectProviderFirst: "Nejprve vyber poskytovatele.",
   setupGuideApiKeyLabel: "API klíč",
-  setupGuideApiKeyPlaceholder: "Vložte přihlašovací údaje",
+  setupGuideApiKeyPlaceholder: "Vlož přihlašovací údaje",
   setupGuideContinue: "Pokračovat",
-  setupGuideOpenSettings: "Otevřete Nastavení",
+  setupGuideOpenSettings: "Otevři Nastavení",
   setupGuideBack: "Zpět",
-  setupGuideValidateKey: "Ověřte klíč",
+  setupGuideValidateKey: "Ověř klíč",
   setupGuideApiKeyRequiredOrCancel:
-    "Chcete-li pokračovat, přidejte klíč API nebo zrušte průvodce nastavením.",
+    "Chceš-li pokračovat, přidej klíč API nebo zruš průvodce nastavením.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "Chcete-li pokračovat, vyberte poskytovatele a přidejte klíč API, nebo zrušte průvodce nastavením.",
+    "Chceš-li pokračovat, vyber poskytovatele a přidej klíč API, nebo zruš průvodce nastavením.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Tyto přihlašovací údaje ${provider} neumožňují žádosti o odpověď.`,
-  setupGuideKokoroTitle: "Přidejte přirozený hlas na zařízení",
+  setupGuideKokoroTitle: "Přidej přirozený hlas na zařízení",
   setupGuideKokoroBody: ({ size }) =>
-    `Volitelné: stáhněte si Kokoro (asi ${size} MB) pro mnohem přirozenější mluvené odpovědi bez poskytovatele řeči nebo poplatků za používání.`,
+    `Volitelné: stáhni si Kokoro (asi ${size} MB) pro mnohem přirozenější mluvené odpovědi bez poskytovatele řeči nebo poplatků za používání.`,
   setupGuideKokoroLanguageNote:
-    "Tento model aktuálně mluví anglicky a zjednodušenou čínštinou. Případné záložní trasy nakonfigurujte později v nastavení Mluvení.",
+    "Tento model aktuálně mluví anglicky a zjednodušenou čínštinou. Případné záložní trasy nakonfiguruj později v nastavení Mluvení.",
   setupGuideKokoroDownload: "Stáhnout Kokoro",
-  setupGuideUseKokoro: "Pro mluvené odpovědi použijte Kokoro",
+  setupGuideUseKokoro: "Pro mluvené odpovědi použij Kokoro",
   setupGuideUseKokoroSummary:
-    "Udržujte syntézu v telefonu, kdykoli je podporován jazyk odpovědi.",
-  setupGuideSkipKokoro: "Zatím přeskočte",
-  setupGuideVoiceTestTitle: "Otestujte své nastavení",
+    "Udržuj syntézu v telefonu, kdykoli je podporován jazyk odpovědi.",
+  setupGuideSkipKokoro: "Zatím přeskoč",
+  setupGuideVoiceTestTitle: "Otestuj své nastavení",
   setupGuideVoiceTestBody:
-    "Řekněte krátkou větu. Otestuji přístup k mikrofonu, přepis, nakonfigurovanou trasu odpovědi a mluvený výstup, když je k dispozici přijatelná hlasová trasa.",
+    "Řekni krátkou větu. Otestuji přístup k mikrofonu, přepis, nakonfigurovanou trasu odpovědi a mluvený výstup, když je k dispozici přijatelná hlasová trasa.",
   setupGuideVoiceTestNoInputBody:
-    "Hlasový vstup není u tohoto nastavení dostupný. Pokračujte v kontrole zjištěných tras a v případě potřeby později upravte nastavení řeči.",
+    "Hlasový vstup není u tohoto nastavení dostupný. Pokračuj v kontrole zjištěných tras a v případě potřeby později uprav nastavení řeči.",
   setupGuideVoiceTestTextOnlyNote:
     "Tento test zůstává pouze textový, protože ještě není připravena žádná přijatelná hlasová trasa.",
   setupGuideVoiceTestStart: "Spustit test",
   setupGuideVoiceTestStop: "Zastavit nahrávání",
-  setupGuideVoiceTestRetry: "Spusťte znovu",
+  setupGuideVoiceTestRetry: "Spusť znovu",
   setupGuideVoiceTestTranscribing: "Přepis…",
   setupGuideVoiceTestThinking: "Testování odpovědi…",
   setupGuideVoiceTestSynthesizing: "Příprava hlasu…",
   setupGuideVoiceTestSpeaking: "Přehrávání odpovědi…",
   setupGuideVoiceTestTranscript: "Přepis",
   setupGuideVoiceTestReply: "Odpověď",
-  setupGuideVoiceTestReset: "Vymažte tento výsledek",
+  setupGuideVoiceTestReset: "Vymaž tento výsledek",
   setupGuideVoiceInputUnavailable:
     "Hlasový vstup není pro toto nastavení na tomto zařízení dostupný.",
   setupGuideSummaryTitle: "Nastavení dokončeno",
   setupGuideSummaryBody:
-    "Zde je trasa, kterou použiji s vaší aktuální konfigurací.",
+    "Zde je trasa, kterou použiji s tvou aktuální konfigurací.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Řeč na text",
   setupGuideSummaryTts: "Převod textu na řeč",
@@ -819,12 +819,12 @@ export const cs = {
   setupGuideWebSearchAvailableOff: ({ provider }) =>
     `Dostupné přes ${provider}, aktuálně vypnuto`,
   setupGuideSummaryTextOnlyNote:
-    "Mluvené odpovědi jsou prozatím vypnuty. Odpovědi zůstávají v textu, dokud nepovolíte poskytovatele nebo místní hlas.",
+    "Mluvené odpovědi jsou prozatím vypnuty. Odpovědi zůstávají v textu, dokud nepovolíš poskytovatele nebo místní hlas.",
   setupGuideFinish: "Hotovo",
-  searchConversationsPlaceholder: "Vyhledávejte názvy, modely a text zprávy",
+  searchConversationsPlaceholder: "Vyhledávej názvy, modely a text zprávy",
   noMatchingConversations: "Žádné odpovídající konverzace",
   noMatchingConversationsDescription:
-    "Zkuste jiný název, trasu, model nebo frázi z přepisu.",
+    "Zkus jiný název, trasu, model nebo frázi z přepisu.",
   noProviderYet: "Zatím žádný poskytovatel",
   noModelYet: "Zatím žádný model",
   startedAt: "Zahájeno",
@@ -848,38 +848,38 @@ export const cs = {
   webSearchAction: "vyhledávání na webu",
   thinking: "Přemýšlení",
   speaking: "Mluvení",
-  pleaseWait: "Čekejte prosím",
+  pleaseWait: "Čekej prosím",
   yourTurn: "Jste na řadě",
   keepPressing: "Držte tlačítko",
-  tapWhenDone: "Po dokončení klepněte",
+  tapWhenDone: "Po dokončení klepni",
   speechPaused: "Řeč je pozastavena",
   pausePlaybackUnavailable:
-    "Tuto hlasovou trasu nelze pozastavit. Zastavte to nebo přepněte na hlasový výstup poskytovatele.",
-  holdToSpeak: "Podržte pro mluvení",
-  tapToSpeak: "Klepnutím mluvte",
-  tapAgainToSend: "Opětovným klepnutím odešlete",
+    "Tuto hlasovou trasu nelze pozastavit. Zastav to nebo přepni na hlasový výstup poskytovatele.",
+  holdToSpeak: "Podrž pro mluvení",
+  tapToSpeak: "Klepnutím mluv",
+  tapAgainToSend: "Opětovným klepnutím odešli",
   waitingForReply: "Čekání na odpověď",
-  parsingYourVoice: "Analýza vašeho hlasu",
+  parsingYourVoice: "Analýza tvého hlasu",
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} není nakonfigurováno v Nastavení.`,
   providerNetworkError: ({ provider, action }) =>
-    `Nepodařilo se spojit s ${provider} pro ${action}. Zkontrolujte připojení a zkuste to znovu.`,
+    `Nepodařilo se spojit s ${provider} pro ${action}. Zkontroluj připojení a zkus to znovu.`,
   providerAuthError: ({ provider, action }) =>
-    `${provider} odmítl přihlašovací údaje pro ${action}. Zkontrolujte klíč API a oprávnění.`,
+    `${provider} odmítl přihlašovací údaje pro ${action}. Zkontroluj klíč API a oprávnění.`,
   providerRateLimitError: ({ provider, action }) =>
-    `${provider} právě teď omezuje rychlost ${action}. Zkuste to znovu za chvíli.`,
+    `${provider} právě teď omezuje rychlost ${action}. Zkus to znovu za chvíli.`,
   providerCreditsRequired: ({ provider, action }) =>
-    `${provider} potřebuje dostatečný kredit API pro ${action}. Zkontrolujte zůstatek na účtu a limit útraty klíče.`,
+    `${provider} potřebuje dostatečný kredit API pro ${action}. Zkontroluj zůstatek na účtu a limit útraty klíče.`,
   providerTimeoutError: ({ provider, action }) =>
-    `${provider} trvalo příliš dlouho během ${action}. Zkuste to znovu.`,
+    `${provider} trvalo příliš dlouho během ${action}. Zkus to znovu.`,
   providerTemporaryError: ({ provider, action }) =>
-    `${provider} měl dočasný problém během ${action}. Zkuste to za chvíli znovu.`,
+    `${provider} měl dočasný problém během ${action}. Zkus to za chvíli znovu.`,
   providerEmptyReplyError: ({ provider }) =>
-    `${provider} skončil bez vrácení odpovědi. Zkuste to znovu.`,
+    `${provider} skončil bez vrácení odpovědi. Zkus to znovu.`,
   providerIncompleteReplyError: ({ provider }) =>
-    `Odpověď ${provider} skončila dříve, než byla dokončena. Zkuste to znovu.`,
+    `Odpověď ${provider} skončila dříve, než byla dokončena. Zkus to znovu.`,
   providerContextTooLong: ({ provider }) =>
-    `${provider} odmítl odpověď, protože konverzace byla příliš dlouhá. Založte nové vlákno nebo zkraťte požadavek.`,
+    `${provider} odmítl odpověď, protože konverzace byla příliš dlouhá. Založ nové vlákno nebo zkrať požadavek.`,
   providerRequestRejected: ({ provider, action, detail }) =>
     detail
       ? `${provider} odmítl požadavek ${action}: ${detail}`
@@ -902,7 +902,7 @@ export const cs = {
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `Pro ${languageLabel} není připravena žádná místní nebo cloudová hlasová trasa.`,
   chooseTextToSpeechProviderInSettings:
-    "V Nastavení vyberte poskytovatele převodu textu na řeč.",
+    "V Nastavení vyber poskytovatele převodu textu na řeč.",
   ttsNotSupportedYet: ({ provider }) =>
     `${provider} TTS zatím není podporováno.`,
   ttsError: ({ provider, status, errorText }) =>
@@ -913,17 +913,17 @@ export const cs = {
     `Hlasový výstup ${provider} trval příliš dlouho.`,
   sttTimeout: ({ provider }) => `Přepis řeči ${provider} trval příliš dlouho.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} přijímá pouze nahrávky do ${limit}. Použijte kratší nahrávku, nebo přepněte model STT.`,
+    `${provider} ${model} přijímá pouze nahrávky do ${limit}. Použij kratší nahrávku, nebo přepni model STT.`,
   voiceInputCaptureIncomplete:
-    "Hlasový vstup se nepodařilo zachytit čistě. Zkuste to prosím znovu.",
+    "Hlasový vstup se nepodařilo zachytit čistě. Zkus to prosím znovu.",
   ttsDidNotReturnAudio: ({ provider }) => `${provider} TTS nevrátil zvuk.`,
   nativeSttHandledInApp: "Systémové STT je zpracováno přímo v aplikaci.",
   chooseSpeechToTextProviderInSettings:
-    "V Nastavení vyberte poskytovatele převodu řeči na text.",
+    "V Nastavení vyber poskytovatele převodu řeči na text.",
   sttNotSupportedYet: ({ provider }) =>
     `${provider} STT zatím není podporováno.`,
   providerNotWiredUpYet: ({ provider }) => `${provider} ještě není zapojeno.`,
-  you: "Vy",
+  you: "Ty",
   assistant: "Asistent",
   untitledConversation: "Konverzace bez názvu",
   conversationExportHeader: ({ title }) => `Konverzace: ${title}`,
