@@ -29,7 +29,12 @@
         }
       ],
       "expo-router",
-      "expo-secure-store",
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Allow Mr Broccoli to use Face ID to unlock sessions you have locked."
+        }
+      ],
       "expo-status-bar",
       "expo-sharing",
       [

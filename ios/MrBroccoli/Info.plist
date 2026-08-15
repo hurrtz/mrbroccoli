@@ -48,7 +48,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Allow Mr Broccoli to take photos you choose as prompt context.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Allow Mr Broccoli to access your Face ID biometric data.</string>
+	<string>Allow Mr Broccoli to use Face ID to unlock sessions you have locked.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow Mr Broccoli to use the microphone for native speech input.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
