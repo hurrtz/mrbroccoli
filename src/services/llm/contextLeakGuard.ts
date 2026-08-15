@@ -3,8 +3,7 @@ const VERBATIM_SUSPICION_CHARACTERS = 48;
 const VERBATIM_LEAK_CHARACTERS = 160;
 
 export type InternalContextLeakReason =
-  | "serialized-internal-context"
-  | "verbatim-internal-context";
+  "serialized-internal-context" | "verbatim-internal-context";
 
 export interface SerializedInternalContextLeakLocation {
   markerIds: string[];
@@ -46,7 +45,7 @@ const INTERNAL_MARKERS: InternalMarker[] = [
   {
     id: "system-heading",
     pattern:
-      /(?:Potentially relevant excerpts retrieved from earlier non-private conversations|Earlier conversation context for background memory only|Private orchestration instructions and evidence for this response)/i,
+      /(?:Potentially relevant excerpts retrieved from eligible earlier conversations|Earlier conversation context for background memory only|Private orchestration instructions and evidence for this response)/i,
   },
 ];
 
@@ -95,7 +94,9 @@ function hasVerbatimProtectedText(
 
   for (let start = 0; start <= text.length - minimumCharacters; start += 1) {
     const candidate = text.slice(start, start + minimumCharacters);
-    if (protectedTexts.some((protectedText) => protectedText.includes(candidate))) {
+    if (
+      protectedTexts.some((protectedText) => protectedText.includes(candidate))
+    ) {
       return true;
     }
   }

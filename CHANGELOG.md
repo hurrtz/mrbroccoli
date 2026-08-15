@@ -25,6 +25,9 @@ the complete Play Store translations are kept in a dedicated file under
 - The transcript handle now shows one stable label instead of repeating model,
   age, or reply content; opened sheets and docked iPad transcripts carry the
   same visible heading.
+- Conversation styles such as Explain like I’m five now remain the final,
+  binding response instruction even when a broader assistant prompt asks for a
+  conflicting technical style.
 - Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
   keep the phone interface; regular layouts add a persistent conversations
   sidebar, a docked transcript when all three panes fit, master-detail Settings,

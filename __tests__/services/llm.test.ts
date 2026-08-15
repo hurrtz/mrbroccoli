@@ -133,12 +133,53 @@ describe("streamChat", () => {
     );
   });
 
+  it("sends the selected ELI5 style through the provider request boundary", async () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"Simple"}}]}\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
+
+    await streamChat({
+      messages: mockMessages,
+      model: "gpt-4o",
+      provider: "openai",
+      apiKey: "sk-test-key",
+      assistantInstructions: "Use specialist language.",
+      responseLength: "normal",
+      responseTone: "eli5",
+      language: "en",
+      onChunk: jest.fn(),
+      onDone: jest.fn(),
+      onError: jest.fn(),
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.messages[0]).toMatchObject({ role: "system" });
+    expect(body.messages[0].content).toContain(
+      "The user selected ELI5 for this response",
+    );
+    expect(
+      body.messages[0].content.endsWith("assume no prior knowledge."),
+    ).toBe(true);
+  });
+
   it("sends durable image attachments through OpenAI-compatible chat", async () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
         controller.enqueue(
-          encoder.encode('data: {"choices":[{"delta":{"content":"Seen"}}]}\n\n'),
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"Seen"}}]}\n\n',
+          ),
         );
         controller.enqueue(encoder.encode("data: [DONE]\n\n"));
         controller.close();
@@ -225,7 +266,9 @@ describe("streamChat", () => {
 
     expect(fetch).not.toHaveBeenCalled();
     expect(onError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: expect.stringContaining("cannot use images") }),
+      expect.objectContaining({
+        message: expect.stringContaining("cannot use images"),
+      }),
     );
   });
 
@@ -283,18 +326,18 @@ describe("streamChat", () => {
       }),
     );
     expect(onDone).toHaveBeenCalledWith("Hi", expect.any(Object), {
-        router: {
-          gateway: "OpenRouter",
-          requestedModel: "openai/gpt-5.6-sol-20260709",
-          actualModel: "openai/gpt-5.6-sol-20260709",
-          upstreamProvider: "OpenAI",
-          strategy: "direct",
-          attempts: 2,
-          contextCompression: {
-            originalCount: 20,
-            compressedCount: 12,
-          },
+      router: {
+        gateway: "OpenRouter",
+        requestedModel: "openai/gpt-5.6-sol-20260709",
+        actualModel: "openai/gpt-5.6-sol-20260709",
+        upstreamProvider: "OpenAI",
+        strategy: "direct",
+        attempts: 2,
+        contextCompression: {
+          originalCount: 20,
+          compressedCount: 12,
         },
+      },
     });
   });
 

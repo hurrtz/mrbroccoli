@@ -61,6 +61,12 @@ untrusted data. It cannot override system instructions. Internal context is not
 shown to the user unless a product surface explicitly exposes safe provenance
 metadata.
 
+Per-conversation response length and tone are the most specific user-selected
+style layer. Tone is emitted last in the system prompt and explicitly outranks
+broader assistant-style preferences when they conflict; choosing ELI5 must
+therefore reach every provider request as a binding plain-language instruction,
+not merely as picker metadata.
+
 `contextLeakGuard.ts` inspects streaming output and final text for serialized
 internal context. A suspected leak fails the reply rather than displaying or
 speaking protected material.
