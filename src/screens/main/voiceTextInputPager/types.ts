@@ -27,7 +27,6 @@ export interface VoiceTextInputPagerProps {
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
-  layout: "portrait" | "landscape";
   onInputSurfaceChange?: (surface: InputSurface) => void;
   attachments?: MessageImageAttachment[];
   onRemoveImage?: (attachmentId: string) => void;

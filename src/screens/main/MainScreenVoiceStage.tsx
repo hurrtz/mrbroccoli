@@ -125,7 +125,6 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
           isActive={isActive}
-          layout={layout}
           maxOrbSize={maxOrbSize}
           onInputSurfaceChange={onInputSurfaceChange}
           onRemoveImage={onRemoveImage}

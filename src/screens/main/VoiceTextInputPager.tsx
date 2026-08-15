@@ -22,7 +22,6 @@ export function VoiceTextInputPager({
   initialTextMessage = "",
   inputMode,
   isActive,
-  layout,
   onInputSurfaceChange,
   onRemoveImage,
   onPress,
