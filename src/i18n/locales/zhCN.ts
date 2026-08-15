@@ -455,7 +455,7 @@ export const zhCN = {
     "该提供商当前使用其默认语音进行预览和语音回复。",
   listenLanguages: "收听语言",
   listenLanguagesHint:
-    "选择您希望听起来不错的回复语言。 我在路由语音输出时按此顺序尝试它们。",
+    "选择您希望听起来不错的回复语言。我在路由语音输出时按此顺序尝试它们。",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "已选择 1 种语言" : `已选择 ${count} 种语言`,
   localVoicePacks: "本地语音包",

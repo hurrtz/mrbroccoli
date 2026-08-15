@@ -148,7 +148,7 @@ export const hi = {
   addResponseMode: "मॉडल जोड़ें",
   removeResponseMode: "मॉडल हटाएँ",
   responseModesNoConfiguredProviders:
-    "पहले क्रेडेंशियल जोड़ें. रूट नियंत्रण तब तक छिपे रहते हैं जब तक कि कम से कम एक संगत सेवा कॉन्फ़िगर न हो जाए।",
+    "पहले क्रेडेंशियल जोड़ें। रूट नियंत्रण तब तक छिपे रहते हैं जब तक कि कम से कम एक संगत सेवा कॉन्फ़िगर न हो जाए।",
   useResponseMode: ({ mode }) => `${mode} का प्रयोग करें`,
   chooseResponseModel: "एक मॉडल चुनें",
   responseModelCount: ({ count }) => `${count} मॉडल उपलब्ध हैं`,
@@ -182,7 +182,7 @@ export const hi = {
     "नियंत्रित करें कि उत्तर कब बोलना शुरू करें और कौन सा बैकएंड बोले गए आउटपुट को संभालता है।",
   brief: "संक्षिप्त",
   briefDescription:
-    "उत्तर कड़ा रखें. उपयोगकर्ता को पूर्ण उत्तर देने के लिए आवश्यक न्यूनतम संख्या में वाक्यों का उपयोग करें।",
+    "उत्तर कड़ा रखें। उपयोगकर्ता को पूर्ण उत्तर देने के लिए आवश्यक न्यूनतम संख्या में वाक्यों का उपयोग करें।",
   normal: "सामान्य",
   normalDescription:
     "एक संतुलित प्रतिक्रिया अवधि का लक्ष्य रखें। उत्तर को लंबा खींचे बिना महत्वपूर्ण बिंदुओं को कवर करें।",
@@ -200,7 +200,7 @@ export const hi = {
     "एक उत्साही विशेषज्ञ की तरह बोलें जो गहराई तक जाना पसंद करता है। तकनीकी शब्दावली का स्वतंत्र रूप से उपयोग करें, विवरणों के बारे में जानें, मान लें कि उपयोगकर्ता जानकारी रख सकता है।",
   concise: "संक्षिप्त",
   conciseDescription:
-    "पूर्ण होते हुए भी यथासंभव संक्षिप्त रहें। कोई प्रस्तावना नहीं, कोई पूरक नहीं, बस उत्तर। टेलीग्राम शैली में सोचें.",
+    "पूर्ण होते हुए भी यथासंभव संक्षिप्त रहें। कोई प्रस्तावना नहीं, कोई पूरक नहीं, बस उत्तर। टेलीग्राम शैली में सोचें।",
   socratic: "सुकराती",
   socraticDescription:
     "उपयोगकर्ता की सोच को चुनौती दें। प्रति-प्रश्न पूछें, वैकल्पिक दृष्टिकोण रखें, केवल उनकी बात की पुष्टि न करें। बहस का साथी बनें, हाँ-में-हाँ मिलाने वाली मशीन नहीं।",
@@ -272,20 +272,20 @@ export const hi = {
   ttsInstructionsPlaceholder:
     "उदाहरण के लिए: गर्मजोशी से, स्पष्ट रूप से और आराम से बोलें।",
   ttsInstructionsUnsupported:
-    "वर्तमान भाषण मार्ग वितरण निर्देशों का समर्थन नहीं करता.",
+    "वर्तमान भाषण मार्ग वितरण निर्देशों का समर्थन नहीं करता।",
   conversationVoiceDescription: ({ route }) =>
     `इस बातचीत में ${route} द्वारा इस्तेमाल की गई आवाज़ चुनें।`,
   scrollToLatest: "नवीनतम संदेश तक स्क्रॉल करें",
   conversationTitleGenerate: "शीर्षक स्वतः बनाएँ",
   conversationTitleGenerating: "शीर्षक जनरेट किया जा रहा है...",
-  conversationTitleGenerated: "बातचीत का नाम बदल दिया गया.",
+  conversationTitleGenerated: "बातचीत का नाम बदल दिया गया।",
   conversationTitleNeedsContent:
-    "शीर्षक बनाने से पहले बातचीत शुरू करें.",
+    "शीर्षक बनाने से पहले बातचीत शुरू करें।",
   conversationTitleNeedsProvider:
     "शीर्षक बनाने से पहले चयनित मॉडल को कॉन्फ़िगर करें।",
-  conversationTitleGenerationFailed: "वार्तालाप शीर्षक उत्पन्न नहीं किया जा सका.",
+  conversationTitleGenerationFailed: "वार्तालाप शीर्षक उत्पन्न नहीं किया जा सका।",
   conversationTitleGenerationTimedOut:
-    "शीर्षक निर्माण में बहुत अधिक समय लगा. कृपया पुन: प्रयास करें।",
+    "शीर्षक निर्माण में बहुत अधिक समय लगा। कृपया पुन: प्रयास करें।",
   inputMode: "इनपुट मोड",
   voiceInput: "ध्वनि इनपुट",
   pushToTalk: "दबाकर बोलें",
@@ -304,7 +304,7 @@ export const hi = {
   speechToText: "भाषण से पाठ तक",
   appNative: "सिस्टम पहचान",
   nativeSttDescription:
-    "ऑपरेटिंग सिस्टम के वाक् पहचानकर्ता का उपयोग करें.",
+    "ऑपरेटिंग सिस्टम के वाक् पहचानकर्ता का उपयोग करें।",
   provider: "प्रदाता",
   webSearchProvider: "वेब खोज प्रदाता",
   webSearchProviderMissingHint:
@@ -374,7 +374,7 @@ export const hi = {
   kokoroDownloading: ({ progress }) => `डाउनलोड हो रहा है... ${progress}%`,
   kokoroExtracting: ({ progress }) => `इंस्टाल किया जा रहा है… ${progress}%`,
   kokoroVerifying: "ध्वनि इंजन का सत्यापन किया जा रहा है...",
-  kokoroInstalled: "इस डिवाइस पर इंस्टॉल और तैयार है.",
+  kokoroInstalled: "इस डिवाइस पर इंस्टॉल और तैयार है।",
   kokoroNotInstalled:
     "Kokoro चुनने या उपयोग करने से पहले मॉडल डाउनलोड और सत्यापित करें। किसी प्रदाता कुंजी की आवश्यकता नहीं है।",
   kokoroLanguageFallback:
@@ -403,7 +403,7 @@ export const hi = {
   ttsFallbackRoutesHint:
     "वैकल्पिक। केवल वही मार्ग जोड़ें जो आप चाहते हैं, उसी क्रम में जिस क्रम में उन्हें आज़माया जाना चाहिए। एक बार जब रूट बोलना शुरू कर देता है, तो मैं शेष उत्तर के लिए उस पर रहता हूँ।",
   ttsFallbackNone:
-    "कोई फ़ॉलबैक कॉन्फ़िगर नहीं किया गया है. इसके बजाय ध्वनि विफलता दिखाई जाएगी.",
+    "कोई फ़ॉलबैक कॉन्फ़िगर नहीं किया गया है। इसके बजाय ध्वनि विफलता दिखाई जाएगी।",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
   addFallbackRoute: ({ route }) => `${route} फ़ॉलबैक जोड़ें`,
   removeFallbackRoute: ({ route }) => `${route} फ़ॉलबैक हटाएँ`,
@@ -429,9 +429,9 @@ export const hi = {
   providerVoicesAvailable: ({ count, provider }) =>
     `${provider} से ${count} ${Number(count) === 1 ? "आवाज़ उपलब्ध है" : "आवाज़ें उपलब्ध हैं"}।`,
   providerVoicesLoadFailed:
-    "आवाज़ें ताज़ा नहीं की जा सकीं. आपका वर्तमान चयन अपरिवर्तित है; आप अभी भी मैन्युअल रूप से वॉयस आईडी दर्ज कर सकते हैं।",
+    "आवाज़ें ताज़ा नहीं की जा सकीं। आपका वर्तमान चयन अपरिवर्तित है; आप अभी भी मैन्युअल रूप से वॉयस आईडी दर्ज कर सकते हैं।",
   providerVoicesLoadFailedWithFallback:
-    "खाता आवाजें लोड नहीं की जा सकीं. अंतर्निहित आवाज उपलब्ध रहती है।",
+    "खाता आवाजें लोड नहीं की जा सकीं। अंतर्निहित आवाज उपलब्ध रहती है।",
   providerVoicesErrorDetail: ({ detail }) => `कारण: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
     "ElevenLabs में, इस API कुंजी को संपादित करें और वॉयस → पढ़ें सक्षम करें, फिर यहां रीफ्रेश करें।",
@@ -500,11 +500,11 @@ export const hi = {
     `भाषा: ${languageLabel}`,
   speechDiagnosticProviderLine: ({ provider }) => `प्रदाता: ${provider}`,
   speechDiagnosticVoiceLine: ({ voice }) => `आवाज़: ${voice}`,
-  localTtsPackReady: "इस डिवाइस पर इंस्टॉल किया गया.",
+  localTtsPackReady: "इस डिवाइस पर इंस्टॉल किया गया।",
   localTtsPackBroken:
     "डाउनलोड किया गया, लेकिन यह आवाज़ इस डिवाइस पर स्थानीय सत्यापन में विफल रही। इसे पुनः डाउनलोड करें या कोई अन्य आवाज़ चुनें।",
   localTtsPackMissing:
-    "अभी तक स्थापित नहीं किया गया है. जब तक आप इसे डाउनलोड नहीं करेंगे तब तक क्लाउड TTS या सिस्टम वॉयस का उपयोग किया जाएगा।",
+    "अभी तक स्थापित नहीं किया गया है। जब तक आप इसे डाउनलोड नहीं करेंगे तब तक क्लाउड TTS या सिस्टम वॉयस का उपयोग किया जाएगा।",
   localTtsUnsupportedLanguageFallback:
     "इस भाषा के लिए कोई स्थानीय पैक अभी तक उपलब्ध नहीं है। क्लाउड TTS या सिस्टम वॉयस इसे संभाल लेगा।",
   downloadingLocalTtsPack: ({ progress }) =>
@@ -512,7 +512,7 @@ export const hi = {
   download: "डाउनलोड करना",
   downloadingShort: "लोड हो रहा है...",
   voicePreviewText: "ध्वनि पूर्वावलोकन पाठ",
-  voicePreviewPlaceholder: "इस आवाज़ को सुनने के लिए एक वाक्यांश टाइप करें.",
+  voicePreviewPlaceholder: "इस आवाज़ को सुनने के लिए एक वाक्यांश टाइप करें।",
   voicePreviewHint:
     "भाषा मॉडल पर कुछ भी भेजे बिना वर्तमान में चयनित उत्तर वॉयस बैकएंड का उपयोग करता है।",
   previewVoice: "आवाज़ का पूर्वावलोकन करें",
@@ -521,25 +521,25 @@ export const hi = {
   systemVoice: "सिस्टम आवाज",
   spokenRepliesOff: "केवल टेक्स्ट",
   noTtsProvider: "कोई TTS प्रदाता नहीं",
-  nothingToCopyYet: "अभी तक कॉपी करने के लिए कुछ भी नहीं है.",
-  couldntCopyText: "उस पाठ की प्रतिलिपि नहीं बनाई जा सकी.",
-  nothingToShareYet: "अभी साझा करने के लिए कुछ भी नहीं है.",
-  couldntShareText: "वह पाठ साझा नहीं किया जा सका.",
-  couldntReplayReply: "वह उत्तर दोबारा नहीं चलाया जा सका.",
+  nothingToCopyYet: "अभी तक कॉपी करने के लिए कुछ भी नहीं है।",
+  couldntCopyText: "उस पाठ की प्रतिलिपि नहीं बनाई जा सकी।",
+  nothingToShareYet: "अभी साझा करने के लिए कुछ भी नहीं है।",
+  couldntShareText: "वह पाठ साझा नहीं किया जा सका।",
+  couldntReplayReply: "वह उत्तर दोबारा नहीं चलाया जा सका।",
   replyFailed: "उत्तर विफल",
   retryReply: "उत्तर पुनः प्रयास करें",
   replyFailedHint: "आप पुनः प्रयास करने से पहले उपरोक्त कोई अन्य मॉडल चुन सकते हैं।",
-  spokenReplyFailed: "उत्तर सहेज लिया गया, लेकिन बोला नहीं जा सका.",
+  spokenReplyFailed: "उत्तर सहेज लिया गया, लेकिन बोला नहीं जा सका।",
   retrySpeech: "भाषण पुनः प्रयास करें",
   openSpeakingSettings: "बोलने की सेटिंग",
-  messageCopied: "संदेश कॉपी किया गया.",
-  noConversationToCopyYet: "कॉपी करने के लिए अभी कोई बातचीत नहीं है.",
-  noConversationToShareYet: "साझा करने के लिए अभी तक कोई बातचीत नहीं है.",
+  messageCopied: "संदेश कॉपी किया गया।",
+  noConversationToCopyYet: "कॉपी करने के लिए अभी कोई बातचीत नहीं है।",
+  noConversationToShareYet: "साझा करने के लिए अभी तक कोई बातचीत नहीं है।",
   noReplyToRepeatYet: "पुनः चलाने के लिए अभी तक कोई उत्तर नहीं।",
-  threadCopied: "थ्रेड कॉपी किया गया.",
-  threadRenamed: "थ्रेड का नाम बदला गया.",
-  threadPinned: "थ्रेड पिन किया गया.",
-  threadUnpinned: "थ्रेड अनपिन किया गया.",
+  threadCopied: "थ्रेड कॉपी किया गया।",
+  threadRenamed: "थ्रेड का नाम बदला गया।",
+  threadPinned: "थ्रेड पिन किया गया।",
+  threadUnpinned: "थ्रेड अनपिन किया गया।",
   addProviderKeyToUseProvider: ({ provider }) =>
     `इस मार्ग का उपयोग करने से पहले सेटिंग्स में ${provider} के लिए क्रेडेंशियल जोड़ें।`,
   configureCredentialsBeforeVoiceSession:
@@ -547,9 +547,9 @@ export const hi = {
   endpointCredentialFormatInvalid: ({ provider }) =>
     `${provider} के लिए, प्रदाता आधार URL और API कुंजी को https://your-endpoint.example.com|your-api-key के रूप में दर्ज करें।`,
   speechRecognitionUnavailableOnDevice:
-    "इस डिवाइस पर वाक् पहचान उपलब्ध नहीं है.",
+    "इस डिवाइस पर वाक् पहचान उपलब्ध नहीं है।",
   debugLogLabel: "LOG",
-  debugLogCaptureStarted: "डिबग लॉगिंग प्रारंभ हुई.",
+  debugLogCaptureStarted: "डिबग लॉगिंग प्रारंभ हुई।",
   debugLogCaptureStopped: ({ entryCount, fileName }) =>
     `डीबग लॉग को ${fileName} के रूप में सहेजा गया और क्लिपबोर्ड (${entryCount} प्रविष्टियाँ) पर कॉपी किया गया।`,
   debugLogCaptureStoppedNoClipboard: ({ entryCount, fileName }) =>
@@ -558,7 +558,7 @@ export const hi = {
     `पिछला डिबग लॉग ${fileName} पुनर्प्राप्त किया और इसे क्लिपबोर्ड (${entryCount} प्रविष्टियाँ) पर कॉपी किया।`,
   debugLogCaptureRecoveredNoClipboard: ({ entryCount, fileName }) =>
     `पिछला डिबग लॉग ${fileName} (${entryCount} प्रविष्टियाँ) पुनर्प्राप्त किया गया।`,
-  debugLogCaptureFailed: "डिबग लॉग सहेजा नहीं जा सका.",
+  debugLogCaptureFailed: "डिबग लॉग सहेजा नहीं जा सका।",
   chooseSttBeforeVoiceSession:
     "वॉयस सेशन शुरू करने से पहले सेटिंग्स में कॉन्फ़िगर किया गया STT रूट चुनें।",
   chooseTtsBeforeSpokenReplies:
@@ -566,8 +566,8 @@ export const hi = {
   stopSessionBeforeReplay:
     "अंतिम उत्तर पुनः चलाने से पहले सक्रिय ध्वनि सत्र रोकें।",
   couldntCatchThatTryAgain: "उसे पकड़ नहीं सका, पुनः प्रयास करें।",
-  couldntStartVoiceInput: "ध्वनि इनपुट प्रारंभ नहीं किया जा सका.",
-  couldntProcessVoiceInput: "ध्वनि इनपुट संसाधित नहीं किया जा सका.",
+  couldntStartVoiceInput: "ध्वनि इनपुट प्रारंभ नहीं किया जा सका।",
+  couldntProcessVoiceInput: "ध्वनि इनपुट संसाधित नहीं किया जा सका।",
   maxRecordingLengthReached:
     "रिकॉर्डिंग की अधिकतम अवधि पूरी हो गई है - जो मेरे पास है उसे भेज रहा हूँ।",
   sttRecordingTooLarge: ({ provider, limit }) =>
@@ -580,15 +580,15 @@ export const hi = {
     "आवाज़ों का पूर्वावलोकन करने के लिए सेटिंग्स में कॉन्फ़िगर किया गया TTS रूट चुनें।",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
     `पहले चयनित ${languageLabel} लोकल वॉयस डाउनलोड करें।`,
-  couldntPreviewVoice: "आवाज का पूर्वावलोकन नहीं किया जा सका.",
+  couldntPreviewVoice: "आवाज का पूर्वावलोकन नहीं किया जा सका।",
   spokenRepliesDisabled: "सेटिंग्स में बोले गए उत्तर बंद हैं।",
   providerVoiceFallback:
-    "कॉन्फ़िगर किया गया ध्वनि मार्ग विफल रहा. इस उत्तर को फ़ॉलबैक आवाज़ में बदल दिया गया।",
+    "कॉन्फ़िगर किया गया ध्वनि मार्ग विफल रहा। इस उत्तर को फ़ॉलबैक आवाज़ में बदल दिया गया।",
   localVoiceFallback:
-    "स्थानीय आवाज़ अनुपलब्ध थी. इस उत्तर को फ़ॉलबैक आवाज़ में बदल दिया गया।",
+    "स्थानीय आवाज़ अनुपलब्ध थी। इस उत्तर को फ़ॉलबैक आवाज़ में बदल दिया गया।",
   localTtsPackInstalled: ({ languageLabel }) =>
     `${languageLabel} स्थानीय वॉयस पैक स्थापित।`,
-  localTtsPackInstallFailed: "स्थानीय वॉयस पैक स्थापित नहीं किया जा सका.",
+  localTtsPackInstallFailed: "स्थानीय वॉयस पैक स्थापित नहीं किया जा सका।",
   clear: "साफ़ करें",
   voiceOutput: "आवाज आउटपुट",
   speechReplayCache: "स्पीच रीप्ले कैश",
@@ -629,10 +629,10 @@ export const hi = {
   threadTitle: "थ्रेड शीर्षक",
   noTranscriptYet: "अभी तक कोई प्रतिलेख नहीं",
   previewTranscriptEmptyDescription:
-    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें. आपकी बातचीत यहां दिखाई देगी.",
+    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें। आपकी बातचीत यहां दिखाई देगी।",
   noConversationYet: "अभी तक कोई बातचीत नहीं हुई",
   expandedTranscriptEmptyDescription:
-    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें. जब आप मुख्य मंच पर लौटना चाहें तो इस स्क्रीन को बंद कर दें।",
+    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें। जब आप मुख्य मंच पर लौटना चाहें तो इस स्क्रीन को बंद कर दें।",
   transcriptSelectionHint:
     "किसी भी संदेश का पाठ सीधे चुनें, या नीचे अलग-अलग संदेश साझा और कॉपी करें।",
   textMessagePlaceholder: "एक संदेश टाइप करें",
@@ -709,7 +709,7 @@ export const hi = {
   idle: "निष्क्रिय",
   yourConversationAppearsHere: "आपकी बातचीत यहां दिखाई देती है",
   defaultTranscriptEmptyDescription:
-    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें. मैं थ्रेड रखूँगा और यहाँ जवाब दूँगा।",
+    "आरंभ करने के लिए ध्वनि या पाठ का उपयोग करें। मैं थ्रेड रखूँगा और यहाँ जवाब दूँगा।",
   delete: "हटाएँ",
   deleteConversationConfirmationTitle: ({ title }) => `"${title}" हटाएं?`,
   deleteConversationConfirmationMessage:
@@ -742,7 +742,7 @@ export const hi = {
     "वह बाहरी सेवा चुनें जिसे आप कॉन्फ़िगर करना चाहते हैं, फिर उत्तर पहुंच के साथ क्रेडेंशियल पेस्ट करें।",
   setupGuideProviderPickerLabel: "उत्तर सेवा",
   setupGuideSelectProvider: "एक प्रदाता चुनें",
-  setupGuideSelectProviderFirst: "पहले एक प्रदाता चुनें.",
+  setupGuideSelectProviderFirst: "पहले एक प्रदाता चुनें।",
   setupGuideApiKeyLabel: "API कुंजी",
   setupGuideApiKeyPlaceholder: "क्रेडेंशियल चिपकाएँ",
   setupGuideContinue: "जारी रखें",
@@ -873,7 +873,7 @@ export const hi = {
   providerValidationSuccess: ({ provider }) => `${provider} उपयोग के लिए तैयार है।`,
   providerCapabilityValidationSuccess: ({ provider, capability }) =>
     `${provider} ${capability} काम कर रहा है.`,
-  providerValidationFailed: "प्रदाता सत्यापन विफल रहा.",
+  providerValidationFailed: "प्रदाता सत्यापन विफल रहा।",
   webSearchFallback:
     "वेब खोज अनुपलब्ध थी, इसलिए उत्तर लाइव वेब संदर्भ के बिना जारी रहा।",
   noBase64EncoderAvailable: "कोई बेस64 एनकोडर उपलब्ध नहीं है।",
@@ -897,7 +897,7 @@ export const hi = {
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
     `${provider} ${model} केवल ${limit} तक की रिकॉर्डिंग स्वीकार करता है। एक छोटी क्लिप का उपयोग करें या STT मॉडल स्विच करें।`,
   voiceInputCaptureIncomplete:
-    "वॉइस इनपुट साफ़-साफ़ कैप्चर नहीं किया जा सका. कृपया पुन: प्रयास करें।",
+    "वॉइस इनपुट साफ़-साफ़ कैप्चर नहीं किया जा सका। कृपया पुन: प्रयास करें।",
   ttsDidNotReturnAudio: ({ provider }) =>
     `${provider} TTS ने ऑडियो वापस नहीं किया।`,
   nativeSttHandledInApp: "सिस्टम STT को सीधे ऐप में नियंत्रित किया जाता है।",
@@ -910,14 +910,14 @@ export const hi = {
   untitledConversation: "शीर्षकहीन बातचीत",
   conversationExportHeader: ({ title }) => `बातचीत: ${title}`,
   speechRecognitionPermissionNotGranted:
-    "वाक् पहचान अनुमति नहीं दी गई.",
+    "वाक् पहचान अनुमति नहीं दी गई।",
   speechRecognitionUnavailableForDeviceLanguage:
     "वर्तमान डिवाइस भाषा के लिए वाक् पहचान उपलब्ध नहीं है।",
   nativeSpeechRecognitionNeedsNetwork:
     "मूल वाक् पहचान को अभी नेटवर्क एक्सेस की आवश्यकता है।",
-  noSpeechDetected: "कोई भाषण नहीं मिला.",
-  nativeSpeechRecognitionFailed: "मूल वाक् पहचान विफल रही.",
+  noSpeechDetected: "कोई भाषण नहीं मिला।",
+  nativeSpeechRecognitionFailed: "मूल वाक् पहचान विफल रही।",
   couldntStartNativeSpeechRecognition:
-    "मूल वाक् पहचान प्रारंभ नहीं की जा सकी.",
+    "मूल वाक् पहचान प्रारंभ नहीं की जा सकी।",
   microphonePermissionNotGranted: "माइक्रोफ़ोन की अनुमति नहीं दी गई",
 } satisfies TranslationDictionary;

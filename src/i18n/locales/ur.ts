@@ -701,7 +701,7 @@ export const ur = {
   turnReceiptTimingTotal: "کل",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} ٹوکنز`,
   unknownUsageRoute: "نامعلوم راستہ",
-  setupGuideConnectProviderTitle: "اسناد کو ترتیب دیں۔",
+  setupGuideConnectProviderTitle: "اسناد کو ترتیب دیں",
   setupGuideConnectProviderDescription:
     "ترتیبات میں اسناد شامل کریں، پھر وہ راستے منتخب کریں جنہیں آپ استعمال کرنا چاہتے ہیں۔",
   idle: "فارغ",
@@ -719,7 +719,7 @@ export const ur = {
   noSavedConversationsYet: "ابھی تک کوئی محفوظ شدہ گفتگو نہیں ہے۔",
   drawerEmptyDescription:
     "مین ویو سے بولنا شروع کریں اور میں خود بخود ایک سیشن بناؤں گا۔",
-  setupGuideTitle: "ایپ کو کنفیگر کریں۔",
+  setupGuideTitle: "ایپ کو کنفیگر کریں",
   setupGuideSubtitle: "اسناد شامل کریں اور ترتیبات میں راستے منتخب کریں۔",
   fastestStartPreset: "کم سے کم سیٹ اپ",
   fastestStartDescription:
@@ -731,12 +731,12 @@ export const ur = {
     "اب ہم ترتیبات کھولیں گے تاکہ آپ اسناد پیسٹ کر کے ان کی توثیق کر سکیں۔",
   useThisSetup: "اس سیٹ اپ کو استعمال کریں۔",
   notNow: "ابھی نہیں۔",
-  setupGuideIntroTitle: "میں کیسے کام کرتا ہوں۔",
+  setupGuideIntroTitle: "میں کیسے کام کرتا ہوں",
   setupGuideIntroBody:
     "میں خالی شروع ہوتا ہوں۔ بیرونی خدمات کے لیے اسناد شامل کریں جو آپ پہلے سے استعمال کرتے ہیں، پھر منتخب کریں کہ جوابات، اسپیچ ان پٹ، بولی جانے والی آؤٹ پٹ، اور اختیاری ویب سیاق و سباق کو کیسے روٹ کیا جاتا ہے۔",
   setupGuideIntroNote:
     "سیٹ اپ کے بعد، بات چیت شروع کرنے اور روکنے کے لیے مین وائس کنٹرول کا استعمال کریں۔ موجودہ ٹرانسکرپٹ ہوم اسکرین پر دستیاب رہتی ہے، اور ہر راستے کو بعد میں ترتیبات میں تبدیل کیا جا سکتا ہے۔",
-  setupGuideProviderTitle: "اسناد شامل کریں۔",
+  setupGuideProviderTitle: "اسناد شامل کریں",
   setupGuideProviderBody:
     "وہ بیرونی سروس منتخب کریں جسے آپ کنفیگر کرنا چاہتے ہیں، پھر جوابی رسائی کے ساتھ اسناد پیسٹ کریں۔",
   setupGuideProviderPickerLabel: "جوابی خدمت",
@@ -754,7 +754,7 @@ export const ur = {
     "ایک فراہم کنندہ کا انتخاب کریں اور جاری رکھنے کے لیے ایک API کلید شامل کریں، یا سیٹ اپ گائیڈ کو منسوخ کریں۔",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `یہ ${provider} اسناد جوابی درخواستوں کی اجازت نہیں دیتے ہیں۔`,
-  setupGuideKokoroTitle: "ایک قدرتی آن ڈیوائس آواز شامل کریں۔",
+  setupGuideKokoroTitle: "ایک قدرتی آن ڈیوائس آواز شامل کریں",
   setupGuideKokoroBody: ({ size }) =>
     `اختیاری: Kokoro ڈاؤن لوڈ کریں (تقریباً ${size} MB) اسپیچ فراہم کنندہ یا استعمال کے چارجز کے بغیر کہیں زیادہ فطری بولے جانے والے جوابات کے لیے۔`,
   setupGuideKokoroLanguageNote:
@@ -764,7 +764,7 @@ export const ur = {
   setupGuideUseKokoroSummary:
     "جب بھی جوابی زبان سپورٹ ہو، آواز کی تیاری فون پر ہی رکھیں۔",
   setupGuideSkipKokoro: "ابھی کے لیے چھوڑ دیں۔",
-  setupGuideVoiceTestTitle: "اپنے سیٹ اپ کی جانچ کریں۔",
+  setupGuideVoiceTestTitle: "اپنے سیٹ اپ کی جانچ کریں",
   setupGuideVoiceTestBody:
     "ایک مختصر جملہ کہیں۔ میں قابل قبول صوتی راستہ دستیاب ہونے پر مائیکروفون تک رسائی، ٹرانسکرپشن، ترتیب شدہ جوابی راستے، اور بولے جانے والے آؤٹ پٹ کی جانچ کروں گا۔",
   setupGuideVoiceTestNoInputBody:
