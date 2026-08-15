@@ -1,5 +1,14 @@
 import React from "react";
-import { Animated, Pressable, ScrollView, Text, View } from "react-native";
+import {
+  Animated,
+  PanResponder,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import type { EdgeInsets } from "react-native-safe-area-context";
 import { Toast } from "../../components/Toast";
@@ -30,6 +39,53 @@ interface AntSettingsFrameProps {
   onSelectPage: (page: SettingsDetailPage) => void;
   title: string;
   validationToastMessage: string | null;
+}
+
+const SETTINGS_BACK_SWIPE_EDGE = 28;
+const SETTINGS_BACK_SWIPE_SLOP = 10;
+const SETTINGS_BACK_SWIPE_DISTANCE = 72;
+const SETTINGS_BACK_SWIPE_VELOCITY = 0.55;
+
+interface SettingsBackSwipeGesture {
+  dx: number;
+  dy: number;
+  isRtl: boolean;
+  width: number;
+  x0: number;
+}
+
+/** Compact iOS Settings follows the platform's leading-edge back gesture. */
+export function shouldClaimSettingsBackSwipe({
+  dx,
+  dy,
+  isRtl,
+  width,
+  x0,
+}: SettingsBackSwipeGesture) {
+  const beganAtLeadingEdge = isRtl
+    ? x0 >= width - SETTINGS_BACK_SWIPE_EDGE
+    : x0 <= SETTINGS_BACK_SWIPE_EDGE;
+  const leadingDistance = isRtl ? -dx : dx;
+
+  return (
+    beganAtLeadingEdge &&
+    leadingDistance > SETTINGS_BACK_SWIPE_SLOP &&
+    leadingDistance > Math.abs(dy) * 1.2
+  );
+}
+
+export function shouldCompleteSettingsBackSwipe({
+  dx,
+  isRtl,
+  vx,
+}: Pick<SettingsBackSwipeGesture, "dx" | "isRtl"> & { vx: number }) {
+  const leadingDistance = isRtl ? -dx : dx;
+  const leadingVelocity = isRtl ? -vx : vx;
+
+  return (
+    leadingDistance >= SETTINGS_BACK_SWIPE_DISTANCE ||
+    leadingVelocity >= SETTINGS_BACK_SWIPE_VELOCITY
+  );
 }
 
 function IpadSettingsCategoryNav({
@@ -158,7 +214,52 @@ export function AntSettingsFrame({
 }: AntSettingsFrameProps) {
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
+  const { width } = useWindowDimensions();
   const showsBackButton = !isRegularIpad && activePage !== "overview";
+  const backSwipeEnabled = Platform.OS === "ios" && showsBackButton;
+  const backSwipeStateRef = React.useRef({
+    enabled: backSwipeEnabled,
+    isRtl,
+    onBack,
+    width,
+  });
+  backSwipeStateRef.current = {
+    enabled: backSwipeEnabled,
+    isRtl,
+    onBack,
+    width,
+  };
+  const backSwipeResponder = React.useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponderCapture: (_event, gesture) => {
+        const state = backSwipeStateRef.current;
+        return (
+          state.enabled &&
+          shouldClaimSettingsBackSwipe({
+            dx: gesture.dx,
+            dy: gesture.dy,
+            isRtl: state.isRtl,
+            width: state.width,
+            x0: gesture.x0,
+          })
+        );
+      },
+      onPanResponderRelease: (_event, gesture) => {
+        const state = backSwipeStateRef.current;
+        if (
+          state.enabled &&
+          shouldCompleteSettingsBackSwipe({
+            dx: gesture.dx,
+            isRtl: state.isRtl,
+            vx: gesture.vx,
+          })
+        ) {
+          state.onBack();
+        }
+      },
+      onPanResponderTerminationRequest: () => false,
+    }),
+  ).current;
   const detailPage: SettingsDetailPage =
     activePage === "overview" ? "connections" : activePage;
   const animatedModalStyle = {
@@ -211,6 +312,7 @@ export function AntSettingsFrame({
         </>
       ) : null}
       <Animated.View
+        {...(backSwipeEnabled ? backSwipeResponder.panHandlers : null)}
         testID="settings-modal-panel"
         style={[
           styles.modal,

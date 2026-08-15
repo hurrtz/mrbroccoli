@@ -67,6 +67,13 @@ and restores its normal back-to-overview control. RTL places the rail on the
 leading right edge and mirrors each row's leading/trailing arrangement without
 changing page ownership.
 
+On iOS, compact detail pages also expose the native leading-edge back gesture:
+swiping inward from the left in LTR or the right in RTL returns to the Settings
+overview. The gesture is deliberately edge-bound and horizontally dominant so
+vertical Settings scrolling and controls away from that edge keep ownership of
+their touches. Android keeps its system-back behavior and regular iPad keeps
+the persistent category rail instead of a back gesture.
+
 ## Edition Boundary
 
 Free and Premium users see the same seven-page overview and the same structure

@@ -28,6 +28,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Conversation styles such as Explain like I’m five now remain the final,
   binding response instruction even when a broader assistant prompt asks for a
   conflicting technical style.
+- iPhone Settings detail pages now support the standard edge swipe back in
+  both left-to-right and right-to-left interfaces.
 - Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
   keep the phone interface; regular layouts add a persistent conversations
   sidebar, a docked transcript when all three panes fit, master-detail Settings,
