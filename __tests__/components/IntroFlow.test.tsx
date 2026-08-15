@@ -5,6 +5,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  UIManager,
   useWindowDimensions,
 } from "react-native";
 import { translations } from "../../src/i18n/localeRegistry";
@@ -75,9 +76,15 @@ import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfil
 import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
 
 const t = ((key: string) => key) as never;
+const mockHasViewManagerConfig = jest.spyOn(UIManager, "hasViewManagerConfig");
 
 beforeEach(() => {
   jest.clearAllMocks();
+  Object.defineProperty(Platform, "OS", {
+    configurable: true,
+    value: "ios",
+    writable: true,
+  });
   Object.defineProperty(Platform, "isPad", {
     configurable: true,
     value: false,
@@ -97,6 +104,7 @@ beforeEach(() => {
     .mockImplementation(() => new Promise(() => undefined));
   mockPlaying = false;
   mockStatus = {};
+  mockHasViewManagerConfig.mockReturnValue(true);
 });
 
 function renderScreen(
@@ -329,24 +337,23 @@ describe("IntroFlowScreen", () => {
     expect(far.filter).toBeUndefined();
 
     const headlineBlur = getByTestId("intro-dialogue-headline-blur");
-    expect(headlineBlur.props).toEqual(
-      expect.objectContaining({
-        blurMethod: "dimezisBlurViewSdk31Plus",
-        blurReductionFactor: 3,
-        intensity: 72,
-        pointerEvents: "none",
-      }),
+    expect(headlineBlur.props.blurMethod).toBe("dimezisBlurViewSdk31Plus");
+    expect(headlineBlur.props.blurReductionFactor).toBe(4);
+    expect(headlineBlur.props.intensity).toBe(42);
+    expect(headlineBlur.props.pointerEvents).toBe("none");
+    expect(headlineBlur.props.tint).toMatch(
+      /^systemUltraThinMaterial(?:Light|Dark)$/,
     );
     expect(StyleSheet.flatten(headlineBlur.props.style)).toEqual(
       expect.objectContaining({
-        height: 196,
+        height: 132,
         position: "absolute",
-        top: -54,
+        top: -28,
         zIndex: 1,
       }),
     );
     expect(getByTestId("intro-dialogue-headline-fade").props.locations).toEqual(
-      [0, 0.35, 0.72, 1],
+      [0, 0.34, 0.72, 1],
     );
     expect(
       StyleSheet.flatten(
@@ -387,6 +394,31 @@ describe("IntroFlowScreen", () => {
         "That answer makes more sense out loud. Tap play and let Mr Broccoli explain it himself.",
       ),
     ).toBeTruthy();
+  });
+
+  it("falls back without mounting unavailable Android blur managers", () => {
+    Object.defineProperty(Platform, "OS", {
+      configurable: true,
+      value: "android",
+      writable: true,
+    });
+    mockHasViewManagerConfig.mockReturnValue(false);
+
+    const screen = renderScreen();
+    const hidden = { includeHiddenElements: true } as const;
+
+    expect(screen.queryByTestId("intro-dialogue-headline-blur")).toBeNull();
+    expect(screen.getByTestId("intro-dialogue-headline-fade")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("intro-dialogue-far", hidden).props.style,
+      ),
+    ).toEqual(expect.objectContaining({ filter: [{ blur: 4 }] }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("intro-dialogue-mid", hidden).props.style,
+      ),
+    ).toEqual(expect.objectContaining({ filter: [{ blur: 2.4 }] }));
   });
 
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
@@ -432,7 +464,7 @@ describe("IntroFlowScreen", () => {
         (testID): testID is string =>
           typeof testID === "string" && testID.startsWith("intro-page-"),
       );
-    expect(scrollablePages).toEqual([]);
+    expect(scrollablePages).toEqual(["intro-page-try", "intro-page-setup"]);
     const pageWidth = StyleSheet.flatten(
       screen.getByTestId("intro-page-welcome").props.style,
     ).width;
@@ -856,20 +888,19 @@ describe("IntroFlowScreen", () => {
     expect(props.autoSetup.start).toHaveBeenCalledTimes(1);
   });
 
-  it("reveals the pipeline-ordered manual catalogue behind its switch", () => {
+  it("reveals the manual catalogue inside Setup's page scroller", () => {
     const { getByTestId, UNSAFE_getAllByType } = renderScreen();
 
     fireEvent.press(getByTestId("intro-manual-switch"));
     const catalogue = getByTestId("intro-manual-catalogue");
-    expect(catalogue.props.showsVerticalScrollIndicator).toBe(false);
     expect(StyleSheet.flatten(catalogue.props.style)).toEqual(
-      expect.objectContaining({ flex: 1 }),
+      expect.objectContaining({ gap: 16 }),
     );
-    expect(
-      UNSAFE_getAllByType(ScrollView)
-        .map((view) => view.props.testID)
-        .filter(Boolean),
-    ).toContain("intro-manual-catalogue");
+    const scrollTestIds = UNSAFE_getAllByType(ScrollView)
+      .map((view) => view.props.testID)
+      .filter(Boolean);
+    expect(scrollTestIds).toContain("intro-page-setup");
+    expect(scrollTestIds).not.toContain("intro-manual-catalogue");
     expect(getByTestId("intro-manual-stt")).toBeTruthy();
     expect(getByTestId("intro-manual-llm")).toBeTruthy();
     expect(getByTestId("intro-manual-provider")).toBeTruthy();
@@ -939,7 +970,7 @@ describe("IntroFlowScreen", () => {
     expect(
       StyleSheet.flatten(getByTestId("intro-try-mic").props.style),
     ).toEqual(
-      expect.objectContaining({ borderRadius: 12, height: 76, width: 76 }),
+      expect.objectContaining({ borderRadius: 999, height: 76, width: 76 }),
     );
     expect(
       StyleSheet.flatten(getByTestId("intro-try-replay").props.style),

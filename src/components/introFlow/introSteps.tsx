@@ -3,10 +3,11 @@ import { BlurTargetView, BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   AccessibilityInfo,
+  Platform,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
+  UIManager,
   View,
 } from "react-native";
 
@@ -80,6 +81,27 @@ export interface IntroStepProps {
   testTurn: IntroTestTurnState;
   /** A runnable reasoning route exists for the live test. */
   thinkingReady: boolean;
+}
+
+const EXPO_BLUR_VIEW_MANAGER = "ViewManagerAdapter_ExpoBlur_ExpoBlurView";
+const EXPO_BLUR_TARGET_MANAGER =
+  "ViewManagerAdapter_ExpoBlur_ExpoBlurTargetView";
+
+/**
+ * An updated JavaScript bundle can reach a development install before a newly
+ * added native view has been linked into that binary. Rendering an unavailable
+ * Expo view is fatal on Android, so the introduction treats blur as a runtime
+ * capability and keeps an already-shipped visual fallback.
+ */
+function supportsNativeIntroBlur(): boolean {
+  try {
+    const hasBlurView = UIManager.hasViewManagerConfig(EXPO_BLUR_VIEW_MANAGER);
+    return Platform.OS === "android"
+      ? hasBlurView && UIManager.hasViewManagerConfig(EXPO_BLUR_TARGET_MANAGER)
+      : hasBlurView;
+  } catch {
+    return false;
+  }
 }
 
 /** A stored-dialogue bubble in the app's messenger anatomy. */
@@ -156,6 +178,9 @@ function WelcomeStep({ language, t }: IntroStepProps) {
   const [played, setPlayed] = React.useState(false);
   const [pickerOpen, setPickerOpen] = React.useState(false);
   const blurTargetRef = React.useRef<View | null>(null);
+  const nativeBlurAvailable = supportsNativeIntroBlur();
+  const useAndroidFilterFallback =
+    Platform.OS === "android" && !nativeBlurAvailable;
   const { playing, toggle } = useIntroPlayback(getIntroClip(previewLanguage));
 
   const preview = translations[previewLanguage];
@@ -163,6 +188,123 @@ function WelcomeStep({ language, t }: IntroStepProps) {
   const previewIsRtl = previewDirection === "rtl";
   const activeLanguage = APP_LANGUAGE_OPTIONS.find(
     (option) => option.value === previewLanguage,
+  );
+  const dialogue = (
+    <>
+      <View
+        accessible={false}
+        importantForAccessibility="no-hide-descendants"
+        style={styles.dialogueHistory}
+      >
+        <View
+          style={[
+            styles.dialogueFar,
+            useAndroidFilterFallback ? styles.dialogueFarFilterFallback : null,
+          ]}
+          testID="intro-dialogue-far"
+        >
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            mine
+            testID="intro-dialogue-prompt-1"
+            theme={theme}
+          >
+            {preview.introDialogueOpeningPrompt}
+          </Bubble>
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            testID="intro-dialogue-response-1"
+            theme={theme}
+          >
+            {preview.introDialogueFar}
+          </Bubble>
+        </View>
+        <View
+          style={[
+            styles.dialogueMid,
+            useAndroidFilterFallback ? styles.dialogueMidFilterFallback : null,
+          ]}
+          testID="intro-dialogue-mid"
+        >
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            mine
+            testID="intro-dialogue-prompt-2"
+            theme={theme}
+          >
+            {preview.introDialogueQuestion}
+          </Bubble>
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            testID="intro-dialogue-response-2"
+            theme={theme}
+          >
+            {preview.introDialogueNear}
+          </Bubble>
+        </View>
+        <View style={styles.dialogueNear} testID="intro-dialogue-near">
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            mine
+            testID="intro-dialogue-prompt-3"
+            theme={theme}
+          >
+            {preview.introDialoguePromptThree}
+          </Bubble>
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            testID="intro-dialogue-response-3"
+            theme={theme}
+          >
+            {preview.introDialogueResponseThree}
+          </Bubble>
+        </View>
+        <View style={styles.dialogueSoft} testID="intro-dialogue-soft">
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            mine
+            testID="intro-dialogue-prompt-4"
+            theme={theme}
+          >
+            {preview.introDialoguePromptFour}
+          </Bubble>
+          <Bubble
+            contentDirection={previewDirection}
+            isRtl={previewIsRtl}
+            testID="intro-dialogue-response-4"
+            theme={theme}
+          >
+            {preview.introDialogueResponseFour}
+          </Bubble>
+        </View>
+      </View>
+      <View style={styles.dialogueFinal}>
+        <Bubble
+          contentDirection={previewDirection}
+          isRtl={previewIsRtl}
+          mine
+          testID="intro-dialogue-query-bubble"
+          theme={theme}
+        >
+          {preview.introWelcomeQuery}
+        </Bubble>
+        <Bubble
+          contentDirection={previewDirection}
+          isRtl={previewIsRtl}
+          testID="intro-dialogue-play-response-bubble"
+          theme={theme}
+        >
+          {preview.introDialoguePlayResponse}
+        </Bubble>
+      </View>
+    </>
   );
 
   return (
@@ -177,137 +319,61 @@ function WelcomeStep({ language, t }: IntroStepProps) {
           out of the accessibility tree; the crisp final exchange explains the
           play action and is announced. */}
       <View style={[styles.dialogueZone, { direction: previewDirection }]}>
-        <BlurTargetView
-          ref={blurTargetRef}
-          style={styles.dialogueConversation}
-          testID="intro-dialogue-conversation"
-        >
-          <View
-            accessible={false}
-            importantForAccessibility="no-hide-descendants"
-            style={styles.dialogueHistory}
+        {nativeBlurAvailable ? (
+          <BlurTargetView
+            ref={blurTargetRef}
+            style={styles.dialogueConversation}
+            testID="intro-dialogue-conversation"
           >
-            <View style={styles.dialogueFar} testID="intro-dialogue-far">
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                mine
-                testID="intro-dialogue-prompt-1"
-                theme={theme}
-              >
-                {preview.introDialogueOpeningPrompt}
-              </Bubble>
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                testID="intro-dialogue-response-1"
-                theme={theme}
-              >
-                {preview.introDialogueFar}
-              </Bubble>
-            </View>
-            <View style={styles.dialogueMid} testID="intro-dialogue-mid">
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                mine
-                testID="intro-dialogue-prompt-2"
-                theme={theme}
-              >
-                {preview.introDialogueQuestion}
-              </Bubble>
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                testID="intro-dialogue-response-2"
-                theme={theme}
-              >
-                {preview.introDialogueNear}
-              </Bubble>
-            </View>
-            <View style={styles.dialogueNear} testID="intro-dialogue-near">
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                mine
-                testID="intro-dialogue-prompt-3"
-                theme={theme}
-              >
-                {preview.introDialoguePromptThree}
-              </Bubble>
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                testID="intro-dialogue-response-3"
-                theme={theme}
-              >
-                {preview.introDialogueResponseThree}
-              </Bubble>
-            </View>
-            <View style={styles.dialogueSoft} testID="intro-dialogue-soft">
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                mine
-                testID="intro-dialogue-prompt-4"
-                theme={theme}
-              >
-                {preview.introDialoguePromptFour}
-              </Bubble>
-              <Bubble
-                contentDirection={previewDirection}
-                isRtl={previewIsRtl}
-                testID="intro-dialogue-response-4"
-                theme={theme}
-              >
-                {preview.introDialogueResponseFour}
-              </Bubble>
-            </View>
+            {dialogue}
+          </BlurTargetView>
+        ) : (
+          <View
+            style={styles.dialogueConversation}
+            testID="intro-dialogue-conversation"
+          >
+            {dialogue}
           </View>
-          <View style={styles.dialogueFinal}>
-            <Bubble
-              contentDirection={previewDirection}
-              isRtl={previewIsRtl}
-              mine
-              testID="intro-dialogue-query-bubble"
-              theme={theme}
-            >
-              {preview.introWelcomeQuery}
-            </Bubble>
-            <Bubble
-              contentDirection={previewDirection}
-              isRtl={previewIsRtl}
-              testID="intro-dialogue-play-response-bubble"
-              theme={theme}
-            >
-              {preview.introDialoguePlayResponse}
-            </Bubble>
-          </View>
-        </BlurTargetView>
+        )}
       </View>
 
-      <BlurView
-        blurMethod="dimezisBlurViewSdk31Plus"
-        blurReductionFactor={3}
-        blurTarget={blurTargetRef}
-        intensity={72}
-        pointerEvents="none"
-        style={styles.dialogueHeadlineEffect}
-        testID="intro-dialogue-headline-blur"
-        tint={theme.blurTint}
-      >
+      {nativeBlurAvailable ? (
+        <BlurView
+          blurMethod="dimezisBlurViewSdk31Plus"
+          blurReductionFactor={4}
+          blurTarget={blurTargetRef}
+          intensity={42}
+          pointerEvents="none"
+          style={styles.dialogueHeadlineEffect}
+          testID="intro-dialogue-headline-blur"
+          tint={theme.blurTint}
+        >
+          <LinearGradient
+            colors={[
+              withAlpha(theme.canvas, 0.16),
+              withAlpha(theme.canvas, 0.08),
+              withAlpha(theme.canvas, 0),
+              withAlpha(theme.canvas, 0),
+            ]}
+            locations={[0, 0.34, 0.72, 1]}
+            style={StyleSheet.absoluteFill}
+            testID="intro-dialogue-headline-fade"
+          />
+        </BlurView>
+      ) : (
         <LinearGradient
           colors={[
-            withAlpha(theme.canvas, 0.78),
-            withAlpha(theme.canvas, 0.5),
-            withAlpha(theme.canvas, 0.12),
+            withAlpha(theme.canvas, 0.34),
+            withAlpha(theme.canvas, 0.18),
+            withAlpha(theme.canvas, 0),
             withAlpha(theme.canvas, 0),
           ]}
-          locations={[0, 0.35, 0.72, 1]}
-          style={StyleSheet.absoluteFill}
+          locations={[0, 0.34, 0.72, 1]}
+          pointerEvents="none"
+          style={styles.dialogueHeadlineEffect}
           testID="intro-dialogue-headline-fade"
         />
-      </BlurView>
+      )}
 
       <View style={styles.welcomeCentre}>
         <Pressable
@@ -674,7 +740,7 @@ function SetupStep({
   );
 
   return (
-    <View style={[styles.stack, styles.setupStack]} testID="intro-setup-step">
+    <View style={styles.stack} testID="intro-setup-step">
       <IntroTitle>{t("introSetupTitle")}</IntroTitle>
       <IntroBody>{t("introSetupBody")}</IntroBody>
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
@@ -744,12 +810,7 @@ function SetupStep({
       </View>
 
       {manualOpen ? (
-        <ScrollView
-          contentContainerStyle={styles.manualStack}
-          showsVerticalScrollIndicator={false}
-          style={styles.manualScroller}
-          testID="intro-manual-catalogue"
-        >
+        <View style={styles.manualStack} testID="intro-manual-catalogue">
           <Text style={[styles.manualTitle, { color: theme.text }]}>
             {t("introManualTitle")}
           </Text>
@@ -847,7 +908,7 @@ function SetupStep({
               theme={theme}
             />
           </ManualGroup>
-        </ScrollView>
+        </View>
       ) : null}
     </View>
   );
@@ -1025,12 +1086,15 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 5,
   },
   // Earlier turns become more legible toward the crisp query. A native blur
-  // surface above this stack owns the actual cross-platform headline effect;
-  // per-view `filter: blur` is intentionally avoided because iOS leaves it
-  // sharp while Android applies it.
+  // surface above this stack owns the effect when linked; Android can use its
+  // already-supported view filter while an updated JavaScript bundle is still
+  // running inside an older native development install.
   dialogueFar: {
     gap: 8,
     opacity: 0.38,
+  },
+  dialogueFarFilterFallback: {
+    filter: [{ blur: 4 }],
   },
   dialogueConversation: {
     bottom: 0,
@@ -1041,6 +1105,9 @@ const styles = StyleSheet.create({
   dialogueMid: {
     gap: 8,
     opacity: 0.56,
+  },
+  dialogueMidFilterFallback: {
+    filter: [{ blur: 2.4 }],
   },
   dialogueNear: {
     gap: 8,
@@ -1058,11 +1125,11 @@ const styles = StyleSheet.create({
     gap: 9,
   },
   dialogueHeadlineEffect: {
-    height: 196,
+    height: 132,
     left: -22,
     position: "absolute",
     right: -22,
-    top: -54,
+    top: -28,
     zIndex: 1,
   },
   dialogueZone: {
@@ -1205,9 +1272,6 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
     paddingTop: 6,
   },
-  manualScroller: {
-    flex: 1,
-  },
   manualSwitchRow: {
     alignItems: "center",
     flexDirection: "row",
@@ -1290,9 +1354,6 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
   },
-  setupStack: {
-    flex: 1,
-  },
   stack: {
     gap: 14,
   },
@@ -1324,7 +1385,7 @@ const styles = StyleSheet.create({
   },
   tryMic: {
     alignItems: "center",
-    borderRadius: introRadius.iconButton,
+    borderRadius: introRadius.pill,
     borderWidth: 2,
     elevation: 10,
     height: 76,

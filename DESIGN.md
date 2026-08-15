@@ -72,13 +72,15 @@ available.
 The first-run introduction is a three-page horizontal pager. Its welcome page
 renders a fixed five-exchange localized conversation from oldest and most
 obscured to a crisp final prompt and response, then plays the bundled answer in
-the selected interface language. Every page is a fixed View, never a vertical
-page scroll; Setup confines its optional overflow to the manual catalogue. A
-native blur view and canvas-colored gradient sit over the conversation and
-below the headline, so the overflow transition does not depend on
-platform-specific React Native filters. The fixed bottom action shares one
-geometry across pages; only the last page changes its label and completion
-gate.
+the selected interface language. Welcome is a fixed View and never scrolls;
+Setup and Try use vertical page scrollers so expanded setup choices and live
+test results remain reachable. A capability-guarded native blur view and a
+canvas-colored gradient sit over the welcome conversation and below the
+headline. Android falls back to its supported view filter when a newer
+JavaScript bundle is running in an older native development install. The fixed
+bottom action shares one geometry across pages; only the last page changes its
+label and completion gate. The Try voice action is circular to echo the home
+voice orb.
 
 The iOS presentation remains one component tree across iPhone and iPad.
 `resolveIpadLayout` maps the live window and native iPad identity into compact

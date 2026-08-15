@@ -30,7 +30,9 @@ export function getIntroTheme(colors: Colors, isDark: boolean) {
     accentSoft: colors.accentSoft,
     accentBorder: colors.accent,
     onAccent: colors.onAccent,
-    blurTint: isDark ? ("dark" as const) : ("light" as const),
+    blurTint: isDark
+      ? ("systemUltraThinMaterialDark" as const)
+      : ("systemUltraThinMaterialLight" as const),
 
     /**
      * Warm sand for a chosen option: at rest a hairline, once chosen a fill

@@ -364,7 +364,7 @@ export function IntroFlowScreen({
                         />
                       );
 
-                      return (
+                      return step === "welcome" ? (
                         <View
                           key={`${step}-${openNonce}`}
                           style={[
@@ -376,6 +376,16 @@ export function IntroFlowScreen({
                         >
                           {content}
                         </View>
+                      ) : (
+                        <ScrollView
+                          contentContainerStyle={[styles.page, styles.pageFill]}
+                          key={`${step}-${openNonce}`}
+                          showsVerticalScrollIndicator={false}
+                          style={{ direction, width: pagerViewportWidth }}
+                          testID={`intro-page-${step}`}
+                        >
+                          {content}
+                        </ScrollView>
                       );
                     })}
                   </ScrollView>
