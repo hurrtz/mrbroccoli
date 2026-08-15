@@ -27,6 +27,9 @@ authoritative documents.
   defines the current design-system and native-runtime reconciliation goal;
   its sibling `design.md`, `tasks.md`, and `matrix.md` hold the execution model
   and live evidence status.
+- [`gaplist.md`](./gaplist.md) records the screenshot-to-design-system audit
+  that preceded the current reconciliation work. It is implementation evidence,
+  not a replacement for the living specs.
 
 ## Stable Boundaries
 
