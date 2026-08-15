@@ -60,6 +60,11 @@ tags:
     direction: DOWN
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/settings-app-02
+- scrollUntilVisible:
+    element:
+      id: app-theme
+    direction: UP
+    centerElement: true
 - tapOn:
     id: app-theme
 - assertVisible:
