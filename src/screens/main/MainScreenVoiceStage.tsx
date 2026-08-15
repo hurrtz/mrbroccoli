@@ -18,6 +18,8 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
   disabled?: boolean;
+  driveSilenceCountdownSeconds?: number | null;
+  driveVoiceActive?: boolean;
   /** Controls centred with the orb/composer as one measured cluster. */
   footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
@@ -62,6 +64,8 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   compactPromptNotice = false,
   disabled = false,
+  driveSilenceCountdownSeconds = null,
+  driveVoiceActive = false,
   footer,
   initialInputSurface,
   initialTextInputFocused,
@@ -119,6 +123,8 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           colors={colors}
           compactPromptNotice={compactPromptNotice}
           disabled={disabled}
+          driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
+          driveVoiceActive={driveVoiceActive}
           footer={footer}
           initialSurface={initialInputSurface}
           initialTextInputFocused={initialTextInputFocused}

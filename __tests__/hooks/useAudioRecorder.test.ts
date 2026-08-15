@@ -177,10 +177,16 @@ describe("useAudioRecorder permissions", () => {
         sessionId,
         metering: -52,
       });
+      nativeWaveformListener?.({
+        type: "levels",
+        sessionId,
+        metering: -52,
+      });
     });
 
     expect(result.current.ambientMonitoring).toBe(true);
     expect(result.current.ambientInputMetering).toBe(-52);
+    expect(result.current.ambientInputMeteringSampleId).toBe(2);
     expect(result.current.audioRoute).toBe("built-in");
 
     await act(async () => {

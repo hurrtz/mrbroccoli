@@ -819,6 +819,46 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: true });
   });
 
+  it("shows the Drive silence countdown in the recording orb", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveSilenceCountdownSeconds: 3,
+          driveVoiceActive: false,
+          inputMode: "drive-session",
+          isActive: true,
+          recordingStartedAtMs: Date.now(),
+          visualPhase: "recording",
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("voice-orb-core-label").props.children).toBe(
+      "3",
+    );
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core-label").props.style)
+        .color,
+    ).toBe(lightColors.danger);
+    expect(screen.getByTestId("voice-orb-active").props.accessibilityLabel).toBe(
+      "Sends in 3…",
+    );
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          driveSilenceCountdownSeconds: 3,
+          driveVoiceActive: true,
+          inputMode: "drive-session",
+          isActive: true,
+          recordingStartedAtMs: Date.now(),
+          visualPhase: "recording",
+        })}
+      />,
+    );
+    expect(screen.queryByTestId("voice-orb-core-label")).toBeNull();
+  });
+
   it("announces voice pipeline phase changes without announcing every ETA tick", () => {
     const announce = jest
       .spyOn(AccessibilityInfo, "announceForAccessibility")

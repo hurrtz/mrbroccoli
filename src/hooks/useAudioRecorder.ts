@@ -23,6 +23,7 @@ import { assessRecordedSpeech } from "../services/recordingSpeechGate";
 
 export interface RecorderState {
   ambientInputMetering: number | null;
+  ambientInputMeteringSampleId: number;
   ambientMonitoring: boolean;
   audioRoute: string | null;
   isRecording: boolean;
@@ -74,6 +75,8 @@ export function useAudioRecorder() {
   const [ambientInputMetering, setAmbientInputMetering] = useState<
     number | null
   >(null);
+  const [ambientInputMeteringSampleId, setAmbientInputMeteringSampleId] =
+    useState(0);
   const [nativeAudioRoute, setNativeAudioRoute] = useState<string | null>(
     null,
   );
@@ -135,6 +138,7 @@ export function useAudioRecorder() {
         event.sessionId === ambientSessionIdRef.current
       ) {
         setAmbientInputMetering(event.metering);
+        setAmbientInputMeteringSampleId((sampleId) => sampleId + 1);
         return;
       }
 
@@ -638,6 +642,7 @@ export function useAudioRecorder() {
 
   return {
     ambientInputMetering,
+    ambientInputMeteringSampleId,
     ambientMonitoring,
     audioRoute: nativeAudioRoute,
     isRecording: usingNativeRecorder

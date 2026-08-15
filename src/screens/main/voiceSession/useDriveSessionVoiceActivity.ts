@@ -24,6 +24,7 @@ import {
 
 interface UseDriveSessionVoiceActivityParams {
   ambientInputMetering: number | null;
+  ambientInputMeteringSampleId: number;
   ambientMonitoring: boolean;
   audioRoute: string | null;
   autoContinueEnabled: boolean;
@@ -46,6 +47,7 @@ interface UseDriveSessionVoiceActivityParams {
 
 export function useDriveSessionVoiceActivity({
   ambientInputMetering,
+  ambientInputMeteringSampleId,
   ambientMonitoring,
   audioRoute,
   autoContinueEnabled,
@@ -322,6 +324,7 @@ export function useDriveSessionVoiceActivity({
     });
   }, [
     ambientInputMetering,
+    ambientInputMeteringSampleId,
     ambientMonitoring,
     autoContinueEnabled,
     engaged,

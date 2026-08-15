@@ -987,6 +987,8 @@ export function MainScreen() {
 
   const {
     driveAutoContinueEnabled,
+    driveSilenceCountdownSeconds,
+    driveVoiceActive,
     handleContinueDriveSession,
     handlePressIn,
     handlePressOut,
@@ -1566,6 +1568,8 @@ export function MainScreen() {
         voiceStage: {
           attachments: pendingImages.attachments,
           disabled: voiceStageDisabled,
+          driveSilenceCountdownSeconds,
+          driveVoiceActive,
           initialInputSurface: inputSurfaceRef.current,
           initialTextInputFocused: textInputFocusedRef.current,
           initialTextMessage: textMessageDraftRef.current,

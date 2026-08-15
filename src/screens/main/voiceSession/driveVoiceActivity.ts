@@ -4,6 +4,7 @@ const DEFAULT_NOISE_FLOOR_DB = -60;
 const MIN_VOICE_THRESHOLD_DB = -48;
 const VOICE_THRESHOLD_ABOVE_FLOOR_DB = 10;
 const VOICE_RELEASE_ABOVE_FLOOR_DB = 6;
+const SPEECH_RELEASE_BELOW_LEVEL_DB = 15;
 const VOICE_ATTACK_SAMPLE_COUNT = 2;
 const SUSTAINED_VOICE_ATTACK_SAMPLE_COUNT = 5;
 const MIN_SUSTAINED_VOICE_DURATION_MS = 600;
@@ -120,9 +121,13 @@ function getVoiceThresholds(state: DriveVoiceActivityState) {
     state.noiseFloorDb + clamp(speechGapDb * 0.25, 3, 8);
 
   return {
-    releaseThresholdDb: Math.min(
-      state.speechLevelDb - 5,
-      releaseThresholdDb,
+    // The ambient floor can change sharply between environments while the
+    // recording is active. Release after a sustained drop from this user's
+    // learned speech level as well as from the learned floor, otherwise loud
+    // car or cafe noise can keep the detector latched forever.
+    releaseThresholdDb: Math.max(
+      state.speechLevelDb - SPEECH_RELEASE_BELOW_LEVEL_DB,
+      Math.min(state.speechLevelDb - 5, releaseThresholdDb),
     ),
     voiceThresholdDb: Math.min(
       state.speechLevelDb - 3,

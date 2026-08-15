@@ -108,6 +108,21 @@ describe("driveVoiceActivity", () => {
     expect(getDriveCountdownSeconds(state, 11_150)).toBe(0);
   });
 
+  it("releases loud speech into a loud new environment", () => {
+    let state = createDriveVoiceActivityState(0);
+
+    state = updateDriveVoiceActivity(state, -20, 1_000);
+    state = updateDriveVoiceActivity(state, -18, 1_150);
+    expect(state.voiceActive).toBe(true);
+
+    state = updateDriveVoiceActivity(state, -38, 1_300);
+    state = updateDriveVoiceActivity(state, -39, 1_450);
+    state = updateDriveVoiceActivity(state, -40, 1_600);
+
+    expect(state.voiceActive).toBe(false);
+    expect(getDriveCountdownSeconds(state, 1_600)).toBe(10);
+  });
+
   it("confirms moderate speech without letting the learned threshold chase it", () => {
     let state = createDriveVoiceActivityState(0);
 

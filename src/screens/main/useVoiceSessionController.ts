@@ -136,6 +136,8 @@ export function useVoiceSessionController({
     isBusy,
     isRecording,
     ambientInputMetering: recorder.ambientInputMetering,
+    ambientInputMeteringSampleId:
+      recorder.ambientInputMeteringSampleId,
     ambientMonitoring: recorder.ambientMonitoring ?? false,
     audioRoute: recorder.audioRoute,
     inputMetering:

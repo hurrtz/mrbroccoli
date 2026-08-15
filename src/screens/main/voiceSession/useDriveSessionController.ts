@@ -21,6 +21,7 @@ import { useDriveSessionVoiceActivity } from "./useDriveSessionVoiceActivity";
 
 interface UseDriveSessionControllerParams {
   ambientInputMetering?: number | null;
+  ambientInputMeteringSampleId?: number;
   ambientMonitoring?: boolean;
   audioRoute?: string | null;
   cancelCurrentInteraction: () => Promise<void>;
@@ -49,6 +50,7 @@ interface UseDriveSessionControllerParams {
 
 export function useDriveSessionController({
   ambientInputMetering = null,
+  ambientInputMeteringSampleId = 0,
   ambientMonitoring = false,
   audioRoute = null,
   cancelCurrentInteraction,
@@ -114,6 +116,7 @@ export function useDriveSessionController({
     voiceActive,
   } = useDriveSessionVoiceActivity({
     ambientInputMetering,
+    ambientInputMeteringSampleId,
     ambientMonitoring,
     audioRoute,
     autoContinueEnabled,

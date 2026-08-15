@@ -24,6 +24,7 @@ export interface AudioPlayerController {
 
 export interface AudioRecorderController {
   ambientInputMetering?: number | null;
+  ambientInputMeteringSampleId?: number;
   ambientMonitoring?: boolean;
   audioRoute?: string | null;
   clearLastError: () => void;

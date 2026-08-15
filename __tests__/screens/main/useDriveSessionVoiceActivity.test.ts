@@ -1,5 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native";
 
+import { recordDebugLogEvent } from "../../../src/services/debugLogCapture";
 import { useDriveSessionVoiceActivity } from "../../../src/screens/main/voiceSession/useDriveSessionVoiceActivity";
 
 jest.mock("../../../src/services/debugLogCapture", () => ({
@@ -28,6 +29,7 @@ describe("useDriveSessionVoiceActivity", () => {
     const stopVoiceCapture = jest.fn(async () => undefined);
     const base = {
       ambientInputMetering: null,
+      ambientInputMeteringSampleId: 0,
       ambientMonitoring: false,
       audioRoute: "built-in-mic",
       autoContinueEnabled: true,
@@ -79,5 +81,49 @@ describe("useDriveSessionVoiceActivity", () => {
     });
 
     expect(stopVoiceCapture).toHaveBeenCalledTimes(1);
+  });
+
+  it("learns from repeated identical ambient microphone samples", () => {
+    const base = {
+      ambientInputMetering: -30,
+      ambientInputMeteringSampleId: 0,
+      ambientMonitoring: true,
+      audioRoute: "built-in-mic",
+      autoContinueEnabled: true,
+      engaged: true,
+      inputMetering: null as number | null,
+      inputMeteringSampleId: 0,
+      inputMode: "drive-session" as const,
+      isBusy: true,
+      isRecording: false,
+      mainSurfaceVisible: true,
+      playerIsPlaybackPaused: false,
+      playerIsPlaying: false,
+      replayPhase: "idle" as const,
+      showToast: jest.fn(),
+      stopVoiceCapture: jest.fn(async () => undefined),
+      t: jest.fn(() => "Could not process voice input") as any,
+    };
+    const view = renderHook(
+      (props: typeof base) => useDriveSessionVoiceActivity(props),
+      { initialProps: base },
+    );
+
+    for (const sampleId of [1, 2, 3]) {
+      act(() => {
+        jest.setSystemTime(sampleId * 150);
+        view.rerender({
+          ...base,
+          ambientInputMeteringSampleId: sampleId,
+        });
+      });
+    }
+
+    expect(recordDebugLogEvent).toHaveBeenCalledWith(
+      expect.objectContaining({
+        event: "drive-session-acoustic-profile-updated",
+        payload: expect.objectContaining({ ambientSampleCount: 3 }),
+      }),
+    );
   });
 });

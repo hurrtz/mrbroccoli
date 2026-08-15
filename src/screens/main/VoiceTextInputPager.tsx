@@ -16,6 +16,8 @@ export function VoiceTextInputPager({
   colors,
   compactPromptNotice = false,
   disabled,
+  driveSilenceCountdownSeconds = null,
+  driveVoiceActive = false,
   footer,
   initialSurface = "voice",
   initialTextInputFocused = false,
@@ -82,6 +84,14 @@ export function VoiceTextInputPager({
     visualPhase,
   });
   const progress = orbProgressOverride ?? derivedProgress;
+  const showDriveCountdown =
+    inputMode === "drive-session" &&
+    visualPhase === "recording" &&
+    !driveVoiceActive &&
+    driveSilenceCountdownSeconds !== null;
+  const activeOrbLabel = showDriveCountdown
+    ? t("driveSendsIn", { seconds: driveSilenceCountdownSeconds })
+    : statusLabel;
   const showCompactPromptAction =
     compactPromptNotice &&
     Boolean(onResolvePromptBlock) &&
@@ -171,7 +181,19 @@ export function VoiceTextInputPager({
             testID={`voice-stage-${visualPhase}-orb`}
           >
             <VoiceOrb
-              label={statusLabel}
+              coreLabel={
+                showDriveCountdown
+                  ? String(driveSilenceCountdownSeconds)
+                  : undefined
+              }
+              coreLabelColor={
+                showDriveCountdown &&
+                driveSilenceCountdownSeconds !== null &&
+                driveSilenceCountdownSeconds <= 3
+                  ? colors.danger
+                  : undefined
+              }
+              label={activeOrbLabel}
               onPress={inputMode === "push-to-talk" ? undefined : onPress}
               onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
               onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
