@@ -36,7 +36,7 @@ export const pt = {
   aboutSetting: ({ setting }) => `Sobre ${setting}`,
   unavailable: "Indisponível",
   selection: "Seleção",
-  chooseCompatibleProviderFirst: "Escolha primeiro um fornecedor compatível",
+  chooseCompatibleProviderFirst: "Escolhe primeiro um fornecedor compatível",
   settings: "Definições",
   settingsReleaseVersion: ({ version }) => `Versão ${version}`,
   all: "Todos",
@@ -64,7 +64,7 @@ export const pt = {
   settingsAppDiagnostics: "Aplicação e diagnóstico",
   settingsGuidedSetup: "Configuração guiada",
   settingsGuidedSetupSummary:
-    "Reveja as ligações e teste a rota de voz completa.",
+    "Revê as ligações e testa a rota de voz completa.",
   setupGuideShowInSettings: "Mostrar configuração guiada em Definições",
   setupGuideShowInSettingsSummary:
     "Mostrar ou ocultar o atalho de configuração guiada na vista geral das definições.",
@@ -81,7 +81,7 @@ export const pt = {
   language: "Idioma",
   recognitionLanguage: "Idioma de reconhecimento",
   recognitionLanguageHint:
-    "Escolha um idioma para melhorar o reconhecimento ou deixe o dispositivo ou fornecedor detetá-lo automaticamente.",
+    "Escolhe um idioma para melhorar o reconhecimento ou deixa o dispositivo ou fornecedor detetá-lo automaticamente.",
   automaticLanguage: "Automático",
   speechLanguageUnsupportedByProvider: ({ provider, language }) =>
     `${provider} não suporta oficialmente ${language} nesta rota de voz.`,
@@ -135,22 +135,22 @@ export const pt = {
   speechTranscriptionAction: "transcrição de fala",
   speechSynthesisAction: "síntese de voz",
   instructionsTabDescription:
-    "Molde a orientação oculta que orienta o assistente antes de qualquer fornecedor ver o pedido.",
+    "Molda a orientação oculta que orienta o assistente antes de qualquer fornecedor ver o pedido.",
   providersTabDescription:
-    "Armazene as credenciais de serviço externo no dispositivo e configure os modos de resposta que pretende utilizar.",
+    "Armazena as credenciais de serviço externo no dispositivo e configura os modos de resposta que pretendes utilizar.",
   webSearchTabDescription:
-    "Configure o contexto web ao vivo opcional antes das respostas.",
+    "Configura o contexto web ao vivo opcional antes das respostas.",
   responseModes: "Seleção de modelo",
   aboutModelSelection: "Sobre a seleção do modelo",
   modelSelectionInfo:
-    "Cada cartão de modelo torna-se uma escolha no ecrã inicial. Configure o seu fornecedor, modelo e nível de esforço opcional e, em seguida, mude de cartão para escolher que modelo responde a seguir.",
+    "Cada cartão de modelo torna-se uma escolha no ecrã inicial. Configura o teu fornecedor, modelo e nível de esforço opcional e, em seguida, muda de cartão para escolher que modelo responde a seguir.",
   responseModeItemTitle: ({ index }) => `Modelo ${index}`,
   addResponseMode: "Adicionar modelo",
   removeResponseMode: "Remover modelo",
   responseModesNoConfiguredProviders:
-    "Adicione as credenciais primeiro. Os controlos de rota permanecem ocultos até que pelo menos um serviço compatível seja configurado.",
+    "Adiciona as credenciais primeiro. Os controlos de rota permanecem ocultos até que pelo menos um serviço compatível seja configurado.",
   useResponseMode: ({ mode }) => `Utilizar ${mode}`,
-  chooseResponseModel: "Escolha um modelo",
+  chooseResponseModel: "Escolhe um modelo",
   responseModelCount: ({ count }) => `${count} modelos disponíveis`,
   ulraMode: "Modo Supremo",
   ulraModeHomeLabel: "Mostrar o modo Supremo no ecrã inicial",
@@ -177,43 +177,43 @@ export const pt = {
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chamadas internas a modelos falharam; a resposta final usou ${succeeded} contributos bem-sucedidos.`,
   sttTabDescription:
-    "Controle a forma como a fala é capturada e qual o back-end que transforma o áudio em texto antes de este chegar ao modelo.",
+    "Controla a forma como a fala é capturada e qual o back-end que transforma o áudio em texto antes de este chegar ao modelo.",
   ttsTabDescription:
-    "Controle quando as respostas começam a ser faladas e qual o back-end que lida com a saída falada.",
+    "Controla quando as respostas começam a ser faladas e qual o back-end que lida com a saída falada.",
   brief: "Breve",
   briefDescription:
-    "Mantenha a resposta curta. Utilize o número mínimo de frases necessárias para responder completamente ao utilizador.",
+    "Mantém a resposta curta. Utiliza o número mínimo de frases necessárias para responder completamente ao utilizador.",
   normal: "Normal",
   normalDescription:
-    "Procure um comprimento de resposta equilibrado. Cubra os pontos importantes sem arrastar a resposta.",
+    "Procura um comprimento de resposta equilibrado. Cobre os pontos importantes sem arrastar a resposta.",
   thorough: "Minucioso",
   thoroughDescription:
-    "Vá a fundo e seja abrangente. Inclua nuances, detalhes, compensações e o raciocínio que importa.",
+    "Vai a fundo e sê abrangente. Inclui nuances, detalhes, compensações e o raciocínio que importa.",
   professional: "Profissional",
   professionalDescription:
-    "Fale como um consultor sénior a apresentar um relatório a um cliente. Linguagem precisa, sem calão, comedida e com autoridade.",
+    "Fala como um consultor sénior a apresentar um relatório a um cliente. Linguagem precisa, sem calão, comedida e com autoridade.",
   casual: "Casual",
   casualDescription:
-    "Fale como um amigo inteligente numa cafetaria. Descontraído, natural, conversador. As contrações não são problema, as digressões também não.",
+    "Fala como um amigo inteligente numa cafetaria. Descontraído, natural, conversador. As contrações não são problema, as digressões também não.",
   nerdy: "Nerd",
   nerdyDescription:
-    "Fale como um especialista entusiasta que adora ir a fundo. Utilize a terminologia técnica livremente, entusiasme-se com os detalhes e presuma que o utilizador consegue acompanhar.",
+    "Fala como um especialista entusiasta que adora ir a fundo. Utiliza a terminologia técnica livremente, entusiasma-se com os detalhes e presume que o utilizador consegue acompanhar.",
   concise: "Conciso",
   conciseDescription:
-    "Seja o mais breve possível e ao mesmo tempo completo. Sem preâmbulo, sem preenchimento, apenas a resposta. Pense no estilo telegrama.",
+    "Sê o mais breve possível e ao mesmo tempo completo. Sem preâmbulo, sem preenchimento, apenas a resposta. Pensa no estilo telegrama.",
   socratic: "Socrático",
   socraticDescription:
-    "Desafie o pensamento do utilizador. Faça contra-perguntas, ofereça perspetivas alternativas, não se limite a confirmar o que disseram. Seja um sparring, não uma máquina de sim.",
+    "Desafia o pensamento do utilizador. Faz contra-perguntas, oferece perspetivas alternativas, não se limite a confirmar o que disseram. Sê um sparring, não uma máquina de sim.",
   eli5: "ELI5",
   eli5Description:
-    "Explique tudo da forma mais simples possível. Utilize analogias, linguagem quotidiana, zero jargão. Não presuma qualquer conhecimento prévio sobre qualquer assunto.",
+    "Explica tudo da forma mais simples possível. Utiliza analogias, linguagem quotidiana, zero jargão. Não presume qualquer conhecimento prévio sobre qualquer assunto.",
   useProvider: ({ provider }) => `Utilizar ${provider}`,
   createApiKey: "Credenciais",
   apiKey: "Chave API",
   aboutThisProvider: "Sobre este fornecedor",
   openRouterOnboardingTitle: "Uma chave, vários fornecedores",
   openRouterOnboardingDescription:
-    "Crie uma chave OpenRouter dedicada, cole-a abaixo e utilize modelos baseados em snapshots de vários fornecedores sem substituir qualquer ligação direta.",
+    "Cria uma chave OpenRouter dedicada, cola-a abaixo e utiliza modelos baseados em snapshots de vários fornecedores sem substituir qualquer ligação direta.",
   openRouterOnboardingRoute:
     "Caminho do pedido: este dispositivo → OpenRouter → fornecedor upstream selecionado",
   openRouterKeys: "Chaves OpenRouter",
@@ -237,7 +237,7 @@ export const pt = {
   providerCapability_search: "Pesquisa na Web",
   providerCapability_voices: "Biblioteca de voz",
   providerValidationUnavailable:
-    "A validação ao vivo ainda não está ligada para este fornecedor. Guarde a chave aqui e verifique-a durante a utilização real.",
+    "A validação ao vivo ainda não está ligada para este fornecedor. Guarda a chave aqui e verifica-a durante a utilização real.",
   providerNeedsAttention: "precisa de atenção",
   catalogProviderLimitsSummary: ({ summary }) => `Limites: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Região: ${summary}`,
@@ -248,7 +248,7 @@ export const pt = {
   systemPrompt: "Prompt do sistema",
   aboutSystemPrompt: "Sobre o prompt do sistema",
   assistantInstructionsIntro:
-    "Molde a orientação oculta que o modelo recebe antes de cada resposta.",
+    "Molda a orientação oculta que o modelo recebe antes de cada resposta.",
   baseInstructions: "Instruções base",
   assistantInstructionsPlaceholder: "Defina como o assistente se deve comportar.",
   assistantInstructionsHint:
@@ -261,42 +261,42 @@ export const pt = {
   openStyleSheet: "Abrir definições de conversa",
   conversationThinkingInstructions: "Instruções de pensamento",
   conversationThinkingInstructionsDescription:
-    "Adicione instruções após o prompt de sistema global para esta conversa.",
+    "Adiciona instruções após o prompt de sistema global para esta conversa.",
   conversationThinkingInstructionsPlaceholder:
-    "Por exemplo: Desafie as minhas suposições e utilize exemplos concretos.",
+    "Por exemplo: Desafia as minhas suposições e utiliza exemplos concretos.",
   ttsInstructions: "Instruções de entrega da fala",
   ttsInstructionsDescription:
-    "Oriente o tom, o ritmo, o sotaque ou a apresentação utilizados pelos modelos de fala compatíveis.",
+    "Orienta o tom, o ritmo, o sotaque ou a apresentação utilizados pelos modelos de fala compatíveis.",
   conversationTtsInstructionsDescription:
-    "Adicione instruções de entrega após as instruções de fala globais para esta conversa.",
+    "Adiciona instruções de entrega após as instruções de fala globais para esta conversa.",
   ttsInstructionsPlaceholder:
     "Por exemplo: fale de forma calorosa, clara e a um ritmo descontraído.",
   ttsInstructionsUnsupported:
     "A rota de fala atual não suporta instruções de entrega.",
   conversationVoiceDescription: ({ route }) =>
-    `Escolha a voz utilizada por ${route} nesta conversa.`,
+    `Escolhe a voz utilizada por ${route} nesta conversa.`,
   scrollToLatest: "Deslocar até à última mensagem",
   conversationTitleGenerate: "Gerar título automaticamente",
   conversationTitleGenerating: "A gerar título…",
   conversationTitleGenerated: "Conversa renomeada.",
   conversationTitleNeedsContent:
-    "Inicie uma conversa antes de gerar um título.",
+    "Inicia uma conversa antes de gerar um título.",
   conversationTitleNeedsProvider:
-    "Configure o modelo selecionado antes de gerar um título.",
+    "Configura o modelo selecionado antes de gerar um título.",
   conversationTitleGenerationFailed: "Não foi possível gerar o título da conversa.",
   conversationTitleGenerationTimedOut:
-    "A geração do título demorou muito tempo. Por favor, tente novamente.",
+    "A geração do título demorou muito tempo. Por favor, tenta novamente.",
   inputMode: "Modo de entrada",
   voiceInput: "Entrada de voz",
   pushToTalk: "Premir para falar",
   pushToTalkDescription:
-    "Segure o botão principal enquanto fala e solte para enviar.",
+    "Segura o botão principal enquanto fala e solta para enviar.",
   toggleToTalk: "Tocar para falar",
   toggleToTalkDescription:
-    "Toque uma vez para iniciar a gravação e toque novamente quando terminar.",
+    "Toca uma vez para iniciar a gravação e toca novamente quando terminar.",
   driveSession: "Sessão Drive",
   driveSessionDescription:
-    "Quando a continuação automática está ativada, a gravação começa após cada resposta falada. Toque no botão principal quando terminar de falar.",
+    "Quando a continuação automática está ativada, a gravação começa após cada resposta falada. Toca no botão principal quando terminar de falar.",
   stopDriveSession: "Pausar automático",
   repeatDriveReply: "Repetir última",
   continueDriveSession: "Retomar automático",
@@ -304,25 +304,25 @@ export const pt = {
   speechToText: "Fala para Texto",
   appNative: "Reconhecimento do Sistema",
   nativeSttDescription:
-    "Utilize o reconhecedor de fala do sistema operativo.",
+    "Utiliza o reconhecedor de fala do sistema operativo.",
   provider: "Fornecedor",
   webSearchProvider: "Fornecedor de pesquisa na Web",
   webSearchProviderMissingHint:
-    "Configure pelo menos um serviço com capacidade de pesquisa em Credenciais para ativar aqui a fundamentação com contexto da web.",
+    "Configura pelo menos um serviço com capacidade de pesquisa em Credenciais para ativar aqui a fundamentação com contexto da web.",
   webSearchModelHint: ({ model }) =>
     `Utiliza ${model} nos bastidores para fundamentar as respostas com contexto atual da web.`,
   webSearchHomeHint:
-    "Utilize o botão de alternância do ecrã inicial para ativar ou desativar o contexto da web para este tópico.",
+    "Utiliza o botão de alternância do ecrã inicial para ativar ou desativar o contexto da web para este tópico.",
   settingsWebSearchCompactHint:
-    "Opcionalmente, acrescente um novo contexto web antes de o modelo principal responder.",
+    "Opcionalmente, acrescenta um novo contexto web antes de o modelo principal responder.",
   webSearchAdvanced: "Controlos de pesquisa avançada",
   expandAdvancedSearch: "Expandir os controlos de pesquisa avançada",
   collapseAdvancedSearch: "Recolher controlos de pesquisa avançada",
-  webSearchSetupNeeded: "Adicione credenciais para utilizar a pesquisa na web ao vivo.",
+  webSearchSetupNeeded: "Adiciona credenciais para utilizar a pesquisa na web ao vivo.",
   webSearchEnabledDescription:
     "Novo contexto web é adicionado antes de o modelo responder.",
   webSearchDisabledDescription:
-    "Utilize o contexto da web ao vivo para este tópico quando os factos atuais são importantes.",
+    "Utiliza o contexto da web ao vivo para este tópico quando os factos atuais são importantes.",
   webSearchNobodyDescription:
     "Sem pedidos à web. Responde com o que o modelo sabe.",
   webSearchQualityControls: "Qualidade de pesquisa",
@@ -341,31 +341,31 @@ export const pt = {
   setWebSearchMode: ({ mode }) => `Definir o modo de pesquisa na Web para ${mode}`,
   openWebSearchSettings: "Abrir as definições de pesquisa na Web",
   providerSttDescription:
-    "Utilize um serviço externo configurado para transcrever a sua voz antes de esta ser enviada para a rota de resposta.",
+    "Utiliza um serviço externo configurado para transcrever a tua voz antes de esta ser enviada para a rota de resposta.",
   sttProvider: "Fornecedor STT",
   sttProviderEnabledHint:
     "Apenas os fornecedores ativados com suporte para transcrição aparecem aqui.",
   sttProviderMissingHint:
-    "Adicione credenciais para um serviço com suporte STT para o escolher aqui.",
+    "Adiciona credenciais para um serviço com suporte STT para o escolher aqui.",
   nativeSttHint:
-    "O reconhecimento do sistema funciona independentemente das chaves do seu fornecedor e pode ser processado no dispositivo ou pelo serviço de voz do sistema operativo.",
+    "O reconhecimento do sistema funciona independentemente das chaves do teu fornecedor e pode ser processado no dispositivo ou pelo serviço de voz do sistema operativo.",
   replyPlayback: "Reprodução da resposta",
   sentencesArrive: "À chegada dos parágrafos",
   sentencesArriveDescription:
-    "Comece a falar assim que um parágrafo completo estiver pronto.",
+    "Começa a falar assim que um parágrafo completo estiver pronto.",
   fullReplyFirst: "Resposta completa primeiro",
   fullReplyFirstDescription:
-    "Gere primeiro a resposta inteira e depois reproduza-a de uma só vez.",
+    "Gera primeiro a resposta inteira e depois reproduz-a de uma só vez.",
   textToSpeech: "Texto para voz",
   spokenReplies: "Respostas faladas",
   spokenRepliesEnabledDescription:
-    "Leia as respostas do assistente em voz alta quando estiver disponível uma via de voz.",
+    "Lê as respostas do assistente em voz alta quando estiver disponível uma via de voz.",
   spokenRepliesDisabledDescription:
-    "Mantenha as respostas apenas em texto por enquanto. A sua rota preferida TTS fica guardada para mais tarde.",
+    "Mantém as respostas apenas em texto por enquanto. A tua rota preferida TTS fica guardada para mais tarde.",
   nativeTtsDescription:
-    "Utilize o motor de fala do dispositivo para respostas faladas e amostras de voz.",
+    "Utiliza o motor de fala do dispositivo para respostas faladas e amostras de voz.",
   kokoroTtsDescription:
-    "Utilize uma voz neural muito mais natural, totalmente neste dispositivo. O texto das respostas faladas é sintetizado localmente, sem chave de fornecedor de fala nem custos de utilização.",
+    "Utiliza uma voz neural muito mais natural, totalmente neste dispositivo. O texto das respostas faladas é sintetizado localmente, sem chave de fornecedor de fala nem custos de utilização.",
   kokoroVoices: "Vozes Kokoro no dispositivo",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `O modelo multilingue descarrega cerca de ${size} MB e ocupa cerca de ${installedSize} MB após a instalação.`,
@@ -376,32 +376,32 @@ export const pt = {
   kokoroVerifying: "A verificar o motor de voz…",
   kokoroInstalled: "Instalado e pronto neste dispositivo.",
   kokoroNotInstalled:
-    "Transfira e verifique o modelo antes de selecionar ou utilizar o Kokoro. Não é necessária nenhuma chave de fornecedor.",
+    "Transfere e verifica o modelo antes de selecionar ou utilizar o Kokoro. Não é necessária nenhuma chave de fornecedor.",
   kokoroLanguageFallback:
-    "Kokoro fala atualmente inglês e chinês simplificado aqui. Para outros idiomas de resposta selecionados, adicione uma rota alternativa explícita ou a fala será interrompida com um erro.",
+    "Kokoro fala atualmente inglês e chinês simplificado aqui. Para outros idiomas de resposta selecionados, adiciona uma rota alternativa explícita ou a fala será interrompida com um erro.",
   kokoroRemoveTitle: "Remover o modelo Kokoro?",
   kokoroRemoveBody: ({ installedSize }) =>
-    `Isto liberta cerca de ${installedSize} MB. Pode descarregar o modelo novamente a qualquer momento.`,
+    `Isto liberta cerca de ${installedSize} MB. Podes descarregar o modelo novamente a qualquer momento.`,
   removeKokoroModel: "Remover o modelo Kokoro",
   downloadKokoroModel: "Descarregar o modelo Kokoro",
   kokoroFallbackNeeded: ({ languages }) =>
     `É necessária uma rota alternativa explícita para: ${languages}.`,
   kokoroNoSelectedLanguages:
-    "Selecione Inglês ou Chinês Simplificado em Idiomas de escuta para configurar uma voz Kokoro.",
+    "Seleciona Inglês ou Chinês Simplificado em Idiomas de escuta para configurar uma voz Kokoro.",
   expandVoiceSettings: ({ language }) => `Expandir as definições de voz ${language}`,
   collapseVoiceSettings: ({ language }) =>
     `Recolher as definições de voz ${language}`,
   remove: "Remover",
   voiceOutputDescription:
-    "Escolha o motor de fala, os idiomas de escuta e as amostras de voz para as respostas faladas.",
+    "Escolhe o motor de fala, os idiomas de escuta e as amostras de voz para as respostas faladas.",
   localTts: "Local",
   localTtsDescription:
-    "Utilize uma voz local descarregada correspondente para as respostas faladas.",
+    "Utiliza uma voz local descarregada correspondente para as respostas faladas.",
   providerTtsDescription:
-    "Utilize o serviço configurado selecionado para respostas faladas.",
+    "Utiliza o serviço configurado selecionado para respostas faladas.",
   ttsFallbackRoutes: "Rotas alternativas",
   ttsFallbackRoutesHint:
-    "Opcional. Adicione apenas as rotas pretendidas, pela ordem em que devem ser tentadas. Assim que uma rota começa a falar, permaneço nela durante o resto da resposta.",
+    "Opcional. Adiciona apenas as rotas pretendidas, pela ordem em que devem ser tentadas. Assim que uma rota começa a falar, permaneço nela durante o resto da resposta.",
   ttsFallbackNone:
     "Não está configurada nenhuma rota alternativa. Em vez disso, será apresentada uma falha de voz.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -413,7 +413,7 @@ export const pt = {
   ttsProviderEnabledHint:
     "Apenas os fornecedores ativados com suporte para resposta falada aparecem aqui.",
   ttsProviderMissingHint:
-    "Adicione credenciais para um serviço com suporte TTS para o escolher aqui.",
+    "Adiciona credenciais para um serviço com suporte TTS para o escolher aqui.",
   localTtsOrderHint:
     "Apenas são tentadas rotas alternativas explicitamente configuradas.",
   providerTtsOrderHint:
@@ -429,12 +429,12 @@ export const pt = {
   providerVoicesAvailable: ({ count, provider }) =>
     `${count} ${Number(count) === 1 ? "voz disponível" : "vozes disponíveis"} de ${provider}.`,
   providerVoicesLoadFailed:
-    "Não foi possível atualizar as vozes. A sua seleção atual permanece inalterada; pode ainda introduzir um ID de voz manualmente.",
+    "Não foi possível atualizar as vozes. A tua seleção atual permanece inalterada; podes ainda introduzir um ID de voz manualmente.",
   providerVoicesLoadFailedWithFallback:
     "Não foi possível carregar as vozes da conta. A voz integrada continua disponível.",
   providerVoicesErrorDetail: ({ detail }) => `Motivo: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
-    "Em ElevenLabs, edite esta chave API e ative Voices → Read e atualize aqui.",
+    "Em ElevenLabs, edita esta chave API e ativa Voices → Read e atualiza aqui.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Carrego as vozes disponíveis automaticamente a partir de ${provider}.`,
   providerVoiceId: "ID de voz",
@@ -442,9 +442,9 @@ export const pt = {
   providerVoiceIdFallbackHint:
     "A introdução manual permanece disponível quando a biblioteca de voz não pode ser carregada.",
   providerVoiceIdRequired: ({ provider }) =>
-    `Atualize a biblioteca de voz ${provider} ou introduza um ID de voz antes de utilizar a saída de voz.`,
+    `Atualiza a biblioteca de voz ${provider} ou introduz um ID de voz antes de utilizar a saída de voz.`,
   qwenSpeechUnavailableInUs:
-    "As minhas rotas de voz Qwen atuais não estão disponíveis na região dos EUA. Escolha Singapura ou Pequim para o discurso Qwen.",
+    "As minhas rotas de voz Qwen atuais não estão disponíveis na região dos EUA. Escolhe Singapura ou Pequim para o discurso Qwen.",
   qwenApiRegion: "Região Qwen API",
   qwenRegionSingapore: "Singapura",
   qwenRegionUs: "EUA (Virgínia)",
@@ -454,19 +454,19 @@ export const pt = {
   qwenRegionUsSpeechHint:
     "As chaves da região dos EUA suportam o chat e a pesquisa na web aqui. As minhas rotas Qwen STT e TTS atuais requerem uma chave de Singapura ou Pequim.",
   providerDefaultVoiceHint:
-    "Este fornecedor utiliza atualmente a sua voz predefinida para as amostras e as respostas faladas.",
+    "Este fornecedor utiliza atualmente a tua voz predefinida para as amostras e as respostas faladas.",
   listenLanguages: "Idiomas de escuta",
   listenLanguagesHint:
-    "Escolha os idiomas de resposta que pretende que soem bem. Tento-os por esta ordem ao encaminhar a saída de voz.",
+    "Escolhe os idiomas de resposta que pretendes que soem bem. Tento-os por esta ordem ao encaminhar a saída de voz.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 idioma selecionado" : `${count} idiomas selecionados`,
   localVoicePacks: "Pacotes de voz locais",
   localVoicePacksHint:
-    "Cada língua mantém a sua própria voz local. Escolha a voz pretendida para esse idioma e descarregue apenas os pacotes do seu interesse.",
+    "Cada língua mantém a sua própria voz local. Escolhe a voz pretendida para esse idioma e descarrega apenas os pacotes do teu interesse.",
   localVoiceForLanguage: ({ languageLabel }) => `Voz para ${languageLabel}`,
   providerVoicePreviews: "Amostras de voz do fornecedor",
   providerVoicePreviewsHint:
-    "Teste aqui a rota TTS atualmente selecionada com um texto de amostra separado para cada idioma de resposta.",
+    "Testa aqui a rota TTS atualmente selecionada com um texto de amostra separado para cada idioma de resposta.",
   nativeVoicePreviewSection: "Amostra de voz nativa",
   nativeVoicePreviewSectionHint:
     "Fala diretamente através do sintetizador de voz integrado do telefone para que possa compará-lo com as vozes configuradas do fornecedor.",
@@ -486,7 +486,7 @@ export const pt = {
     "Mostra os últimos pedidos de fala, a rota solicitada, a rota realmente utilizada e o motivo de qualquer mudança para uma alternativa.",
   clearSpeechDiagnostics: "Limpar atividade de fala recente",
   speechDiagnosticsEmpty:
-    "Ainda não há pedidos de fala recentes. Ouça uma amostra de voz ou reproduza uma resposta para ver aqui os detalhes do encaminhamento.",
+    "Ainda não há pedidos de fala recentes. Ouve uma amostra de voz ou reproduz uma resposta para ver aqui os detalhes do encaminhamento.",
   clearSpeechDiagnosticsConfirmationTitle: "Limpar atividade de fala recente?",
   clearSpeechDiagnosticsConfirmationMessage:
     "Isto remove todos os diagnósticos de encaminhamento de fala capturados. Esta ação não pode ser anulada.",
@@ -503,7 +503,7 @@ export const pt = {
   speechDiagnosticVoiceLine: ({ voice }) => `Voz: ${voice}`,
   localTtsPackReady: "Instalado neste dispositivo.",
   localTtsPackBroken:
-    "Transferido, mas esta voz falhou a verificação local neste dispositivo. Transfira novamente ou escolha outra voz.",
+    "Transferido, mas esta voz falhou a verificação local neste dispositivo. Transfere novamente ou escolhe outra voz.",
   localTtsPackMissing:
     "Ainda não instalado. O TTS na nuvem ou a voz do sistema será utilizado até fazer a transferência.",
   localTtsUnsupportedLanguageFallback:
@@ -529,7 +529,7 @@ export const pt = {
   couldntReplayReply: "Não foi possível reproduzir esta resposta.",
   replyFailed: "Falha na resposta",
   retryReply: "Tentar responder novamente",
-  replyFailedHint: "Pode escolher outro modelo acima antes de tentar novamente.",
+  replyFailedHint: "Podes escolher outro modelo acima antes de tentar novamente.",
   spokenReplyFailed: "A resposta foi guardada, mas não pôde ser falada.",
   retrySpeech: "Tentar novamente a fala",
   openSpeakingSettings: "Definições de fala",
@@ -542,11 +542,11 @@ export const pt = {
   threadPinned: "Tópico fixado.",
   threadUnpinned: "Tópico desafixado.",
   addProviderKeyToUseProvider: ({ provider }) =>
-    `Adicione as credenciais para ${provider} em Definições antes de utilizar esta rota.`,
+    `Adiciona as credenciais para ${provider} em Definições antes de utilizar esta rota.`,
   configureCredentialsBeforeVoiceSession:
-    "Adicione credenciais em Definições antes de iniciar uma sessão de voz.",
+    "Adiciona credenciais em Definições antes de iniciar uma sessão de voz.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `Para ${provider}, introduza o URL base do fornecedor e a chave API como https://your-endpoint.example.com|your-api-key.`,
+    `Para ${provider}, introduz o URL base do fornecedor e a chave API como https://your-endpoint.example.com|your-api-key.`,
   speechRecognitionUnavailableOnDevice:
     "O reconhecimento de voz não está disponível neste dispositivo.",
   debugLogLabel: "REGISTO",
@@ -561,26 +561,26 @@ export const pt = {
     `Registo de depuração anterior ${fileName} recuperado (${entryCount} entradas).`,
   debugLogCaptureFailed: "Não foi possível guardar o registo de depuração.",
   chooseSttBeforeVoiceSession:
-    "Escolha uma rota STT configurada em Definições antes de iniciar uma sessão de voz.",
+    "Escolhe uma rota STT configurada em Definições antes de iniciar uma sessão de voz.",
   chooseTtsBeforeSpokenReplies:
-    "Escolha uma rota TTS configurada em Definições antes de utilizar respostas faladas.",
+    "Escolhe uma rota TTS configurada em Definições antes de utilizar respostas faladas.",
   stopSessionBeforeReplay:
-    "Pare a sessão de voz ativa antes de reproduzir a última resposta.",
-  couldntCatchThatTryAgain: "Não foi possível capturar isto, tente novamente.",
+    "Interrompe a sessão de voz ativa antes de reproduzir a última resposta.",
+  couldntCatchThatTryAgain: "Não foi possível capturar isto, tenta novamente.",
   couldntStartVoiceInput: "Não foi possível iniciar a entrada de voz.",
   couldntProcessVoiceInput: "Não foi possível processar a entrada de voz.",
   maxRecordingLengthReached:
     "Duração máxima de gravação atingida — envio o que tenho.",
   sttRecordingTooLarge: ({ provider, limit }) =>
-    `Esta gravação é demasiado longa para a conversão de voz em texto ${provider} (máx. ${limit}). Experimente uma mensagem mais curta ou altere a conversão de voz em texto para reconhecimento do sistema.`,
+    `Esta gravação é demasiado longa para a conversão de voz em texto ${provider} (máx. ${limit}). Experimenta uma mensagem mais curta ou altera a conversão de voz em texto para reconhecimento do sistema.`,
   addProviderKeyToEnableProvider: ({ provider }) =>
-    `Adicione as credenciais para ${provider} em Definições antes de utilizar esta rota.`,
+    `Adiciona as credenciais para ${provider} em Definições antes de utilizar esta rota.`,
   stopSessionBeforePreview:
-    "Pare a sessão de voz ativa antes de ouvir uma amostra de voz.",
+    "Interrompe a sessão de voz ativa antes de ouvir uma amostra de voz.",
   chooseTtsToPreviewVoices:
-    "Escolha uma rota TTS configurada em Definições para ouvir amostras de voz.",
+    "Escolhe uma rota TTS configurada em Definições para ouvir amostras de voz.",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
-    `Transfira primeiro a voz local ${languageLabel} selecionada.`,
+    `Transfere primeiro a voz local ${languageLabel} selecionada.`,
   couldntPreviewVoice: "Não foi possível reproduzir a amostra de voz.",
   spokenRepliesDisabled: "As respostas faladas estão desativadas nas definições.",
   providerVoiceFallback:
@@ -598,9 +598,9 @@ export const pt = {
   clearSpeechReplayCache: "Limpar cache de voz",
   speechReplayCacheCleared: "Os ficheiros de voz em cache foram removidos.",
   speechReplayCacheClearFailed: "Não foi possível limpar a cache de voz.",
-  listeningToYourVoice: "A ouvir a sua voz",
-  parsingYourVoiceInput: "A transformar a sua voz em texto",
-  preparingRequest: "A preparar o seu pedido",
+  listeningToYourVoice: "A ouvir a tua voz",
+  parsingYourVoiceInput: "A transformar a tua voz em texto",
+  preparingRequest: "A preparar o teu pedido",
   searchingTheWeb: "A pesquisar na web contexto atualizado",
   waitingForProvider: ({ provider }) => `À espera de ${provider}`,
   preparingVoiceWithProvider: ({ provider }) =>
@@ -615,14 +615,14 @@ export const pt = {
   conversationActions: "Ações da conversa",
   statusDetails: "Detalhes do estado",
   persistenceFailure:
-    "Não consegui guardar dados neste dispositivo. Mantenha a aplicação aberta e tente novamente; alterações recentes podem ser perdidas após a reinicialização.",
+    "Não consegui guardar dados neste dispositivo. Mantém a aplicação aberta e tenta novamente; alterações recentes podem ser perdidas após a reinicialização.",
   show: "Mostrar",
   showTranscript: "Mostrar transcrição",
   hide: "Ocultar",
   copyThread: "Copiar Tópico",
   shareThread: "Partilhar tópico",
   reportResponse: "Denunciar esta resposta",
-  reportResponseIntro: "Denúncia de resposta de IA do Mr Broccoli. Reveja o conteúdo, descreva o problema e envie esta denúncia ao programador.",
+  reportResponseIntro: "Denúncia de resposta de IA do Mr Broccoli. Revê o conteúdo, descreve o problema e envia esta denúncia ao programador.",
   repeatReply: "Repetir resposta",
   renameThread: "Renomear tópico",
   renameThreadHint:
@@ -630,23 +630,23 @@ export const pt = {
   threadTitle: "Título do tópico",
   noTranscriptYet: "Nenhuma transcrição ainda",
   previewTranscriptEmptyDescription:
-    "Use voz ou texto para começar. A sua conversa aparecerá aqui.",
+    "Usa voz ou texto para começar. A tua conversa aparecerá aqui.",
   noConversationYet: "Nenhuma conversa ainda",
   expandedTranscriptEmptyDescription:
-    "Use voz ou texto para começar. Feche este ecrã quando quiser regressar ao palco principal.",
+    "Usa voz ou texto para começar. Fecha este ecrã quando quiser regressar ao palco principal.",
   transcriptSelectionHint:
-    "Selecione qualquer texto de mensagem diretamente ou partilhe e copie mensagens individuais abaixo.",
+    "Seleciona qualquer texto de mensagem diretamente ou partilha e copia mensagens individuais abaixo.",
   textMessagePlaceholder: "Introduza uma mensagem",
   sendTextMessage: "Enviar mensagem",
   showVoiceInput: "Mostrar entrada de voz",
   showTextInput: "Mostrar entrada de texto",
   usageStatsHiddenDescription:
-    "Mantenha as estimativas de tokens fora da interface da transcrição.",
+    "Mantém as estimativas de tokens fora da interface da transcrição.",
   usageStatsVisibleDescription:
     "Mostrar a utilização estimada de tokens para as respostas e os totais da conversa.",
   debugLogButton: "Botão Registo de depuração",
   debugLogButtonHiddenDescription:
-    "Mantenha o botão REGISTO do ecrã inicial oculto, a menos que uma captura já esteja a ser executada.",
+    "Mantém o botão REGISTO do ecrã inicial oculto, a menos que uma captura já esteja a ser executada.",
   debugLogButtonVisibleDescription:
     "Mostrar o botão REGISTO do ecrã inicial para iniciar e interromper capturas de depuração.",
   debugLogButtonUsageDescription:
@@ -708,44 +708,44 @@ export const pt = {
   unknownUsageRoute: "Rota desconhecida",
   setupGuideConnectProviderTitle: "Configurar credenciais",
   setupGuideConnectProviderDescription:
-    "Adicione credenciais em Definições e escolha as rotas que pretende utilizar.",
+    "Adiciona credenciais em Definições e escolhe as rotas que pretendes utilizar.",
   idle: "Ocioso",
-  yourConversationAppearsHere: "A sua conversa aparece aqui",
+  yourConversationAppearsHere: "A tua conversa aparece aqui",
   defaultTranscriptEmptyDescription:
-    "Use voz ou texto para começar. Manterei o tópico e responderei aqui.",
+    "Usa voz ou texto para começar. Manterei o tópico e responderei aqui.",
   delete: "Eliminar",
   deleteConversationConfirmationTitle: ({ title }) => `Eliminar “${title}”?`,
   deleteConversationConfirmationMessage:
     "Isto elimina permanentemente a conversa e todas as suas mensagens. Esta ação não pode ser anulada.",
   conversations: "Conversas",
-  drawerSubtitle: "Salte entre tópicos ao vivo ou comece uma nova sala.",
+  drawerSubtitle: "Salte entre tópicos ao vivo ou começa uma nova sala.",
   newSession: "Nova sessão",
   noSavedConversationsYet: "Ainda não há conversas guardadas",
   drawerEmptyDescription:
-    "Comece a falar na vista principal e criarei uma sessão automaticamente.",
+    "Começa a falar na vista principal e criarei uma sessão automaticamente.",
   setupGuideTitle: "Configurar a aplicação",
-  setupGuideSubtitle: "Adicione credenciais e escolha rotas em Definições.",
+  setupGuideSubtitle: "Adiciona credenciais e escolhe rotas em Definições.",
   fastestStartPreset: "Configuração mínima",
   fastestStartDescription:
-    "Utilize a fala do dispositivo quando disponível e configure apenas a rota de resposta necessária.",
+    "Utiliza a fala do dispositivo quando disponível e configura apenas a rota de resposta necessária.",
   fullVoicePreset: "Voz configurada",
   fullVoiceDescription:
-    "Utilize serviços configurados para respostas, transcrição e saída falada quando os escolher.",
+    "Utiliza serviços configurados para respostas, transcrição e saída falada quando os escolher.",
   setupGuideNote:
     "A seguir abriremos as Definições para que possa colar e validar as credenciais.",
   useThisSetup: "Utilizar esta configuração",
   notNow: "Agora não",
   setupGuideIntroTitle: "Como funciono",
   setupGuideIntroBody:
-    "Começo em branco. Adicione credenciais para serviços externos que já utiliza e escolha como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
+    "Começo em branco. Adiciona credenciais para serviços externos que já utiliza e escolhe como as respostas, a entrada de fala, a saída falada e o contexto Web opcional serão encaminhados.",
   setupGuideIntroNote:
-    "Após a configuração, utilize o controlo de voz principal para iniciar e interromper uma conversa. A transcrição atual permanece disponível no ecrã inicial e cada rota pode ser alterada posteriormente nas Definições.",
+    "Após a configuração, utiliza o controlo de voz principal para iniciar e interromper uma conversa. A transcrição atual permanece disponível no ecrã inicial e cada rota pode ser alterada posteriormente nas Definições.",
   setupGuideProviderTitle: "Adicionar credenciais",
   setupGuideProviderBody:
-    "Escolha o serviço externo que pretende configurar e cole as credenciais com acesso de resposta.",
+    "Escolhe o serviço externo que pretendes configurar e cola as credenciais com acesso de resposta.",
   setupGuideProviderPickerLabel: "Serviço de resposta",
-  setupGuideSelectProvider: "Selecione um fornecedor",
-  setupGuideSelectProviderFirst: "Selecione primeiro um fornecedor.",
+  setupGuideSelectProvider: "Seleciona um fornecedor",
+  setupGuideSelectProviderFirst: "Seleciona primeiro um fornecedor.",
   setupGuideApiKeyLabel: "Chave API",
   setupGuideApiKeyPlaceholder: "Colar credenciais",
   setupGuideContinue: "Continuar",
@@ -753,26 +753,26 @@ export const pt = {
   setupGuideBack: "Voltar",
   setupGuideValidateKey: "Validar chave",
   setupGuideApiKeyRequiredOrCancel:
-    "Adicione uma chave API para continuar ou cancele o guia de configuração.",
+    "Adiciona uma chave API para continuar ou cancela o guia de configuração.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "Escolha um fornecedor e adicione uma chave API para continuar ou cancele o guia de configuração.",
+    "Escolhe um fornecedor e adiciona uma chave API para continuar ou cancela o guia de configuração.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Estas credenciais ${provider} não permitem pedidos de resposta.`,
-  setupGuideKokoroTitle: "Adicione uma voz natural no dispositivo",
+  setupGuideKokoroTitle: "Adiciona uma voz natural no dispositivo",
   setupGuideKokoroBody: ({ size }) =>
-    `Opcional: descarregue Kokoro (cerca de ${size} MB) para obter respostas faladas muito mais naturais, sem fornecedor de voz ou encargos de utilização.`,
+    `Opcional: descarrega Kokoro (cerca de ${size} MB) para obter respostas faladas muito mais naturais, sem fornecedor de voz ou encargos de utilização.`,
   setupGuideKokoroLanguageNote:
-    "Este modelo fala atualmente inglês e chinês simplificado. Configure quaisquer rotas alternativas desejadas posteriormente nas definições de Fala.",
+    "Este modelo fala atualmente inglês e chinês simplificado. Configura quaisquer rotas alternativas desejadas posteriormente nas definições de Fala.",
   setupGuideKokoroDownload: "Transferir o Kokoro",
   setupGuideUseKokoro: "Utilizar o Kokoro para respostas faladas",
   setupGuideUseKokoroSummary:
-    "Mantenha a síntese no telefone sempre que o idioma de resposta for compatível.",
+    "Mantém a síntese no telefone sempre que o idioma de resposta for compatível.",
   setupGuideSkipKokoro: "Saltar por enquanto",
-  setupGuideVoiceTestTitle: "Teste a sua configuração",
+  setupGuideVoiceTestTitle: "Testa a tua configuração",
   setupGuideVoiceTestBody:
-    "Diga uma frase curta. Testarei o acesso ao microfone, a transcrição, a rota de resposta configurada e a saída falada quando uma rota de voz aceitável estiver disponível.",
+    "Diz uma frase curta. Testarei o acesso ao microfone, a transcrição, a rota de resposta configurada e a saída falada quando uma rota de voz aceitável estiver disponível.",
   setupGuideVoiceTestNoInputBody:
-    "A entrada de voz não está disponível nesta configuração. Continue a rever as rotas detetadas e ajuste as definições de fala mais tarde, se necessário.",
+    "A entrada de voz não está disponível nesta configuração. Continua a rever as rotas detetadas e ajusta as definições de fala mais tarde, se necessário.",
   setupGuideVoiceTestTextOnlyNote:
     "Este teste continua apenas em texto porque ainda não está pronta nenhuma rota de voz falada aceitável.",
   setupGuideVoiceTestStart: "Iniciar teste",
@@ -789,7 +789,7 @@ export const pt = {
     "A entrada de voz não está disponível para esta configuração neste dispositivo.",
   setupGuideSummaryTitle: "Configuração concluída",
   setupGuideSummaryBody:
-    "Aqui está a rota que irei utilizar com a sua configuração atual.",
+    "Aqui está a rota que irei utilizar com a tua configuração atual.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Fala para texto",
   setupGuideSummaryTts: "Texto para voz",
@@ -811,7 +811,7 @@ export const pt = {
   searchConversationsPlaceholder: "Pesquise títulos, modelos e texto de mensagens",
   noMatchingConversations: "Nenhuma conversa correspondente",
   noMatchingConversationsDescription:
-    "Experimente um título, rota, modelo ou frase diferente da transcrição.",
+    "Experimenta um título, rota, modelo ou frase diferente da transcrição.",
   noProviderYet: "Nenhum fornecedor ainda",
   noModelYet: "Nenhum modelo ainda",
   startedAt: "Iniciado",
@@ -835,38 +835,38 @@ export const pt = {
   webSearchAction: "pesquisa na web",
   thinking: "A pensar",
   speaking: "A falar",
-  pleaseWait: "Por favor, aguarde",
-  yourTurn: "A sua vez",
-  keepPressing: "Continue a pressionar",
-  tapWhenDone: "Toque quando terminar",
+  pleaseWait: "Por favor, aguarda",
+  yourTurn: "A tua vez",
+  keepPressing: "Continua a pressionar",
+  tapWhenDone: "Toca quando terminar",
   speechPaused: "A fala está pausada",
   pausePlaybackUnavailable:
-    "Esta rota de voz não pode ser colocada em pausa. Pare ou mude para a saída de voz do fornecedor.",
-  holdToSpeak: "Segure para falar",
-  tapToSpeak: "Toque para falar",
-  tapAgainToSend: "Toque novamente para enviar",
+    "Esta rota de voz não pode ser colocada em pausa. Interrompe ou muda para a saída de voz do fornecedor.",
+  holdToSpeak: "Segura para falar",
+  tapToSpeak: "Toca para falar",
+  tapAgainToSend: "Toca novamente para enviar",
   waitingForReply: "A aguardar resposta",
-  parsingYourVoice: "A analisar a sua voz",
+  parsingYourVoice: "A analisar a tua voz",
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} não está configurado em Definições.`,
   providerNetworkError: ({ provider, action }) =>
-    `Não foi possível aceder a ${provider} para ${action}. Verifique a ligação e tente novamente.`,
+    `Não foi possível aceder a ${provider} para ${action}. Verifica a ligação e tenta novamente.`,
   providerAuthError: ({ provider, action }) =>
-    `${provider} rejeitou as credenciais para ${action}. Verifique a chave API e as permissões.`,
+    `${provider} rejeitou as credenciais para ${action}. Verifica a chave API e as permissões.`,
   providerRateLimitError: ({ provider, action }) =>
-    `${provider} está a limitar os pedidos de ${action} neste momento. Tente novamente dentro de alguns instantes.`,
+    `${provider} está a limitar os pedidos de ${action} neste momento. Tenta novamente dentro de alguns instantes.`,
   providerCreditsRequired: ({ provider, action }) =>
-    `${provider} precisa de crédito API suficiente para ${action}. Verifique o saldo da conta e o limite de gastos da chave.`,
+    `${provider} precisa de crédito API suficiente para ${action}. Verifica o saldo da conta e o limite de gastos da chave.`,
   providerTimeoutError: ({ provider, action }) =>
-    `${provider} demorou muito tempo durante ${action}. Tente novamente.`,
+    `${provider} demorou muito tempo durante ${action}. Tenta novamente.`,
   providerTemporaryError: ({ provider, action }) =>
-    `${provider} teve um problema temporário durante ${action}. Tente novamente em breve.`,
+    `${provider} teve um problema temporário durante ${action}. Tenta novamente em breve.`,
   providerEmptyReplyError: ({ provider }) =>
-    `${provider} terminou sem devolver resposta. Tente novamente.`,
+    `${provider} terminou sem devolver resposta. Tenta novamente.`,
   providerIncompleteReplyError: ({ provider }) =>
-    `A resposta de ${provider} terminou antes de estar concluída. Tente novamente.`,
+    `A resposta de ${provider} terminou antes de estar concluída. Tenta novamente.`,
   providerContextTooLong: ({ provider }) =>
-    `${provider} rejeitou a resposta porque a conversa se tornou demasiado longa. Inicie um novo tópico ou encurte o pedido.`,
+    `${provider} rejeitou a resposta porque a conversa se tornou demasiado longa. Inicia um novo tópico ou encurta o pedido.`,
   providerRequestRejected: ({ provider, action, detail }) =>
     detail
       ? `${provider} rejeitou o pedido de ${action}: ${detail}`
@@ -888,7 +888,7 @@ export const pt = {
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `Nenhuma rota de voz local ou na nuvem está pronta para ${languageLabel}.`,
   chooseTextToSpeechProviderInSettings:
-    "Escolha um fornecedor de conversão de texto em voz em Definições.",
+    "Escolhe um fornecedor de conversão de texto em voz em Definições.",
   ttsNotSupportedYet: ({ provider }) => `${provider} TTS ainda não é compatível.`,
   ttsError: ({ provider, status, errorText }) =>
     `Erro ${provider} TTS (${status}): ${errorText}`,
@@ -898,17 +898,17 @@ export const pt = {
   sttTimeout: ({ provider }) =>
     `A transcrição da fala ${provider} demorou muito tempo.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} apenas aceita gravações até ${limit}. Utilize um clipe mais curto ou troque os modelos STT.`,
+    `${provider} ${model} apenas aceita gravações até ${limit}. Utiliza um clipe mais curto ou troca os modelos STT.`,
   voiceInputCaptureIncomplete:
-    "A entrada de voz não pôde ser captada corretamente. Por favor, tente novamente.",
+    "A entrada de voz não pôde ser captada corretamente. Por favor, tenta novamente.",
   ttsDidNotReturnAudio: ({ provider }) =>
     `${provider} TTS não devolveu áudio.`,
   nativeSttHandledInApp: "O STT do sistema é tratado diretamente na aplicação.",
   chooseSpeechToTextProviderInSettings:
-    "Escolha um fornecedor de voz para texto em Definições.",
+    "Escolhe um fornecedor de voz para texto em Definições.",
   sttNotSupportedYet: ({ provider }) => `${provider} STT ainda não é compatível.`,
   providerNotWiredUpYet: ({ provider }) => `${provider} ainda não está ligado.`,
-  you: "Você",
+  you: "Tu",
   assistant: "Assistente",
   untitledConversation: "Conversa sem título",
   conversationExportHeader: ({ title }) => `Conversa: ${title}`,
