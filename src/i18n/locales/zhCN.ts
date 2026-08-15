@@ -399,7 +399,7 @@ export const zhCN = {
     "使用选定的已配置服务进行语音回复。",
   ttsFallbackRoutes: "回退路由",
   ttsFallbackRoutesHint:
-    "可选。仅按期望的尝试顺序添加需要的路由。一旦某条路由开始朗读，Mr Broccoli 将在本条回复中一直使用它。",
+    "可选。仅按期望的尝试顺序添加需要的路由。一旦某条路由开始朗读，我将在本条回复中一直使用它。",
   ttsFallbackNone:
     "未配置回退路由。语音失败时将直接显示错误。",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -434,7 +434,7 @@ export const zhCN = {
   elevenLabsVoicesReadPermissionHint:
     "在 ElevenLabs 中，编辑此 API 键并启用 Voices → Read，然后在此处刷新。",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli 自动从 ${provider} 加载可用语音。`,
+    `我会自动从 ${provider} 加载可用语音。`,
   providerVoiceId: "语音 ID",
   providerVoiceIdPlaceholder: "输入语音 ID",
   providerVoiceIdFallbackHint:
@@ -442,7 +442,7 @@ export const zhCN = {
   providerVoiceIdRequired: ({ provider }) =>
     `使用语音输出前，请刷新 ${provider} 语音库或输入语音 ID。`,
   qwenSpeechUnavailableInUs:
-    "Mr Broccoli 当前的 Qwen 语音路由在美国区域不可用。请为 Qwen 语音选择新加坡或北京区域。",
+    "我当前的 Qwen 语音路由在美国区域不可用。请为 Qwen 语音选择新加坡或北京区域。",
   qwenApiRegion: "Qwen API 区域",
   qwenRegionSingapore: "新加坡",
   qwenRegionUs: "美国（弗吉尼亚州）",
@@ -450,12 +450,12 @@ export const zhCN = {
   qwenRegionHint:
     "所选区域必须与创建此 API 密钥的区域匹配。",
   qwenRegionUsSpeechHint:
-    "美国区域的密钥支持此处的聊天和网页搜索。Mr Broccoli 当前的 Qwen STT 和 TTS 路由需要新加坡或北京区域的密钥。",
+    "美国区域的密钥支持此处的聊天和网页搜索。我当前的 Qwen STT 和 TTS 路由需要新加坡或北京区域的密钥。",
   providerDefaultVoiceHint:
     "该提供商当前使用其默认语音进行预览和语音回复。",
   listenLanguages: "收听语言",
   listenLanguagesHint:
-    "选择您希望听起来不错的回复语言。 Mr Broccoli 在路由语音输出时按此顺序尝试它们。",
+    "选择您希望听起来不错的回复语言。 我在路由语音输出时按此顺序尝试它们。",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "已选择 1 种语言" : `已选择 ${count} 种语言`,
   localVoicePacks: "本地语音包",
@@ -472,7 +472,7 @@ export const zhCN = {
     "此设备未报告任何本机系统语音以进行预览。",
   runtimeCompatibilityOverrides: "运行时兼容性",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `有 ${count} 个经提供商确认不可用的模型或设置配置仅在此设备上被停用。Mr Broccoli会自动绕过它们。`,
+    `有 ${count} 个经提供商确认不可用的模型或设置配置仅在此设备上被停用。我会自动绕过它们。`,
   clearRuntimeCompatibilityOverrides: "清除运行时兼容性",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "要清除运行时兼容性吗？",
@@ -612,7 +612,7 @@ export const zhCN = {
   conversationActions: "对话动作",
   statusDetails: "状态详情",
   persistenceFailure:
-    "Mr Broccoli 无法在此设备上保存数据。保持应用程序打开并重试；重启后最近的更改可能会丢失。",
+    "我无法在此设备上保存数据。保持应用程序打开并重试；重启后最近的更改可能会丢失。",
   show: "显示",
   showTranscript: "显示文字记录",
   hide: "隐藏",
@@ -707,7 +707,7 @@ export const zhCN = {
   idle: "空闲",
   yourConversationAppearsHere: "您的对话出现在这里",
   defaultTranscriptEmptyDescription:
-    "使用语音或文本开始对话。Mr Broccoli 会保留这段对话并在此回复。",
+    "使用语音或文本开始对话。我会保留这段对话并在此回复。",
   delete: "删除",
   deleteConversationConfirmationTitle: ({ title }) => `删除“${title}”？`,
   deleteConversationConfirmationMessage:
@@ -717,7 +717,7 @@ export const zhCN = {
   newSession: "新会话",
   noSavedConversationsYet: "尚未保存对话",
   drawerEmptyDescription:
-    "在主界面开始说话，Mr Broccoli 会自动创建会话。",
+    "在主界面开始说话，我会自动创建会话。",
   setupGuideTitle: "配置应用程序",
   setupGuideSubtitle: "添加凭据并在“设置”中选择路由。",
   fastestStartPreset: "最简设置",
@@ -730,9 +730,9 @@ export const zhCN = {
     "接下来我们将打开“设置”，以便您可以粘贴和验证凭据。",
   useThisSetup: "使用此设置",
   notNow: "暂时不用",
-  setupGuideIntroTitle: "Mr Broccoli 的工作原理",
+  setupGuideIntroTitle: "我的工作原理",
   setupGuideIntroBody:
-    "Mr Broccoli 初始为空。请为您已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
+    "我初始为空。请为您已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
   setupGuideIntroNote:
     "设置完成后，使用主语音控制来开始和停止对话。当前文字记录会保留在主屏幕上，每条路由以后都可以在“设置”中更改。",
   setupGuideProviderTitle: "添加凭据",
@@ -765,7 +765,7 @@ export const zhCN = {
   setupGuideSkipKokoro: "暂时跳过",
   setupGuideVoiceTestTitle: "测试您的设置",
   setupGuideVoiceTestBody:
-    "说一个简短的句子。当可接受的语音路由可用时，Mr Broccoli 将测试麦克风访问、转录、配置的回复路由和语音输出。",
+    "说一个简短的句子。当可接受的语音路由可用时，我将测试麦克风访问、转录、配置的回复路由和语音输出。",
   setupGuideVoiceTestNoInputBody:
     "此配置无法使用语音输入。请继续查看检测到的路由，之后可按需调整语音设置。",
   setupGuideVoiceTestTextOnlyNote:
@@ -784,7 +784,7 @@ export const zhCN = {
     "在此设备上，该配置无法使用语音输入。",
   setupGuideSummaryTitle: "设置完成",
   setupGuideSummaryBody:
-    "以下是 Mr Broccoli 在您当前配置下将使用的路由。",
+    "以下是我在您当前配置下将使用的路由。",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "语音转文字",
   setupGuideSummaryTts: "文字转语音",

@@ -402,7 +402,7 @@ export const tr = {
     "Sözlü yanıtlar için seçilen yapılandırılmış hizmeti kullanın.",
   ttsFallbackRoutes: "Geri dönüş rotaları",
   ttsFallbackRoutesHint:
-    "İsteğe bağlı. Yalnızca istediğiniz rotaları, denenmeleri gereken sıraya göre ekleyin. Rota konuşmaya başladığında Mr Broccoli yanıtın geri kalanı boyunca rota üzerinde kalır.",
+    "İsteğe bağlı. Yalnızca istediğiniz rotaları, denenmeleri gereken sıraya göre ekleyin. Rota konuşmaya başladığında yanıtın geri kalanı boyunca rota üzerinde kalırım.",
   ttsFallbackNone:
     "Hiçbir geri dönüş yapılandırılmadı. Bunun yerine bir ses hatası gösterilecektir.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -437,7 +437,7 @@ export const tr = {
   elevenLabsVoicesReadPermissionHint:
     "ElevenLabs'de bu API anahtarını düzenleyin ve Sesler → Oku'yu etkinleştirin, ardından burayı yenileyin.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli, mevcut sesleri ${provider} hizmetinden otomatik olarak yükler.`,
+    `Mevcut sesleri ${provider} hizmetinden otomatik olarak yüklerim.`,
   providerVoiceId: "Ses Kimliği",
   providerVoiceIdPlaceholder: "Bir ses kimliği girin",
   providerVoiceIdFallbackHint:
@@ -445,7 +445,7 @@ export const tr = {
   providerVoiceIdRequired: ({ provider }) =>
     `Konuşma çıkışını kullanmadan önce ${provider} ses kitaplığını yenileyin veya bir ses kimliği girin.`,
   qwenSpeechUnavailableInUs:
-    "Mr Broccoli'nin mevcut Qwen konuşma yolları ABD bölgesinde mevcut değildir. Qwen konuşması için Singapur veya Pekin'i seçin.",
+    "Mevcut Qwen konuşma yollarım ABD bölgesinde kullanılamıyor. Qwen konuşması için Singapur veya Pekin'i seçin.",
   qwenApiRegion: "Qwen API Bölgesi",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "ABD (Virginia)",
@@ -453,12 +453,12 @@ export const tr = {
   qwenRegionHint:
     "Seçilen bölge, bu API anahtarının oluşturulduğu bölgeyle eşleşmelidir.",
   qwenRegionUsSpeechHint:
-    "ABD bölgesi anahtarları burada sohbeti ve web aramasını destekler. Mr Broccoli'nin mevcut Qwen STT ve TTS rotaları, Singapur veya Pekin anahtarı gerektirir.",
+    "ABD bölgesi anahtarları burada sohbeti ve web aramasını destekler. Mevcut Qwen STT ve TTS rotalarım, Singapur veya Pekin anahtarı gerektirir.",
   providerDefaultVoiceHint:
     "Bu sağlayıcı şu anda önizleme ve sesli yanıtlar için varsayılan sesini kullanıyor.",
   listenLanguages: "Dinleme Dilleri",
   listenLanguagesHint:
-    "Kulağa hoş gelmesini istediğiniz yanıt dillerini seçin. Mr Broccoli, konuşma çıkışını yönlendirirken bunları bu sırayla dener.",
+    "Kulağa hoş gelmesini istediğiniz yanıt dillerini seçin. Konuşma çıkışını yönlendirirken bunları bu sırayla denerim.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 dil seçildi" : `${count} dil seçildi`,
   localVoicePacks: "Yerel Ses Paketleri",
@@ -475,7 +475,7 @@ export const tr = {
     "Bu cihaz, önizleme için herhangi bir yerel sistem sesini bildirmedi.",
   runtimeCompatibilityOverrides: "Çalışma zamanı uyumluluğu",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `Sağlayıcının kullanılamadığını doğruladığı ${count} model veya ayar yapılandırması yalnızca bu cihazda devre dışı. Mr Broccoli bunları otomatik olarak atlar.`,
+    `Sağlayıcının kullanılamadığını doğruladığı ${count} model veya ayar yapılandırması yalnızca bu cihazda devre dışı. Bunları otomatik olarak atlarım.`,
   clearRuntimeCompatibilityOverrides: "Çalışma zamanı uyumluluğunu temizle",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Çalışma zamanı uyumluluğu temizlensin mi?",
@@ -616,7 +616,7 @@ export const tr = {
   conversationActions: "Konuşma eylemleri",
   statusDetails: "Durum ayrıntıları",
   persistenceFailure:
-    "Mr Broccoli bu cihaza veri kaydedemedi. Uygulamayı açık tutun ve tekrar deneyin; yeniden başlatmanın ardından son değişiklikler kaybolabilir.",
+    "Bu cihaza veri kaydedemedim. Uygulamayı açık tutun ve tekrar deneyin; yeniden başlatmanın ardından son değişiklikler kaybolabilir.",
   show: "Göster",
   showTranscript: "Konuşma metnini göster",
   hide: "Gizle",
@@ -712,7 +712,7 @@ export const tr = {
   idle: "Boşta",
   yourConversationAppearsHere: "Konuşmanız burada görünüyor",
   defaultTranscriptEmptyDescription:
-    "Başlamak için ses veya metin kullanın. Mr Broccoli ileti dizisini tutacak ve burada yanıt verecek.",
+    "Başlamak için ses veya metin kullanın. İleti dizisini tutacağım ve burada yanıt vereceğim.",
   delete: "Sil",
   deleteConversationConfirmationTitle: ({ title }) => `“${title}” silinsin mi?`,
   deleteConversationConfirmationMessage:
@@ -723,7 +723,7 @@ export const tr = {
   newSession: "Yeni Oturum",
   noSavedConversationsYet: "Henüz kayıtlı görüşme yok",
   drawerEmptyDescription:
-    "Ana görünümden konuşmaya başladığınızda Mr Broccoli otomatik olarak bir oturum oluşturacaktır.",
+    "Ana görünümden konuşmaya başladığınızda otomatik olarak bir oturum oluştururum.",
   setupGuideTitle: "Uygulamayı yapılandırın",
   setupGuideSubtitle:
     "Kimlik bilgilerini ekleyin ve Ayarlar'da rotaları seçin.",
@@ -737,9 +737,9 @@ export const tr = {
     "Kimlik bilgilerini yapıştırıp doğrulayabilmeniz için daha sonra Ayarlar'ı açacağız.",
   useThisSetup: "Bu kurulumu kullan",
   notNow: "Şimdi değil",
-  setupGuideIntroTitle: "Mr Broccoli nasıl çalışır?",
+  setupGuideIntroTitle: "Nasıl çalışırım?",
   setupGuideIntroBody:
-    "Mr Broccoli boş başlar. Halihazırda kullanmakta olduğunuz harici hizmetler için kimlik bilgilerini ekleyin, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seçin.",
+    "Boş başlarım. Halihazırda kullanmakta olduğunuz harici hizmetler için kimlik bilgilerini ekleyin, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seçin.",
   setupGuideIntroNote:
     "Kurulumdan sonra konuşmayı başlatmak ve durdurmak için ana ses kontrolünü kullanın. Geçerli transkript ana ekranda kalır ve her rota daha sonra Ayarlar'dan değiştirilebilir.",
   setupGuideProviderTitle: "Kimlik Bilgilerini Ekle",
@@ -772,7 +772,7 @@ export const tr = {
   setupGuideSkipKokoro: "Şimdilik atla",
   setupGuideVoiceTestTitle: "Kurulumunuzu Test Edin",
   setupGuideVoiceTestBody:
-    "Kısa bir cümle söyleyin. Mr Broccoli, kabul edilebilir bir ses yolu mevcut olduğunda mikrofon erişimini, transkripsiyonu, yapılandırılmış yanıt yolunu ve sözlü çıkışı test edecektir.",
+    "Kısa bir cümle söyleyin. Kabul edilebilir bir ses yolu mevcut olduğunda mikrofon erişimini, transkripsiyonu, yapılandırılmış yanıt yolunu ve sözlü çıkışı test edeceğim.",
   setupGuideVoiceTestNoInputBody:
     "Bu kurulumda ses girişi kullanılamaz. Algılanan rotaları incelemeye devam edin, ardından gerekirse konuşma ayarlarını daha sonra yapın.",
   setupGuideVoiceTestTextOnlyNote:
@@ -791,7 +791,7 @@ export const tr = {
     "Bu cihazda bu kurulum için ses girişi mevcut değil.",
   setupGuideSummaryTitle: "Kurulum Tamamlandı",
   setupGuideSummaryBody:
-    "İşte Mr Broccoli'nin mevcut yapılandırmanızla kullanacağı rota.",
+    "İşte mevcut yapılandırmanızla kullanacağım rota.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Konuşmadan metne",
   setupGuideSummaryTts: "Metinden konuşmaya",

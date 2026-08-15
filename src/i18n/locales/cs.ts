@@ -403,7 +403,7 @@ export const cs = {
     "Použít vybranou nakonfigurovanou službu pro mluvené odpovědi.",
   ttsFallbackRoutes: "Záložní trasy",
   ttsFallbackRoutesHint:
-    "Volitelné. Přidejte pouze trasy, které chcete, v pořadí, v jakém se mají vyzkoušet. Jakmile trasa začne mluvit, Mr Broccoli na ní zůstane po zbytek odpovědi.",
+    "Volitelné. Přidejte pouze trasy, které chcete, v pořadí, v jakém se mají vyzkoušet. Jakmile trasa začne mluvit, zůstanu na ní po zbytek odpovědi.",
   ttsFallbackNone:
     "Není nakonfigurována žádná záložní trasa. Místo toho se zobrazí chyba hlasu.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -438,7 +438,7 @@ export const cs = {
   elevenLabsVoicesReadPermissionHint:
     "V ElevenLabs upravte tento klíč API a povolte Hlasy → Číst a poté zde obnovte.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli automaticky načte dostupné hlasy od poskytovatele ${provider}.`,
+    `Automaticky načtu dostupné hlasy od poskytovatele ${provider}.`,
   providerVoiceId: "Hlasové ID",
   providerVoiceIdPlaceholder: "Zadejte hlasové ID",
   providerVoiceIdFallbackHint:
@@ -446,7 +446,7 @@ export const cs = {
   providerVoiceIdRequired: ({ provider }) =>
     `Před použitím hlasového výstupu aktualizujte hlasovou knihovnu ${provider} nebo zadejte hlasové ID.`,
   qwenSpeechUnavailableInUs:
-    "Aktuální hlasové trasy Qwen v aplikaci Mr Broccoli nejsou v regionu USA dostupné. Pro řeč Qwen vyberte Singapur nebo Peking.",
+    "Mé aktuální hlasové trasy Qwen nejsou v regionu USA dostupné. Pro řeč Qwen vyberte Singapur nebo Peking.",
   qwenApiRegion: "Oblast API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginie)",
@@ -454,12 +454,12 @@ export const cs = {
   qwenRegionHint:
     "Vybraná oblast se musí shodovat s oblastí, ve které byl tento klíč API vytvořen.",
   qwenRegionUsSpeechHint:
-    "Klíče pro oblast USA zde podporují chat a vyhledávání na webu. Aktuální trasy Qwen STT a TTS v aplikaci Mr Broccoli vyžadují singapurský nebo pekingský klíč.",
+    "Klíče pro oblast USA zde podporují chat a vyhledávání na webu. Mé aktuální trasy Qwen STT a TTS vyžadují singapurský nebo pekingský klíč.",
   providerDefaultVoiceHint:
     "Tento poskytovatel aktuálně používá svůj výchozí hlas pro náhled a mluvené odpovědi.",
   listenLanguages: "Jazyky poslechu",
   listenLanguagesHint:
-    "Vyberte jazyky odpovědí, které chcete, aby zněly dobře. Mr Broccoli je zkouší v tomto pořadí při směrování hlasového výstupu.",
+    "Vyberte jazyky odpovědí, které chcete, aby zněly dobře. Zkouším je v tomto pořadí při směrování hlasového výstupu.",
   listenLanguagesSelected: ({ count }) =>
     Number(count) === 1
       ? "Vybrán 1 jazyk"
@@ -480,7 +480,7 @@ export const cs = {
     "Toto zařízení nenahlásilo žádné nativní systémové hlasy pro náhled.",
   runtimeCompatibilityOverrides: "Kompatibilita za běhu",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} konfigurací modelů nebo nastavení, jejichž nedostupnost potvrdil poskytovatel, je vypnuto pouze na tomto zařízení. Mr Broccoli je automaticky obchází.`,
+    `${count} konfigurací modelů nebo nastavení, jejichž nedostupnost potvrdil poskytovatel, je vypnuto pouze na tomto zařízení. Automaticky je obcházím.`,
   clearRuntimeCompatibilityOverrides: "Vymazat kompatibilitu za běhu",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Vymazat kompatibilitu za běhu?",
@@ -624,7 +624,7 @@ export const cs = {
   conversationActions: "Konverzační akce",
   statusDetails: "Podrobnosti o stavu",
   persistenceFailure:
-    "Mr Broccoli nemohl uložit data do tohoto zařízení. Nechte aplikaci otevřenou a zkuste to znovu; nedávné změny mohou být po restartu ztraceny.",
+    "Nemohl jsem uložit data do tohoto zařízení. Nechte aplikaci otevřenou a zkuste to znovu; nedávné změny mohou být po restartu ztraceny.",
   show: "Zobrazit",
   showTranscript: "Zobrazit přepis",
   hide: "Skrýt",
@@ -721,7 +721,7 @@ export const cs = {
   idle: "Nečinný",
   yourConversationAppearsHere: "Zde se zobrazí vaše konverzace",
   defaultTranscriptEmptyDescription:
-    "Začněte pomocí hlasu nebo textu. Mr Broccoli ponechá vlákno a odpoví zde.",
+    "Začněte pomocí hlasu nebo textu. Ponechám vlákno a odpovím zde.",
   delete: "Smazat",
   deleteConversationConfirmationTitle: ({ title }) => `Smazat „${title}“?`,
   deleteConversationConfirmationMessage:
@@ -731,7 +731,7 @@ export const cs = {
   newSession: "Nová relace",
   noSavedConversationsYet: "Zatím žádné uložené konverzace",
   drawerEmptyDescription:
-    "Začněte mluvit z hlavního zobrazení a Mr Broccoli automaticky vytvoří relaci.",
+    "Začněte mluvit z hlavního zobrazení a automaticky vytvořím relaci.",
   setupGuideTitle: "Nakonfigurujte aplikaci",
   setupGuideSubtitle:
     "Přidejte přihlašovací údaje a vyberte trasy v Nastavení.",
@@ -745,9 +745,9 @@ export const cs = {
     "Jako další otevřeme Nastavení, abyste mohli vložit a ověřit přihlašovací údaje.",
   useThisSetup: "Použijte toto nastavení",
   notNow: "Teď ne",
-  setupGuideIntroTitle: "Jak funguje Mr Broccoli",
+  setupGuideIntroTitle: "Jak funguji",
   setupGuideIntroBody:
-    "Mr Broccoli začíná prázdný. Přidejte přihlašovací údaje pro externí služby, které již používáte, a poté vyberte, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
+    "Začínám prázdný. Přidejte přihlašovací údaje pro externí služby, které již používáte, a poté vyberte, jak budou směrovány odpovědi, hlasový vstup, mluvený výstup a volitelný webový kontext.",
   setupGuideIntroNote:
     "Po nastavení zahajte a zastavte konverzaci pomocí hlavního hlasového ovládání. Aktuální přepis zůstává k dispozici na domovské obrazovce a každou trasu lze později změnit v Nastavení.",
   setupGuideProviderTitle: "Přidat přihlašovací údaje",
@@ -780,7 +780,7 @@ export const cs = {
   setupGuideSkipKokoro: "Zatím přeskočte",
   setupGuideVoiceTestTitle: "Otestujte své nastavení",
   setupGuideVoiceTestBody:
-    "Řekněte krátkou větu. Mr Broccoli otestuje přístup k mikrofonu, přepis, nakonfigurovanou trasu odpovědi a mluvený výstup, když je k dispozici přijatelná hlasová trasa.",
+    "Řekněte krátkou větu. Otestuji přístup k mikrofonu, přepis, nakonfigurovanou trasu odpovědi a mluvený výstup, když je k dispozici přijatelná hlasová trasa.",
   setupGuideVoiceTestNoInputBody:
     "Hlasový vstup není u tohoto nastavení dostupný. Pokračujte v kontrole zjištěných tras a v případě potřeby později upravte nastavení řeči.",
   setupGuideVoiceTestTextOnlyNote:
@@ -799,7 +799,7 @@ export const cs = {
     "Hlasový vstup není pro toto nastavení na tomto zařízení dostupný.",
   setupGuideSummaryTitle: "Nastavení dokončeno",
   setupGuideSummaryBody:
-    "Zde je trasa, kterou Mr Broccoli použije s vaší aktuální konfigurací.",
+    "Zde je trasa, kterou použiji s vaší aktuální konfigurací.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Řeč na text",
   setupGuideSummaryTts: "Převod textu na řeč",

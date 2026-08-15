@@ -399,7 +399,7 @@ export const en = {
     "Use the selected configured service for spoken replies.",
   ttsFallbackRoutes: "Fallback routes",
   ttsFallbackRoutesHint:
-    "Optional. Add only the routes you want, in the order they should be tried. Once a route starts speaking, Mr Broccoli stays on it for the rest of the reply.",
+    "Optional. Add only the routes you want, in the order they should be tried. Once a route starts speaking, I stay on it for the rest of the reply.",
   ttsFallbackNone:
     "No fallback is configured. A voice failure will be shown instead.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -434,7 +434,7 @@ export const en = {
   elevenLabsVoicesReadPermissionHint:
     "In ElevenLabs, edit this API key and enable Voices → Read, then refresh here.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli loads available voices automatically from ${provider}.`,
+    `I load available voices automatically from ${provider}.`,
   providerVoiceId: "Voice ID",
   providerVoiceIdPlaceholder: "Enter a voice ID",
   providerVoiceIdFallbackHint:
@@ -442,7 +442,7 @@ export const en = {
   providerVoiceIdRequired: ({ provider }) =>
     `Refresh the ${provider} voice library or enter a voice ID before using speech output.`,
   qwenSpeechUnavailableInUs:
-    "Mr Broccoli's current Qwen speech routes are not available in the US region. Choose Singapore or Beijing for Qwen speech.",
+    "My current Qwen speech routes are not available in the US region. Choose Singapore or Beijing for Qwen speech.",
   qwenApiRegion: "Qwen API Region",
   qwenRegionSingapore: "Singapore",
   qwenRegionUs: "US (Virginia)",
@@ -450,12 +450,12 @@ export const en = {
   qwenRegionHint:
     "The selected region must match the region in which this API key was created.",
   qwenRegionUsSpeechHint:
-    "US-region keys support chat and web search here. Mr Broccoli's current Qwen STT and TTS routes require a Singapore or Beijing key.",
+    "US-region keys support chat and web search here. My current Qwen STT and TTS routes require a Singapore or Beijing key.",
   providerDefaultVoiceHint:
     "This provider currently uses its default voice for preview and spoken replies.",
   listenLanguages: "Listen Languages",
   listenLanguagesHint:
-    "Pick the reply languages you want to sound good. Mr Broccoli tries them in this order when routing speech output.",
+    "Pick the reply languages you want to sound good. I try them in this order when routing speech output.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 language selected" : `${count} languages selected`,
   localVoicePacks: "Local Voice Packs",
@@ -472,7 +472,7 @@ export const en = {
     "This device did not report any native system voices for preview.",
   runtimeCompatibilityOverrides: "Runtime compatibility",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} provider-confirmed unavailable model or setting configurations are disabled only on this device. Mr Broccoli routes around them automatically.`,
+    `${count} provider-confirmed unavailable model or setting configurations are disabled only on this device. I route around them automatically.`,
   clearRuntimeCompatibilityOverrides: "Clear runtime compatibility",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Clear runtime compatibility?",
@@ -612,7 +612,7 @@ export const en = {
   conversationActions: "Conversation actions",
   statusDetails: "Status details",
   persistenceFailure:
-    "Mr Broccoli couldn't save data on this device. Keep the app open and try again; recent changes may be lost after restart.",
+    "I couldn't save data on this device. Keep the app open and try again; recent changes may be lost after restart.",
   show: "Show",
   showTranscript: "Show transcript",
   hide: "Hide",
@@ -708,7 +708,7 @@ export const en = {
   idle: "Idle",
   yourConversationAppearsHere: "Your conversation appears here",
   defaultTranscriptEmptyDescription:
-    "Use voice or text to begin. Mr Broccoli will keep the thread and respond here.",
+    "Use voice or text to begin. I'll keep the thread and respond here.",
   delete: "Delete",
   deleteConversationConfirmationTitle: ({ title }) => `Delete “${title}”?`,
   deleteConversationConfirmationMessage:
@@ -718,7 +718,7 @@ export const en = {
   newSession: "New Session",
   noSavedConversationsYet: "No saved conversations yet",
   drawerEmptyDescription:
-    "Start speaking from the main view and Mr Broccoli will build a session automatically.",
+    "Start speaking from the main view and I'll build a session automatically.",
   setupGuideTitle: "Configure the app",
   setupGuideSubtitle: "Add credentials and choose routes in Settings.",
   fastestStartPreset: "Minimal setup",
@@ -731,9 +731,9 @@ export const en = {
     "We will open Settings next so you can paste and validate credentials.",
   useThisSetup: "Use this setup",
   notNow: "Not now",
-  setupGuideIntroTitle: "How Mr Broccoli works",
+  setupGuideIntroTitle: "How I work",
   setupGuideIntroBody:
-    "Mr Broccoli starts blank. Add credentials for external services you already use, then choose how replies, speech input, spoken output, and optional web context are routed.",
+    "I start blank. Add credentials for external services you already use, then choose how replies, speech input, spoken output, and optional web context are routed.",
   setupGuideIntroNote:
     "After setup, use the main voice control to start and stop a conversation. The current transcript stays available on the home screen, and every route can be changed later in Settings.",
   setupGuideProviderTitle: "Add Credentials",
@@ -766,7 +766,7 @@ export const en = {
   setupGuideSkipKokoro: "Skip for now",
   setupGuideVoiceTestTitle: "Test Your Setup",
   setupGuideVoiceTestBody:
-    "Say a short sentence. Mr Broccoli will test microphone access, transcription, the configured reply route, and spoken output when an acceptable voice route is available.",
+    "Say a short sentence. I'll test microphone access, transcription, the configured reply route, and spoken output when an acceptable voice route is available.",
   setupGuideVoiceTestNoInputBody:
     "Voice input is not available with this setup. Continue to review the detected routes, then adjust speech settings later if needed.",
   setupGuideVoiceTestTextOnlyNote:
@@ -785,7 +785,7 @@ export const en = {
     "Voice input is not available for this setup on this device.",
   setupGuideSummaryTitle: "Setup Complete",
   setupGuideSummaryBody:
-    "Here is the route Mr Broccoli will use with your current configuration.",
+    "Here is the route I'll use with your current configuration.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Speech to text",
   setupGuideSummaryTts: "Text to speech",

@@ -405,7 +405,7 @@ export const it = {
     "Utilizza il servizio configurato selezionato per le risposte vocali.",
   ttsFallbackRoutes: "Percorsi di fallback",
   ttsFallbackRoutesHint:
-    "Opzionale. Aggiungi solo i percorsi che desideri, nell'ordine in cui dovrebbero essere provati. Una volta che un percorso inizia a parlare, Mr Broccoli rimane su di esso per il resto della risposta.",
+    "Opzionale. Aggiungi solo i percorsi che desideri, nell'ordine in cui dovrebbero essere provati. Una volta che un percorso inizia a parlare, rimango su di esso per il resto della risposta.",
   ttsFallbackNone:
     "Non è configurato alcun fallback. Verrà invece mostrato un errore vocale.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -440,7 +440,7 @@ export const it = {
   elevenLabsVoicesReadPermissionHint:
     "In ElevenLabs, modifica questa chiave API e abilita Voci → Leggi, quindi aggiorna qui.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli carica automaticamente le voci disponibili da ${provider}.`,
+    `Carico automaticamente le voci disponibili da ${provider}.`,
   providerVoiceId: "ID vocale",
   providerVoiceIdPlaceholder: "Inserisci un ID vocale",
   providerVoiceIdFallbackHint:
@@ -448,7 +448,7 @@ export const it = {
   providerVoiceIdRequired: ({ provider }) =>
     `Aggiorna la libreria vocale ${provider} o inserisci un ID vocale prima di utilizzare l'output vocale.`,
   qwenSpeechUnavailableInUs:
-    "Gli attuali percorsi vocali Qwen di Mr Broccoli non sono disponibili nella regione degli Stati Uniti. Scegli Singapore o Pechino per le funzioni vocali Qwen.",
+    "I miei attuali percorsi vocali Qwen non sono disponibili nella regione degli Stati Uniti. Scegli Singapore o Pechino per le funzioni vocali Qwen.",
   qwenApiRegion: "Regione API Qwen",
   qwenRegionSingapore: "Singapore",
   qwenRegionUs: "Stati Uniti (Virginia)",
@@ -456,12 +456,12 @@ export const it = {
   qwenRegionHint:
     "La regione selezionata deve corrispondere alla regione in cui è stata creata questa chiave API.",
   qwenRegionUsSpeechHint:
-    "Le chiavi per la regione degli Stati Uniti supportano la chat e la ricerca web qui. Gli attuali percorsi STT e TTS di Qwen in Mr Broccoli richiedono una chiave della regione Singapore o Pechino.",
+    "Le chiavi per la regione degli Stati Uniti supportano la chat e la ricerca web qui. I miei attuali percorsi STT e TTS di Qwen richiedono una chiave della regione Singapore o Pechino.",
   providerDefaultVoiceHint:
     "Questo provider attualmente utilizza la sua voce predefinita per l'anteprima e le risposte vocali.",
   listenLanguages: "Lingue di ascolto",
   listenLanguagesHint:
-    "Scegli le lingue di risposta che vuoi far suonare bene. Mr Broccoli le prova in questo ordine quando instrada l'output vocale.",
+    "Scegli le lingue di risposta che vuoi far suonare bene. Le provo in questo ordine quando instrada l'output vocale.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 lingua selezionata" : `${count} lingue selezionate`,
   localVoicePacks: "Pacchetti vocali locali",
@@ -478,7 +478,7 @@ export const it = {
     "Questo dispositivo non ha segnalato alcuna voce di sistema nativa per l'anteprima.",
   runtimeCompatibilityOverrides: "Compatibilità di runtime",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} configurazioni di modello o impostazione confermate non disponibili dal provider sono disattivate solo su questo dispositivo. Mr Broccoli le evita automaticamente.`,
+    `${count} configurazioni di modello o impostazione confermate non disponibili dal provider sono disattivate solo su questo dispositivo. Le evito automaticamente.`,
   clearRuntimeCompatibilityOverrides: "Cancella compatibilità di runtime",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Cancellare la compatibilità di runtime?",
@@ -618,7 +618,7 @@ export const it = {
   conversationActions: "Azioni di conversazione",
   statusDetails: "Dettagli sullo stato",
   persistenceFailure:
-    "Mr Broccoli non ha potuto salvare i dati su questo dispositivo. Tieni l'app aperta e riprova; le modifiche recenti potrebbero andare perse dopo il riavvio.",
+    "Non ho potuto salvare i dati su questo dispositivo. Tieni l'app aperta e riprova; le modifiche recenti potrebbero andare perse dopo il riavvio.",
   show: "Mostra",
   showTranscript: "Mostra la trascrizione",
   hide: "Nascondi",
@@ -715,7 +715,7 @@ export const it = {
   idle: "Inattivo",
   yourConversationAppearsHere: "La tua conversazione appare qui",
   defaultTranscriptEmptyDescription:
-    "Utilizza la voce o il testo per iniziare. Mr Broccoli manterrà la discussione e risponderà qui.",
+    "Utilizza la voce o il testo per iniziare. Manterrò la discussione e risponderò qui.",
   delete: "Elimina",
   deleteConversationConfirmationTitle: ({ title }) => `Eliminare "${title}"?`,
   deleteConversationConfirmationMessage:
@@ -726,7 +726,7 @@ export const it = {
   newSession: "Nuova sessione",
   noSavedConversationsYet: "Ancora nessuna conversazione salvata",
   drawerEmptyDescription:
-    "Inizia a parlare dalla vista principale e Mr Broccoli creerà automaticamente una sessione.",
+    "Inizia a parlare dalla vista principale e creerò automaticamente una sessione.",
   setupGuideTitle: "Configura l'applicazione",
   setupGuideSubtitle: "Aggiungi le credenziali e scegli i percorsi in Impostazioni.",
   fastestStartPreset: "Configurazione minima",
@@ -739,9 +739,9 @@ export const it = {
     "Successivamente apriremo le Impostazioni in modo da poter incollare e convalidare le credenziali.",
   useThisSetup: "Usa questa configurazione",
   notNow: "Non adesso",
-  setupGuideIntroTitle: "Come funziona Mr Broccoli",
+  setupGuideIntroTitle: "Come funziono",
   setupGuideIntroBody:
-    "Mr Broccoli inizia vuoto. Aggiungi le credenziali per i servizi esterni che già utilizzi, quindi scegli come instradare le risposte, l'input vocale, l'output vocale e il contesto web opzionale.",
+    "Inizio vuoto. Aggiungi le credenziali per i servizi esterni che già utilizzi, quindi scegli come instradare le risposte, l'input vocale, l'output vocale e il contesto web opzionale.",
   setupGuideIntroNote:
     "Dopo la configurazione, utilizza il controllo vocale principale per avviare e interrompere una conversazione. La trascrizione corrente rimane disponibile nella schermata principale e ogni percorso può essere modificato successivamente in Impostazioni.",
   setupGuideProviderTitle: "Aggiungi credenziali",
@@ -774,7 +774,7 @@ export const it = {
   setupGuideSkipKokoro: "Salta per ora",
   setupGuideVoiceTestTitle: "Metti alla prova la tua configurazione",
   setupGuideVoiceTestBody:
-    "Pronuncia una breve frase. Mr Broccoli testerà l'accesso al microfono, la trascrizione, il percorso di risposta configurato e l'output parlato quando è disponibile un percorso vocale accettabile.",
+    "Pronuncia una breve frase. Testerò l'accesso al microfono, la trascrizione, il percorso di risposta configurato e l'output parlato quando è disponibile un percorso vocale accettabile.",
   setupGuideVoiceTestNoInputBody:
     "L'input vocale non è disponibile con questa configurazione. Continua a rivedere i percorsi rilevati, quindi modifica le impostazioni vocali in un secondo momento, se necessario.",
   setupGuideVoiceTestTextOnlyNote:
@@ -793,7 +793,7 @@ export const it = {
     "L'input vocale non è disponibile per questa configurazione su questo dispositivo.",
   setupGuideSummaryTitle: "Configurazione completata",
   setupGuideSummaryBody:
-    "Ecco il percorso che Mr Broccoli utilizzerà con la configurazione attuale.",
+    "Ecco il percorso che utilizzerò con la configurazione attuale.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Da voce a testo",
   setupGuideSummaryTts: "Da testo a voce",

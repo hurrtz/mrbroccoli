@@ -404,7 +404,7 @@ export const pl = {
     "Użyj wybranej skonfigurowanej usługi do odpowiedzi głosowych.",
   ttsFallbackRoutes: "Trasy rezerwowe",
   ttsFallbackRoutesHint:
-    "Opcjonalne. Dodaj tylko te trasy, które chcesz, w kolejności, w jakiej powinny być wypróbowane. Gdy trasa zacznie mówić, Mr Broccoli pozostanie na niej do końca odpowiedzi.",
+    "Opcjonalne. Dodaj tylko te trasy, które chcesz, w kolejności, w jakiej powinny być wypróbowane. Gdy trasa zacznie mówić, pozostanę na niej do końca odpowiedzi.",
   ttsFallbackNone:
     "Nie skonfigurowano żadnej trasy rezerwowej. Zamiast tego zostanie wyświetlony błąd głosu.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -439,7 +439,7 @@ export const pl = {
   elevenLabsVoicesReadPermissionHint:
     "W ElevenLabs edytuj ten klucz API i włącz Głosy → Czytaj, a następnie odśwież tutaj.",
   providerVoicesLoadingHint: ({ provider }) =>
-    `Mr Broccoli automatycznie ładuje dostępne głosy z ${provider}.`,
+    `Automatycznie ładuję dostępne głosy z ${provider}.`,
   providerVoiceId: "Identyfikator głosu",
   providerVoiceIdPlaceholder: "Wprowadź identyfikator głosu",
   providerVoiceIdFallbackHint:
@@ -447,7 +447,7 @@ export const pl = {
   providerVoiceIdRequired: ({ provider }) =>
     `Odśwież bibliotekę głosową ${provider} lub wprowadź identyfikator głosu przed użyciem mowy.`,
   qwenSpeechUnavailableInUs:
-    "Obecne trasy mowy Qwen w Mr Broccoli nie są dostępne w regionie USA. Dla mowy Qwen wybierz Singapur lub Pekin.",
+    "Moje obecne trasy mowy Qwen nie są dostępne w regionie USA. Dla mowy Qwen wybierz Singapur lub Pekin.",
   qwenApiRegion: "Region API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Wirginia)",
@@ -455,12 +455,12 @@ export const pl = {
   qwenRegionHint:
     "Wybrany region musi odpowiadać regionowi, w którym utworzono ten klucz API.",
   qwenRegionUsSpeechHint:
-    "Klucze regionu USA obsługują tutaj czat i wyszukiwanie w Internecie. Obecne trasy Qwen STT i TTS w Mr Broccoli wymagają klucza z Singapuru lub Pekinu.",
+    "Klucze regionu USA obsługują tutaj czat i wyszukiwanie w Internecie. Moje obecne trasy Qwen STT i TTS wymagają klucza z Singapuru lub Pekinu.",
   providerDefaultVoiceHint:
     "Ten dostawca używa obecnie domyślnego głosu do podglądu i odpowiedzi głosowych.",
   listenLanguages: "Języki słuchania",
   listenLanguagesHint:
-    "Wybierz języki odpowiedzi, które mają dobrze brzmieć. Mr Broccoli wypróbowuje je w tej kolejności podczas kierowania wyjścia mowy.",
+    "Wybierz języki odpowiedzi, które mają dobrze brzmieć. Wypróbowuję je w tej kolejności podczas kierowania wyjścia mowy.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "Wybrano 1 język" : `Wybrano języków: ${count}`,
   localVoicePacks: "Lokalne pakiety głosowe",
@@ -477,7 +477,7 @@ export const pl = {
     "To urządzenie nie zgłosiło żadnych natywnych głosów systemowych do podglądu.",
   runtimeCompatibilityOverrides: "Zgodność w czasie działania",
   runtimeCompatibilityOverridesDescription: ({ count }) =>
-    `${count} konfiguracji modeli lub ustawień, których niedostępność potwierdził dostawca, jest wyłączonych tylko na tym urządzeniu. Mr Broccoli automatycznie je omija.`,
+    `${count} konfiguracji modeli lub ustawień, których niedostępność potwierdził dostawca, jest wyłączonych tylko na tym urządzeniu. Automatycznie je omijam.`,
   clearRuntimeCompatibilityOverrides: "Wyczyść zgodność w czasie działania",
   clearRuntimeCompatibilityOverridesConfirmationTitle:
     "Wyczyścić zgodność w czasie działania?",
@@ -621,7 +621,7 @@ export const pl = {
   conversationActions: "Działania konwersacyjne",
   statusDetails: "Szczegóły statusu",
   persistenceFailure:
-    "Mr Broccoli nie mógł zapisać danych na tym urządzeniu. Pozostaw aplikację otwartą i spróbuj ponownie; ostatnie zmiany mogą zostać utracone po ponownym uruchomieniu.",
+    "Nie mogłem zapisać danych na tym urządzeniu. Pozostaw aplikację otwartą i spróbuj ponownie; ostatnie zmiany mogą zostać utracone po ponownym uruchomieniu.",
   show: "Pokaż",
   showTranscript: "Pokaż transkrypcję",
   hide: "Ukryj",
@@ -718,7 +718,7 @@ export const pl = {
   idle: "Bezczynny",
   yourConversationAppearsHere: "Twoja rozmowa pojawi się tutaj",
   defaultTranscriptEmptyDescription:
-    "Aby rozpocząć, użyj głosu lub tekstu. Mr Broccoli zachowa wątek i odpowie tutaj.",
+    "Aby rozpocząć, użyj głosu lub tekstu. Zachowam wątek i odpowiem tutaj.",
   delete: "Usuń",
   deleteConversationConfirmationTitle: ({ title }) => `Usunąć „${title}”?`,
   deleteConversationConfirmationMessage:
@@ -728,7 +728,7 @@ export const pl = {
   newSession: "Nowa sesja",
   noSavedConversationsYet: "Nie ma jeszcze zapisanych rozmów",
   drawerEmptyDescription:
-    "Zacznij mówić w widoku głównym, a Mr Broccoli automatycznie zbuduje sesję.",
+    "Zacznij mówić w widoku głównym, a ja automatycznie zbuduję sesję.",
   setupGuideTitle: "Skonfiguruj aplikację",
   setupGuideSubtitle:
     "Dodaj dane uwierzytelniające i wybierz trasy w Ustawieniach.",
@@ -742,9 +742,9 @@ export const pl = {
     "Następnie otworzymy Ustawienia, abyś mógł wkleić i zweryfikować dane uwierzytelniające.",
   useThisSetup: "Użyj tej konfiguracji",
   notNow: "Nie teraz",
-  setupGuideIntroTitle: "Jak działa Mr Broccoli",
+  setupGuideIntroTitle: "Jak działam",
   setupGuideIntroBody:
-    "Mr Broccoli zaczyna z czystą kartą. Dodaj dane uwierzytelniające do usług zewnętrznych, z których już korzystasz, a następnie wybierz sposób kierowania odpowiedzi, wprowadzania mowy i komunikatów głosowych oraz opcjonalnego kontekstu internetowego.",
+    "Zaczynam z czystą kartą. Dodaj dane uwierzytelniające do usług zewnętrznych, z których już korzystasz, a następnie wybierz sposób kierowania odpowiedzi, wprowadzania mowy i komunikatów głosowych oraz opcjonalnego kontekstu internetowego.",
   setupGuideIntroNote:
     "Po konfiguracji użyj głównego sterowania głosowego, aby rozpocząć i zakończyć rozmowę. Bieżący zapis pozostaje dostępny na ekranie głównym, a każdą trasę można później zmienić w Ustawieniach.",
   setupGuideProviderTitle: "Dodaj dane uwierzytelniające",
@@ -777,7 +777,7 @@ export const pl = {
   setupGuideSkipKokoro: "Pomiń na razie",
   setupGuideVoiceTestTitle: "Przetestuj swoją konfigurację",
   setupGuideVoiceTestBody:
-    "Powiedz krótkie zdanie. Mr Broccoli przetestuje dostęp do mikrofonu, transkrypcję, skonfigurowaną trasę odpowiedzi i dźwięk mówiony, gdy dostępna będzie akceptowalna trasa głosowa.",
+    "Powiedz krótkie zdanie. Przetestuję dostęp do mikrofonu, transkrypcję, skonfigurowaną trasę odpowiedzi i dźwięk mówiony, gdy dostępna będzie akceptowalna trasa głosowa.",
   setupGuideVoiceTestNoInputBody:
     "Wprowadzanie głosowe nie jest dostępne w tej konfiguracji. Kontynuuj przeglądanie wykrytych tras, a następnie w razie potrzeby dostosuj ustawienia mowy później.",
   setupGuideVoiceTestTextOnlyNote:
@@ -796,7 +796,7 @@ export const pl = {
     "Wprowadzanie głosowe nie jest dostępne w przypadku tej konfiguracji na tym urządzeniu.",
   setupGuideSummaryTitle: "Konfiguracja ukończona",
   setupGuideSummaryBody:
-    "Oto trasa, której Mr Broccoli użyje w Twojej bieżącej konfiguracji.",
+    "Oto trasa, której użyję w Twojej bieżącej konfiguracji.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Mowa na tekst",
   setupGuideSummaryTts: "Tekst na mowę",

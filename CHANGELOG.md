@@ -21,6 +21,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Grok 4.6 is now available, both as a direct xAI route and through OpenRouter,
   and is the new xAI default. On the direct route it is the only Grok model
   offering the extra-high reasoning effort above high.
+- Mr Broccoli now speaks about himself in the first person in every interface
+  language, instead of referring to himself by name in the third person.
 
 ## 4.0.0 - 2026-08-15
 
