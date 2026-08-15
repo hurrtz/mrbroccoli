@@ -29,8 +29,8 @@ before changing code, and update the affected spec chain with the implementation
 - Drive Session with audible state cues, explicit pause-safe turn endings, reply interruption, and large stop/repeat/continue controls
 - Configurable assistant instructions, response length, and response tone
 - Rolling conversation compaction for long sessions to reduce token cost
-- Optional on-device retrieval from earlier non-private conversations, with
-  visible source sessions and per-conversation privacy controls
+- Optional on-device retrieval from eligible earlier conversations, with
+  visible source sessions and locked-session exclusion
 - Premium, animated mobile UI tuned for spoken conversation
 
 ## Supported Providers
@@ -194,14 +194,14 @@ The app runtime is centered around user-supplied keys in Settings rather than sh
 
 - The active conversation thread is sent back to the model. When Past
   conversation knowledge is enabled, a small number of relevant excerpts from
-  other non-private conversations may also be included and are shown as source
+  other eligible conversations may also be included and are shown as source
   sessions on the reply.
 - Long conversations are compacted automatically.
 - Older turns are summarized into a rolling `contextSummary`.
 - Only a bounded recent window is sent verbatim once the thread grows large.
 - Assistant turns can expose a transparent receipt of the requested route, actual route, context transformation, web search decision, speech route, fallback, and latency.
-- Cross-session indexing and retrieval stay on-device. Private conversations
-  are never indexed; their compact memory still works inside that conversation.
+- Cross-session indexing and retrieval stay on-device. Locked sessions are
+  never indexed, even during an authenticated foreground visit.
 - The derived search index is excluded from backups and deleted when the
   feature is disabled. Retrieved excerpts are sent to the selected model
   provider as part of that request.
