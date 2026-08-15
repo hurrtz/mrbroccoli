@@ -36,7 +36,7 @@ export const tr = {
   aboutSetting: ({ setting }) => `${setting} Hakkında`,
   unavailable: "Kullanılamıyor",
   selection: "Seçim",
-  chooseCompatibleProviderFirst: "Önce uyumlu bir sağlayıcı seçin",
+  chooseCompatibleProviderFirst: "Önce uyumlu bir sağlayıcı seç",
   settings: "Ayarlar",
   settingsReleaseVersion: ({ version }) => `Sürüm ${version}`,
   all: "Hepsi",
@@ -64,10 +64,10 @@ export const tr = {
   settingsAppDiagnostics: "Uygulama ve tanılama",
   settingsGuidedSetup: "Kılavuzlu kurulum",
   settingsGuidedSetupSummary:
-    "Bağlantıları inceleyin ve ses yolunun tamamını test edin.",
+    "Bağlantıları incele ve ses yolunun tamamını test et.",
   setupGuideShowInSettings: "Ayarlar'da rehberli kurulumu göster",
   setupGuideShowInSettingsSummary:
-    "Ayarlara genel bakışta rehberli kurulum kısayolunu gösterin veya gizleyin.",
+    "Ayarlara genel bakışta rehberli kurulum kısayolunu göster veya gizle.",
   settingsConnectionsSummary: "Sağlayıcı anahtarları, doğrulama ve yetenekler.",
   settingsThinkingSummary: "Ev kartları, modeller, çaba ve sistem istemi.",
   settingsListeningSummary: "Giriş modu ve konuşmayı metne yönlendirme.",
@@ -81,7 +81,7 @@ export const tr = {
   language: "Dil",
   recognitionLanguage: "Tanıma dili",
   recognitionLanguageHint:
-    "Tanıma işlemini geliştirmek için bir dil seçin veya cihaz ya da sağlayıcı tespiti için otomatik olarak bırakın.",
+    "Tanıma işlemini geliştirmek için bir dil seç veya cihaz ya da sağlayıcı tespiti için otomatik olarak bırak.",
   automaticLanguage: "Otomatik",
   speechLanguageUnsupportedByProvider: ({ provider, language }) =>
     `${provider}, bu konuşma yolu için ${language} dilini resmi olarak desteklemiyor.`,
@@ -133,22 +133,22 @@ export const tr = {
   speechTranscriptionAction: "konuşma transkripsiyonu",
   speechSynthesisAction: "konuşma sentezi",
   instructionsTabDescription:
-    "Herhangi bir sağlayıcı talebi görmeden önce asistanı yönlendiren gizli kılavuzu şekillendirin.",
+    "Herhangi bir sağlayıcı talebi görmeden önce asistanı yönlendiren gizli kılavuzu şekillendir.",
   providersTabDescription:
-    "Harici hizmet kimlik bilgilerini cihazda saklayın ve kullanmak istediğiniz yanıt modlarını yapılandırın.",
+    "Harici hizmet kimlik bilgilerini cihazda sakla ve kullanmak istediğin yanıt modlarını yapılandır.",
   webSearchTabDescription:
-    "Yanıtlardan önce isteğe bağlı canlı web içeriğini yapılandırın.",
+    "Yanıtlardan önce isteğe bağlı canlı web içeriğini yapılandır.",
   responseModes: "Model Seçimi",
   aboutModelSelection: "Model seçimi hakkında",
   modelSelectionInfo:
-    "Her model kartı ana ekranda bir seçim haline gelir. Sağlayıcısını, modelini ve isteğe bağlı efor düzeyini yapılandırın, ardından hangi modelin yanıt vereceğini seçmek için kartları değiştirin.",
+    "Her model kartı ana ekranda bir seçim haline gelir. Sağlayıcısını, modelini ve isteğe bağlı efor düzeyini yapılandır, ardından hangi modelin yanıt vereceğini seçmek için kartları değiştir.",
   responseModeItemTitle: ({ index }) => `Model ${index}`,
   addResponseMode: "Model ekle",
   removeResponseMode: "Modeli kaldır",
   responseModesNoConfiguredProviders:
-    "Önce kimlik bilgilerini ekleyin. Rota kontrolleri, en az bir uyumlu hizmet yapılandırılana kadar gizli kalır.",
+    "Önce kimlik bilgilerini ekle. Rota kontrolleri, en az bir uyumlu hizmet yapılandırılana kadar gizli kalır.",
   useResponseMode: ({ mode }) => `${mode} seçeneğini kullan`,
-  chooseResponseModel: "Bir model seçin",
+  chooseResponseModel: "Bir model seç",
   responseModelCount: ({ count }) => `${count} model mevcut`,
   ulraMode: "Süper Mod",
   ulraModeHomeLabel: "Süper Modu ana ekranda göster",
@@ -175,43 +175,43 @@ export const tr = {
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} dahili model çağrısı başarısız oldu; son yanıt ${succeeded} başarılı katkıyı kullandı.`,
   sttTabDescription:
-    "Konuşmanın nasıl yakalandığını ve modele ulaşmadan önce hangi arka ucun sesi metne dönüştürdüğünü kontrol edin.",
+    "Konuşmanın nasıl yakalandığını ve modele ulaşmadan önce hangi arka ucun sesi metne dönüştürdüğünü kontrol et.",
   ttsTabDescription:
-    "Yanıtların ne zaman konuşmaya başlayacağını ve sözlü çıktıyı hangi arka ucun işleyeceğini kontrol edin.",
+    "Yanıtların ne zaman konuşmaya başlayacağını ve sözlü çıktıyı hangi arka ucun işleyeceğini kontrol et.",
   brief: "Kısa",
   briefDescription:
-    "Cevabı sıkı tutun. Kullanıcıya tam olarak cevap vermek için gereken minimum cümle sayısını kullanın.",
+    "Cevabı sıkı tut. Kullanıcıya tam olarak cevap vermek için gereken minimum cümle sayısını kullan.",
   normal: "Normal",
   normalDescription:
-    "Dengeli bir yanıt uzunluğunu hedefleyin. Cevabı uzatmadan önemli noktaları ele alın.",
+    "Dengeli bir yanıt uzunluğunu hedefle. Cevabı uzatmadan önemli noktaları ele al.",
   thorough: "Kapsamlı",
   thoroughDescription:
-    "Derinlere inin ve kapsamlı olun. Nüansları, ayrıntıları, ödünleşimleri ve önemli olan mantığı ekleyin.",
+    "Derinlere inin ve kapsamlı ol. Nüansları, ayrıntıları, ödünleşimleri ve önemli olan mantığı ekle.",
   professional: "Profesyonel",
   professionalDescription:
-    "Müşteriye brifing veren kıdemli bir danışman gibi konuşun. Kesin bir dil, argo yok, ölçülü ve otoriter.",
+    "Müşteriye brifing veren kıdemli bir danışman gibi konuş. Kesin bir dil, argo yok, ölçülü ve otoriter.",
   casual: "Gündelik",
   casualDescription:
-    "Kafedeki akıllı bir arkadaş gibi konuşun. Rahat, doğal, sohbet havasında. Günlük konuşma kalıpları da konudan sapmalar da sorun değil.",
+    "Kafedeki akıllı bir arkadaş gibi konuş. Rahat, doğal, sohbet havasında. Günlük konuşma kalıpları da konudan sapmalar da sor değil.",
   nerdy: "İnek",
   nerdyDescription:
-    "Derinlere inmeyi seven coşkulu bir uzman gibi konuşun. Teknik terimleri özgürce kullanın, ayrıntılara coşkuyla dalın, kullanıcının size ayak uydurabileceğini varsayın.",
+    "Derinlere inmeyi seven coşkulu bir uzman gibi konuş. Teknik terimleri özgürce kullan, ayrıntılara coşkuyla dal, kullanıcının size ayak uydurabileceğini varsay.",
   concise: "Kısa",
   conciseDescription:
-    "Hala eksiksizken mümkün olduğunca kısa olun. Önsöz yok, dolgu yok, sadece cevap. Telgraf stilini düşünün.",
+    "Hala eksiksizken mümkün olduğunca kısa ol. Önsöz yok, dolgu yok, sadece cevap. Telgraf stilini düşün.",
   socratic: "Sokratik",
   socraticDescription:
-    "Kullanıcının düşüncesine meydan okuyun. Karşı sorular sorun, alternatif bakış açıları sunun, sadece söylediklerini onaylamayın. Bir evet makinesi değil, tartışma ortağı olun.",
+    "Kullanıcının düşüncesine meydan oku. Karşı sorular sor, alternatif bakış açıları sun, sadece söylediklerini onaylama. Bir evet makinesi değil, tartışma ortağı ol.",
   eli5: "ELI5",
   eli5Description:
-    "Her şeyi olabildiğince basit bir şekilde açıklayın. Analojiler, günlük dil ve sıfır jargon kullanın. Herhangi bir konu hakkında önceden bilgi sahibi olmadığınızı varsayın.",
+    "Her şeyi olabildiğince basit bir şekilde açıkla. Analojiler, günlük dil ve sıfır jargon kullan. Herhangi bir konu hakkında önceden bilgi sahibi olmadığını varsay.",
   useProvider: ({ provider }) => `${provider} sağlayıcısını kullan`,
   createApiKey: "Kimlik bilgileri",
   apiKey: "API anahtarı",
   aboutThisProvider: "Bu sağlayıcı hakkında",
   openRouterOnboardingTitle: "Tek anahtar, birden fazla sağlayıcı",
   openRouterOnboardingDescription:
-    "Özel bir OpenRouter anahtarı oluşturun, aşağıya yapıştırın ve herhangi bir doğrudan bağlantıyı değiştirmeden çeşitli sağlayıcıların anlık görüntü destekli modellerini kullanın.",
+    "Özel bir OpenRouter anahtarı oluştur, aşağıya yapıştır ve herhangi bir doğrudan bağlantıyı değiştirmeden çeşitli sağlayıcıların anlık görüntü destekli modellerini kullan.",
   openRouterOnboardingRoute:
     "Talep yolu: bu cihaz → OpenRouter → seçilen yukarı akış sağlayıcısı",
   openRouterKeys: "OpenRouter anahtarları",
@@ -235,7 +235,7 @@ export const tr = {
   providerCapability_search: "Web araması",
   providerCapability_voices: "Ses kitaplığı",
   providerValidationUnavailable:
-    "Bu sağlayıcı için canlı doğrulama henüz sağlanmadı. Anahtarı buraya kaydedin ve gerçek kullanım sırasında doğrulayın.",
+    "Bu sağlayıcı için canlı doğrulama henüz sağlanmadı. Anahtarı buraya kaydet ve gerçek kullanım sırasında doğrula.",
   providerNeedsAttention: "dikkat edilmesi gerekiyor",
   catalogProviderLimitsSummary: ({ summary }) => `Limitler: ${summary}`,
   catalogProviderRegionSummary: ({ summary }) => `Bölge: ${summary}`,
@@ -246,10 +246,10 @@ export const tr = {
   systemPrompt: "Sistem İstemi",
   aboutSystemPrompt: "Sistem istemi hakkında",
   assistantInstructionsIntro:
-    "Modelin her yanıttan önce aldığı gizli rehberliği şekillendirin.",
+    "Modelin her yanıttan önce aldığı gizli rehberliği şekillendir.",
   baseInstructions: "Temel Talimatlar",
   assistantInstructionsPlaceholder:
-    "Asistanın nasıl davranması gerektiğini tanımlayın.",
+    "Asistanın nasıl davranması gerektiğini tanımla.",
   assistantInstructionsHint:
     "Bu her zaman seçilen yanıt uzunluğu ve tonun önüne eklenir.",
   adaptiveLength: "Uyarlanabilir Uzunluk",
@@ -257,46 +257,46 @@ export const tr = {
   homeStyleChipLabel: ({ tone, length }) => `Stil — ${tone} · ${length}`,
   styleSheetTitle: "Konuşma ayarları",
   styleSheetSubtitle:
-    "Yalnızca bu görüşme için yanıtları ve konuşmayı şekillendirin.",
+    "Yalnızca bu görüşme için yanıtları ve konuşmayı şekillendir.",
   openStyleSheet: "Konuşma ayarlarını aç",
   conversationThinkingInstructions: "Düşünme talimatları",
   conversationThinkingInstructionsDescription:
-    "Bu görüşme için genel sistem isteminden sonra talimatları ekleyin.",
+    "Bu görüşme için genel sistem isteminden sonra talimatları ekle.",
   conversationThinkingInstructionsPlaceholder:
-    "Örneğin: Varsayımlarıma meydan okuyun ve somut örnekler kullanın.",
+    "Örneğin: Varsayımlarıma meydan oku ve somut örnekler kullan.",
   ttsInstructions: "Konuşma iletimi talimatları",
   ttsInstructionsDescription:
-    "Uyumlu konuşma modellerinin kullandığı tonu, tempoyu, aksanı veya konuşmayı yönlendirin.",
+    "Uyumlu konuşma modellerinin kullandığı tonu, tempoyu, aksanı veya konuşmayı yönlendir.",
   conversationTtsInstructionsDescription:
-    "Bu görüşme için genel konuşma talimatlarının sonrasına teslimat talimatlarını ekleyin.",
+    "Bu görüşme için genel konuşma talimatlarının sonrasına teslimat talimatlarını ekle.",
   ttsInstructionsPlaceholder:
-    "Örneğin: Sıcak, net ve rahat bir tempoda konuşun.",
+    "Örneğin: Sıcak, net ve rahat bir tempoda konuş.",
   ttsInstructionsUnsupported:
     "Mevcut konuşma rotası iletim talimatlarını desteklemiyor.",
   conversationVoiceDescription: ({ route }) =>
-    `Bu görüşmede ${route} tarafından kullanılan sesi seçin.`,
-  scrollToLatest: "En son mesaja ilerleyin",
+    `Bu görüşmede ${route} tarafından kullanılan sesi seç.`,
+  scrollToLatest: "En son mesaja ilerle",
   conversationTitleGenerate: "Başlığı otomatik oluştur",
   conversationTitleGenerating: "Başlık oluşturuluyor…",
   conversationTitleGenerated: "Görüşme yeniden adlandırıldı.",
   conversationTitleNeedsContent:
-    "Bir başlık oluşturmadan önce bir konuşma başlatın.",
+    "Bir başlık oluşturmadan önce bir konuşma başlat.",
   conversationTitleNeedsProvider:
-    "Bir başlık oluşturmadan önce seçilen modeli yapılandırın.",
+    "Bir başlık oluşturmadan önce seçilen modeli yapılandır.",
   conversationTitleGenerationFailed: "Konuşma başlığı oluşturulamadı.",
   conversationTitleGenerationTimedOut:
-    "Başlık oluşturma çok uzun sürdü. Lütfen tekrar deneyin.",
+    "Başlık oluşturma çok uzun sürdü. Lütfen tekrar dene.",
   inputMode: "Giriş Modu",
   voiceInput: "Ses Girişi",
   pushToTalk: "Bas Konuş",
   pushToTalkDescription:
-    "Konuşurken ana düğmeyi basılı tutun, ardından göndermek için bırakın.",
+    "Konuşurken ana düğmeyi basılı tut, ardından göndermek için bırak.",
   toggleToTalk: "Konuşmaya Geç",
   toggleToTalkDescription:
-    "Kaydı başlatmak için bir kez dokunun ve işiniz bittiğinde tekrar dokunun.",
+    "Kaydı başlatmak için bir kez dokun ve işiniz bittiğinde tekrar dokun.",
   driveSession: "Sürüş Oturumu",
   driveSessionDescription:
-    "Otomatik devam etme açıkken, kayıt her sözlü yanıttan sonra başlar. Konuşmanız bittiğinde ana düğmeye dokunun.",
+    "Otomatik devam etme açıkken, kayıt her sözlü yanıttan sonra başlar. Konuşmanız bittiğinde ana düğmeye dokun.",
   stopDriveSession: "Otomatik duraklat",
   repeatDriveReply: "Sonuncuyu tekrarla",
   continueDriveSession: "Otomatik devam ettir",
@@ -304,26 +304,26 @@ export const tr = {
   speechToText: "Konuşmadan Metne",
   appNative: "Sistem Tanıma",
   nativeSttDescription:
-    "İşletim sisteminin konuşma tanıyıcısını kullanın.",
+    "İşletim sisteminin konuşma tanıyıcısını kullan.",
   provider: "Sağlayıcı",
   webSearchProvider: "Web Arama Sağlayıcısı",
   webSearchProviderMissingHint:
-    "Burada canlı web bağlamını etkinleştirmek için Kimlik Bilgileri'nde en az bir arama özellikli hizmeti yapılandırın.",
+    "Burada canlı web bağlamını etkinleştirmek için Kimlik Bilgileri'nde en az bir arama özellikli hizmeti yapılandır.",
   webSearchModelHint: ({ model }) =>
     `Canlı web bağlamı için perde arkasında ${model} modelini kullanır.`,
   webSearchHomeHint:
-    "Bu konu için canlı web bağlamını açmak veya kapatmak için ana ekran geçişini kullanın.",
+    "Bu konu için canlı web bağlamını açmak veya kapatmak için ana ekran geçişini kullan.",
   settingsWebSearchCompactHint:
-    "İsteğe bağlı olarak, ana model yanıt vermeden önce yeni web bağlamını başına ekleyin.",
+    "İsteğe bağlı olarak, ana model yanıt vermeden önce yeni web bağlamını başına ekle.",
   webSearchAdvanced: "Gelişmiş Arama Kontrolleri",
-  expandAdvancedSearch: "Gelişmiş arama kontrollerini genişletin",
+  expandAdvancedSearch: "Gelişmiş arama kontrollerini genişlet",
   collapseAdvancedSearch: "Gelişmiş arama kontrollerini daralt",
   webSearchSetupNeeded:
-    "Canlı web aramasını kullanmak için kimlik bilgileri ekleyin.",
+    "Canlı web aramasını kullanmak için kimlik bilgileri ekle.",
   webSearchEnabledDescription:
     "Model yanıt vermeden önce yeni web içeriği eklenir.",
   webSearchDisabledDescription:
-    "Güncel gerçekler önemli olduğunda bu başlık için canlı web içeriğini kullanın.",
+    "Güncel gerçekler önemli olduğunda bu başlık için canlı web içeriğini kullan.",
   webSearchNobodyDescription:
     "Web isteği yok. Modelin bildikleriyle yanıtlar.",
   webSearchQualityControls: "Arama Kalitesi",
@@ -339,34 +339,34 @@ export const tr = {
     `Bu kontroller, ${provider}'nin yanıttan önce yeni bağlamı nasıl topladığını ayarlar.`,
   webSearchNoExtraControls: ({ provider }) =>
     `${provider} henüz bu uygulamada ekstra arama kalitesi kontrollerini göstermiyor.`,
-  setWebSearchMode: ({ mode }) => `Web arama modunu ${mode} olarak ayarlayın`,
+  setWebSearchMode: ({ mode }) => `Web arama modunu ${mode} olarak ayarla`,
   openWebSearchSettings: "Web arama ayarlarını aç",
   providerSttDescription:
-    "Sesinizi yanıt yoluna gönderilmeden önce yazıya dönüştürmek için yapılandırılmış bir harici hizmet kullanın.",
+    "Sesinizi yanıt yoluna gönderilmeden önce yazıya dönüştürmek için yapılandırılmış bir harici hizmet kullan.",
   sttProvider: "STT Sağlayıcısı",
   sttProviderEnabledHint:
     "Burada yalnızca transkripsiyon desteğine sahip etkin sağlayıcılar görünür.",
   sttProviderMissingHint:
-    "Burada seçmek için STT desteği olan bir hizmete ilişkin kimlik bilgilerini ekleyin.",
+    "Burada seçmek için STT desteği olan bir hizmete ilişkin kimlik bilgilerini ekle.",
   nativeSttHint:
     "Sistem tanıma, sağlayıcı anahtarlarınızdan bağımsız olarak çalışır ve cihaz üzerinde veya işletim sisteminin konuşma hizmeti tarafından işlenebilir.",
   replyPlayback: "Yanıt Oynatma",
   sentencesArrive: "Paragraflar Geliyor",
   sentencesArriveDescription:
-    "Tam bir paragraf hazır olur olmaz konuşmaya başlayın.",
+    "Tam bir paragraf hazır olur olmaz konuşmaya başla.",
   fullReplyFirst: "Önce Tam Yanıt",
   fullReplyFirstDescription:
-    "Önce cevabın tamamını oluşturun, ardından tek geçişte oynatın.",
+    "Önce cevabın tamamını oluştur, ardından tek geçişte oynat.",
   textToSpeech: "Metinden Konuşmaya",
   spokenReplies: "Sözlü Yanıtlar",
   spokenRepliesEnabledDescription:
-    "Bir ses rotası mevcut olduğunda asistan yanıtlarını sesli okuyun.",
+    "Bir ses rotası mevcut olduğunda asistan yanıtlarını sesli oku.",
   spokenRepliesDisabledDescription:
-    "Yanıtları şimdilik yalnızca metin halinde tutun. Tercih ettiğiniz TTS rotası daha sonra kullanılmak üzere kayıtlı kalır.",
+    "Yanıtları şimdilik yalnızca metin halinde tut. Tercih ettiğin TTS rotası daha sonra kullanılmak üzere kayıtlı kalır.",
   nativeTtsDescription:
-    "Sözlü yanıtlar ve ses önizlemesi için cihazın konuşma motorunu kullanın.",
+    "Sözlü yanıtlar ve ses önizlemesi için cihazın konuşma motorunu kullan.",
   kokoroTtsDescription:
-    "Tamamen bu cihazda çalışan çok daha doğal bir nöral ses kullanın. Sözlü yanıt metni, konuşma sağlayıcı anahtarı veya kullanım ücreti olmaksızın yerel olarak sentezlenir.",
+    "Tamamen bu cihazda çalışan çok daha doğal bir nöral ses kullan. Sözlü yanıt metni, konuşma sağlayıcı anahtarı veya kullanım ücreti olmaksızın yerel olarak sentezlenir.",
   kokoroVoices: "Kokoro Cihaz İçi Sesler",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `Çok dilli model yaklaşık ${size} MB indirir ve kurulumdan sonra yaklaşık ${installedSize} MB yer kaplar.`,
@@ -377,32 +377,32 @@ export const tr = {
   kokoroVerifying: "Ses motoru doğrulanıyor…",
   kokoroInstalled: "Bu cihaza yüklendi ve hazır.",
   kokoroNotInstalled:
-    "Kokoro'yu seçmeden veya kullanmadan önce modeli indirip doğrulayın. Sağlayıcı anahtarı gerekmez.",
+    "Kokoro'yu seçmeden veya kullanmadan önce modeli indirip doğrula. Sağlayıcı anahtarı gerekmez.",
   kokoroLanguageFallback:
-    "Kokoro şu anda burada İngilizce ve Basitleştirilmiş Çince konuşmaktadır. Seçilen diğer yanıt dilleri için açık bir geri dönüş yolu ekleyin, aksi takdirde konuşma bir hatayla duracaktır.",
+    "Kokoro şu anda burada İngilizce ve Basitleştirilmiş Çince konuşmaktadır. Seçilen diğer yanıt dilleri için açık bir geri dönüş yolu ekle, aksi takdirde konuşma bir hatayla duracaktır.",
   kokoroRemoveTitle: "Kokoro modeli kaldırılsın mı?",
   kokoroRemoveBody: ({ installedSize }) =>
-    `Bu, yaklaşık ${installedSize} MB yer açar. Modeli istediğiniz zaman tekrar indirebilirsiniz.`,
-  removeKokoroModel: "Kokoro modelini kaldırın",
-  downloadKokoroModel: "Kokoro modelini indirin",
+    `Bu, yaklaşık ${installedSize} MB yer açar. Modeli istediğin zaman tekrar indirebilirsin.`,
+  removeKokoroModel: "Kokoro modelini kaldır",
+  downloadKokoroModel: "Kokoro modelini indir",
   kokoroFallbackNeeded: ({ languages }) =>
     `Aşağıdakiler için açık bir geri dönüş rotası gereklidir: ${languages}.`,
   kokoroNoSelectedLanguages:
-    "Kokoro sesini yapılandırmak için Dinleme Dilleri altında İngilizce veya Basitleştirilmiş Çince'yi seçin.",
+    "Kokoro sesini yapılandırmak için Dinleme Dilleri altında İngilizce veya Basitleştirilmiş Çince'yi seç.",
   expandVoiceSettings: ({ language }) =>
-    `${language} ses ayarlarını genişletin`,
+    `${language} ses ayarlarını genişlet`,
   collapseVoiceSettings: ({ language }) => `${language} ses ayarlarını daralt`,
   remove: "Kaldır",
   voiceOutputDescription:
-    "Sözlü yanıtlar için konuşma motorunu, dinleme dillerini ve ses önizlemelerini seçin.",
+    "Sözlü yanıtlar için konuşma motorunu, dinleme dillerini ve ses önizlemelerini seç.",
   localTts: "Yerel",
   localTtsDescription:
-    "Sözlü yanıtlar için eşleşen, indirilmiş bir yerel ses kullanın.",
+    "Sözlü yanıtlar için eşleşen, indirilmiş bir yerel ses kullan.",
   providerTtsDescription:
-    "Sözlü yanıtlar için seçilen yapılandırılmış hizmeti kullanın.",
+    "Sözlü yanıtlar için seçilen yapılandırılmış hizmeti kullan.",
   ttsFallbackRoutes: "Geri dönüş rotaları",
   ttsFallbackRoutesHint:
-    "İsteğe bağlı. Yalnızca istediğiniz rotaları, denenmeleri gereken sıraya göre ekleyin. Rota konuşmaya başladığında yanıtın geri kalanı boyunca rota üzerinde kalırım.",
+    "İsteğe bağlı. Yalnızca istediğin rotaları, denenmeleri gereken sıraya göre ekle. Rota konuşmaya başladığında yanıtın geri kalanı boyunca rota üzerinde kalırım.",
   ttsFallbackNone:
     "Hiçbir geri dönüş yapılandırılmadı. Bunun yerine bir ses hatası gösterilecektir.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -414,7 +414,7 @@ export const tr = {
   ttsProviderEnabledHint:
     "Burada yalnızca sesli yanıt desteğine sahip etkin sağlayıcılar görünür.",
   ttsProviderMissingHint:
-    "Burada seçmek için TTS desteğine sahip bir hizmete ilişkin kimlik bilgilerini ekleyin.",
+    "Burada seçmek için TTS desteğine sahip bir hizmete ilişkin kimlik bilgilerini ekle.",
   localTtsOrderHint:
     "Yalnızca açıkça yapılandırılmış geri dönüş yolları denenir.",
   providerTtsOrderHint:
@@ -430,22 +430,22 @@ export const tr = {
   providerVoicesAvailable: ({ count, provider }) =>
     `${provider} üzerinden ${count} ses kullanılabilir`,
   providerVoicesLoadFailed:
-    "Sesler yenilenemedi. Mevcut seçiminiz değişmedi; yine de manuel olarak bir ses kimliği girebilirsiniz.",
+    "Sesler yenilenemedi. Mevcut seçimin değişmedi; yine de manuel olarak bir ses kimliği girebilirsin.",
   providerVoicesLoadFailedWithFallback:
     "Hesap sesleri yüklenemedi. Dahili ses kullanılabilir durumda kalır.",
   providerVoicesErrorDetail: ({ detail }) => `Sebep: ${detail}`,
   elevenLabsVoicesReadPermissionHint:
-    "ElevenLabs'de bu API anahtarını düzenleyin ve Sesler → Oku'yu etkinleştirin, ardından burayı yenileyin.",
+    "ElevenLabs'de bu API anahtarını düzenle ve Sesler → Oku'yu etkinleştir, ardından burayı yenile.",
   providerVoicesLoadingHint: ({ provider }) =>
     `Mevcut sesleri ${provider} hizmetinden otomatik olarak yüklerim.`,
   providerVoiceId: "Ses Kimliği",
-  providerVoiceIdPlaceholder: "Bir ses kimliği girin",
+  providerVoiceIdPlaceholder: "Bir ses kimliği gir",
   providerVoiceIdFallbackHint:
     "Ses kitaplığı yüklenemediğinde manuel giriş kullanılabilir durumda kalır.",
   providerVoiceIdRequired: ({ provider }) =>
-    `Konuşma çıkışını kullanmadan önce ${provider} ses kitaplığını yenileyin veya bir ses kimliği girin.`,
+    `Konuşma çıkışını kullanmadan önce ${provider} ses kitaplığını yenile veya bir ses kimliği gir.`,
   qwenSpeechUnavailableInUs:
-    "Mevcut Qwen konuşma yollarım ABD bölgesinde kullanılamıyor. Qwen konuşması için Singapur veya Pekin'i seçin.",
+    "Mevcut Qwen konuşma yollarım ABD bölgesinde kullanılamıyor. Qwen konuşması için Singapur veya Pekin'i seç.",
   qwenApiRegion: "Qwen API Bölgesi",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "ABD (Virginia)",
@@ -458,19 +458,19 @@ export const tr = {
     "Bu sağlayıcı şu anda önizleme ve sesli yanıtlar için varsayılan sesini kullanıyor.",
   listenLanguages: "Dinleme Dilleri",
   listenLanguagesHint:
-    "Kulağa hoş gelmesini istediğiniz yanıt dillerini seçin. Konuşma çıkışını yönlendirirken bunları bu sırayla denerim.",
+    "Kulağa hoş gelmesini istediğin yanıt dillerini seç. Konuşma çıkışını yönlendirirken bunları bu sırayla denerim.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 dil seçildi" : `${count} dil seçildi`,
   localVoicePacks: "Yerel Ses Paketleri",
   localVoicePacksHint:
-    "Her dil kendi yerel sesini korur. O dil için istediğiniz sesi seçin ve ardından yalnızca gerçekten önemsediğiniz paketleri indirin.",
+    "Her dil kendi yerel sesini korur. O dil için istediğin sesi seç ve ardından yalnızca gerçekten önemsediğin paketleri indir.",
   localVoiceForLanguage: ({ languageLabel }) => `${languageLabel} için Ses`,
   providerVoicePreviews: "Sağlayıcı Ses Önizlemeleri",
   providerVoicePreviewsHint:
-    "Şu anda seçili olan TTS rotasını her yanıt dili için ayrı bir önizleme metniyle burada test edin.",
+    "Şu anda seçili olan TTS rotasını her yanıt dili için ayrı bir önizleme metniyle burada test et.",
   nativeVoicePreviewSection: "Yerel Ses Önizlemesi",
   nativeVoicePreviewSectionHint:
-    "Bu, doğrudan telefonun yerleşik konuşma sentezleyicisi aracılığıyla konuşur, böylece onu yapılandırılmış sağlayıcı sesleriyle karşılaştırabilirsiniz.",
+    "Bu, doğrudan telefonun yerleşik konuşma sentezleyicisi aracılığıyla konuşur, böylece onu yapılandırılmış sağlayıcı sesleriyle karşılaştırabilirsin.",
   nativeVoiceUnavailable:
     "Bu cihaz, önizleme için herhangi bir yerel sistem sesini bildirmedi.",
   runtimeCompatibilityOverrides: "Çalışma zamanı uyumluluğu",
@@ -486,7 +486,7 @@ export const tr = {
     "En son konuşma isteklerini, istedikleri rotayı, fiilen kullandıkları rotayı ve geri dönüş nedenlerini gösterir.",
   clearSpeechDiagnostics: "Son konuşma etkinliğini temizle",
   speechDiagnosticsEmpty:
-    "Henüz yeni konuşma isteği yok. Burada yönlendirme ayrıntılarını görmek için bir sesi önizleyin veya bir yanıtı oynatın.",
+    "Henüz yeni konuşma isteği yok. Burada yönlendirme ayrıntılarını görmek için bir sesi önizle veya bir yanıtı oynat.",
   clearSpeechDiagnosticsConfirmationTitle:
     "Son konuşma etkinliği temizlensin mi?",
   clearSpeechDiagnosticsConfirmationMessage:
@@ -503,7 +503,7 @@ export const tr = {
   speechDiagnosticVoiceLine: ({ voice }) => `Ses: ${voice}`,
   localTtsPackReady: "Bu cihazda yüklü.",
   localTtsPackBroken:
-    "İndirildi, ancak bu ses bu cihazda yerel doğrulamada başarısız oldu. Yeniden indirin veya başka bir ses seçin.",
+    "İndirildi, ancak bu ses bu cihazda yerel doğrulamada başarısız oldu. Yeniden indir veya başka bir ses seç.",
   localTtsPackMissing:
     "Henüz kurulmadı. Siz indirene kadar bulut TTS veya sistem sesi kullanılır.",
   localTtsUnsupportedLanguageFallback:
@@ -513,7 +513,7 @@ export const tr = {
   download: "İndir",
   downloadingShort: "Yükleniyor...",
   voicePreviewText: "Ses Önizleme Metni",
-  voicePreviewPlaceholder: "Bu sesi duymak için bir cümle yazın.",
+  voicePreviewPlaceholder: "Bu sesi duymak için bir cümle yaz.",
   voicePreviewHint:
     "Dil modeline herhangi bir şey göndermeden, seçili olan yanıt sesi arka ucunu kullanır.",
   previewVoice: "Sesi Önizle",
@@ -530,7 +530,7 @@ export const tr = {
   replyFailed: "Yanıt başarısız oldu",
   retryReply: "Yanıtı yeniden dene",
   replyFailedHint:
-    "Tekrar denemeden önce yukarıdan başka bir model seçebilirsiniz.",
+    "Tekrar denemeden önce yukarıdan başka bir model seçebilirsin.",
   spokenReplyFailed: "Yanıt kaydedildi ancak söylenemedi.",
   retrySpeech: "Konuşmayı yeniden dene",
   openSpeakingSettings: "Konuşma ayarları",
@@ -543,11 +543,11 @@ export const tr = {
   threadPinned: "Konu sabitlendi.",
   threadUnpinned: "Konunun sabitlemesi kaldırıldı.",
   addProviderKeyToUseProvider: ({ provider }) =>
-    `Bu rotayı kullanmadan önce Ayarlar'da ${provider} için kimlik bilgilerini ekleyin.`,
+    `Bu rotayı kullanmadan önce Ayarlar'da ${provider} için kimlik bilgilerini ekle.`,
   configureCredentialsBeforeVoiceSession:
-    "Sesli oturum başlatmadan önce Ayarlar'a kimlik bilgilerini ekleyin.",
+    "Sesli oturum başlatmadan önce Ayarlar'a kimlik bilgilerini ekle.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `${provider} için sağlayıcı temel URL'sini ve API anahtarını https://uc-noktaniz.example.com|api-anahtariniz biçiminde girin.`,
+    `${provider} için sağlayıcı temel URL'sini ve API anahtarını https://uc-noktaniz.example.com|api-anahtariniz biçiminde gir.`,
   speechRecognitionUnavailableOnDevice:
     "Bu cihazda konuşma tanıma kullanılamıyor.",
   debugLogLabel: "GÜNLÜK",
@@ -562,26 +562,26 @@ export const tr = {
     `Önceki hata ayıklama günlüğü ${fileName} (${entryCount} giriş) kurtarıldı.`,
   debugLogCaptureFailed: "Hata ayıklama günlüğü kaydedilemedi.",
   chooseSttBeforeVoiceSession:
-    "Sesli oturum başlatmadan önce Ayarlar'da yapılandırılmış bir STT rotası seçin.",
+    "Sesli oturum başlatmadan önce Ayarlar'da yapılandırılmış bir STT rotası seç.",
   chooseTtsBeforeSpokenReplies:
-    "Sözlü yanıtları kullanmadan önce Ayarlar'da yapılandırılmış bir TTS rotası seçin.",
+    "Sözlü yanıtları kullanmadan önce Ayarlar'da yapılandırılmış bir TTS rotası seç.",
   stopSessionBeforeReplay:
-    "Son yanıtı tekrar oynatmadan önce aktif ses oturumunu durdurun.",
-  couldntCatchThatTryAgain: "Yakalanamadı, tekrar deneyin.",
+    "Son yanıtı tekrar oynatmadan önce aktif ses oturumunu durdur.",
+  couldntCatchThatTryAgain: "Yakalanamadı, tekrar dene.",
   couldntStartVoiceInput: "Ses girişi başlatılamadı.",
   couldntProcessVoiceInput: "Ses girişi işlenemedi.",
   maxRecordingLengthReached:
     "Maksimum kayıt uzunluğuna ulaşıldı — elimdekileri gönderiyorum.",
   sttRecordingTooLarge: ({ provider, limit }) =>
-    `Bu kayıt, ${provider} konuşmayı metne dönüştürme için çok uzun (maks. ${limit}). Daha kısa bir mesaj deneyin veya Konuşmayı Metne Dönüştürme özelliğini Sistem Tanıma olarak değiştirin.`,
+    `Bu kayıt, ${provider} konuşmayı metne dönüştürme için çok uzun (maks. ${limit}). Daha kısa bir mesaj dene veya Konuşmayı Metne Dönüştürme özelliğini Sistem Tanıma olarak değiştir.`,
   addProviderKeyToEnableProvider: ({ provider }) =>
-    `Bu rotayı kullanmadan önce Ayarlar'da ${provider} için kimlik bilgilerini ekleyin.`,
+    `Bu rotayı kullanmadan önce Ayarlar'da ${provider} için kimlik bilgilerini ekle.`,
   stopSessionBeforePreview:
-    "Bir sesi önizlemeden önce aktif ses oturumunu durdurun.",
+    "Bir sesi önizlemeden önce aktif ses oturumunu durdur.",
   chooseTtsToPreviewVoices:
-    "Sesleri önizlemek için Ayarlar'da yapılandırılmış bir TTS rotası seçin.",
+    "Sesleri önizlemek için Ayarlar'da yapılandırılmış bir TTS rotası seç.",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
-    `Önce seçilen ${languageLabel} yerel sesi indirin.`,
+    `Önce seçilen ${languageLabel} yerel sesi indir.`,
   couldntPreviewVoice: "Sesin önizlemesi yapılamadı.",
   spokenRepliesDisabled: "Sözlü yanıtlar Ayarlar'da kapatılmıştır.",
   providerVoiceFallback:
@@ -599,9 +599,9 @@ export const tr = {
   clearSpeechReplayCache: "Konuşma önbelleğini temizle",
   speechReplayCacheCleared: "Önbellekteki konuşma dosyaları silindi.",
   speechReplayCacheClearFailed: "Konuşma önbelleği temizlenemedi.",
-  listeningToYourVoice: "Sesiniz dinleniyor",
-  parsingYourVoiceInput: "Sesiniz metne dönüştürülüyor",
-  preparingRequest: "Talebiniz hazırlanıyor",
+  listeningToYourVoice: "Sesin dinleniyor",
+  parsingYourVoiceInput: "Sesin metne dönüştürülüyor",
+  preparingRequest: "Talebin hazırlanıyor",
   searchingTheWeb: "Web'de yeni bağlam aranıyor",
   waitingForProvider: ({ provider }) => `${provider} bekleniyor`,
   preparingVoiceWithProvider: ({ provider }) =>
@@ -616,40 +616,40 @@ export const tr = {
   conversationActions: "Konuşma eylemleri",
   statusDetails: "Durum ayrıntıları",
   persistenceFailure:
-    "Bu cihaza veri kaydedemedim. Uygulamayı açık tutun ve tekrar deneyin; yeniden başlatmanın ardından son değişiklikler kaybolabilir.",
+    "Bu cihaza veri kaydedemedim. Uygulamayı açık tut ve tekrar dene; yeniden başlatmanın ardından son değişiklikler kaybolabilir.",
   show: "Göster",
   showTranscript: "Konuşma metnini göster",
   hide: "Gizle",
   copyThread: "Konuyu Kopyala",
   shareThread: "Konuyu Paylaş",
   reportResponse: "Bu yanıtı bildir",
-  reportResponseIntro: "Mr Broccoli'den yapay zekâ yanıt bildirimi. Aşağıdaki içeriği inceleyin, sorunu açıklayın ve bu bildirimi geliştiriciye gönderin.",
+  reportResponseIntro: "Mr Broccoli'den yapay zekâ yanıt bildirimi. Aşağıdaki içeriği incele, sorunu açıkla ve bu bildirimi geliştiriciye gönder.",
   repeatReply: "Yanıtı Tekrarla",
   renameThread: "Konuyu Yeniden Adlandır",
   renameThreadHint:
-    "Bu konuşmaya daha sonra hızlıca bulabileceğiniz bir başlık verin.",
+    "Bu konuşmaya daha sonra hızlıca bulabileceğin bir başlık ver.",
   threadTitle: "Konu başlığı",
   noTranscriptYet: "Henüz transkript yok",
   previewTranscriptEmptyDescription:
-    "Başlamak için ses veya metin kullanın. Konuşmanız burada görünecek.",
+    "Başlamak için ses veya metin kullan. Konuşmanız burada görünecek.",
   noConversationYet: "Henüz konuşma yok",
   expandedTranscriptEmptyDescription:
-    "Başlamak için ses veya metin kullanın. Ana sahneye dönmek istediğinizde bu ekranı kapatın.",
+    "Başlamak için ses veya metin kullan. Ana sahneye dönmek istediğinde bu ekranı kapat.",
   transcriptSelectionHint:
-    "Herhangi bir mesaj metnini doğrudan seçin veya aşağıda tek tek mesajları paylaşıp kopyalayın.",
-  textMessagePlaceholder: "Bir mesaj yazın",
+    "Herhangi bir mesaj metnini doğrudan seç veya aşağıda tek tek mesajları paylaşıp kopyala.",
+  textMessagePlaceholder: "Bir mesaj yaz",
   sendTextMessage: "Mesaj gönder",
   showVoiceInput: "Ses girişini göster",
   showTextInput: "Metin girişini göster",
   usageStatsHiddenDescription:
-    "Token tahminlerini transkript arayüzünün dışında tutun.",
+    "Token tahminlerini transkript arayüzünün dışında tut.",
   usageStatsVisibleDescription:
-    "Yanıtlar ve görüşme toplamları için tahmini token kullanımını gösterin.",
+    "Yanıtlar ve görüşme toplamları için tahmini token kullanımını göster.",
   debugLogButton: "Hata Ayıklama Günlüğü Düğmesi",
   debugLogButtonHiddenDescription:
-    "Halihazırda bir yakalama işlemi yapılmadığı sürece ana ekrandaki GÜNLÜK düğmesini gizli tutun.",
+    "Halihazırda bir yakalama işlemi yapılmadığı sürece ana ekrandaki GÜNLÜK düğmesini gizli tut.",
   debugLogButtonVisibleDescription:
-    "Hata ayıklama yakalamalarını başlatmak ve durdurmak için ana ekranda GÜNLÜK düğmesini gösterin.",
+    "Hata ayıklama yakalamalarını başlatmak ve durdurmak için ana ekranda GÜNLÜK düğmesini göster.",
   debugLogButtonUsageDescription:
     "Düğme nasıl kullanılır: düğmeyi açmak, günlükleri yakalamaya başlayacaktır. Bunu kapatmak, günlüklerin yakalanmasını durduracak ve yakalananların panoya taşınmasına neden olacaktır.",
   estimatedUsageTitle: "Tahmini Kullanım",
@@ -706,48 +706,48 @@ export const tr = {
   turnReceiptTimingTotal: "toplam",
   estimatedRouteUsageTokensOnly: ({ tokens }) => `${tokens} token`,
   unknownUsageRoute: "Bilinmeyen rota",
-  setupGuideConnectProviderTitle: "Kimlik bilgilerini yapılandırın",
+  setupGuideConnectProviderTitle: "Kimlik bilgilerini yapılandır",
   setupGuideConnectProviderDescription:
-    "Ayarlar'da kimlik bilgilerini ekleyin, ardından kullanmak istediğiniz rotaları seçin.",
+    "Ayarlar'da kimlik bilgilerini ekle, ardından kullanmak istediğin rotaları seç.",
   idle: "Boşta",
   yourConversationAppearsHere: "Konuşmanız burada görünüyor",
   defaultTranscriptEmptyDescription:
-    "Başlamak için ses veya metin kullanın. İleti dizisini tutacağım ve burada yanıt vereceğim.",
+    "Başlamak için ses veya metin kullan. İleti dizisini tutacağım ve burada yanıt vereceğim.",
   delete: "Sil",
   deleteConversationConfirmationTitle: ({ title }) => `“${title}” silinsin mi?`,
   deleteConversationConfirmationMessage:
     "Bu, görüşmeyi ve tüm mesajlarını kalıcı olarak siler. Bu eylem geri alınamaz.",
   conversations: "Konuşmalar",
   drawerSubtitle:
-    "Canlı başlıklar arasında geçiş yapın veya yeni bir oda başlatın.",
+    "Canlı başlıklar arasında geçiş yap veya yeni bir oda başlat.",
   newSession: "Yeni Oturum",
   noSavedConversationsYet: "Henüz kayıtlı görüşme yok",
   drawerEmptyDescription:
     "Ana görünümden konuşmaya başladığınızda otomatik olarak bir oturum oluştururum.",
-  setupGuideTitle: "Uygulamayı yapılandırın",
+  setupGuideTitle: "Uygulamayı yapılandır",
   setupGuideSubtitle:
-    "Kimlik bilgilerini ekleyin ve Ayarlar'da rotaları seçin.",
+    "Kimlik bilgilerini ekle ve Ayarlar'da rotaları seç.",
   fastestStartPreset: "Minimum kurulum",
   fastestStartDescription:
-    "Mümkün olduğunda cihaz konuşmasını kullanın ve yalnızca ihtiyacınız olan yanıt yolunu yapılandırın.",
+    "Mümkün olduğunda cihaz konuşmasını kullan ve yalnızca ihtiyacın olan yanıt yolunu yapılandır.",
   fullVoicePreset: "Yapılandırılmış ses",
   fullVoiceDescription:
-    "Yanıtlar, transkripsiyon ve sözlü çıktı için yapılandırılmış hizmetleri seçtiğinizde kullanın.",
+    "Yanıtlar, transkripsiyon ve sözlü çıktı için yapılandırılmış hizmetleri seçtiğinizde kullan.",
   setupGuideNote:
     "Kimlik bilgilerini yapıştırıp doğrulayabilmeniz için daha sonra Ayarlar'ı açacağız.",
   useThisSetup: "Bu kurulumu kullan",
   notNow: "Şimdi değil",
   setupGuideIntroTitle: "Nasıl çalışırım?",
   setupGuideIntroBody:
-    "Boş başlarım. Halihazırda kullanmakta olduğunuz harici hizmetler için kimlik bilgilerini ekleyin, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seçin.",
+    "Boş başlarım. Halihazırda kullanmakta olduğun harici hizmetler için kimlik bilgilerini ekle, ardından yanıtların, konuşma girişinin, sözlü çıkışın ve isteğe bağlı web içeriğinin nasıl yönlendirileceğini seç.",
   setupGuideIntroNote:
-    "Kurulumdan sonra konuşmayı başlatmak ve durdurmak için ana ses kontrolünü kullanın. Geçerli transkript ana ekranda kalır ve her rota daha sonra Ayarlar'dan değiştirilebilir.",
+    "Kurulumdan sonra konuşmayı başlatmak ve durdurmak için ana ses kontrolünü kullan. Geçerli transkript ana ekranda kalır ve her rota daha sonra Ayarlar'dan değiştirilebilir.",
   setupGuideProviderTitle: "Kimlik Bilgilerini Ekle",
   setupGuideProviderBody:
-    "Yapılandırmak istediğiniz harici hizmeti seçin, ardından kimlik bilgilerini yanıt erişimiyle birlikte yapıştırın.",
+    "Yapılandırmak istediğin harici hizmeti seç, ardından kimlik bilgilerini yanıt erişimiyle birlikte yapıştır.",
   setupGuideProviderPickerLabel: "Yanıt hizmeti",
-  setupGuideSelectProvider: "Bir sağlayıcı seçin",
-  setupGuideSelectProviderFirst: "Önce bir sağlayıcı seçin.",
+  setupGuideSelectProvider: "Bir sağlayıcı seç",
+  setupGuideSelectProviderFirst: "Önce bir sağlayıcı seç.",
   setupGuideApiKeyLabel: "API anahtarı",
   setupGuideApiKeyPlaceholder: "Kimlik bilgilerini yapıştır",
   setupGuideContinue: "Devam et",
@@ -755,26 +755,26 @@ export const tr = {
   setupGuideBack: "Geri",
   setupGuideValidateKey: "Anahtarı doğrula",
   setupGuideApiKeyRequiredOrCancel:
-    "Devam etmek için bir API anahtarı ekleyin veya kurulum kılavuzunu iptal edin.",
+    "Devam etmek için bir API anahtarı ekle veya kurulum kılavuzunu iptal et.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "Devam etmek için bir sağlayıcı seçin ve bir API anahtarı ekleyin veya kurulum kılavuzunu iptal edin.",
+    "Devam etmek için bir sağlayıcı seç ve bir API anahtarı ekle veya kurulum kılavuzunu iptal et.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Bu ${provider} kimlik bilgileri yanıt isteklerine izin vermiyor.`,
   setupGuideKokoroTitle: "Doğal Cihaz İçi Ses Ekleme",
   setupGuideKokoroBody: ({ size }) =>
-    `İsteğe bağlı: Konuşma sağlayıcısı veya kullanım ücreti olmadan çok daha doğal sözlü yanıtlar için Kokoro'yu (yaklaşık ${size} MB) indirin.`,
+    `İsteğe bağlı: Konuşma sağlayıcısı veya kullanım ücreti olmadan çok daha doğal sözlü yanıtlar için Kokoro'yu (yaklaşık ${size} MB) indir.`,
   setupGuideKokoroLanguageNote:
-    "Bu model şu anda İngilizce ve Basitleştirilmiş Çince konuşmaktadır. İstediğiniz geri dönüş rotalarını daha sonra Konuşma ayarlarında yapılandırın.",
+    "Bu model şu anda İngilizce ve Basitleştirilmiş Çince konuşmaktadır. İstediğin geri dönüş rotalarını daha sonra Konuşma ayarlarında yapılandır.",
   setupGuideKokoroDownload: "Kokoro'yu indir",
   setupGuideUseKokoro: "Sözlü yanıtlar için Kokoro'yu kullan",
   setupGuideUseKokoroSummary:
-    "Cevap dili desteklendiğinde sentezi telefonda tutun.",
+    "Cevap dili desteklendiğinde sentezi telefonda tut.",
   setupGuideSkipKokoro: "Şimdilik atla",
   setupGuideVoiceTestTitle: "Kurulumunuzu Test Edin",
   setupGuideVoiceTestBody:
-    "Kısa bir cümle söyleyin. Kabul edilebilir bir ses yolu mevcut olduğunda mikrofon erişimini, transkripsiyonu, yapılandırılmış yanıt yolunu ve sözlü çıkışı test edeceğim.",
+    "Kısa bir cümle söyle. Kabul edilebilir bir ses yolu mevcut olduğunda mikrofon erişimini, transkripsiyonu, yapılandırılmış yanıt yolunu ve sözlü çıkışı test edeceğim.",
   setupGuideVoiceTestNoInputBody:
-    "Bu kurulumda ses girişi kullanılamaz. Algılanan rotaları incelemeye devam edin, ardından gerekirse konuşma ayarlarını daha sonra yapın.",
+    "Bu kurulumda ses girişi kullanılamaz. Algılanan rotaları incelemeye devam et, ardından gerekirse konuşma ayarlarını daha sonra yap.",
   setupGuideVoiceTestTextOnlyNote:
     "Henüz kabul edilebilir bir sözlü ses yolu hazır olmadığından bu test yalnızca metin olarak kalır.",
   setupGuideVoiceTestStart: "Testi başlat",
@@ -791,7 +791,7 @@ export const tr = {
     "Bu cihazda bu kurulum için ses girişi mevcut değil.",
   setupGuideSummaryTitle: "Kurulum Tamamlandı",
   setupGuideSummaryBody:
-    "İşte mevcut yapılandırmanızla kullanacağım rota.",
+    "İşte mevcut yapılandırmanla kullanacağım rota.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Konuşmadan metne",
   setupGuideSummaryTts: "Metinden konuşmaya",
@@ -813,10 +813,10 @@ export const tr = {
     "Sözlü yanıtlar şimdilik kapalı. Bir sağlayıcıyı veya yerel sesi etkinleştirene kadar yanıtlar metinde kalır.",
   setupGuideFinish: "Bitti",
   searchConversationsPlaceholder:
-    "Başlıkları, modelleri ve mesaj metnini arayın",
+    "Başlıkları, modelleri ve mesaj metnini ara",
   noMatchingConversations: "Eşleşen görüşme yok",
   noMatchingConversationsDescription:
-    "Transkriptten farklı bir başlık, rota, model veya ifade deneyin.",
+    "Transkriptten farklı bir başlık, rota, model veya ifade dene.",
   noProviderYet: "Henüz sağlayıcı yok",
   noModelYet: "Henüz model yok",
   startedAt: "Başlatıldı",
@@ -840,38 +840,38 @@ export const tr = {
   webSearchAction: "web araması",
   thinking: "Düşünme",
   speaking: "Konuşma",
-  pleaseWait: "Lütfen bekleyin",
+  pleaseWait: "Lütfen bekle",
   yourTurn: "Sıra sende",
   keepPressing: "Basmaya devam et",
-  tapWhenDone: "İşiniz bittiğinde dokunun",
+  tapWhenDone: "İşiniz bittiğinde dokun",
   speechPaused: "Konuşma duraklatıldı",
   pausePlaybackUnavailable:
-    "Bu ses rotası duraklatılamaz. Durdurun veya sağlayıcı ses çıkışına geçin.",
-  holdToSpeak: "Konuşmak için basılı tutun",
-  tapToSpeak: "Konuşmak için dokunun",
-  tapAgainToSend: "Göndermek için tekrar dokunun",
+    "Bu ses rotası duraklatılamaz. Durdur veya sağlayıcı ses çıkışına geç.",
+  holdToSpeak: "Konuşmak için basılı tut",
+  tapToSpeak: "Konuşmak için dokun",
+  tapAgainToSend: "Göndermek için tekrar dokun",
   waitingForReply: "Yanıt bekleniyor",
-  parsingYourVoice: "Sesiniz ayrıştırılıyor",
+  parsingYourVoice: "Sesin ayrıştırılıyor",
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} Ayarlar'da yapılandırılmamış.`,
   providerNetworkError: ({ provider, action }) =>
-    `${action} için ${provider} sağlayıcısına ulaşılamadı. Bağlantıyı kontrol edip tekrar deneyin.`,
+    `${action} için ${provider} sağlayıcısına ulaşılamadı. Bağlantıyı kontrol edip tekrar dene.`,
   providerAuthError: ({ provider, action }) =>
-    `${provider}, ${action} kimlik bilgilerini reddetti. API anahtarını ve izinlerini kontrol edin.`,
+    `${provider}, ${action} kimlik bilgilerini reddetti. API anahtarını ve izinlerini kontrol et.`,
   providerRateLimitError: ({ provider, action }) =>
-    `${provider} şu anda ${action} için hız sınırı uyguluyor. Birazdan tekrar deneyin.`,
+    `${provider} şu anda ${action} için hız sınırı uyguluyor. Birazdan tekrar dene.`,
   providerCreditsRequired: ({ provider, action }) =>
-    `${provider}, ${action} için yeterli API kredisine ihtiyaç duyar. Hesap bakiyesini ve anahtarın harcama limitini kontrol edin.`,
+    `${provider}, ${action} için yeterli API kredisine ihtiyaç duyar. Hesap bakiyesini ve anahtarın harcama limitini kontrol et.`,
   providerTimeoutError: ({ provider, action }) =>
-    `${provider}, ${action} sırasında çok uzun sürdü. Tekrar deneyin.`,
+    `${provider}, ${action} sırasında çok uzun sürdü. Tekrar dene.`,
   providerTemporaryError: ({ provider, action }) =>
-    `${provider}, ${action} sırasında geçici bir sorunla karşılaştı. Kısa süre sonra tekrar deneyin.`,
+    `${provider}, ${action} sırasında geçici bir sorunla karşılaştı. Kısa süre sonra tekrar dene.`,
   providerEmptyReplyError: ({ provider }) =>
-    `${provider} yanıt vermeden bitirdi. Tekrar deneyin.`,
+    `${provider} yanıt vermeden bitirdi. Tekrar dene.`,
   providerIncompleteReplyError: ({ provider }) =>
-    `${provider} yanıtı tamamlanmadan sona erdi. Tekrar deneyin.`,
+    `${provider} yanıtı tamamlanmadan sona erdi. Tekrar dene.`,
   providerContextTooLong: ({ provider }) =>
-    `${provider}, görüşme çok uzadığı için yanıtı reddetti. Yeni bir konu başlatın veya isteği kısaltın.`,
+    `${provider}, görüşme çok uzadığı için yanıtı reddetti. Yeni bir konu başlat veya isteği kısalt.`,
   providerRequestRejected: ({ provider, action, detail }) =>
     detail
       ? `${provider}, ${action} isteğini reddetti: ${detail}`
@@ -893,7 +893,7 @@ export const tr = {
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `${languageLabel} için hazır yerel veya bulut ses rotası yok.`,
   chooseTextToSpeechProviderInSettings:
-    "Ayarlar'da bir metin-konuşma sağlayıcısı seçin.",
+    "Ayarlar'da bir metin-konuşma sağlayıcısı seç.",
   ttsNotSupportedYet: ({ provider }) => `${provider} TTS henüz desteklenmiyor.`,
   ttsError: ({ provider, status, errorText }) =>
     `${provider} TTS hatası (${status}): ${errorText}`,
@@ -903,13 +903,13 @@ export const tr = {
   sttTimeout: ({ provider }) =>
     `${provider} konuşmanın transkripsiyonu çok uzun sürdü.`,
   sttFileSizeLimitExceeded: ({ provider, model, limit }) =>
-    `${provider} ${model} yalnızca ${limit}'ye kadar olan kayıtları kabul eder. Daha kısa bir klip kullanın veya STT modellerini değiştirin.`,
+    `${provider} ${model} yalnızca ${limit}'ye kadar olan kayıtları kabul eder. Daha kısa bir klip kullan veya STT modellerini değiştir.`,
   voiceInputCaptureIncomplete:
-    "Ses girişi net bir şekilde yakalanamadı. Lütfen tekrar deneyin.",
+    "Ses girişi net bir şekilde yakalanamadı. Lütfen tekrar dene.",
   ttsDidNotReturnAudio: ({ provider }) => `${provider} TTS ses döndürmedi.`,
   nativeSttHandledInApp: "Sistem STT'si doğrudan uygulamada gerçekleştirilir.",
   chooseSpeechToTextProviderInSettings:
-    "Ayarlar'da konuşmayı metne dönüştürme sağlayıcısını seçin.",
+    "Ayarlar'da konuşmayı metne dönüştürme sağlayıcısını seç.",
   sttNotSupportedYet: ({ provider }) => `${provider} STT henüz desteklenmiyor.`,
   providerNotWiredUpYet: ({ provider }) =>
     `${provider} entegrasyonu henüz hazır değil.`,
