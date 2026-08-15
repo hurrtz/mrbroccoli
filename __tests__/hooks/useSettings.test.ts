@@ -1403,7 +1403,14 @@ describe("useSettings", () => {
     expect(result.current.settings.responseModes).toEqual(
       deriveResponseModesForProvider("xai"),
     );
-    expect(result.current.settings.responseModes).toHaveLength(2);
+    // What matters is that restoring the key rebuilds several genuinely
+    // distinct routes, not how many models xAI happens to offer today. The
+    // deep equality above already pins the exact derivation.
+    const models = result.current.settings.responseModes.map(
+      (mode) => mode.route.model,
+    );
+    expect(models.length).toBeGreaterThan(1);
+    expect(new Set(models).size).toBe(models.length);
   });
 
   it("removes provider api keys when cleared", async () => {

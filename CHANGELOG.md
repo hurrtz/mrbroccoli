@@ -18,6 +18,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Pausing a spoken reply now turns the voice orb's glyph into a play symbol, so
   the orb states that the next tap resumes the reply instead of continuing to
   offer pause.
+- Grok 4.6 is now available, both as a direct xAI route and through OpenRouter,
+  and is the new xAI default. On the direct route it is the only Grok model
+  offering the extra-high reasoning effort above high.
 
 ## 4.0.0 - 2026-08-15
 

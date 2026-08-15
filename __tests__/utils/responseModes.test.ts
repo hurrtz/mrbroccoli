@@ -93,7 +93,7 @@ describe("response mode selectors", () => {
 
   it("uses the curated provider default instead of the first picker entry", () => {
     expect(getDefaultModelForProvider("anthropic")).toBe("claude-sonnet-5");
-    expect(getDefaultModelForProvider("xai")).toBe("grok-4.5");
+    expect(getDefaultModelForProvider("xai")).toBe("grok-4.6");
   });
 
   it("validates Gemini with its current default instead of a persisted legacy model", () => {
@@ -233,10 +233,11 @@ describe("deriveResponseModesForProvider", () => {
     );
   });
 
-  it("derives two genuinely different xAI routes", () => {
+  it("derives three genuinely different xAI routes", () => {
     const modes = deriveResponseModesForProvider("xai");
 
     expect(modes.map((mode) => mode.route.model)).toEqual([
+      "grok-4.6",
       "grok-4.5",
       "grok-4.3",
     ]);

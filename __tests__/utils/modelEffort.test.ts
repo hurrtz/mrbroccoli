@@ -66,6 +66,7 @@ describe("model effort metadata", () => {
     expect(getDefaultModelEffort("anthropic", "claude-sonnet-5")).toBe("high");
     expect(getDefaultModelEffort("xai", "grok-4.3")).toBe("low");
     expect(getDefaultModelEffort("xai", "grok-4.5")).toBe("high");
+    expect(getDefaultModelEffort("xai", "grok-4.6")).toBe("high");
     expect(getDefaultModelEffort("gemini", "gemini-3.6-flash")).toBe("medium");
     expect(getDefaultModelEffort("gemini", "gemini-3.5-flash")).toBe("medium");
     expect(getDefaultModelEffort("gemini", "gemini-3.5-flash-lite")).toBe(
@@ -159,6 +160,11 @@ describe("model effort metadata", () => {
     expect(
       getModelEffortOptions("xai", "grok-4.5").map((option) => option.id),
     ).toEqual(["low", "medium", "high"]);
+    // Grok 4.6 is the only xAI route offering a tier above high, and it still
+    // cannot turn reasoning off, so `none` must stay absent.
+    expect(
+      getModelEffortOptions("xai", "grok-4.6").map((option) => option.id),
+    ).toEqual(["low", "medium", "high", "xhigh"]);
     expect(
       getModelEffortOptions("deepseek", "deepseek-v4-pro").map(
         (option) => option.id,

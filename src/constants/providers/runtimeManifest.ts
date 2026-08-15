@@ -389,6 +389,15 @@ const XAI_GROK_45_EFFORT = effortConfig("reasoning-effort", "high", [
   "high",
 ]);
 
+// Grok 4.6 keeps Grok 4.5's high default and adds a tier above it. Reasoning
+// still cannot be disabled, so there is no `none` here.
+const XAI_GROK_46_EFFORT = effortConfig("reasoning-effort", "high", [
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+]);
+
 const DEEPSEEK_THINKING_EFFORT = effortConfig(
   "deepseek-thinking-effort",
   "high",
@@ -698,6 +707,15 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
             "Google · Gemini 3.5 Flash Lite",
           ),
           OPENROUTER_GEMINI_REASONING_EFFORT,
+        ),
+        withEffort(
+          // xAI publishes no dated snapshot for 4.6, so the bare slug is the
+          // canonical id here. The shared Grok effort set stays low/medium/high:
+          // xhigh is documented on xAI's own API, not on OpenRouter's
+          // passthrough, and offering an effort the route rejects would only
+          // earn a runtime capability override.
+          namedModel("x-ai/grok-4.6", "xAI · Grok 4.6"),
+          OPENROUTER_GROK_REASONING_EFFORT,
         ),
         withEffort(
           namedModel("x-ai/grok-4.5-20260708", "xAI · Grok 4.5"),
@@ -1193,9 +1211,10 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://api.x.ai/v1/chat/completions",
-      defaultModel: "grok-4.5",
-      fallbackModelIds: ["grok-4.5", "grok-4.3"],
+      defaultModel: "grok-4.6",
+      fallbackModelIds: ["grok-4.6", "grok-4.5", "grok-4.3"],
       models: [
+        withEffort(model("grok-4.6"), XAI_GROK_46_EFFORT),
         withEffort(model("grok-4.5"), XAI_GROK_45_EFFORT),
         withEffort(model("grok-4.3"), XAI_GROK_43_EFFORT),
       ],

@@ -3,6 +3,60 @@ import { providerContext } from "./provider";
 export const llms = providerContext.defineLlms([
   providerContext.llm(
     {
+      "modelId": "grok-4.6",
+      "publicName": "Grok 4.6",
+      "status": "Documented active/current",
+      "pricingSummary": "$2.00 / 1M input tokens, $0.50 / 1M cached input tokens, and $6.00 / 1M output tokens below 200,000 prompt tokens; $4.00, $1.00, and $12.00 respectively once a prompt reaches that threshold, applied to every token in the request.",
+      "limitsSummary": "500,000 context window. Supports text and image input, text output, function calling, structured outputs, and reasoning effort low/medium/high/xhigh.",
+      "regionSummary": null,
+      "languagesSummary": "No official model-specific language matrix is published.",
+      "notes": "Current xAI frontier model, released 2026-08-12. Adds an xhigh reasoning effort above Grok 4.5's low/medium/high. Long-context pricing is charged on the whole request once the prompt reaches 200,000 tokens, not only on the tokens past it.",
+      "officialSources": [
+        "https://docs.x.ai/developers/grok-4-6",
+        "https://docs.x.ai/developers/models/grok-4.6"
+      ],
+      "openAiCompatible": true,
+      "supportsRealtime": false,
+      "supportsBatch": null,
+      "priceMeasurements": [
+        {
+          "amountUsd": 2,
+          "unit": "million_input_tokens",
+          "sourceText": "Input $2.00 / 1M tokens below 200k prompt tokens."
+        },
+        {
+          "amountUsd": 0.5,
+          "unit": "million_input_tokens",
+          "sourceText": "Cached input $0.50 / 1M tokens below 200k prompt tokens."
+        },
+        {
+          "amountUsd": 6,
+          "unit": "million_output_tokens",
+          "sourceText": "Output $6.00 / 1M tokens below 200k prompt tokens."
+        }
+      ],
+      "constraints": [
+        {
+          "metric": "context_tokens",
+          "comparator": "=",
+          "value": 500000,
+          "unit": "tokens",
+          "scope": "model",
+          "sourceText": "Context window 500,000 tokens."
+        }
+      ],
+      "languageSupport": {
+        "rawText": "No official model-specific language coverage table is published.",
+        "isMultilingual": true,
+        "languageCount": 0,
+        "voiceCount": 0,
+        "listedLanguages": [],
+        "notes": ["multilingual support inferred; official count unknown"]
+      }
+    }
+  ),
+  providerContext.llm(
+    {
       "modelId": "grok-4.5",
       "publicName": "Grok 4.5",
       "aliases": ["grok-4.5-latest", "grok-build-latest"],
