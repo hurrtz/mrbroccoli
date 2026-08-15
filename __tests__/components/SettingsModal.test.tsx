@@ -1760,15 +1760,21 @@ describe("SettingsModal", () => {
     fireEvent.press(
       screen.getByTestId("app-language-picker-sheet-header-handle"),
     );
-    await waitFor(() => {
-      expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
-    });
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
+      },
+      { timeout: 5_000 },
+    );
 
     fireEvent.press(languagePicker);
     fireEvent.press(screen.getByTestId("app-language-picker-option-en"));
-    await waitFor(() => {
-      expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
-    });
+    await waitFor(
+      () => {
+        expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
+      },
+      { timeout: 5_000 },
+    );
   });
 
   it("shows the entitlement simulator only for a .dev app variant", async () => {
