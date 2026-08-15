@@ -738,7 +738,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     ).toEqual(expect.objectContaining({ flexDirection: "row" }));
     expect(screen.getByTestId("mock-docked-transcript")).toBeTruthy();
     expect(screen.queryByTestId("transcript-handle")).toBeNull();
-    expect(screen.queryByTestId("transcript-sheet-close")).toBeNull();
+    expect(screen.queryByTestId("transcript-sheet-header")).toBeNull();
     expect(screen.queryByTestId("landscape-left-pane")).toBeNull();
     expect(
       screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
@@ -772,12 +772,13 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    // The stable title replaces conversation metadata while the whole header
-    // remains the labelled close action.
+    // The stable title replaces conversation metadata while the generous
+    // grabber target remains the labelled close action.
     expect(screen.queryByText("Streaming test")).toBeNull();
-    const grabber = screen.getByTestId("transcript-sheet-close");
+    const header = screen.getByTestId("transcript-sheet-header");
+    const grabber = screen.getByTestId("transcript-sheet-header-handle");
     expect(grabber.props.accessibilityRole).toBe("button");
-    expect(within(grabber).getByText("Transcript")).toBeTruthy();
+    expect(within(header).getByText("Transcript")).toBeTruthy();
     expect(
       StyleSheet.flatten(screen.getByTestId("native-dialog-card").props.style),
     ).toEqual(
@@ -788,12 +789,10 @@ describe("MainScreenWorkspace streaming isolation", () => {
         paddingTop: 0,
       }),
     );
-    expect(StyleSheet.flatten(grabber.props.style)).toEqual(
+    expect(StyleSheet.flatten(header.props.style)).toEqual(
       expect.objectContaining({
-        marginHorizontal: -18,
-        marginTop: 0,
-        minHeight: 64,
-        paddingBottom: 8,
+        minHeight: 78,
+        paddingBottom: 12,
       }),
     );
     fireEvent.press(grabber);

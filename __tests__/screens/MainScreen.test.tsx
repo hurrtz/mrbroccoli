@@ -1803,7 +1803,7 @@ describe("MainScreen", () => {
         .UNSAFE_getAllByType(RNModal)
         .find(
           (modal) =>
-            modal.findAllByProps({ testID: "transcript-sheet-close" }).length >
+            modal.findAllByProps({ testID: "transcript-sheet-header" }).length >
             0,
         );
 
