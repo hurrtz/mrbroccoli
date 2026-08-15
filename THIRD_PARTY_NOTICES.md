@@ -282,7 +282,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo-google-fonts/material-symbols@0.4.42
+### @expo-google-fonts/material-symbols@0.4.44
 License: MIT AND Apache-2.0
 
 ```text
@@ -338,8 +338,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/cli@57.0.12
-Packages (48): @expo/cli@57.0.12, @expo/config-plugins@57.0.6, @expo/config@57.0.6, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.6, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.4, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.5, @expo/log-box@57.0.2, @expo/metro-config@57.0.7, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.8, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.10, @expo/router-server@57.0.5, babel-preset-expo@57.0.5, expo-asset@57.0.8, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.9, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.1, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.7, expo-image-picker@57.0.7, expo-keep-awake@57.0.1, expo-linear-gradient@57.0.1, expo-linking@57.0.5, expo-modules-autolinking@57.0.9, expo-modules-core@57.0.9, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.1, expo-sharing@57.0.8, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.1, expo@57.0.10
+### @expo/cli@57.0.15
+Packages (48): @expo/cli@57.0.15, @expo/config-plugins@57.0.8, @expo/config@57.0.7, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.7, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.5, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.6, @expo/log-box@57.0.2, @expo/metro-config@57.0.8, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.10, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.12, @expo/router-server@57.0.6, babel-preset-expo@57.0.7, expo-asset@57.0.11, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.11, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.4, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.10, expo-image-picker@57.0.10, expo-keep-awake@57.0.1, expo-linear-gradient@57.0.1, expo-linking@57.0.6, expo-modules-autolinking@57.0.10, expo-modules-core@57.0.11, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.3, expo-sharing@57.0.12, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.2, expo@57.0.13
 
 License: MIT
 
@@ -397,7 +397,7 @@ SOFTWARE.
 ```
 
 ### @expo/devcert@1.2.1
-Packages (62): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.9, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.74.89, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.10, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, tr46@0.0.3, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
+Packages (62): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.11, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.2, @react-native/babel-plugin-codegen@0.86.2, @react-native/babel-preset@0.86.2, @react-native/codegen@0.86.2, @react-native/community-cli-plugin@0.86.2, @react-native/debugger-shell@0.86.2, @react-native/dev-middleware@0.86.2, @react-native/gradle-plugin@0.86.2, @react-native/jest-preset@0.86.2, @react-native/js-polyfills@0.86.2, @react-native/metro-babel-transformer@0.86.2, @react-native/metro-config@0.86.2, @react-native/normalize-colors@0.74.89, @react-native/normalize-colors@0.86.2, @react-native/virtualized-lists@0.86.2, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, css.escape@1.5.1, emoji-regex@8.0.0, expo-router@57.0.13, hermes-compiler@250829098.0.16, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-cache-key@0.84.4, metro-cache@0.84.4, metro-config@0.84.4, metro-core@0.84.4, metro-file-map@0.84.4, metro-minify-terser@0.84.4, metro-resolver@0.84.4, metro-runtime@0.84.4, metro-source-map@0.84.4, metro-symbolicate@0.84.4, metro-transform-plugins@0.84.4, metro-transform-worker@0.84.4, metro@0.84.4, natural-compare@1.4.0, ob1@0.84.4, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, tr46@0.0.3, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
 
 License: MIT
 
@@ -1208,6 +1208,8 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
 ### agent-cli-detector@0.1.5
+Packages (2): agent-cli-detector@0.1.5, sandbox-cli-detector@0.2.0
+
 License: MIT
 
 ```text
@@ -4335,7 +4337,7 @@ SOFTWARE.
 ```
 
 ### dnssd-advertise@1.1.6
-Packages (3): dnssd-advertise@1.1.6, multitars@1.0.0, toqr@0.1.1
+Packages (3): dnssd-advertise@1.1.6, multitars@1.0.2, toqr@0.1.1
 
 License: MIT
 
@@ -7608,7 +7610,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### nanoid@3.3.16
+### nanoid@3.3.18
 License: MIT
 
 ```text
@@ -8463,7 +8465,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### postcss@8.5.25
+### postcss@8.5.26
 License: MIT
 
 ```text
