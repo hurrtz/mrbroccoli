@@ -1,5 +1,11 @@
 import React from "react";
-import { Pressable, StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
@@ -9,7 +15,8 @@ import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { Modal } from "../../design-system/NativeControls";
 import type { Colors } from "../../theme/colors";
-import type { Message, VoiceVisualPhase } from "../../types";
+import { fonts } from "../../theme/typography";
+import type { VoiceVisualPhase } from "../../types";
 import type { IpadLayout } from "../../utils/ipadLayout";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenTopBar } from "./MainScreenTopBar";
@@ -228,11 +235,11 @@ interface MainScreenWorkspaceProps {
     countLabel: string | null;
     emptyLabel: string;
     hideLabel: string;
-    meta: string | null;
     onClose: () => void;
     onDismiss: () => void;
     onOpen: () => void;
     showLabel: string;
+    titleLabel: string;
     visible: boolean;
   };
   visualPhase: VoiceVisualPhase;
@@ -240,16 +247,6 @@ interface MainScreenWorkspaceProps {
     React.ComponentProps<typeof MainScreenVoiceStage>,
     "colors" | "layout" | "maxOrbSize"
   >;
-}
-
-function getLastAssistantMessage(messages: Message[]): Message | null {
-  for (let index = messages.length - 1; index >= 0; index -= 1) {
-    const message = messages[index];
-    if (message.role === "assistant" && message.content.trim()) {
-      return message;
-    }
-  }
-  return null;
 }
 
 export function MainScreenWorkspace({
@@ -271,7 +268,6 @@ export function MainScreenWorkspace({
   const { fontScale, height: windowHeight } = useWindowDimensions();
   const useAccessibilityCompactLayout =
     fontScale >= ACCESSIBILITY_COMPACT_FONT_SCALE;
-  const lastAssistant = getLastAssistantMessage(transcript.messages);
   const messageCount = transcript.messages.length;
   // The accessible name always states the real count, from the same list
   // that decides the empty state.
@@ -420,11 +416,8 @@ export function MainScreenWorkspace({
             {!ipadLayout.transcriptDocked ? (
               <TranscriptHandle
                 accessibilityLabel={handleAccessibilityLabel}
-                emptyLabel={transcriptSheet.emptyLabel}
-                messageCount={messageCount}
-                meta={transcriptSheet.meta ?? undefined}
+                label={transcriptSheet.titleLabel}
                 onPress={transcriptSheet.onOpen}
-                preview={lastAssistant?.content.trim()}
                 style={workspaceStyles.ipadTranscriptHandle}
                 testID="transcript-handle"
               />
@@ -454,6 +447,14 @@ export function MainScreenWorkspace({
                       { backgroundColor: colors.borderStrong },
                     ]}
                   />
+                  <Text
+                    style={[
+                      workspaceStyles.transcriptSheetTitle,
+                      { color: colors.text },
+                    ]}
+                  >
+                    {transcriptSheet.titleLabel}
+                  </Text>
                 </Pressable>
               }
               visible={transcriptSheet.visible}
@@ -481,12 +482,30 @@ export function MainScreenWorkspace({
             ]}
             testID="ipad-transcript-pane"
           >
-            <TranscriptPreviewCard
-              colors={colors}
-              layout="landscape"
-              style={styles.landscapeTranscriptCard}
-              {...transcript}
-            />
+            <View
+              style={[
+                workspaceStyles.ipadTranscriptPaneHeader,
+                { borderBottomColor: colors.border },
+              ]}
+            >
+              <Text
+                accessibilityRole="header"
+                style={[
+                  workspaceStyles.ipadTranscriptPaneTitle,
+                  { color: colors.text },
+                ]}
+              >
+                {transcriptSheet.titleLabel}
+              </Text>
+            </View>
+            <View style={workspaceStyles.ipadTranscriptPaneContent}>
+              <TranscriptPreviewCard
+                colors={colors}
+                layout="landscape"
+                style={styles.landscapeTranscriptCard}
+                {...transcript}
+              />
+            </View>
           </View>
         ) : null}
 
@@ -612,11 +631,8 @@ export function MainScreenWorkspace({
 
       <TranscriptHandle
         accessibilityLabel={handleAccessibilityLabel}
-        emptyLabel={transcriptSheet.emptyLabel}
-        messageCount={messageCount}
-        meta={transcriptSheet.meta ?? undefined}
+        label={transcriptSheet.titleLabel}
         onPress={transcriptSheet.onOpen}
-        preview={lastAssistant?.content.trim()}
         style={workspaceStyles.transcriptHandle}
         testID="transcript-handle"
       />
@@ -630,9 +646,8 @@ export function MainScreenWorkspace({
         onClose={transcriptSheet.onClose}
         onDismiss={transcriptSheet.onDismiss}
         title={
-          /* The status line already carries the conversation name; the
-             sheet is the transcript handle pulled up, so its only chrome
-             is the grabber, which doubles as the labeled close action. */
+          /* The sheet repeats the handle's stable title, not conversation
+             metadata. The whole header remains the labelled close action. */
           <Pressable
             accessibilityLabel={transcriptSheet.hideLabel}
             accessibilityRole="button"
@@ -646,6 +661,14 @@ export function MainScreenWorkspace({
                 { backgroundColor: colors.borderStrong },
               ]}
             />
+            <Text
+              style={[
+                workspaceStyles.transcriptSheetTitle,
+                { color: colors.text },
+              ]}
+            >
+              {transcriptSheet.titleLabel}
+            </Text>
           </Pressable>
         }
         visible={transcriptSheet.visible}
@@ -714,6 +737,23 @@ const workspaceStyles = StyleSheet.create({
     borderStartWidth: StyleSheet.hairlineWidth,
     flexShrink: 0,
     minHeight: 0,
+  },
+  ipadTranscriptPaneHeader: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingBottom: 12,
+    paddingHorizontal: 20,
+    paddingTop: 18,
+  },
+  ipadTranscriptPaneTitle: {
+    fontFamily: fonts.headline,
+    fontSize: 18,
+    fontWeight: "400",
+    letterSpacing: -0.2,
+    lineHeight: 24,
+  },
+  ipadTranscriptPaneContent: {
+    flex: 1,
+    minHeight: 0,
     paddingHorizontal: 18,
     paddingVertical: 12,
   },
@@ -742,22 +782,32 @@ const workspaceStyles = StyleSheet.create({
     top: 0,
     zIndex: 1,
   },
-  // A 44pt grab-and-close target around the 38x4 handle.
+  // A 64pt grab-and-close target around the grip and visible title.
   transcriptSheetCard: {
     gap: 0,
     paddingHorizontal: 18,
     paddingTop: 0,
   },
   transcriptSheetHeader: {
+    alignItems: "center",
+    gap: 8,
+    justifyContent: "center",
     marginHorizontal: -18,
     marginTop: 0,
-    minHeight: 44,
-    justifyContent: "center",
+    minHeight: 64,
+    paddingBottom: 8,
   },
   transcriptSheetGrip: {
     alignSelf: "center",
     borderRadius: 2,
     height: 4,
     width: 38,
+  },
+  transcriptSheetTitle: {
+    fontFamily: fonts.headline,
+    fontSize: 17,
+    fontWeight: "400",
+    letterSpacing: -0.2,
+    lineHeight: 22,
   },
 });

@@ -168,11 +168,11 @@ function createWorkspaceProps(t: jest.Mock) {
       countLabel: "1 message",
       emptyLabel: "No messages yet",
       hideLabel: "Hide transcript",
-      meta: "GPT-5.4 · now",
       onClose: jest.fn(),
       onDismiss: jest.fn(),
       onOpen: jest.fn(),
       showLabel: "Show transcript",
+      titleLabel: "Transcript",
       visible: false,
     },
     visualPhase: "thinking" as const,
@@ -530,9 +530,10 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     expect(mockRouteBylineRenderCount).toBe(1);
     expect(mockVoicePagerRenderCount).toBe(1);
-    // The handle keeps reading from the live message list.
-    expect(screen.getByText("Hello there")).toBeTruthy();
-    expect(screen.getByText("GPT-5.4 · now")).toBeTruthy();
+    // Transcript updates do not leak reply or route metadata into the stable
+    // design-system handle.
+    expect(screen.getByText("Transcript")).toBeTruthy();
+    expect(screen.queryByText("Hello there")).toBeNull();
   });
 
   it("top-aligns the complete Drive control stack in constrained landscape", () => {
@@ -723,6 +724,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
 
     expect(screen.getByTestId("ipad-transcript-pane")).toBeTruthy();
     expect(
+      within(screen.getByTestId("ipad-transcript-pane")).getByText(
+        "Transcript",
+      ),
+    ).toBeTruthy();
+    expect(
       StyleSheet.flatten(screen.getByTestId("ipad-workspace").props.style),
     ).toEqual(expect.objectContaining({ flexDirection: "row" }));
     expect(
@@ -739,7 +745,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     ).toBe("204");
   });
 
-  it("opens the portrait transcript as a grabber-only sheet", () => {
+  it("opens the portrait transcript with the labelled design-system header", () => {
     const t = jest.fn((key: string) => key);
     const workspaceProps = createWorkspaceProps(t);
     const onClose = jest.fn();
@@ -766,12 +772,12 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    // The status line owns the conversation name; the sheet is the handle
-    // pulled up — its only chrome is the grabber, which is the labeled
-    // close action.
+    // The stable title replaces conversation metadata while the whole header
+    // remains the labelled close action.
     expect(screen.queryByText("Streaming test")).toBeNull();
     const grabber = screen.getByTestId("transcript-sheet-close");
     expect(grabber.props.accessibilityRole).toBe("button");
+    expect(within(grabber).getByText("Transcript")).toBeTruthy();
     expect(
       StyleSheet.flatten(screen.getByTestId("native-dialog-card").props.style),
     ).toEqual(
@@ -786,7 +792,8 @@ describe("MainScreenWorkspace streaming isolation", () => {
       expect.objectContaining({
         marginHorizontal: -18,
         marginTop: 0,
-        minHeight: 44,
+        minHeight: 64,
+        paddingBottom: 8,
       }),
     );
     fireEvent.press(grabber);

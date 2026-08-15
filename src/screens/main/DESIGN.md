@@ -274,17 +274,17 @@ Landscape applies the same threshold to the blocked-route card: its full
 message remains the control's accessible name while the visible card contracts
 to the actionable label, leaving the inline transcript and status unobscured.
 
-The portrait transcript handle derives the latest assistant model and
-localized relative age in `mainScreenViewModel.ts`. The formatter feature-tests
-`Intl.RelativeTimeFormat` because some Hermes Release runtimes omit it; those
-runtimes receive a compact localized time or date from `Intl.DateTimeFormat`
-instead, with an ISO timestamp as the last non-throwing fallback. The portrait
-sheet replaces the generic elevated-card fill and dialog spacing with the
-transcript canvas: an 18-point outer gutter, a compact 6-point list inset, and
-the 44-point labelled grip as its only chrome. `TranscriptPreviewCard` owns only
-the scrolling script and message actions, so it cannot duplicate image, style,
-or sheet-dismiss controls. Landscape mounts that same headerless transcript
-content directly in the right pane.
+The portrait transcript handle renders the translated stable title
+`Transcript`; the message list still derives its accessible count, but model,
+age, and reply preview are deliberately absent. The portrait sheet replaces
+the generic elevated-card fill and dialog spacing with the transcript canvas:
+an 18-point outer gutter, a compact 6-point list inset, and a 64-point header
+containing the grip plus the same title. The whole header remains the labelled
+tap-and-drag close target. `TranscriptPreviewCard` owns only the scrolling
+script and message actions, so it cannot duplicate image, style, or
+sheet-dismiss controls. Landscape mounts that same headerless transcript
+content directly in the phone's right pane; a docked regular-iPad pane adds its
+own `Transcript` heading above the shared content.
 
 ## Evidence
 

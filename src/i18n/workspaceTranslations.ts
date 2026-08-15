@@ -16,6 +16,7 @@ const en = {
   transportForward: "Forward",
   transportResume: "Resume",
   workspaceHideTranscript: "Hide transcript",
+  workspaceTranscriptTitle: "Transcript",
   conversationDefaultsTitle: "Conversation defaults",
   conversationDefaultsDescription:
     "Used by new sessions and any session without its own overrides.",
@@ -48,6 +49,7 @@ export const workspaceTranslations = {
     transportForward: "تقدّم",
     transportResume: "استئناف",
     workspaceHideTranscript: "إخفاء النص",
+    workspaceTranscriptTitle: "النص",
     conversationDefaultsTitle: "الإعدادات الافتراضية للمحادثة",
     conversationDefaultsDescription:
       "تُستخدم للجلسات الجديدة وأي جلسة بلا إعدادات خاصة بها.",
@@ -73,6 +75,7 @@ export const workspaceTranslations = {
     transportForward: "Vpřed",
     transportResume: "Pokračovat",
     workspaceHideTranscript: "Skrýt přepis",
+    workspaceTranscriptTitle: "Přepis",
     conversationDefaultsTitle: "Výchozí nastavení konverzace",
     conversationDefaultsDescription:
       "Použije se pro nové relace a relace bez vlastních nastavení.",
@@ -98,6 +101,7 @@ export const workspaceTranslations = {
     transportForward: "Vor",
     transportResume: "Weiter",
     workspaceHideTranscript: "Transkript ausblenden",
+    workspaceTranscriptTitle: "Transkript",
     conversationDefaultsTitle: "Standardeinstellungen für Gespräche",
     conversationDefaultsDescription:
       "Werden für neue Sitzungen und Sitzungen ohne eigene Anpassungen verwendet.",
@@ -123,6 +127,7 @@ export const workspaceTranslations = {
     transportForward: "Adelante",
     transportResume: "Reanudar",
     workspaceHideTranscript: "Ocultar transcripción",
+    workspaceTranscriptTitle: "Transcripción",
     conversationDefaultsTitle: "Ajustes predeterminados de conversación",
     conversationDefaultsDescription:
       "Se usan en sesiones nuevas y en sesiones sin ajustes propios.",
@@ -148,6 +153,7 @@ export const workspaceTranslations = {
     transportForward: "Avancer",
     transportResume: "Continuer",
     workspaceHideTranscript: "Masquer la transcription",
+    workspaceTranscriptTitle: "Transcription",
     conversationDefaultsTitle: "Réglages de conversation par défaut",
     conversationDefaultsDescription:
       "Utilisés pour les nouvelles sessions et celles sans réglages spécifiques.",
@@ -173,6 +179,7 @@ export const workspaceTranslations = {
     transportForward: "आगे",
     transportResume: "जारी",
     workspaceHideTranscript: "प्रतिलेख छिपाएँ",
+    workspaceTranscriptTitle: "प्रतिलेख",
     conversationDefaultsTitle: "बातचीत की डिफ़ॉल्ट सेटिंग",
     conversationDefaultsDescription:
       "नए सत्रों और बिना अलग सेटिंग वाले सत्रों में इस्तेमाल होती हैं।",
@@ -198,6 +205,7 @@ export const workspaceTranslations = {
     transportForward: "Előre",
     transportResume: "Folytatás",
     workspaceHideTranscript: "Átirat elrejtése",
+    workspaceTranscriptTitle: "Átirat",
     conversationDefaultsTitle: "Alapértelmezett beszélgetési beállítások",
     conversationDefaultsDescription:
       "Új munkamenetekhez és saját beállítás nélküli munkamenetekhez használjuk.",
@@ -223,6 +231,7 @@ export const workspaceTranslations = {
     transportForward: "Avanti",
     transportResume: "Riprendi",
     workspaceHideTranscript: "Nascondi trascrizione",
+    workspaceTranscriptTitle: "Trascrizione",
     conversationDefaultsTitle: "Impostazioni predefinite della conversazione",
     conversationDefaultsDescription:
       "Usate per le nuove sessioni e per quelle senza personalizzazioni.",
@@ -248,6 +257,7 @@ export const workspaceTranslations = {
     transportForward: "進む",
     transportResume: "再開",
     workspaceHideTranscript: "トランスクリプトを隠す",
+    workspaceTranscriptTitle: "トランスクリプト",
     conversationDefaultsTitle: "会話のデフォルト設定",
     conversationDefaultsDescription:
       "新しいセッションと個別設定のないセッションで使用されます。",
@@ -273,6 +283,7 @@ export const workspaceTranslations = {
     transportForward: "Dalej",
     transportResume: "Wznów",
     workspaceHideTranscript: "Ukryj transkrypcję",
+    workspaceTranscriptTitle: "Transkrypcja",
     conversationDefaultsTitle: "Domyślne ustawienia rozmowy",
     conversationDefaultsDescription:
       "Używane w nowych sesjach i sesjach bez własnych ustawień.",
@@ -298,6 +309,7 @@ export const workspaceTranslations = {
     transportForward: "Avançar",
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
+    workspaceTranscriptTitle: "Transcrição",
     conversationDefaultsTitle: "Predefinições da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -323,6 +335,7 @@ export const workspaceTranslations = {
     transportForward: "Avançar",
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
+    workspaceTranscriptTitle: "Transcrição",
     conversationDefaultsTitle: "Configurações padrão da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -348,6 +361,7 @@ export const workspaceTranslations = {
     transportForward: "Вперёд",
     transportResume: "Продолжить",
     workspaceHideTranscript: "Скрыть расшифровку",
+    workspaceTranscriptTitle: "Стенограмма",
     conversationDefaultsTitle: "Настройки разговора по умолчанию",
     conversationDefaultsDescription:
       "Используются для новых сеансов и сеансов без собственных настроек.",
@@ -373,6 +387,7 @@ export const workspaceTranslations = {
     transportForward: "Framåt",
     transportResume: "Fortsätt",
     workspaceHideTranscript: "Dölj transkription",
+    workspaceTranscriptTitle: "Transkription",
     conversationDefaultsTitle: "Standardinställningar för samtal",
     conversationDefaultsDescription:
       "Används för nya sessioner och sessioner utan egna inställningar.",
@@ -398,6 +413,7 @@ export const workspaceTranslations = {
     transportForward: "İleri",
     transportResume: "Sürdür",
     workspaceHideTranscript: "Dökümü gizle",
+    workspaceTranscriptTitle: "Döküm",
     conversationDefaultsTitle: "Varsayılan konuşma ayarları",
     conversationDefaultsDescription:
       "Yeni oturumlarda ve kendi ayarları olmayan oturumlarda kullanılır.",
@@ -423,6 +439,7 @@ export const workspaceTranslations = {
     transportForward: "Вперед",
     transportResume: "Далі",
     workspaceHideTranscript: "Сховати розшифровку",
+    workspaceTranscriptTitle: "Стенограма",
     conversationDefaultsTitle: "Стандартні налаштування розмови",
     conversationDefaultsDescription:
       "Використовуються для нових сеансів і сеансів без власних налаштувань.",
@@ -448,6 +465,7 @@ export const workspaceTranslations = {
     transportForward: "آگے",
     transportResume: "جاری",
     workspaceHideTranscript: "نقل چھپائیں",
+    workspaceTranscriptTitle: "نقل",
     conversationDefaultsTitle: "گفتگو کی طے شدہ ترتیبات",
     conversationDefaultsDescription:
       "نئے سیشنز اور اپنی الگ ترتیبات کے بغیر سیشنز میں استعمال ہوتی ہیں۔",
@@ -473,6 +491,7 @@ export const workspaceTranslations = {
     transportForward: "前进",
     transportResume: "继续",
     workspaceHideTranscript: "隐藏文字记录",
+    workspaceTranscriptTitle: "文字记录",
     conversationDefaultsTitle: "对话默认设置",
     conversationDefaultsDescription: "用于新会话以及没有单独设置的会话。",
     useConversationDefaults: "使用对话默认设置",

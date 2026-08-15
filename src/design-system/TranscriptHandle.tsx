@@ -13,34 +13,26 @@ import { useTheme } from "../theme/ThemeContext";
 
 /**
  * The top edge of the transcript drawer, peeking above the bottom of the
- * workspace. It reads as the drawer it opens rather than as a button: a grip,
- * the last reply's provenance, and one line of the reply itself.
+ * workspace. It reads as the drawer it opens rather than as a button: a grip
+ * and the single word "Transcript". The route byline already carries the
+ * conversation and model context.
  *
  * Pin it flush to the bottom edge with no side padding, so it reads as a
  * drawer you can pull rather than a card floating above one. It rounds only
  * its top corners for the same reason.
  */
 export function TranscriptHandle({
-  messageCount = 0,
-  meta,
-  preview,
-  emptyLabel,
+  label,
   accessibilityLabel,
   onPress,
   style,
   testID,
 }: {
-  /** 0 shows the empty state and suppresses the preview. */
-  messageCount?: number;
-  /** Provenance of the last reply, e.g. "GPT-5 · 2 min ago". */
-  meta?: string;
-  /** One line of the last reply. Truncates; never wraps. */
-  preview?: string;
-  /** Shown centred when there are no messages. Translated by the caller. */
-  emptyLabel: string;
+  /** The translated visible label, normally "Transcript". */
+  label: string;
   /**
-   * Accessible name. Derive it from the same message count that decides the
-   * empty state, so the visible state and the announced state cannot drift.
+   * Accessible name. The caller includes the real message count even though
+   * the visible label deliberately remains stable.
    */
   accessibilityLabel: string;
   onPress: () => void;
@@ -48,7 +40,6 @@ export function TranscriptHandle({
   testID?: string;
 }) {
   const { colors } = useTheme();
-  const empty = !messageCount;
 
   return (
     <Pressable
@@ -65,31 +56,8 @@ export function TranscriptHandle({
       ]}
       testID={testID ?? "transcript-handle"}
     >
-      <View
-        style={[styles.grip, { backgroundColor: colors.borderStrong }]}
-      />
-      {empty ? (
-        <Text style={[styles.empty, { color: colors.textMuted }]}>
-          {emptyLabel}
-        </Text>
-      ) : (
-        <>
-          {meta ? (
-            <Text
-              numberOfLines={1}
-              style={[styles.meta, { color: colors.textMuted }]}
-            >
-              {meta}
-            </Text>
-          ) : null}
-          <Text
-            numberOfLines={1}
-            style={[styles.preview, { color: colors.textSecondary }]}
-          >
-            {preview}
-          </Text>
-        </>
-      )}
+      <View style={[styles.grip, { backgroundColor: colors.borderStrong }]} />
+      <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -111,23 +79,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     width: 38,
   },
-  empty: {
+  label: {
     fontFamily: fonts.mono,
     fontSize: 11,
     letterSpacing: 0.75,
     textAlign: "center",
     textTransform: "uppercase",
-  },
-  meta: {
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    letterSpacing: 0.6,
-    marginBottom: 3,
-    textTransform: "uppercase",
-  },
-  preview: {
-    fontFamily: fonts.body,
-    fontSize: 13,
-    lineHeight: 19,
   },
 });

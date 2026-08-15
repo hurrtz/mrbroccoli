@@ -123,11 +123,12 @@ receive already-derived state and callbacks.
   superseded capture or replay session cannot seal the active response's reel.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
-  assistive technology, the transcript handle names the latest model and age,
-  and Settings owns the route summary — a permanent row restating all of that
-  was chrome between the satellites and the transcript. Rejected alternative:
-  moving its info control onto the handle or the top bar, which would have kept
-  a surface whose content is available in two other places.
+  assistive technology, the route byline names the response route, the
+  transcript handle names only the surface it opens, and Settings owns the
+  route summary — a permanent row restating all of that was chrome between the
+  satellites and the transcript. Rejected alternative: moving its info control
+  onto the handle or the top bar, which would have kept a surface whose content
+  is available in two other places.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
   It reads as one continuous script with a fixed speaker margin, provider or
@@ -137,12 +138,14 @@ receive already-derived state and callbacks.
   metrics appear only on an open row, while compact metadata remains visible
   when usage details are enabled. Swiping a row exposes explicit removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
-  whose metadata names the latest model and localized age, with the same safe
-  timestamp fallback on runtimes without relative-time formatting. It opens
-  over the workspace as one continuous canvas with an 18-point horizontal
-  gutter. Its only chrome is the grip, which is also the labelled close action;
-  it has no repeated conversation title, image or conversation-setting
-  controls, or footer close action. Expanded turn metrics are the only raised
+  with a grip and the translated title `Transcript`; the visible handle never
+  varies with message count and does not repeat model, age, or reply content.
+  Its accessible name still states the real message count. It opens over the
+  workspace as one continuous canvas with an 18-point horizontal
+  gutter. Its only chrome is the grip plus the stable transcript title; the
+  whole header is the labelled close action. It has no repeated conversation
+  title, image or conversation-setting controls, or footer close action.
+  Expanded turn metrics are the only raised
   surface inside the script. In landscape it stays inline in the right pane.
   Actions inside the portrait sheet that open Speaking settings dismiss the
   transcript completely before presenting the sibling modal. The same

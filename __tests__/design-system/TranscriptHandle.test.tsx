@@ -13,7 +13,7 @@ function renderHandle(
     <ThemeProvider mode="light">
       <TranscriptHandle
         accessibilityLabel="Show transcript. No messages yet."
-        emptyLabel="No messages yet"
+        label="Transcript"
         onPress={jest.fn()}
         {...props}
       />
@@ -22,33 +22,15 @@ function renderHandle(
 }
 
 describe("TranscriptHandle", () => {
-  it("collapses to the empty state with no preview", () => {
-    const screen = renderHandle({
-      meta: "GPT-5 · 2 min ago",
-      preview: "should not appear",
-    });
+  it("shows only the stable transcript label", () => {
+    const screen = renderHandle();
 
-    expect(screen.getByText("No messages yet")).toBeTruthy();
-    expect(screen.queryByText("should not appear")).toBeNull();
-  });
-
-  it("shows the last reply's provenance and one line of it", () => {
-    const screen = renderHandle({
-      messageCount: 12,
-      meta: "GPT-5 · 2 min ago",
-      preview: "The tide turns at half past four.",
-      accessibilityLabel: "Show transcript. 12 messages",
-    });
-    const preview = screen.getByText("The tide turns at half past four.");
-
-    expect(screen.getByText("GPT-5 · 2 min ago")).toBeTruthy();
-    expect(preview.props.numberOfLines).toBe(1);
+    expect(screen.getByText("Transcript")).toBeTruthy();
+    expect(screen.queryByText("No messages yet")).toBeNull();
   });
 
   it("always states the real count in the accessible name", () => {
     const screen = renderHandle({
-      messageCount: 12,
-      preview: "The tide turns.",
       accessibilityLabel: "Show transcript. 12 messages",
     });
     const handle = screen.getByTestId("transcript-handle");

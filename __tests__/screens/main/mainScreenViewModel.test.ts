@@ -1,7 +1,4 @@
-import {
-  formatRelativeAge,
-  getMainScreenViewModel,
-} from "../../../src/screens/main/mainScreenViewModel";
+import { getMainScreenViewModel } from "../../../src/screens/main/mainScreenViewModel";
 import { Conversation, DEFAULT_SETTINGS, Settings } from "../../../src/types";
 
 function t(key: any, params?: Record<string, string | number | undefined>) {
@@ -75,7 +72,6 @@ describe("getMainScreenViewModel", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: conversation,
       isRecording: false,
-      language: "en",
       model: "gpt-5.4",
       pipelinePhase: "thinking-briefly",
       player: {
@@ -94,55 +90,12 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.isActive).toBe(true);
     expect(viewModel.messages).toHaveLength(2);
     expect(viewModel.lastAssistantReply).toBe("Stored reply");
-    expect(viewModel.transcriptHandleMeta).toContain("GPT-5.4 · ");
-  });
-
-  it("formats localized relative ages and ignores invalid timestamps", () => {
-    const now = Date.parse("2026-08-12T14:30:00.000Z");
-
-    expect(
-      formatRelativeAge("2026-08-12T14:28:00.000Z", "en", now),
-    ).toBe("2 min. ago");
-    expect(
-      formatRelativeAge("2026-08-12T14:28:00.000Z", "de", now),
-    ).toBe("vor 2 Min.");
-    expect(formatRelativeAge("not-a-date", "en", now)).toBeNull();
-  });
-
-  it("falls back to a localized timestamp when relative time is unavailable", () => {
-    const descriptor = Object.getOwnPropertyDescriptor(
-      Intl,
-      "RelativeTimeFormat",
-    );
-    const timestamp = "2026-08-12T14:28:00.000Z";
-    const now = Date.parse("2026-08-12T14:30:00.000Z");
-
-    Object.defineProperty(Intl, "RelativeTimeFormat", {
-      configurable: true,
-      value: undefined,
-    });
-
-    try {
-      expect(formatRelativeAge(timestamp, "en", now)).toBe(
-        new Intl.DateTimeFormat("en", {
-          hour: "numeric",
-          minute: "2-digit",
-        }).format(new Date(timestamp)),
-      );
-    } finally {
-      if (descriptor) {
-        Object.defineProperty(Intl, "RelativeTimeFormat", descriptor);
-      } else {
-        Reflect.deleteProperty(Intl, "RelativeTimeFormat");
-      }
-    }
   });
 
   it("shows synthesis rather than speaking while audio is only pending", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
       isRecording: false,
-      language: "en",
       model: "gpt-5.4",
       pipelinePhase: "speaking",
       player: {
@@ -165,7 +118,6 @@ describe("getMainScreenViewModel", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
       isRecording: false,
-      language: "en",
       model: "gpt-5.4",
       pipelinePhase: "speaking",
       player: {
@@ -187,7 +139,6 @@ describe("getMainScreenViewModel", () => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
       isRecording: false,
-      language: "en",
       model: "gpt-5.4",
       pipelinePhase: "thinking",
       player: {
@@ -208,5 +159,4 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.statusDisplay.statusTitle).toBe("listening");
     expect(viewModel.statusDisplay.statusDetail).toBe("listeningToYourVoice");
   });
-
 });

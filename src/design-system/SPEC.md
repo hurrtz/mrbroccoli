@@ -40,7 +40,9 @@ framework or hiding platform behavior behind excessive abstraction.
   forms that preserve their labelled 44-point control when the owning layout
   cannot safely render optional visible copy. The conversation summary's full
   visible row is its one press target; the trailing control glyph is
-  decorative rather than a smaller nested action.
+  decorative rather than a smaller nested action. `TranscriptHandle` shows a
+  grip plus the translated stable transcript label; conversation name, route,
+  age, and reply previews belong elsewhere in the workspace.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.

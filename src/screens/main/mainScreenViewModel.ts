@@ -1,10 +1,6 @@
-import {
-  getProviderModelName,
-  PROVIDER_LABELS,
-} from "../../constants/models";
+import { PROVIDER_LABELS } from "../../constants/models";
 import { PipelinePhase } from "../../hooks/useVoicePipeline";
 import {
-  AppLanguage,
   Conversation,
   Message,
   Provider,
@@ -26,7 +22,6 @@ interface AudioSignalState {
 interface GetMainScreenViewModelParams {
   activeConversation: Conversation | null;
   isRecording: boolean;
-  language: AppLanguage;
   model: string;
   pipelinePhase: PipelinePhase;
   player: AudioSignalState;
@@ -38,72 +33,9 @@ interface GetMainScreenViewModelParams {
   visualPhaseOverride?: VoiceVisualPhase | null;
 }
 
-export function formatRelativeAge(
-  timestamp: string | null | undefined,
-  language: AppLanguage,
-  nowMs = Date.now(),
-): string | null {
-  if (!timestamp) {
-    return null;
-  }
-
-  const timestampMs = Date.parse(timestamp);
-  if (!Number.isFinite(timestampMs)) {
-    return null;
-  }
-
-  const deltaSeconds = (timestampMs - nowMs) / 1_000;
-  const absoluteSeconds = Math.abs(deltaSeconds);
-  const [divisor, unit]: [number, Intl.RelativeTimeFormatUnit] =
-    absoluteSeconds < 60
-      ? [1, "second"]
-      : absoluteSeconds < 60 * 60
-        ? [60, "minute"]
-        : absoluteSeconds < 24 * 60 * 60
-          ? [60 * 60, "hour"]
-          : absoluteSeconds < 7 * 24 * 60 * 60
-            ? [24 * 60 * 60, "day"]
-            : absoluteSeconds < 35 * 24 * 60 * 60
-              ? [7 * 24 * 60 * 60, "week"]
-              : absoluteSeconds < 365 * 24 * 60 * 60
-                ? [30 * 24 * 60 * 60, "month"]
-                : [365 * 24 * 60 * 60, "year"];
-
-  if (typeof Intl.RelativeTimeFormat === "function") {
-    return new Intl.RelativeTimeFormat(language, {
-      numeric: "auto",
-      style: "short",
-    }).format(Math.round(deltaSeconds / divisor), unit);
-  }
-
-  const date = new Date(timestampMs);
-  const now = new Date(nowMs);
-  const isSameDay =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-  const isSameYear = date.getFullYear() === now.getFullYear();
-
-  try {
-    return new Intl.DateTimeFormat(
-      language,
-      isSameDay
-        ? { hour: "numeric", minute: "2-digit" }
-        : {
-            day: "numeric",
-            month: "short",
-            ...(isSameYear ? {} : { year: "numeric" as const }),
-          },
-    ).format(date);
-  } catch {
-    return date.toISOString().slice(0, 16).replace("T", " ");
-  }
-}
-
 export function getMainScreenViewModel({
   activeConversation,
   isRecording,
-  language,
   model,
   pipelinePhase,
   player,
@@ -162,23 +94,6 @@ export function getMainScreenViewModel({
         },
       ]
     : baseMessages;
-  const lastAssistantMessage = [...messages]
-    .reverse()
-    .find((message) => message.role === "assistant" && message.content.trim());
-  const lastAssistantAge = formatRelativeAge(
-    lastAssistantMessage?.timestamp,
-    language,
-  );
-  const lastAssistantModel =
-    lastAssistantMessage?.provider && lastAssistantMessage.model
-      ? getProviderModelName(
-          lastAssistantMessage.provider,
-          lastAssistantMessage.model,
-        )
-      : null;
-  const transcriptHandleMeta = [lastAssistantModel, lastAssistantAge]
-    .filter(Boolean)
-    .join(" · ");
   const statusDisplay = getStatusDisplayData({
     inputMode: settings.inputMode,
     messageCount: messages.length,
@@ -197,7 +112,6 @@ export function getMainScreenViewModel({
     lastAssistantReply,
     messages,
     statusDisplay,
-    transcriptHandleMeta: transcriptHandleMeta || null,
     usageDisplay: getConversationUsageDisplayData({
       conversation: activeConversation,
       showUsageStats: settings.showUsageStats,
