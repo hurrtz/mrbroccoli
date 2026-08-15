@@ -28,3 +28,18 @@ jest.mock("expo-linear-gradient", () => {
       React.createElement(View, props, children),
   };
 });
+
+jest.mock("expo-blur", () => {
+  const React = require("react");
+  const { View } = require("react-native");
+  return {
+    BlurTargetView: React.forwardRef(function MockBlurTargetView(
+      { children, ...props },
+      ref,
+    ) {
+      return React.createElement(View, { ...props, ref }, children);
+    }),
+    BlurView: ({ children, ...props }) =>
+      React.createElement(View, props, children),
+  };
+});

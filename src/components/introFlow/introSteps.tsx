@@ -1,7 +1,10 @@
 import React from "react";
+import { BlurTargetView, BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   AccessibilityInfo,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -32,6 +35,7 @@ import {
   translations,
 } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
+import { withAlpha } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
 import { IntroBody, IntroTitle } from "./IntroPrimitives";
@@ -151,6 +155,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
     React.useState<AppLanguage>(language);
   const [played, setPlayed] = React.useState(false);
   const [pickerOpen, setPickerOpen] = React.useState(false);
+  const blurTargetRef = React.useRef<View | null>(null);
   const { playing, toggle } = useIntroPlayback(getIntroClip(previewLanguage));
 
   const preview = translations[previewLanguage];
@@ -172,7 +177,8 @@ function WelcomeStep({ language, t }: IntroStepProps) {
           out of the accessibility tree; the crisp final exchange explains the
           play action and is announced. */}
       <View style={[styles.dialogueZone, { direction: previewDirection }]}>
-        <View
+        <BlurTargetView
+          ref={blurTargetRef}
           style={styles.dialogueConversation}
           testID="intro-dialogue-conversation"
         >
@@ -277,8 +283,31 @@ function WelcomeStep({ language, t }: IntroStepProps) {
               {preview.introDialoguePlayResponse}
             </Bubble>
           </View>
-        </View>
+        </BlurTargetView>
       </View>
+
+      <BlurView
+        blurMethod="dimezisBlurViewSdk31Plus"
+        blurReductionFactor={3}
+        blurTarget={blurTargetRef}
+        intensity={72}
+        pointerEvents="none"
+        style={styles.dialogueHeadlineEffect}
+        testID="intro-dialogue-headline-blur"
+        tint={theme.blurTint}
+      >
+        <LinearGradient
+          colors={[
+            withAlpha(theme.canvas, 0.78),
+            withAlpha(theme.canvas, 0.5),
+            withAlpha(theme.canvas, 0.12),
+            withAlpha(theme.canvas, 0),
+          ]}
+          locations={[0, 0.35, 0.72, 1]}
+          style={StyleSheet.absoluteFill}
+          testID="intro-dialogue-headline-fade"
+        />
+      </BlurView>
 
       <View style={styles.welcomeCentre}>
         <Pressable
@@ -645,7 +674,7 @@ function SetupStep({
   );
 
   return (
-    <View style={styles.stack} testID="intro-setup-step">
+    <View style={[styles.stack, styles.setupStack]} testID="intro-setup-step">
       <IntroTitle>{t("introSetupTitle")}</IntroTitle>
       <IntroBody>{t("introSetupBody")}</IntroBody>
       <View style={[styles.divider, { backgroundColor: theme.border }]} />
@@ -715,7 +744,12 @@ function SetupStep({
       </View>
 
       {manualOpen ? (
-        <View style={styles.manualStack} testID="intro-manual-catalogue">
+        <ScrollView
+          contentContainerStyle={styles.manualStack}
+          showsVerticalScrollIndicator={false}
+          style={styles.manualScroller}
+          testID="intro-manual-catalogue"
+        >
           <Text style={[styles.manualTitle, { color: theme.text }]}>
             {t("introManualTitle")}
           </Text>
@@ -813,7 +847,7 @@ function SetupStep({
               theme={theme}
             />
           </ManualGroup>
-        </View>
+        </ScrollView>
       ) : null}
     </View>
   );
@@ -990,13 +1024,13 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 5,
   },
-  // Earlier turns emerge from blur toward the crisp query. RN's filter blur
-  // renders where the platform supports it; the opacity ladder carries the
-  // same depth cue everywhere else.
+  // Earlier turns become more legible toward the crisp query. A native blur
+  // surface above this stack owns the actual cross-platform headline effect;
+  // per-view `filter: blur` is intentionally avoided because iOS leaves it
+  // sharp while Android applies it.
   dialogueFar: {
     gap: 8,
-    filter: [{ blur: 4 }],
-    opacity: 0.5,
+    opacity: 0.38,
   },
   dialogueConversation: {
     bottom: 0,
@@ -1006,18 +1040,15 @@ const styles = StyleSheet.create({
   },
   dialogueMid: {
     gap: 8,
-    filter: [{ blur: 2.4 }],
-    opacity: 0.65,
+    opacity: 0.56,
   },
   dialogueNear: {
     gap: 8,
-    filter: [{ blur: 1.1 }],
-    opacity: 0.85,
+    opacity: 0.72,
   },
   dialogueSoft: {
     gap: 8,
-    filter: [{ blur: 0.45 }],
-    opacity: 0.94,
+    opacity: 0.86,
   },
   dialogueFinal: {
     gap: 8,
@@ -1025,6 +1056,14 @@ const styles = StyleSheet.create({
   },
   dialogueHistory: {
     gap: 9,
+  },
+  dialogueHeadlineEffect: {
+    height: 196,
+    left: -22,
+    position: "absolute",
+    right: -22,
+    top: -54,
+    zIndex: 1,
   },
   dialogueZone: {
     flex: 1,
@@ -1163,7 +1202,11 @@ const styles = StyleSheet.create({
   },
   manualStack: {
     gap: 16,
+    paddingBottom: 8,
     paddingTop: 6,
+  },
+  manualScroller: {
+    flex: 1,
   },
   manualSwitchRow: {
     alignItems: "center",
@@ -1247,6 +1290,9 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
   },
+  setupStack: {
+    flex: 1,
+  },
   stack: {
     gap: 14,
   },
@@ -1326,7 +1372,7 @@ const styles = StyleSheet.create({
     paddingTop: 18,
   },
   welcomeTitle: {
-    zIndex: 1,
+    zIndex: 2,
   },
   voiceNote: {
     fontFamily: fonts.body,

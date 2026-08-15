@@ -303,7 +303,7 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("shows five complete exchanges while announcing only the crisp hand-off", () => {
+  it("uses a native headline blur over five fixed exchanges", () => {
     // Four faded exchanges are decoration: hidden from assistive tech and
     // stepped through the blur/opacity ladder. The final prompt and response
     // explain the play action and stay announced.
@@ -322,17 +322,31 @@ describe("IntroFlowScreen", () => {
     const soft = StyleSheet.flatten(
       getByTestId("intro-dialogue-soft", hidden).props.style,
     );
-    expect(far).toEqual(
-      expect.objectContaining({ filter: [{ blur: 4 }], opacity: 0.5 }),
+    expect(far).toEqual(expect.objectContaining({ opacity: 0.38 }));
+    expect(mid).toEqual(expect.objectContaining({ opacity: 0.56 }));
+    expect(near).toEqual(expect.objectContaining({ opacity: 0.72 }));
+    expect(soft).toEqual(expect.objectContaining({ opacity: 0.86 }));
+    expect(far.filter).toBeUndefined();
+
+    const headlineBlur = getByTestId("intro-dialogue-headline-blur");
+    expect(headlineBlur.props).toEqual(
+      expect.objectContaining({
+        blurMethod: "dimezisBlurViewSdk31Plus",
+        blurReductionFactor: 3,
+        intensity: 72,
+        pointerEvents: "none",
+      }),
     );
-    expect(mid).toEqual(
-      expect.objectContaining({ filter: [{ blur: 2.4 }], opacity: 0.65 }),
+    expect(StyleSheet.flatten(headlineBlur.props.style)).toEqual(
+      expect.objectContaining({
+        height: 196,
+        position: "absolute",
+        top: -54,
+        zIndex: 1,
+      }),
     );
-    expect(near).toEqual(
-      expect.objectContaining({ filter: [{ blur: 1.1 }], opacity: 0.85 }),
-    );
-    expect(soft).toEqual(
-      expect.objectContaining({ filter: [{ blur: 0.45 }], opacity: 0.94 }),
+    expect(getByTestId("intro-dialogue-headline-fade").props.locations).toEqual(
+      [0, 0.35, 0.72, 1],
     );
     expect(
       StyleSheet.flatten(
@@ -348,7 +362,7 @@ describe("IntroFlowScreen", () => {
     );
     expect(
       StyleSheet.flatten(getByTestId("intro-welcome-title").props.style),
-    ).toEqual(expect.objectContaining({ zIndex: 1 }));
+    ).toEqual(expect.objectContaining({ zIndex: 2 }));
 
     for (let exchange = 1; exchange <= 5; exchange += 1) {
       const promptTestId =
@@ -408,18 +422,17 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
     expect(screen.getByText("introNext")).toBeTruthy();
 
-    const physicalPages = screen
+    expect(screen.getByTestId("intro-page-try")).toBeTruthy();
+    expect(screen.getByTestId("intro-page-setup")).toBeTruthy();
+    expect(screen.getByTestId("intro-page-welcome")).toBeTruthy();
+    const scrollablePages = screen
       .UNSAFE_getAllByType(ScrollView)
       .map((page) => page.props.testID)
       .filter(
         (testID): testID is string =>
           typeof testID === "string" && testID.startsWith("intro-page-"),
       );
-    expect(physicalPages).toEqual([
-      "intro-page-try",
-      "intro-page-setup",
-      "intro-page-welcome",
-    ]);
+    expect(scrollablePages).toEqual([]);
     const pageWidth = StyleSheet.flatten(
       screen.getByTestId("intro-page-welcome").props.style,
     ).width;
@@ -844,10 +857,19 @@ describe("IntroFlowScreen", () => {
   });
 
   it("reveals the pipeline-ordered manual catalogue behind its switch", () => {
-    const { getByTestId } = renderScreen();
+    const { getByTestId, UNSAFE_getAllByType } = renderScreen();
 
     fireEvent.press(getByTestId("intro-manual-switch"));
-    expect(getByTestId("intro-manual-catalogue")).toBeTruthy();
+    const catalogue = getByTestId("intro-manual-catalogue");
+    expect(catalogue.props.showsVerticalScrollIndicator).toBe(false);
+    expect(StyleSheet.flatten(catalogue.props.style)).toEqual(
+      expect.objectContaining({ flex: 1 }),
+    );
+    expect(
+      UNSAFE_getAllByType(ScrollView)
+        .map((view) => view.props.testID)
+        .filter(Boolean),
+    ).toContain("intro-manual-catalogue");
     expect(getByTestId("intro-manual-stt")).toBeTruthy();
     expect(getByTestId("intro-manual-llm")).toBeTruthy();
     expect(getByTestId("intro-manual-provider")).toBeTruthy();

@@ -349,32 +349,33 @@ export function IntroFlowScreen({
                       : INTRO_STEPS.slice(0, maxReachableIndex + 1)
                     ).map((step) => {
                       const StepContent = INTRO_STEP_CONTENT[step];
+                      const content = (
+                        <StepContent
+                          autoSetup={autoSetup}
+                          language={language}
+                          modelStateReadsSuspended={modelStateReadsSuspended}
+                          onConnectProvider={onConnectProvider}
+                          onInstallLocal={onInstallLocal}
+                          onOpenStt={onOpenStt}
+                          onOpenTts={onOpenTts}
+                          t={t}
+                          testTurn={testTurn}
+                          thinkingReady={thinkingReady}
+                        />
+                      );
+
                       return (
-                        <ScrollView
-                          contentContainerStyle={[
-                            styles.page,
-                            step === "welcome" || step === "try"
-                              ? styles.pageFill
-                              : null,
-                          ]}
+                        <View
                           key={`${step}-${openNonce}`}
-                          showsVerticalScrollIndicator={false}
-                          style={{ direction, width: pagerViewportWidth }}
+                          style={[
+                            styles.page,
+                            styles.pageFill,
+                            { direction, width: pagerViewportWidth },
+                          ]}
                           testID={`intro-page-${step}`}
                         >
-                          <StepContent
-                            autoSetup={autoSetup}
-                            language={language}
-                            modelStateReadsSuspended={modelStateReadsSuspended}
-                            onConnectProvider={onConnectProvider}
-                            onInstallLocal={onInstallLocal}
-                            onOpenStt={onOpenStt}
-                            onOpenTts={onOpenTts}
-                            t={t}
-                            testTurn={testTurn}
-                            thinkingReady={thinkingReady}
-                          />
-                        </ScrollView>
+                          {content}
+                        </View>
                       );
                     })}
                   </ScrollView>

@@ -216,9 +216,12 @@ boundary.
   screen-reader focus, and dynamic announcements are rate-limited to meaningful
   state changes.
 - The three-step introduction uses one full-width 48-point bottom action on
-  every page. Its welcome preview is five prompt-and-response exchanges whose
-  final localized prompt matches the bundled spoken answer; earlier exchanges
-  fade behind the heading and the final response explains the play hand-off.
+  every page. Each page is a fixed, non-scrolling canvas; Setup confines any
+  overflow to its expandable manual catalogue. The welcome preview is five
+  prompt-and-response exchanges whose final localized prompt matches the
+  bundled spoken answer; earlier exchanges pass beneath a native blur and
+  canvas fade behind the heading, and the final response explains the play
+  hand-off.
 - **Decision:** iPad is an adaptive form factor of the same iOS product, not a
   separate app. Compact iPad windows reuse the phone interface exactly; regular
   windows expose persistent navigation and wider information layouts while
