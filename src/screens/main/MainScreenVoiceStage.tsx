@@ -18,7 +18,7 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
   disabled?: boolean;
-  /** Portrait controls centred with the orb/composer as one measured cluster. */
+  /** Controls centred with the orb/composer as one measured cluster. */
   footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
   initialTextInputFocused?: boolean;

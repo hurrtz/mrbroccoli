@@ -203,6 +203,30 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("portrait-stage-controls")).toBeTruthy();
   });
 
+  it("reserves a bounded orb slot above landscape controls", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          footer: <View testID="landscape-stage-controls" />,
+          layout: "landscape",
+          maxOrbSize: 150,
+        })}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("voice-text-input-viewport").props.style,
+      ),
+    ).toMatchObject({
+      flexBasis: 150,
+      flexGrow: 0,
+      flexShrink: 1,
+      maxHeight: 150,
+    });
+    expect(screen.getByTestId("landscape-stage-controls")).toBeTruthy();
+  });
+
   it("previews prompt images without owning the add control", () => {
     const onRemoveImage = jest.fn();
     const screen = renderStage(

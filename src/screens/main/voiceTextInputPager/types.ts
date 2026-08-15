@@ -20,7 +20,7 @@ export interface VoiceTextInputPagerProps {
   driveSilenceCountdownSeconds?: number | null;
   driveSessionCanRepeat?: boolean;
   driveVoiceActive?: boolean;
-  /** Portrait controls that stay attached to the measured orb/composer slot. */
+  /** Controls that stay attached to the measured orb/composer slot. */
   footer?: ReactNode;
   initialSurface?: InputSurface;
   initialTextInputFocused?: boolean;

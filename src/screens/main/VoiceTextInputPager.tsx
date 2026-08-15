@@ -128,7 +128,7 @@ export function VoiceTextInputPager({
         onLayout={handleViewportLayout}
         style={[
           styles.viewportFlexible,
-          footer && layout === "portrait"
+          footer
             ? [
                 styles.viewportWithFooter,
                 { flexBasis: maxOrbSize, maxHeight: maxOrbSize },
