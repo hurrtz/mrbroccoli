@@ -77,6 +77,8 @@ export interface VoiceOrbRingTiming {
   durationMs: number;
   /** Optional delay before the clock starts, used for the overtime tail. */
   delayMs?: number;
+  /** Defaults to a complete ring; speaking may target the current clip edge. */
+  target?: number;
 }
 
 function clamp01(value: number | undefined): number {
@@ -188,15 +190,16 @@ function useRingClock(
   const clock = useSharedValue(clamp01(value));
   const durationMs = timing?.durationMs;
   const delayMs = timing?.delayMs;
+  const target = clamp01(timing?.target ?? 1);
 
   React.useEffect(() => {
     cancelAnimation(clock);
     clock.value = clamp01(value);
-    if (durationMs === undefined || clock.value >= 1) {
+    if (durationMs === undefined || clock.value >= target) {
       return () => cancelAnimation(clock);
     }
 
-    const animation = withTiming(1, {
+    const animation = withTiming(target, {
       duration: Math.max(0, Math.round(durationMs)),
       easing: Easing.linear,
     });
@@ -204,7 +207,7 @@ function useRingClock(
       ? withDelay(Math.max(0, Math.round(delayMs)), animation)
       : animation;
     return () => cancelAnimation(clock);
-  }, [clock, delayMs, durationMs, value]);
+  }, [clock, delayMs, durationMs, target, value]);
 
   return clock;
 }

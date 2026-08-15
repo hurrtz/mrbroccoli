@@ -46,6 +46,7 @@ interface MainScreenVoiceStageProps {
   promptBlockedActionLabel?: string | null;
   promptBlockedMessage?: string | null;
   readingProgress?: number | null;
+  readingProgressTiming?: OrbTurnProgress["phaseProgressTiming"] | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   phaseTimingProgress?: VoiceTimingProgress | null;
@@ -86,6 +87,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
   readingProgress = null,
+  readingProgressTiming = null,
   recordingMaxMs,
   recordingStartedAtMs = null,
   phaseTimingProgress = null,
@@ -142,6 +144,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           promptBlockedActionLabel={promptBlockedActionLabel}
           promptBlockedMessage={promptBlockedMessage}
           readingProgress={readingProgress}
+          readingProgressTiming={readingProgressTiming}
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
           phaseTimingProgress={phaseTimingProgress}

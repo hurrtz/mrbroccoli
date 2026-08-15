@@ -1,13 +1,10 @@
 import { act, renderHook } from "@testing-library/react-native";
 
-import {
-  useNativeAudioQueueSubscription,
-} from "../../src/hooks/audioPlayer/useNativeAudioQueueSubscription";
+import { useNativeAudioQueueSubscription } from "../../src/hooks/audioPlayer/useNativeAudioQueueSubscription";
 import type { NativeAudioQueueEvent } from "../../src/services/nativeAudioQueue";
 
-let nativeAudioQueueListener:
-  | ((event: NativeAudioQueueEvent) => void)
-  | null = null;
+let nativeAudioQueueListener: ((event: NativeAudioQueueEvent) => void) | null =
+  null;
 
 jest.mock("../../src/services/nativeAudioQueue", () => ({
   subscribeToNativeAudioQueue: jest.fn((listener) => {
@@ -179,5 +176,34 @@ describe("useNativeAudioQueueSubscription", () => {
     expect(nativeAudioQueuePlayingRef.current).toBe(false);
     expect(finalizeDrainedState).toHaveBeenCalledTimes(1);
     expect(playNextNative).not.toHaveBeenCalled();
+  });
+
+  it("does not finalize the audio session when a seek stops the native queue", () => {
+    const finalizeDrainedState = jest.fn();
+
+    renderHook(() =>
+      useNativeAudioQueueSubscription({
+        usingNativeAudioQueue: true,
+        playNextNative: jest.fn(async () => undefined),
+        finalizeDrainedState,
+        updatePendingPlaybackState: jest.fn(),
+        setNativeAudioQueuePlaying: jest.fn(),
+        currentAudioRef: { current: null },
+        cancelledRef: { current: true },
+        playingRef: { current: false },
+        hasSeenAudioPlayingRef: { current: false },
+        nativeAudioQueueContextsRef: { current: new Map() },
+        nativeAudioQueuePendingCountRef: { current: 0 },
+        nativeAudioQueuePlayingRef: { current: false },
+        playbackPausedRef: { current: false },
+        nativeQueueRef: { current: [] },
+      }),
+    );
+
+    act(() => {
+      nativeAudioQueueListener?.({ type: "drained" });
+    });
+
+    expect(finalizeDrainedState).not.toHaveBeenCalled();
   });
 });

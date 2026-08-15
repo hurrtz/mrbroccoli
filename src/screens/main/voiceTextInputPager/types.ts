@@ -51,6 +51,8 @@ export interface VoiceTextInputPagerProps {
   promptBlockedMessage?: string | null;
   /** 0–1 of the reply already read; drives the speaking arc. */
   readingProgress?: number | null;
+  /** Smooth visual estimate to the measured boundary of the active clip. */
+  readingProgressTiming?: OrbTurnProgress["phaseProgressTiming"] | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   phaseTimingProgress?: VoiceTimingProgress | null;

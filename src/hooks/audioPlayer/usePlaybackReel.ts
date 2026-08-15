@@ -40,10 +40,14 @@ interface UsePlaybackReelParams {
   speakText: (text: string, options?: SpeakOptions) => void;
   /** Bumped by the player whenever a new response supersedes the last. */
   playbackGenerationRef: { current: number };
-  resetCancellation: () => void;
+  restartPlayback: () => Promise<void> | void;
   /** True while player teardown belongs to a paragraph seek, not a drain. */
   seekIntentRef: { current: boolean };
-  stopPlayback: () => Promise<void> | void;
+}
+
+export interface PlaybackReadingTiming {
+  durationMs: number;
+  target: number;
 }
 
 /**
@@ -68,9 +72,8 @@ export function usePlaybackReel({
   enqueueAudio,
   speakText,
   playbackGenerationRef,
-  resetCancellation,
+  restartPlayback,
   seekIntentRef,
-  stopPlayback,
 }: UsePlaybackReelParams) {
   const unitsRef = useRef<PlaybackUnit[]>([]);
   const generationRef = useRef(playbackGenerationRef.current);
@@ -79,6 +82,9 @@ export function usePlaybackReel({
   const floorRef = useRef(0);
   const sealedRef = useRef(false);
   const [readingProgress, setReadingProgress] = useState<number | null>(null);
+  const [readingProgressTiming, setReadingProgressTiming] =
+    useState<PlaybackReadingTiming | null>(null);
+  const [isSeeking, setSeeking] = useState(false);
   // State, not a ref read: Back and Forward have to come alive the moment the
   // reply holds a second paragraph, and nothing else is guaranteed to
   // re-render the workspace at that moment.
@@ -98,6 +104,7 @@ export function usePlaybackReel({
     const playing = playingIndexRef.current;
     if (playing < 0 || playing >= units.length) {
       setReadingProgress(null);
+      setReadingProgressTiming(null);
       return;
     }
 
@@ -111,6 +118,7 @@ export function usePlaybackReel({
     });
     if (total <= 0) {
       setReadingProgress(null);
+      setReadingProgressTiming(null);
       return;
     }
 
@@ -118,6 +126,16 @@ export function usePlaybackReel({
     const next = rewind ? measured : Math.max(measured, floorRef.current);
     floorRef.current = next;
     setReadingProgress(next);
+    const current = units[playing];
+    const target = Math.max(next, Math.min(1, (read + current.weight) / total));
+    const elapsedMs = Math.max(0, Date.now() - startedAtRef.current);
+    const estimatedDurationMs = Math.max(300, (current.weight / 14) * 1000);
+    const durationMs = Math.max(0, estimatedDurationMs - elapsedMs);
+    setReadingProgressTiming(
+      target > next && durationMs > 0
+        ? { durationMs: Math.round(durationMs), target }
+        : null,
+    );
   }, []);
 
   const syncGeneration = useCallback(() => {
@@ -134,6 +152,7 @@ export function usePlaybackReel({
       floorRef.current = 0;
       sealedRef.current = false;
       setReadingProgress(null);
+      setReadingProgressTiming(null);
       setParagraphCount(0);
     }
   }, [playbackGenerationRef, seekIntentRef]);
@@ -242,6 +261,7 @@ export function usePlaybackReel({
     }
     floorRef.current = 1;
     setReadingProgress(1);
+    setReadingProgressTiming(null);
   }, []);
 
   const seekParagraph = useCallback(
@@ -281,10 +301,10 @@ export function usePlaybackReel({
       }
 
       seekIntentRef.current = true;
+      setSeeking(true);
       try {
-        await stopPlayback();
-        resetCancellation();
-        // Both of those bump the player's generation. That marker means "a new
+        await restartPlayback();
+        // Restarting bumps the player's generation. That marker means "a new
         // answer supersedes this one", and a seek is the opposite — the same
         // answer, from further back — so the reel adopts the new number instead
         // of forgetting the reply it is still reading. Units streamed while
@@ -305,6 +325,7 @@ export function usePlaybackReel({
           .forEach((unit, offset) => play(unit, liveTarget + offset));
       } finally {
         seekIntentRef.current = false;
+        setSeeking(false);
       }
     },
     [
@@ -312,16 +333,17 @@ export function usePlaybackReel({
       play,
       playbackGenerationRef,
       publishProgress,
-      resetCancellation,
+      restartPlayback,
       seekIntentRef,
-      stopPlayback,
     ],
   );
 
   return {
     canSeekParagraph: paragraphCount > 1,
+    isSeeking,
     markDrained,
     readingProgress,
+    readingProgressTiming,
     recordAudio,
     recordSpeech,
     seal,

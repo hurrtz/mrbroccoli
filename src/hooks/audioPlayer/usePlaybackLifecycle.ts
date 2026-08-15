@@ -67,6 +67,7 @@ export function usePlaybackLifecycle(params: {
 
       if (
         !nativeSpeakingRef.current &&
+        !cancelledRef.current &&
         nativeAudioQueuePendingCountRef.current === 0 &&
         !nativeAudioQueuePlayingRef.current &&
         nativeQueueRef.current.length === 0
@@ -150,6 +151,7 @@ export function usePlaybackLifecycle(params: {
     }
 
     if (
+      !cancelledRef.current &&
       !playingRef.current &&
       !nativeSpeakingRef.current &&
       queueRef.current.length === 0 &&
@@ -185,9 +187,5 @@ export function usePlaybackLifecycle(params: {
       }
       resolveDrainWaiters();
     };
-  }, [
-    resolveDrainWaiters,
-    setNativeAudioQueuePlaying,
-    usingNativeAudioQueue,
-  ]);
+  }, [resolveDrainWaiters, setNativeAudioQueuePlaying, usingNativeAudioQueue]);
 }

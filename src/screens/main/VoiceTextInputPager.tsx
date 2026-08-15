@@ -38,6 +38,7 @@ export function VoiceTextInputPager({
   promptBlockedActionLabel = null,
   promptBlockedMessage = null,
   readingProgress = null,
+  readingProgressTiming = null,
   recordingMaxMs,
   recordingStartedAtMs,
   phaseTimingProgress,
@@ -75,6 +76,7 @@ export function VoiceTextInputPager({
   const derivedProgress = useOrbTurnProgress({
     phaseTimingProgress: phaseTimingProgress ?? null,
     readingProgress,
+    readingProgressTiming,
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
     speechStartProgress: speechStartProgress ?? null,

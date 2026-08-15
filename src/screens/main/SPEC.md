@@ -113,16 +113,24 @@ receive already-derived state and callbacks.
   expressible.
 - While he speaks, the orb's arc carries how much of the reply has been read,
   weighted by what each paragraph says, so a seek moves the ring by the
-  paragraph it skips rather than by an even step. The arc advances at clip
-  boundaries and only runs backwards when the listener sends it back: neither
-  speech route reports a clip's duration, and a streamed reply grows while it
-  is spoken, so a per-second fill would be invented and an unguarded remeasure
-  would drag the ring back through content already read. Streaming, wait-mode,
-  native, provider, and Restart playback all preserve the same paragraph
-  markers. Once the response is sealed, a natural queue drain completes the
-  arc; a temporary gap while more streamed clips can still arrive does not.
-  Native teardown for Stop or paragraph seek is not a natural drain, and a
-  superseded capture or replay session cannot seal the active response's reel.
+  paragraph it skips rather than by an even step. The measured position still
+  advances at real clip boundaries, while a UI-thread linear estimate moves
+  continuously from that position to the active clip's measured end. The
+  estimate uses spoken character weight only as presentation timing and is
+  corrected by every playback-start callback; it never controls or claims the
+  native clip duration. The arc only runs backwards when the listener sends it
+  back, and a streamed reply growing later must not drag it through content
+  already read. Streaming, wait-mode, native, provider, and Restart playback
+  all preserve the same paragraph markers. Once the response is sealed, a
+  natural queue drain completes the arc; a temporary gap while more streamed
+  clips can still arrive does not. Native teardown for Stop or paragraph seek
+  is not a natural drain, and a superseded capture or replay session cannot
+  seal the active response's reel.
+- Paragraph Back and Forward restart the same reply atomically. They keep the
+  rendered speaking phase and the already-primed audio session through native
+  clip teardown, so the workspace does not expose an idle frame and the next
+  paragraph does not begin through a fresh audio-session fade-in. Explicit Stop
+  and natural drain retain the full teardown behavior.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the route byline names the response route, the

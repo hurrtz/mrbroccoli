@@ -1,4 +1,9 @@
-import { type MutableRefObject, useCallback, type Dispatch, type SetStateAction } from "react";
+import {
+  type MutableRefObject,
+  useCallback,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import * as Speech from "expo-speech";
 import { stopNativeAudioQueue } from "../../services/nativeAudioQueue";
 import { recordSpeechDiagnostic } from "../../services/speech/diagnostics";
@@ -124,6 +129,56 @@ export function useStopPlaybackController(params: {
     usingNativeAudioQueue,
   ]);
 
+  /**
+   * Stops the current clip so the same reply can restart at another paragraph.
+   * Unlike a real stop, this keeps the playback session and rendered pending
+   * state alive: paragraph navigation is one continuous listening action, not
+   * an idle transition followed by a new reply.
+   */
+  const restartPlayback = useCallback(async () => {
+    const nativeStops: Promise<unknown>[] = [Speech.stop()];
+    if (usingNativeAudioQueue) {
+      nativeStops.push(stopNativeAudioQueue());
+    }
+    playbackGenerationRef.current += 1;
+    cancelledRef.current = true;
+    playbackPausedRef.current = false;
+    setPlaybackPaused(false);
+    queueRef.current = [];
+    nativeQueueRef.current = [];
+    currentAudioRef.current = null;
+    hasSeenAudioPlayingRef.current = false;
+    clearNativeAudioQueueState();
+    player.pause();
+    removeLoadedAudio();
+    nativeSpeakingRef.current = false;
+    setNativeSpeaking(false);
+    setNativeSpeechPlaying(false);
+    startingRef.current = false;
+    playingRef.current = false;
+
+    await Promise.allSettled(nativeStops);
+    cancelledRef.current = false;
+  }, [
+    cancelledRef,
+    clearNativeAudioQueueState,
+    currentAudioRef,
+    hasSeenAudioPlayingRef,
+    nativeQueueRef,
+    nativeSpeakingRef,
+    playbackGenerationRef,
+    playbackPausedRef,
+    player,
+    playingRef,
+    queueRef,
+    removeLoadedAudio,
+    setNativeSpeaking,
+    setNativeSpeechPlaying,
+    setPlaybackPaused,
+    startingRef,
+    usingNativeAudioQueue,
+  ]);
+
   const resetCancellation = useCallback(() => {
     const hadPlayback =
       hasPendingPlaybackNow() ||
@@ -179,6 +234,7 @@ export function useStopPlaybackController(params: {
   ]);
 
   return {
+    restartPlayback,
     resetCancellation,
     stopPlayback,
   };

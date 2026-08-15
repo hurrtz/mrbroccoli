@@ -221,6 +221,7 @@ jest.mock("../../src/hooks/useAudioPlayer", () => ({
     isPlaying: false,
     pausePlayback: jest.fn(async () => true),
     readingProgress: null,
+    readingProgressTiming: null,
     resumePlayback: jest.fn(async () => true),
     seekParagraph: jest.fn(async () => undefined),
     stopPlayback: jest.fn(async () => undefined),

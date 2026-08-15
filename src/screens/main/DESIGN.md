@@ -109,11 +109,16 @@ first run to Setup.
 `usePlaybackReel` records every audio or native-speech unit with its paragraph
 marker. Pipeline completion seals the reel, and only a later natural drain may
 publish a full reading arc. This separates final completion from a temporary
-stream gap. Seeking stops native playback, adopts the resulting generation
-marker, then re-reads the live unit list so a chunk that arrived during the
-asynchronous stop is retained. A shared seek-intent guard prevents that stop's
-empty-queue finalizer from masquerading as a natural drain, while capture and
-replay identity checks prevent stale sessions from sealing a newer reel.
+stream gap. Each playback-start callback publishes an authoritative weighted
+boundary plus an estimated duration to the active clip's next boundary; the
+Reanimated ring interpolates that estimate off the JS thread and the next real
+callback corrects it. Seeking uses a restart-specific native stop that retains
+audio-session ownership and speaking presentation, adopts the resulting
+generation marker, then re-reads the live unit list so a chunk that arrived
+during the asynchronous stop is retained. A shared seek-intent guard prevents
+that stop's empty-queue finalizer from masquerading as a natural drain, while
+capture and replay identity checks prevent stale sessions from sealing a newer
+reel.
 
 ## Drive Session State
 
@@ -220,11 +225,14 @@ drawer construction is the navigation boundary.
 `useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
 changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
 uses Reanimated UI-thread clocks for recording, whole-turn estimate, each
-processing phase, and late-tail progress, so both rings stay smooth while
-streamed text updates compete on the JS thread. Recording fills the inner ring
-against the capture cap, the learned route-specific speech-start estimate
-drives the outer ring, and each learned phase estimate drives the inner ring
-from transcription through synthesis. The estimated deadline swaps completed
+processing phase, speaking-clip interpolation, and late-tail progress, so both
+rings stay smooth while streamed text updates compete on the JS thread.
+Recording fills the inner ring against the capture cap, the learned
+route-specific speech-start estimate drives the outer ring, and each learned
+phase estimate drives the inner ring from transcription through synthesis.
+Speaking supplies a measured target short of one when only the current clip is
+known; clip starts and stream growth correct that target without making the
+animation a source of playback truth. The estimated deadline swaps completed
 ink for the approved track plus red tail without a JS timer.
 
 The isolated `.maestro` screenshot identity may replace the visual phase and

@@ -224,7 +224,7 @@ export function useAudioPlayer(
     usingNativeAudioQueue,
   });
 
-  const { stopPlayback, resetCancellation } = useStopPlaybackController({
+  const { restartPlayback, stopPlayback, resetCancellation } = useStopPlaybackController({
     cancelledRef,
     clearNativeAudioQueueState,
     currentAudioRef,
@@ -417,8 +417,10 @@ export function useAudioPlayer(
   // The reply's paragraphs, remembered so playback can move between them.
   const {
     canSeekParagraph,
+    isSeeking: isSeekingParagraph,
     markDrained: markPlaybackReelDrained,
     readingProgress,
+    readingProgressTiming,
     recordAudio,
     recordSpeech,
     seal: sealPlaybackReelState,
@@ -426,10 +428,9 @@ export function useAudioPlayer(
   } = usePlaybackReel({
       enqueueAudio,
       playbackGenerationRef,
-      resetCancellation,
+      restartPlayback,
       seekIntentRef: playbackReelSeekIntentRef,
       speakText,
-      stopPlayback,
     });
   playbackReelDrainedRef.current = markPlaybackReelDrained;
 
@@ -449,8 +450,9 @@ export function useAudioPlayer(
   ]);
 
   return {
-    isPlaying: hasPendingPlayback,
+    isPlaying: hasPendingPlayback || isSeekingParagraph,
     isActivelyPlaying:
+      isSeekingParagraph ||
       nativeSpeechPlaying ||
       nativeAudioQueuePlaying ||
       (!usingNativeAudioQueue && status.playing),
@@ -461,6 +463,7 @@ export function useAudioPlayer(
     speakText: recordSpeech,
     canSeekParagraph,
     readingProgress,
+    readingProgressTiming,
     sealPlaybackReel,
     seekParagraph,
     pausePlayback,

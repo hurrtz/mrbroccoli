@@ -5,6 +5,8 @@ export interface OrbRingTiming {
   durationMs: number;
   /** Optional delay before the clock begins, used for overtime. */
   delayMs?: number;
+  /** Defaults to 1; speaking advances only through the current clip. */
+  target?: number;
 }
 
 export interface OrbTurnProgress {
@@ -44,6 +46,7 @@ function clamp01(value: number) {
 export function useOrbTurnProgress({
   phaseTimingProgress,
   readingProgress,
+  readingProgressTiming,
   recordingMaxMs,
   recordingStartedAtMs,
   speechStartProgress,
@@ -53,6 +56,8 @@ export function useOrbTurnProgress({
   phaseTimingProgress: VoiceTimingProgress | null;
   /** 0–1 of the reply already read, weighted by what each paragraph says. */
   readingProgress?: number | null;
+  /** Estimated remaining time and measured boundary of the active clip. */
+  readingProgressTiming?: OrbRingTiming | null;
   recordingMaxMs: number;
   recordingStartedAtMs: number | null;
   speechStartProgress: VoiceTimingProgress | null;
@@ -85,6 +90,7 @@ export function useOrbTurnProgress({
       phaseProgress: clamp01(readingProgress ?? 0),
       turnProgress: 1,
       overtime: 0,
+      phaseProgressTiming: readingProgressTiming ?? undefined,
     };
   }
 

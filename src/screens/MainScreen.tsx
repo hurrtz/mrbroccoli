@@ -1507,6 +1507,7 @@ export function MainScreen() {
               : kokoroPromptBlockActionLabel,
           promptBlockedMessage,
           readingProgress: player.readingProgress,
+          readingProgressTiming: player.readingProgressTiming,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
           phaseTimingProgress:

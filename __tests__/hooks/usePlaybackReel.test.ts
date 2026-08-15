@@ -11,9 +11,11 @@ function createDeferredVoid() {
 }
 
 function setup() {
-  const enqueueAudio =
-    jest.fn<void, [string, unknown?, (() => void)?]>();
-  const speakText = jest.fn<void, [string, { onPlaybackStarted?: () => void }?]>();
+  const enqueueAudio = jest.fn<void, [string, unknown?, (() => void)?]>();
+  const speakText = jest.fn<
+    void,
+    [string, { onPlaybackStarted?: () => void }?]
+  >();
   const stopPlayback = jest.fn(async () => undefined);
   const resetCancellation = jest.fn();
   const playbackGenerationRef = { current: 1 };
@@ -23,10 +25,9 @@ function setup() {
     usePlaybackReel({
       enqueueAudio,
       playbackGenerationRef,
-      resetCancellation,
+      restartPlayback: stopPlayback,
       seekIntentRef,
       speakText,
-      stopPlayback,
     }),
   );
 
@@ -274,10 +275,15 @@ describe("playback reel", () => {
 
     playbackGenerationRef.current = 2;
     act(() => {
-      view.result.current.recordAudio("file://fresh.m4a", undefined, undefined, {
-        startsParagraph: true,
-        text: "fresh",
-      });
+      view.result.current.recordAudio(
+        "file://fresh.m4a",
+        undefined,
+        undefined,
+        {
+          startsParagraph: true,
+          text: "fresh",
+        },
+      );
     });
 
     expect(view.result.current.canSeekParagraph).toBe(false);
@@ -292,9 +298,17 @@ describe("playback reel", () => {
 
     startChunk(0);
     expect(view.result.current.readingProgress).toBe(0);
+    expect(view.result.current.readingProgressTiming?.target).toBeCloseTo(0.1);
+    expect(
+      view.result.current.readingProgressTiming?.durationMs,
+    ).toBeGreaterThan(650);
 
     startChunk(1);
     expect(view.result.current.readingProgress).toBeCloseTo(0.1);
+    expect(view.result.current.readingProgressTiming?.target).toBeCloseTo(0.4);
+    expect(
+      view.result.current.readingProgressTiming?.durationMs,
+    ).toBeGreaterThan(2_000);
 
     startChunk(2);
     expect(view.result.current.readingProgress).toBeCloseTo(0.4);
@@ -315,6 +329,7 @@ describe("playback reel", () => {
       view.result.current.markDrained();
     });
     expect(view.result.current.readingProgress).toBe(1);
+    expect(view.result.current.readingProgressTiming).toBeNull();
   });
 
   it("moves the arc back by what the skipped paragraph holds", async () => {

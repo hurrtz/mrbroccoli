@@ -127,27 +127,38 @@ describe("useOrbTurnProgress", () => {
 
   it("carries how much of the reply has been read while speaking", () => {
     const { rerender, result } = renderHook(
-      (readingProgress: number | null) =>
+      (props: {
+        readingProgress: number | null;
+        readingProgressTiming?: { durationMs: number; target: number };
+      }) =>
         useOrbTurnProgress({
           phaseTimingProgress: null,
-          readingProgress,
+          ...props,
           recordingMaxMs: 10_000,
           recordingStartedAtMs: null,
           speechStartProgress: null,
           visualPhase: "speaking",
         }),
-      { initialProps: 0.1 as number | null },
+      {
+        initialProps: {
+          readingProgress: 0.1,
+          readingProgressTiming: { durationMs: 1_500, target: 0.4 },
+        },
+      },
     );
 
     expect(result.current.phaseProgress).toBeCloseTo(0.1);
     // Paragraphs differ in length, so a seek moves the arc by the paragraph's
     // own share rather than by an even step.
-    rerender(0.4);
+    expect(result.current.phaseProgressTiming).toEqual({
+      durationMs: 1_500,
+      target: 0.4,
+    });
+    rerender({ readingProgress: 0.4 });
     expect(result.current.phaseProgress).toBeCloseTo(0.4);
-    // The ring is a position, not a clock: nothing animates it forward.
     expect(result.current.phaseProgressTiming).toBeUndefined();
 
-    rerender(null);
+    rerender({ readingProgress: null });
     expect(result.current.phaseProgress).toBe(0);
   });
 });

@@ -58,7 +58,9 @@ framework or hiding platform behavior behind excessive abstraction.
   counter-clockwise tail after the estimate. Interpolation belongs on the
   Reanimated UI thread so streamed-content renders cannot reduce ring frame
   rate; callers provide semantic values and remaining durations, never a JS
-  animation interval. Its approved anatomy is core disc,
+  animation interval. A timing may target a measured boundary short of one, so
+  speaking can interpolate within the current clip without claiming an
+  incomplete reply is finished. Its approved anatomy is core disc,
   screen-coloured gap, inner phase ring, then the outer whole-turn ring flush
   against it; no tinted halo may occupy the gap. When both bands carry the same
   state and progress, they render as one double-width stroke centred over that

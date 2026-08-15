@@ -35,9 +35,7 @@ export function useNativeAudioQueueSubscription(params: {
   nativeAudioQueuePendingCountRef: MutableRefObject<number>;
   nativeAudioQueuePlayingRef: MutableRefObject<boolean>;
   playbackPausedRef: MutableRefObject<boolean>;
-  nativeQueueRef: MutableRefObject<
-    NativeSpeechQueueItem[]
-  >;
+  nativeQueueRef: MutableRefObject<NativeSpeechQueueItem[]>;
 }) {
   const {
     usingNativeAudioQueue,
@@ -113,7 +111,9 @@ export function useNativeAudioQueueSubscription(params: {
               provider: context.diagnostics?.provider ?? null,
               providerModel: context.diagnostics?.providerModel ?? null,
               message:
-                event.type === "failed" ? event.message ?? undefined : undefined,
+                event.type === "failed"
+                  ? (event.message ?? undefined)
+                  : undefined,
             });
           }
 
@@ -161,7 +161,7 @@ export function useNativeAudioQueueSubscription(params: {
             nativeQueueRef.current.length > 0
           ) {
             void playNextNative();
-          } else if (!playbackPausedRef.current) {
+          } else if (!cancelledRef.current && !playbackPausedRef.current) {
             finalizeDrainedState();
           }
           break;

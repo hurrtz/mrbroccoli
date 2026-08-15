@@ -83,9 +83,7 @@ describe("useAudioPlayer", () => {
 
   it("releases ambient monitoring before activating playback", async () => {
     const beforePlayback = jest.fn(async () => undefined);
-    const { result } = renderHook(() =>
-      useAudioPlayer({ beforePlayback }),
-    );
+    const { result } = renderHook(() => useAudioPlayer({ beforePlayback }));
 
     await act(async () => {
       result.current.enqueueAudio("reply.mp3");
@@ -98,8 +96,9 @@ describe("useAudioPlayer", () => {
       Audio.setIsAudioActiveAsync as jest.Mock
     ).mock.calls.findIndex(([active]) => active === true);
     expect(beforePlayback.mock.invocationCallOrder[0]).toBeLessThan(
-      (Audio.setIsAudioActiveAsync as jest.Mock).mock
-        .invocationCallOrder[activateCallIndex],
+      (Audio.setIsAudioActiveAsync as jest.Mock).mock.invocationCallOrder[
+        activateCallIndex
+      ],
     );
   });
 
@@ -543,6 +542,9 @@ describe("useAudioPlayer", () => {
     });
     expect(result.current.readingProgress).toBe(0);
 
+    const deactivateCallsBeforeSeek = (
+      Audio.setIsAudioActiveAsync as jest.Mock
+    ).mock.calls.filter(([active]) => active === false).length;
     let seekPromise!: Promise<void>;
     act(() => {
       seekPromise = result.current.seekParagraph("forward");
@@ -561,12 +563,23 @@ describe("useAudioPlayer", () => {
     });
 
     expect(result.current.readingProgress).not.toBe(1);
+    expect(result.current.isPlaying).toBe(true);
+    expect(
+      (Audio.setIsAudioActiveAsync as jest.Mock).mock.calls.filter(
+        ([active]) => active === false,
+      ),
+    ).toHaveLength(deactivateCallsBeforeSeek);
 
     await act(async () => {
       finishNativeStop();
       await seekPromise;
     });
     expect(result.current.readingProgress).toBeCloseTo(0.1);
+    expect(
+      (Audio.setIsAudioActiveAsync as jest.Mock).mock.calls.filter(
+        ([active]) => active === false,
+      ),
+    ).toHaveLength(deactivateCallsBeforeSeek);
   });
 
   it("tracks pause and resume commands issued by lock-screen controls", async () => {

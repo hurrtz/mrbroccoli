@@ -84,7 +84,9 @@ the complete Play Store translations are kept in a dedicated file under
   holds, so skipping a long paragraph moves it further than skipping a short
   one. Paragraphs now stay seekable for normal wait-mode replies and restarted
   replies too, streamed chunks cannot disappear during a seek, and a naturally
-  completed reply fills the reading ring to its end.
+  completed reply fills the reading ring to its end. Seeking preserves the
+  speaking state and its active audio session, avoiding the idle-orb flash,
+  interrupted voice, and fresh-session fade-in between paragraphs.
 - The switch used across settings and the walkthrough is now one shared
   design-system control rather than a settings-owned one.
 - The orb's two rings now say one thing per phase: at rest both fade to the

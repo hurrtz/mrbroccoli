@@ -114,6 +114,7 @@ function createPlayerBase() {
     enqueueSpeechPause: jest.fn(),
     pausePlayback: jest.fn(async () => true),
     readingProgress: null,
+    readingProgressTiming: null,
     resumePlayback: jest.fn(async () => true),
     seekParagraph: jest.fn(async () => undefined),
     stopPlayback: jest.fn(async () => undefined),
