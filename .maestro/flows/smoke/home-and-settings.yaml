@@ -8,6 +8,7 @@ tags:
     clearKeychain: true
     permissions:
       all: allow
+- setOrientation: PORTRAIT
 - assertVisible:
     id: main-screen
 - assertVisible:
