@@ -226,10 +226,15 @@ boundary.
   every page. Welcome is a fixed, non-scrolling canvas; Setup and Try scroll
   within the pager while the action remains fixed. The welcome preview is five
   prompt-and-response exchanges whose final localized prompt matches the
-  bundled spoken answer; earlier exchanges pass beneath a stretchable,
-  canvas-tinted alpha fade behind the heading, and the final response explains
-  the play hand-off. The image treatment must behave identically without native
-  view dependencies on Android, iPhone, and iPad in both colour schemes.
+  bundled spoken answer; earlier exchanges recede beneath an eased
+  canvas-coloured veil sized as a share of the page, and the final response
+  explains the play hand-off. The veil must reach the canvas completely at the
+  heading, so the oldest exchange dissolves rather than lingering as a ghost,
+  and must behave identically without native view dependencies on Android,
+  iPhone, and iPad in both colour schemes. **Decision:** the veil is the only
+  mechanism that fades those exchanges. Blur is additive softness applied only
+  where the platform resolves it, so the effect degrades to the veil alone
+  rather than to a visibly different screen.
 - **Decision:** iPad is an adaptive form factor of the same iOS product, not a
   separate app. Compact iPad windows reuse the phone interface exactly; regular
   windows expose persistent navigation and wider information layouts while

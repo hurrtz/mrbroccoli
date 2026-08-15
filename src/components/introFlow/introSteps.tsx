@@ -1,13 +1,13 @@
 import React from "react";
 import {
   AccessibilityInfo,
-  Image,
   Platform,
   Pressable,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 import {
   LOCAL_MODEL_CATALOG,
@@ -81,11 +81,42 @@ export interface IntroStepProps {
   thinkingReady: boolean;
 }
 
-const dialogueHeadlineFade = require("../../../assets/intro/dialogue-headline-fade.png");
+/**
+ * The veil that carries the oldest exchanges up into the heading.
+ *
+ * The veil holds full canvas to 18% before it ramps at all. That plateau is
+ * the part that makes the effect read: the heading occupies the top of the
+ * band, so a ramp starting at 0 spends its strongest alpha on empty canvas and
+ * has already decayed to roughly half by the time it meets the oldest bubble,
+ * which then lingers as a legible grey box. Holding the plateau through the
+ * heading puts the dissolve where the bubbles actually are.
+ *
+ * Below the plateau alpha follows `(1 - u)^1.8` over the remaining span, which
+ * keeps the veil concentrated near the heading and leaves a tail shallow
+ * enough to have no visible edge. The last stop is a *transparent canvas*
+ * rather than `transparent`: the latter interpolates through black and hazes
+ * every midtone of the ramp.
+ */
+const DIALOGUE_VEIL_ALPHAS = [1, 1, 0.79, 0.56, 0.37, 0.23, 0.09, 0.02, 0];
+const DIALOGUE_VEIL_LOCATIONS = [
+  0, 0.18, 0.28, 0.4, 0.52, 0.64, 0.78, 0.9, 1,
+] as const;
+
+/**
+ * Softness for the veiled exchanges, farthest first.
+ *
+ * Android resolves `filter` through RenderEffect, so this is a real blur.
+ * React Native has no supported iOS equivalent -- `FilterType::Blur` reaches a
+ * SwiftUI wrapper only behind the default-off `enableSwiftUIBasedFilters`
+ * native flag -- so iOS carries the recession on the veil alone. Blurring the
+ * glyphs there through the text shadow renderer was worse than no blur: it
+ * left every bubble background and border perfectly crisp, which reads as
+ * broken text rather than as depth.
+ */
+const DIALOGUE_VEIL_BLURS = { far: 7, mid: 4.5, near: 2.5, soft: 1 } as const;
 
 /** A stored-dialogue bubble in the app's messenger anatomy. */
 function Bubble({
-  blurRadius,
   children,
   contentDirection = "auto",
   isRtl = false,
@@ -93,7 +124,6 @@ function Bubble({
   testID,
   theme,
 }: {
-  blurRadius?: number;
   children: React.ReactNode;
   contentDirection?: "auto" | "ltr" | "rtl";
   isRtl?: boolean;
@@ -126,10 +156,7 @@ function Bubble({
         style={[
           styles.bubbleText,
           {
-            color:
-              Platform.OS === "ios" && blurRadius
-                ? withAlpha(theme.text, 0.04)
-                : theme.text,
+            color: theme.text,
             textAlign:
               contentDirection === "rtl"
                 ? "right"
@@ -138,13 +165,6 @@ function Bubble({
                   : "auto",
             writingDirection: contentDirection,
           },
-          Platform.OS === "ios" && blurRadius
-            ? {
-                textShadowColor: theme.text,
-                textShadowOffset: { height: 0, width: 0 },
-                textShadowRadius: blurRadius,
-              }
-            : null,
         ]}
       >
         {children}
@@ -164,6 +184,15 @@ function Bubble({
  */
 function WelcomeStep({ language, t }: IntroStepProps) {
   const theme = useIntroTheme();
+  // Read per render rather than once per module: the platform is what decides
+  // whether the veiled exchanges also get real softness.
+  const softened = Platform.OS === "android";
+  const veilColors = React.useMemo<readonly [string, string, ...string[]]>(() => {
+    const [first, second, ...rest] = DIALOGUE_VEIL_ALPHAS.map((alpha) =>
+      withAlpha(theme.canvas, alpha),
+    );
+    return [first, second, ...rest];
+  }, [theme.canvas]);
   const [previewLanguage, setPreviewLanguage] =
     React.useState<AppLanguage>(language);
   const [played, setPlayed] = React.useState(false);
@@ -183,9 +212,11 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         importantForAccessibility="no-hide-descendants"
         style={styles.dialogueHistory}
       >
-        <View style={styles.dialogueFar} testID="intro-dialogue-far">
+        <View
+          style={[styles.dialogueGroup, softened ? styles.dialogueFarBlur : null]}
+          testID="intro-dialogue-far"
+        >
           <Bubble
-            blurRadius={30}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -195,7 +226,6 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueOpeningPrompt}
           </Bubble>
           <Bubble
-            blurRadius={30}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-1"
@@ -204,9 +234,11 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueFar}
           </Bubble>
         </View>
-        <View style={styles.dialogueMid} testID="intro-dialogue-mid">
+        <View
+          style={[styles.dialogueGroup, softened ? styles.dialogueMidBlur : null]}
+          testID="intro-dialogue-mid"
+        >
           <Bubble
-            blurRadius={26}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -216,7 +248,6 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueQuestion}
           </Bubble>
           <Bubble
-            blurRadius={26}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-2"
@@ -225,9 +256,14 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueNear}
           </Bubble>
         </View>
-        <View style={styles.dialogueNear} testID="intro-dialogue-near">
+        <View
+          style={[
+            styles.dialogueGroup,
+            softened ? styles.dialogueNearBlur : null,
+          ]}
+          testID="intro-dialogue-near"
+        >
           <Bubble
-            blurRadius={22}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -237,7 +273,6 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialoguePromptThree}
           </Bubble>
           <Bubble
-            blurRadius={22}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-3"
@@ -246,9 +281,14 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueResponseThree}
           </Bubble>
         </View>
-        <View style={styles.dialogueSoft} testID="intro-dialogue-soft">
+        <View
+          style={[
+            styles.dialogueGroup,
+            softened ? styles.dialogueSoftBlur : null,
+          ]}
+          testID="intro-dialogue-soft"
+        >
           <Bubble
-            blurRadius={18}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -258,7 +298,6 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialoguePromptFour}
           </Bubble>
           <Bubble
-            blurRadius={18}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-4"
@@ -310,21 +349,15 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         </View>
       </View>
 
-      <View
+      <LinearGradient
+        colors={veilColors}
+        end={{ x: 0, y: 1 }}
+        locations={DIALOGUE_VEIL_LOCATIONS}
         pointerEvents="none"
+        start={{ x: 0, y: 0 }}
         style={styles.dialogueHeadlineEffect}
         testID="intro-dialogue-headline-fade"
-      >
-        <Image
-          resizeMode="stretch"
-          source={dialogueHeadlineFade}
-          style={[
-            StyleSheet.absoluteFill,
-            { opacity: 0.42, tintColor: theme.canvas },
-          ]}
-          testID="intro-dialogue-headline-fade-image"
-        />
-      </View>
+      />
 
       <View style={styles.welcomeCentre}>
         <Pressable
@@ -1036,34 +1069,31 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 5,
   },
-  // Earlier turns become more legible toward the crisp query. Android's
-  // built-in View filter softens each whole exchange; iOS uses the Text
-  // shadow renderer to draw blurred glyphs instead of crisp foreground text.
-  // The stretchable alpha mask supplies the shared canvas-colour fade.
-  dialogueFar: {
-    filter: [{ blur: 8 }],
-    gap: 8,
-    opacity: 0.38,
-  },
+  // Earlier turns become more legible toward the crisp query, and the veil
+  // gradient is the only thing that fades them. Stacking a per-group opacity
+  // ladder underneath it is what produced the visible banding this replaced:
+  // four brightness steps read as four bands, where four blur steps do not.
+  // The blur styles therefore carry softness only.
   dialogueConversation: {
     bottom: 0,
     left: 0,
     position: "absolute",
     right: 0,
   },
-  dialogueMid: {
-    filter: [{ blur: 5 }],
-    gap: 8,
-    opacity: 0.56,
+  dialogueFarBlur: {
+    filter: [{ blur: DIALOGUE_VEIL_BLURS.far }],
   },
-  dialogueNear: {
-    filter: [{ blur: 2.5 }],
-    gap: 8,
-    opacity: 0.72,
+  dialogueMidBlur: {
+    filter: [{ blur: DIALOGUE_VEIL_BLURS.mid }],
   },
-  dialogueSoft: {
+  dialogueNearBlur: {
+    filter: [{ blur: DIALOGUE_VEIL_BLURS.near }],
+  },
+  dialogueSoftBlur: {
+    filter: [{ blur: DIALOGUE_VEIL_BLURS.soft }],
+  },
+  dialogueGroup: {
     gap: 8,
-    opacity: 0.86,
   },
   dialogueFinal: {
     gap: 8,
@@ -1072,8 +1102,12 @@ const styles = StyleSheet.create({
   dialogueHistory: {
     gap: 9,
   },
+  // Sized as a share of the page rather than a fixed band, so the veil covers
+  // the same proportion of a small phone, a tall phone, and an iPad. The bleed
+  // past both edges and above the heading covers the conversation's overflow,
+  // which is deliberately allowed to run up behind the title.
   dialogueHeadlineEffect: {
-    height: 132,
+    height: "40%",
     left: -22,
     position: "absolute",
     right: -22,

@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The introduction's opening conversation now recedes into the heading as one
+  smooth fade rather than a stepped band, so the oldest exchanges dissolve
+  completely and the chat reads as having been going on for a while. The fade
+  covers the same share of the page on every screen size, and on Android the
+  earlier exchanges are softened as well.
+
 ## 4.0.0 - 2026-08-15
 
 - Bottom sheets now place their backdrop immediately and animate only the

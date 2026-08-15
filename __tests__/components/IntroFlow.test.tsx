@@ -9,7 +9,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { translations } from "../../src/i18n/localeRegistry";
-import { darkColors, lightColors } from "../../src/theme/colors";
+import { darkColors, lightColors, withAlpha } from "../../src/theme/colors";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 const mockPlayer = { pause: jest.fn(), play: jest.fn(), seekTo: jest.fn() };
@@ -311,76 +311,55 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("uses native blur beneath one stretchable headline fade", () => {
-    // Four faded exchanges are decoration: hidden from assistive tech and
-    // stepped through the fade/opacity ladder. The final prompt and response
-    // explain the play action and stay announced.
+  it("veils the oldest exchanges under one eased canvas gradient", () => {
+    // The gradient owns the whole recession. Groups carry no opacity of their
+    // own, so nothing double-fades into a visible band, and iOS -- which has no
+    // supported view blur -- leans on the gradient alone. The final prompt and
+    // response explain the play action and stay announced.
     const screen = renderScreen();
     const { getByTestId } = screen;
     const hidden = { includeHiddenElements: true } as const;
 
-    const far = StyleSheet.flatten(
-      getByTestId("intro-dialogue-far", hidden).props.style,
-    );
-    const mid = StyleSheet.flatten(
-      getByTestId("intro-dialogue-mid", hidden).props.style,
-    );
-    const near = StyleSheet.flatten(
-      getByTestId("intro-dialogue-near", hidden).props.style,
-    );
-    const soft = StyleSheet.flatten(
-      getByTestId("intro-dialogue-soft", hidden).props.style,
-    );
-    expect(far).toEqual(expect.objectContaining({ opacity: 0.38 }));
-    expect(mid).toEqual(expect.objectContaining({ opacity: 0.56 }));
-    expect(near).toEqual(expect.objectContaining({ opacity: 0.72 }));
-    expect(soft).toEqual(expect.objectContaining({ opacity: 0.86 }));
-    expect(far).toEqual(
-      expect.objectContaining({ filter: [{ blur: 8 }], opacity: 0.38 }),
-    );
-    expect(mid).toEqual(
-      expect.objectContaining({ filter: [{ blur: 5 }], opacity: 0.56 }),
-    );
-    expect(near).toEqual(
-      expect.objectContaining({ filter: [{ blur: 2.5 }], opacity: 0.72 }),
-    );
-    expect(
-      StyleSheet.flatten(
-        getByTestId("intro-dialogue-prompt-1", hidden).findByType(Text).props
+    for (const group of ["far", "mid", "near", "soft"]) {
+      const style = StyleSheet.flatten(
+        getByTestId(`intro-dialogue-${group}`, hidden).props.style,
+      );
+      expect(style).not.toHaveProperty("opacity");
+      expect(style).not.toHaveProperty("filter");
+    }
+
+    // The blurred-glyph workaround is gone: veiled text keeps the real
+    // foreground colour and casts no shadow.
+    for (const bubble of ["prompt-1", "prompt-4"]) {
+      const style = StyleSheet.flatten(
+        getByTestId(`intro-dialogue-${bubble}`, hidden).findByType(Text).props
           .style,
-      ),
-    ).toEqual(
-      expect.objectContaining({
-        color: "rgba(237, 241, 245, 0.04)",
-        textShadowColor: darkColors.text,
-        textShadowRadius: 30,
-      }),
-    );
-    expect(
-      StyleSheet.flatten(
-        getByTestId("intro-dialogue-prompt-4", hidden).findByType(Text).props
-          .style,
-      ),
-    ).toEqual(expect.objectContaining({ textShadowRadius: 18 }));
+      );
+      expect(style).toEqual(expect.objectContaining({ color: darkColors.text }));
+      expect(style).not.toHaveProperty("textShadowRadius");
+    }
 
     const headlineFade = getByTestId("intro-dialogue-headline-fade");
     expect(headlineFade.props.pointerEvents).toBe("none");
     expect(StyleSheet.flatten(headlineFade.props.style)).toEqual(
       expect.objectContaining({
-        height: 132,
+        height: "40%",
         position: "absolute",
         top: -28,
         zIndex: 1,
       }),
     );
-    const headlineFadeImage = getByTestId("intro-dialogue-headline-fade-image");
-    expect(headlineFadeImage.props.resizeMode).toBe("stretch");
-    expect(headlineFadeImage.props.source).toBeTruthy();
-    expect(StyleSheet.flatten(headlineFadeImage.props.style)).toEqual(
-      expect.objectContaining({
-        opacity: 0.42,
-        tintColor: darkColors.background,
-      }),
+    // Full canvas is held to 18% so the dissolve lands on the oldest bubbles
+    // rather than on the empty canvas behind the heading; below that, alpha
+    // follows (1 - u)^1.8. The ramp ends on a transparent canvas rather than
+    // `transparent`, which would drag every midtone through black.
+    expect(headlineFade.props.locations).toEqual([
+      0, 0.18, 0.28, 0.4, 0.52, 0.64, 0.78, 0.9, 1,
+    ]);
+    expect(headlineFade.props.colors).toEqual(
+      [1, 1, 0.79, 0.56, 0.37, 0.23, 0.09, 0.02, 0].map((alpha) =>
+        withAlpha(darkColors.background, alpha),
+      ),
     );
     expect(
       StyleSheet.flatten(
@@ -403,11 +382,11 @@ describe("IntroFlowScreen", () => {
         <IntroFlowScreen {...screen.props} />
       </ThemeProvider>,
     );
-    expect(
-      StyleSheet.flatten(
-        light.getByTestId("intro-dialogue-headline-fade-image").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ tintColor: lightColors.background }));
+    const lightFade = light.getByTestId("intro-dialogue-headline-fade");
+    expect(lightFade.props.colors[0]).toBe(withAlpha(lightColors.background, 1));
+    expect(lightFade.props.colors.at(-1)).toBe(
+      withAlpha(lightColors.background, 0),
+    );
     light.unmount();
 
     for (let exchange = 1; exchange <= 5; exchange += 1) {
@@ -435,7 +414,7 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("uses React Native view blur and the safe fade fallback on Android", () => {
+  it("layers native view blur over the same gradient on Android", () => {
     Object.defineProperty(Platform, "OS", {
       configurable: true,
       value: "android",
@@ -445,25 +424,22 @@ describe("IntroFlowScreen", () => {
     const screen = renderScreen();
     const hidden = { includeHiddenElements: true } as const;
 
+    // Android resolves `filter` through RenderEffect, so the veiled exchanges
+    // gain real softness as well. The ramp decreases monotonically toward the
+    // crisp final exchange and still contributes no opacity of its own.
+    const ramp = { far: 7, mid: 4.5, near: 2.5, soft: 1 };
+    for (const [group, blur] of Object.entries(ramp)) {
+      const style = StyleSheet.flatten(
+        screen.getByTestId(`intro-dialogue-${group}`, hidden).props.style,
+      );
+      expect(style).toEqual(expect.objectContaining({ filter: [{ blur }] }));
+      expect(style).not.toHaveProperty("opacity");
+    }
+
+    // The gradient is the shared mechanism: identical on both platforms.
     expect(
-      StyleSheet.flatten(
-        screen.getByTestId("intro-dialogue-headline-fade-image").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ tintColor: darkColors.background }));
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("intro-dialogue-far", hidden).props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({ filter: [{ blur: 8 }], opacity: 0.38 }),
-    );
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("intro-dialogue-mid", hidden).props.style,
-      ),
-    ).toEqual(
-      expect.objectContaining({ filter: [{ blur: 5 }], opacity: 0.56 }),
-    );
+      screen.getByTestId("intro-dialogue-headline-fade").props.colors[0],
+    ).toBe(withAlpha(darkColors.background, 1));
   });
 
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
