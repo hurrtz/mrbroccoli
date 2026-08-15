@@ -1,16 +1,10 @@
 import React from "react";
-import {
-  AccessibilityInfo,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { AccessibilityInfo, StyleSheet, Text, View } from "react-native";
 
-import { getKokoroLanguage, getKokoroVoiceOptions } from "../../../constants/kokoro";
-import { APP_MODAL_ORIENTATIONS } from "../../../constants/layout";
+import {
+  getKokoroLanguage,
+  getKokoroVoiceOptions,
+} from "../../../constants/kokoro";
 import {
   PROVIDER_DEFAULT_TTS_MODELS,
   PROVIDER_DEFAULT_TTS_VOICES,
@@ -21,7 +15,6 @@ import {
   providerTtsModelSupportsInstructions,
   providerUsesTtsVoiceDirectory,
 } from "../../../constants/models";
-import { IconButton } from "../../../design-system/IconButton";
 import { Input } from "../../../design-system/NativeControls";
 import type { LocalModelDefinition } from "../../../constants/localModels";
 import { useLocalization } from "../../../i18n";
@@ -50,6 +43,7 @@ import { LocalModelRouteGroup } from "../settings-primitives/LocalModelRouteGrou
 import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsRow } from "../settings-primitives/SettingsRow";
+import { SettingsSheet } from "../settings-primitives/SettingsSheet";
 import {
   VoicePickerSheet,
   type VoicePickerOption,
@@ -119,72 +113,30 @@ function InstructionsSheet({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const insets = useSafeAreaInsets();
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
-      transparent
+    <SettingsSheet
+      contentStyle={pageStyles.instructionsContent}
+      keyboardAvoiding
+      onClose={onClose}
+      scrollable={false}
+      title={t("ttsInstructions")}
       visible={visible}
     >
-      <View accessibilityViewIsModal style={pageStyles.overlay}>
-        <Pressable
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no"
-          onPress={onClose}
-          style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
-        />
-        <View
-          style={[
-            pageStyles.instructionsSheet,
-            {
-              backgroundColor: colors.background,
-              borderColor: colors.border,
-              paddingBottom: Math.max(18, insets.bottom + 10),
-            },
-          ]}
-        >
-          <View
-            style={[
-              pageStyles.handle,
-              { backgroundColor: colors.borderStrong },
-            ]}
-          />
-          <View style={pageStyles.sheetHeader}>
-            <Text
-              accessibilityRole="header"
-              style={[pageStyles.sheetTitle, { color: colors.text }]}
-            >
-              {t("ttsInstructions")}
-            </Text>
-            <IconButton
-              icon="close"
-              accessibilityLabel={t("done")}
-              onPress={onClose}
-            />
-          </View>
-          <Text
-            style={[pageStyles.instructionsHint, { color: colors.textMuted }]}
-          >
-            {t("ttsInstructionsDescription")}
-          </Text>
-          <Input.TextArea
-            testID="speaking-instructions-input"
-            value={value}
-            placeholder={t("ttsInstructionsPlaceholder")}
-            placeholderTextColor={colors.textMuted}
-            onFocus={onTextInputFocus}
-            onChangeText={onChange}
-            rows={5}
-            styles={{ container: pageStyles.instructionsInput }}
-          />
-        </View>
-      </View>
-    </Modal>
+      <Text style={[pageStyles.instructionsHint, { color: colors.textMuted }]}>
+        {t("ttsInstructionsDescription")}
+      </Text>
+      <Input.TextArea
+        testID="speaking-instructions-input"
+        value={value}
+        placeholder={t("ttsInstructionsPlaceholder")}
+        placeholderTextColor={colors.textMuted}
+        onFocus={onTextInputFocus}
+        onChangeText={onChange}
+        rows={5}
+        styles={{ container: pageStyles.instructionsInput }}
+      />
+    </SettingsSheet>
   );
 }
 
@@ -253,10 +205,10 @@ export function SpeakingSettingsPage({
     : "";
   const instructionsSupported = Boolean(
     selectedProvider &&
-      providerTtsModelSupportsInstructions(
-        selectedProvider,
-        selectedProviderModel,
-      ),
+    providerTtsModelSupportsInstructions(
+      selectedProvider,
+      selectedProviderModel,
+    ),
   );
   const kokoroLanguage =
     settings.localLanguages.map(getKokoroLanguage).find(Boolean) ?? "en";
@@ -317,9 +269,9 @@ export function SpeakingSettingsPage({
                     })
                   : null,
                 provider === "elevenlabs" &&
-                directory.error?.message.toLocaleLowerCase().includes(
-                  "voices_read",
-                )
+                directory.error?.message
+                  .toLocaleLowerCase()
+                  .includes("voices_read")
                   ? t("elevenLabsVoicesReadPermissionHint")
                   : null,
               ]
@@ -329,8 +281,10 @@ export function SpeakingSettingsPage({
     }
   }
 
-  const selectedVoiceLabel = (options: readonly VoicePickerOption[], value: string) =>
-    options.find((option) => option.value === value)?.label || value;
+  const selectedVoiceLabel = (
+    options: readonly VoicePickerOption[],
+    value: string,
+  ) => options.find((option) => option.value === value)?.label || value;
   const providerVoiceRow = (provider: Provider) => {
     const model = providerModel(provider);
     const directory = providerVoiceDirectories[provider];
@@ -413,9 +367,7 @@ export function SpeakingSettingsPage({
     try {
       await clearProviderTtsAudioCache();
       setSpeechCacheOutcome("success");
-      AccessibilityInfo.announceForAccessibility(
-        t("speechReplayCacheCleared"),
-      );
+      AccessibilityInfo.announceForAccessibility(t("speechReplayCacheCleared"));
     } catch {
       setSpeechCacheOutcome("error");
       AccessibilityInfo.announceForAccessibility(
@@ -522,9 +474,7 @@ export function SpeakingSettingsPage({
                 ? t("speechReplayCacheClearFailed")
                 : undefined
           }
-          supportingTone={
-            speechCacheOutcome === "error" ? "danger" : "default"
-          }
+          supportingTone={speechCacheOutcome === "error" ? "danger" : "default"}
         />
       </SettingsGroup>
 
@@ -553,44 +503,13 @@ export function SpeakingSettingsPage({
 }
 
 const pageStyles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  instructionsSheet: {
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-  },
-  handle: {
-    width: 38,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  sheetHeader: {
-    minHeight: 58,
-    paddingLeft: 18,
-    paddingRight: 8,
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  sheetTitle: {
-    flex: 1,
-    fontFamily: fonts.display,
-    fontSize: 17,
-    lineHeight: 22,
+  instructionsContent: {
+    gap: 10,
   },
   instructionsHint: {
-    marginHorizontal: 18,
-    marginBottom: 10,
     fontFamily: fonts.body,
     fontSize: 12,
     lineHeight: 17,
   },
-  instructionsInput: {
-    marginHorizontal: 18,
-  },
+  instructionsInput: {},
 });

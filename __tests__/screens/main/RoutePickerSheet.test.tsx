@@ -78,6 +78,7 @@ describe("RoutePickerSheet", () => {
 
     expect(onSelect).toHaveBeenCalledWith("mode-2");
     expect(onClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Done")).toBeNull();
   });
 
   it("keeps unready routes visible but not selectable", () => {

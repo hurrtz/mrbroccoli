@@ -2,12 +2,10 @@ import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { getLocalModel } from "../../constants/localModels";
-import {
-  getProviderModelName,
-  PROVIDER_LABELS,
-} from "../../constants/models";
+import { getProviderModelName, PROVIDER_LABELS } from "../../constants/models";
 import { Modal } from "../../design-system/NativeControls";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import { SheetHeader } from "../../design-system/SheetHeader";
 import { ProviderIcon } from "../../components/ProviderIcon";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
@@ -120,10 +118,16 @@ export function RoutePickerSheet({
 }) {
   return (
     <Modal
-      footer={[{ text: t("done"), onPress: onClose }]}
       layout="sheet"
       onClose={onClose}
-      title={t("workspaceRoutePickerTitle")}
+      title={
+        <SheetHeader
+          closeAccessibilityLabel={t("dismiss")}
+          onClose={onClose}
+          testID="route-picker-header"
+          title={t("workspaceRoutePickerTitle")}
+        />
+      }
       visible={visible}
     >
       <View style={styles.list} testID="route-picker-list">

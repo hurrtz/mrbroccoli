@@ -1,21 +1,11 @@
 import React from "react";
-import {
-  Modal,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  useWindowDimensions,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ScrollView, View, useWindowDimensions } from "react-native";
 
-import { APP_MODAL_ORIENTATIONS } from "../../constants/layout";
-import { IconButton } from "../../design-system/IconButton";
 import {
   getResponseLengthOptions,
   getResponseToneOptions,
 } from "../../features/settings-core/helpers";
+import { SettingsSheet } from "../../features/settings/settings-primitives/SettingsSheet";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
 import { AssistantResponseLength, AssistantResponseTone } from "../../types";
@@ -83,190 +73,113 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
   const lengthOptions = React.useMemo(() => getResponseLengthOptions(t), [t]);
   const toneOptions = React.useMemo(() => getResponseToneOptions(t), [t]);
   return (
-    <Modal
+    <SettingsSheet
+      cardStyle={[
+        styles.styleSheetCard,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          shadowColor: colors.glow,
+        },
+      ]}
+      keyboardAvoiding
+      maxHeight={drawerMaxHeight}
+      onClose={onClose}
+      scrollable={false}
+      subtitle={t("styleSheetSubtitle")}
+      testID="conversation-settings-drawer"
+      title={t("styleSheetTitle")}
       visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
-      statusBarTranslucent
     >
-      <View
-        testID="styleSheetOverlay"
-        style={[styles.styleSheetOverlay, { backgroundColor: colors.overlay }]}
+      <ScrollView
+        style={styles.styleSheetScroll}
+        automaticallyAdjustKeyboardInsets
+        contentContainerStyle={[
+          styles.styleSheetScrollContent,
+          isLandscape ? styles.styleSheetScrollContentLandscape : null,
+        ]}
+        keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity
-          testID="styleSheetBackdrop"
-          style={StyleSheet.absoluteFill}
-          onPress={onClose}
-          activeOpacity={1}
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no"
-        />
-        <SafeAreaView
-          testID="conversation-settings-drawer"
-          edges={["bottom", "left", "right"]}
-          accessibilityViewIsModal
-          style={[
-            styles.styleSheetCard,
-            { maxHeight: drawerMaxHeight },
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-              shadowColor: colors.glow,
-            },
-          ]}
+        <View
+          style={
+            isLandscape
+              ? styles.styleSheetOptionsRowLandscape
+              : styles.styleSheetOptionsColumn
+          }
         >
-          <View
-            testID="conversation-settings-header"
-            style={[
-              styles.styleSheetHeader,
-              { borderBottomColor: colors.border },
-            ]}
-          >
-            <View style={styles.styleSheetHeaderCopy}>
-              <Text
-                style={[styles.styleSheetTitle, { color: colors.text }]}
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                {t("styleSheetTitle")}
-              </Text>
-              <Text
-                style={[
-                  styles.styleSheetSubtitle,
-                  { color: colors.textSecondary },
-                ]}
-              >
-                {t("styleSheetSubtitle")}
-              </Text>
-            </View>
-            <IconButton
-              testID="conversation-settings-close"
-              icon="close"
-              style={[
-                styles.styleSheetCloseButton,
-                { backgroundColor: colors.surfaceElevated },
-              ]}
-              onPress={onClose}
-              accessibilityLabel={t("dismiss")}
-            />
-          </View>
+          <StyleChoiceGroup
+            testID="conversation-settings-length"
+            label={t("adaptiveLength")}
+            landscape={isLandscape}
+            onChange={(value) => onChange({ responseLength: value })}
+            options={lengthOptions}
+            value={responseLength}
+          />
+          <StyleChoiceGroup
+            testID="conversation-settings-tone"
+            label={t("responseTone")}
+            landscape={isLandscape}
+            onChange={(value) => onChange({ responseTone: value })}
+            options={toneOptions}
+            value={responseTone}
+          />
+        </View>
 
-          <ScrollView
-            style={styles.styleSheetScroll}
-            automaticallyAdjustKeyboardInsets
-            contentContainerStyle={[
-              styles.styleSheetScrollContent,
-              isLandscape ? styles.styleSheetScrollContentLandscape : null,
-            ]}
-            keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
-            showsVerticalScrollIndicator={false}
-            keyboardShouldPersistTaps="handled"
-          >
-            <View
-              style={
-                isLandscape
-                  ? styles.styleSheetOptionsRowLandscape
-                  : styles.styleSheetOptionsColumn
-              }
-            >
-              <StyleChoiceGroup
-                testID="conversation-settings-length"
-                label={t("adaptiveLength")}
-                landscape={isLandscape}
-                onChange={(value) => onChange({ responseLength: value })}
-                options={lengthOptions}
-                value={responseLength}
-              />
-              <StyleChoiceGroup
-                testID="conversation-settings-tone"
-                label={t("responseTone")}
-                landscape={isLandscape}
-                onChange={(value) => onChange({ responseTone: value })}
-                options={toneOptions}
-                value={responseTone}
-              />
-            </View>
+        {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
+          <ConversationVoiceSection
+            onChange={onTtsVoiceChange}
+            routeLabel={ttsRouteLabel}
+            value={ttsVoice}
+            voiceOptions={ttsVoiceOptions}
+          />
+        ) : null}
 
-            {ttsRouteLabel && ttsVoiceOptions.length > 0 ? (
-              <ConversationVoiceSection
-                onChange={onTtsVoiceChange}
-                routeLabel={ttsRouteLabel}
-                value={ttsVoice}
-                voiceOptions={ttsVoiceOptions}
-              />
-            ) : null}
+        <View
+          style={
+            isLandscape
+              ? styles.styleSheetInstructionRowLandscape
+              : styles.styleSheetOptionsColumn
+          }
+        >
+          <InstructionSection
+            description={t(
+              ttsInstructionsSupported
+                ? "conversationTtsInstructionsDescription"
+                : "ttsInstructionsUnsupported",
+            )}
+            editable={ttsInstructionsSupported}
+            inputTestID="conversation-tts-instructions"
+            label={t("ttsInstructions")}
+            landscape={isLandscape}
+            onChange={onTtsInstructionsChange}
+            placeholder={t("ttsInstructionsPlaceholder")}
+            sectionTestID="conversation-settings-tts-instructions"
+            value={ttsInstructions}
+          />
+          <InstructionSection
+            description={t("conversationThinkingInstructionsDescription")}
+            inputTestID="conversation-llm-instructions"
+            label={t("conversationThinkingInstructions")}
+            landscape={isLandscape}
+            onChange={onLlmInstructionsChange}
+            placeholder={t("conversationThinkingInstructionsPlaceholder")}
+            sectionTestID="conversation-settings-thinking-instructions"
+            value={llmInstructions}
+          />
+        </View>
 
-            <View
-              style={
-                isLandscape
-                  ? styles.styleSheetInstructionRowLandscape
-                  : styles.styleSheetOptionsColumn
-              }
-            >
-              <InstructionSection
-                description={t(
-                  ttsInstructionsSupported
-                    ? "conversationTtsInstructionsDescription"
-                    : "ttsInstructionsUnsupported",
-                )}
-                editable={ttsInstructionsSupported}
-                inputTestID="conversation-tts-instructions"
-                label={t("ttsInstructions")}
-                landscape={isLandscape}
-                onChange={onTtsInstructionsChange}
-                placeholder={t("ttsInstructionsPlaceholder")}
-                sectionTestID="conversation-settings-tts-instructions"
-                value={ttsInstructions}
-              />
-              <InstructionSection
-                description={t("conversationThinkingInstructionsDescription")}
-                inputTestID="conversation-llm-instructions"
-                label={t("conversationThinkingInstructions")}
-                landscape={isLandscape}
-                onChange={onLlmInstructionsChange}
-                placeholder={t("conversationThinkingInstructionsPlaceholder")}
-                sectionTestID="conversation-settings-thinking-instructions"
-                value={llmInstructions}
-              />
-            </View>
+        {hasOverrides ? (
+          <UseConversationDefaultsButton onPress={onUseDefaults} />
+        ) : null}
 
-            {hasOverrides ? (
-              <UseConversationDefaultsButton onPress={onUseDefaults} />
-            ) : null}
-
-            <AutoRenameConversationButton
-              canRename={canAutoRenameConversation}
-              onPress={onAutoRenameConversation}
-              renaming={isAutoRenamingConversation}
-            />
-          </ScrollView>
-
-          <View
-            style={[styles.styleSheetFooter, { borderTopColor: colors.border }]}
-          >
-            <TouchableOpacity
-              style={[
-                styles.styleSheetDoneButton,
-                { backgroundColor: colors.bubbleUser },
-              ]}
-              onPress={onClose}
-              accessibilityRole="button"
-            >
-              <Text
-                style={[
-                  styles.styleSheetDoneButtonText,
-                  { color: colors.onPrimary },
-                ]}
-              >
-                {t("setupGuideFinish")}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      </View>
-    </Modal>
+        <AutoRenameConversationButton
+          canRename={canAutoRenameConversation}
+          onPress={onAutoRenameConversation}
+          renaming={isAutoRenamingConversation}
+        />
+      </ScrollView>
+    </SettingsSheet>
   );
 });

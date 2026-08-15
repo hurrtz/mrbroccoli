@@ -2,7 +2,6 @@ import React from "react";
 import {
   Keyboard,
   Linking,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -10,12 +9,10 @@ import {
   Text,
   View,
 } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { getAppProviderForCatalogProviderId } from "../../../catalog/appProviders";
 import type { CatalogProviderId } from "../../../catalog";
 import { ProviderIcon } from "../../../components/ProviderIcon";
-import { APP_MODAL_ORIENTATIONS } from "../../../constants/layout";
 import {
   PROVIDER_API_KEY_URLS,
   PROVIDER_LABELS,
@@ -44,6 +41,7 @@ import {
 import { PremiumBand } from "../settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
+import { SettingsSheet } from "../settings-primitives/SettingsSheet";
 import { styles } from "../styles";
 
 const IOS_KEYBOARD_DISMISS_FALLBACK_MS = 1_000;
@@ -190,15 +188,14 @@ function ProviderConnectionSheet({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const insets = useSafeAreaInsets();
   const [visibleApiKey, setVisibleApiKey] = React.useState(false);
   const closingRef = React.useRef(false);
   const keyboardHideSubscriptionRef = React.useRef<{
     remove: () => void;
   } | null>(null);
-  const closeFallbackRef = React.useRef<ReturnType<
-    typeof setTimeout
-  > | null>(null);
+  const closeFallbackRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   React.useEffect(() => {
     setVisibleApiKey(false);
@@ -262,126 +259,77 @@ function ProviderConnectionSheet({
   const capabilities = getProviderCapabilities(provider);
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={handleClose}
-      statusBarTranslucent
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
-      transparent
+    <SettingsSheet
+      contentStyle={localStyles.sheetBody}
+      keyboardAvoiding
+      maxHeight="88%"
+      onClose={handleClose}
+      scrollable={false}
+      subtitle={capabilities
+        .map((capability) => getCapabilityLabel(capability, t))
+        .join(" · ")}
+      testID={`provider-connection-sheet-${provider}`}
+      title={PROVIDER_LABELS[provider]}
       visible
     >
-      <View
-        testID={`provider-connection-sheet-${provider}`}
-        accessibilityViewIsModal
-        style={localStyles.overlay}
-      >
-        <Pressable
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no"
-          onPress={handleClose}
-          style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
+      <View style={localStyles.sheetActions}>
+        <ProviderIcon provider={provider} color={colors.text} size="control" />
+        <ProviderHealthPill
+          provider={provider}
+          state={actions.getProviderHealthState(provider)}
+          testID={`provider-sheet-health-${provider}`}
         />
-        <View
-          style={[
-            localStyles.sheet,
-            {
-              backgroundColor: colors.background,
-              borderColor: colors.border,
-              paddingBottom: Math.max(16, insets.bottom),
-            },
-          ]}
-        >
-          <View
-            style={[
-              localStyles.handle,
-              { backgroundColor: colors.borderStrong },
-            ]}
-          />
-          <View style={localStyles.sheetHeader}>
-            <ProviderIcon
-              provider={provider}
-              color={colors.text}
-              size="control"
-            />
-            <View style={localStyles.sheetTitleCopy}>
-              <Text
-                accessibilityRole="header"
-                style={[localStyles.sheetTitle, { color: colors.text }]}
-              >
-                {PROVIDER_LABELS[provider]}
-              </Text>
-              <Text
-                style={[localStyles.sheetMeta, { color: colors.textMuted }]}
-              >
-                {capabilities
-                  .map((capability) => getCapabilityLabel(capability, t))
-                  .join(" · ")}
-              </Text>
-            </View>
-            <ProviderHealthPill
-              provider={provider}
-              state={actions.getProviderHealthState(provider)}
-              testID={`provider-sheet-health-${provider}`}
-            />
-            <IconButton
-              icon="key"
-              accessibilityLabel={`${t(
-                provider === "openrouter" ? "openRouterKeys" : "createApiKey",
-              )}: ${PROVIDER_LABELS[provider]}`}
-              onPress={() => {
-                void Linking.openURL(PROVIDER_API_KEY_URLS[provider]);
-              }}
-            />
-            <IconButton
-              icon="info-circle"
-              accessibilityLabel={`${t("aboutThisProvider")}: ${
-                PROVIDER_LABELS[provider]
-              }`}
-              onPress={onOpenAbout}
-            />
-            <IconButton
-              icon="close"
-              testID={`provider-connection-close-${provider}`}
-              accessibilityLabel={t("dismiss")}
-              onPress={handleClose}
-            />
-          </View>
-          <ScrollView
-            keyboardShouldPersistTaps="handled"
-            contentContainerStyle={localStyles.sheetContent}
-          >
-            <ProviderConnectionPanel
-              provider={provider}
-              visibleApiKey={visibleApiKey}
-              capabilities={capabilities}
-              getCapabilityHealthState={(capability) =>
-                actions.getProviderCapabilityHealthState(provider, capability)
-              }
-              getCircuitState={(capability) =>
-                actions.getProviderCircuitState(provider, capability)
-              }
-              getValidationState={(capability) =>
-                actions.getProviderValidationState(provider, capability)
-              }
-              canValidateCapability={(capability) =>
-                actions.canValidateCapability(provider, capability)
-              }
-              apiKey={apiKey}
-              onToggleApiKeyVisibility={() =>
-                setVisibleApiKey((current) => !current)
-              }
-              onUpdateApiKey={actions.onUpdateApiKey}
-              onTextInputFocus={actions.onTextInputFocus}
-              onValidateCapability={(capability) =>
-                actions.onValidateCapability(provider, capability)
-              }
-              onValidateAll={() => actions.onValidateAll(provider)}
-            />
-          </ScrollView>
-        </View>
+        <View style={localStyles.sheetActionSpacer} />
+        <IconButton
+          icon="key"
+          accessibilityLabel={`${t(
+            provider === "openrouter" ? "openRouterKeys" : "createApiKey",
+          )}: ${PROVIDER_LABELS[provider]}`}
+          onPress={() => {
+            void Linking.openURL(PROVIDER_API_KEY_URLS[provider]);
+          }}
+        />
+        <IconButton
+          icon="info-circle"
+          accessibilityLabel={`${t("aboutThisProvider")}: ${
+            PROVIDER_LABELS[provider]
+          }`}
+          onPress={onOpenAbout}
+        />
       </View>
-    </Modal>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={localStyles.sheetContent}
+      >
+        <ProviderConnectionPanel
+          provider={provider}
+          visibleApiKey={visibleApiKey}
+          capabilities={capabilities}
+          getCapabilityHealthState={(capability) =>
+            actions.getProviderCapabilityHealthState(provider, capability)
+          }
+          getCircuitState={(capability) =>
+            actions.getProviderCircuitState(provider, capability)
+          }
+          getValidationState={(capability) =>
+            actions.getProviderValidationState(provider, capability)
+          }
+          canValidateCapability={(capability) =>
+            actions.canValidateCapability(provider, capability)
+          }
+          apiKey={apiKey}
+          onToggleApiKeyVisibility={() =>
+            setVisibleApiKey((current) => !current)
+          }
+          onUpdateApiKey={actions.onUpdateApiKey}
+          onTextInputFocus={actions.onTextInputFocus}
+          onValidateCapability={(capability) =>
+            actions.onValidateCapability(provider, capability)
+          }
+          onValidateAll={() => actions.onValidateAll(provider)}
+        />
+      </ScrollView>
+    </SettingsSheet>
   );
 }
 
@@ -544,48 +492,19 @@ const localStyles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 16,
   },
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end",
+  sheetBody: {
+    paddingBottom: 0,
+    paddingHorizontal: 0,
   },
-  sheet: {
-    maxHeight: "88%",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    overflow: "hidden",
-  },
-  handle: {
-    width: 38,
-    height: 4,
-    marginTop: 10,
-    borderRadius: 2,
-    alignSelf: "center",
-  },
-  sheetHeader: {
-    minHeight: 58,
-    paddingLeft: 18,
-    paddingRight: 6,
+  sheetActions: {
+    minHeight: 52,
+    paddingHorizontal: 18,
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
   },
-  sheetTitleCopy: {
+  sheetActionSpacer: {
     flex: 1,
-    minWidth: 0,
-  },
-  sheetTitle: {
-    fontFamily: fonts.display,
-    fontSize: 17,
-    lineHeight: 22,
-  },
-  sheetMeta: {
-    marginTop: 1,
-    fontFamily: fonts.mono,
-    fontSize: 10,
-    lineHeight: 14,
-    letterSpacing: 0.4,
   },
   sheetContent: {
     paddingHorizontal: 18,

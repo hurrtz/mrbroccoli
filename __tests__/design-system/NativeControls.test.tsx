@@ -45,6 +45,7 @@ import {
   shouldClaimSheetDrag,
   shouldDismissSheetDrag,
 } from "../../src/design-system/NativeControls";
+import { lightColors } from "../../src/theme/colors";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
@@ -341,11 +342,7 @@ describe("NativeControls", () => {
     expect(dialogCard.transform).toBeUndefined();
   });
 
-  it("binds the sheet overlay's opacity to the sheet-progress animation and leaves the dialog overlay untouched", () => {
-    // Same reasoning as the transform test: a fully-open mount settles
-    // sheetProgress at 1, so a correctly wired opacity binding reads 1
-    // (backdrop fully faded in). Deleting the opacity binding removes the
-    // `opacity` style key outright, which is what this test pins.
+  it("mounts the sheet backdrop fully formed while only the card animates", () => {
     setViewport(390, 844);
     const sheetScreen = renderControl(
       <Modal visible layout="sheet" title="Premium">
@@ -355,7 +352,8 @@ describe("NativeControls", () => {
     const sheetOverlay = StyleSheet.flatten(
       sheetScreen.getByTestId("native-dialog-overlay").props.style,
     );
-    expect(sheetOverlay.opacity).toBe(1);
+    expect(sheetOverlay.opacity).toBeUndefined();
+    expect(sheetOverlay.backgroundColor).toBe(lightColors.overlay);
 
     const dialogScreen = renderControl(
       <Modal visible title="Details">

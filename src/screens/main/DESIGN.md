@@ -279,7 +279,7 @@ The portrait transcript handle renders the translated stable title
 `Transcript`; the message list still derives its accessible count, but model,
 age, and reply preview are deliberately absent. The portrait sheet replaces
 the generic elevated-card fill and dialog spacing with the transcript canvas:
-an 18-point outer gutter, a compact 6-point list inset, and a 64-point header
+an 18-point outer gutter, a compact 6-point list inset, and a 78-point header
 containing the grip plus the same title. The whole header remains the labelled
 tap-and-drag close target. `TranscriptPreviewCard` owns only the scrolling
 script and message actions, so it cannot duplicate image, style, or

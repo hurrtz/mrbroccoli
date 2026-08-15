@@ -3,6 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { Modal } from "../../design-system/NativeControls";
+import { SheetHeader } from "../../design-system/SheetHeader";
 import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { TranslateFn } from "./shared";
@@ -70,11 +71,17 @@ export function ImageSourceSheet({
 
   return (
     <Modal
-      footer={[{ text: t("dismiss"), onPress: onClose }]}
       layout="sheet"
       onClose={onClose}
       onDismiss={drainPendingAction}
-      title={t("chooseImageSource")}
+      title={
+        <SheetHeader
+          closeAccessibilityLabel={t("dismiss")}
+          onClose={onClose}
+          testID="image-source-header"
+          title={t("chooseImageSource")}
+        />
+      }
       visible={visible}
     >
       <View

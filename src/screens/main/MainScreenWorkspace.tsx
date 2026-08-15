@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
 import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
@@ -14,6 +8,7 @@ import { IconButton } from "../../design-system/IconButton";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { Modal } from "../../design-system/NativeControls";
+import { SheetHeader } from "../../design-system/SheetHeader";
 import type { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 import type { VoiceVisualPhase } from "../../types";
@@ -434,28 +429,12 @@ export function MainScreenWorkspace({
               onClose={transcriptSheet.onClose}
               onDismiss={transcriptSheet.onDismiss}
               title={
-                <Pressable
-                  accessibilityLabel={transcriptSheet.hideLabel}
-                  accessibilityRole="button"
-                  onPress={transcriptSheet.onClose}
-                  style={workspaceStyles.transcriptSheetHeader}
-                  testID="transcript-sheet-close"
-                >
-                  <View
-                    style={[
-                      workspaceStyles.transcriptSheetGrip,
-                      { backgroundColor: colors.borderStrong },
-                    ]}
-                  />
-                  <Text
-                    style={[
-                      workspaceStyles.transcriptSheetTitle,
-                      { color: colors.text },
-                    ]}
-                  >
-                    {transcriptSheet.titleLabel}
-                  </Text>
-                </Pressable>
+                <SheetHeader
+                  closeAccessibilityLabel={transcriptSheet.hideLabel}
+                  onClose={transcriptSheet.onClose}
+                  testID="transcript-sheet-header"
+                  title={transcriptSheet.titleLabel}
+                />
               }
               visible={transcriptSheet.visible}
             >
@@ -646,30 +625,12 @@ export function MainScreenWorkspace({
         onClose={transcriptSheet.onClose}
         onDismiss={transcriptSheet.onDismiss}
         title={
-          /* The sheet repeats the handle's stable title, not conversation
-             metadata. The whole header remains the labelled close action. */
-          <Pressable
-            accessibilityLabel={transcriptSheet.hideLabel}
-            accessibilityRole="button"
-            onPress={transcriptSheet.onClose}
-            style={workspaceStyles.transcriptSheetHeader}
-            testID="transcript-sheet-close"
-          >
-            <View
-              style={[
-                workspaceStyles.transcriptSheetGrip,
-                { backgroundColor: colors.borderStrong },
-              ]}
-            />
-            <Text
-              style={[
-                workspaceStyles.transcriptSheetTitle,
-                { color: colors.text },
-              ]}
-            >
-              {transcriptSheet.titleLabel}
-            </Text>
-          </Pressable>
+          <SheetHeader
+            closeAccessibilityLabel={transcriptSheet.hideLabel}
+            onClose={transcriptSheet.onClose}
+            testID="transcript-sheet-header"
+            title={transcriptSheet.titleLabel}
+          />
         }
         visible={transcriptSheet.visible}
       >
@@ -787,27 +748,5 @@ const workspaceStyles = StyleSheet.create({
     gap: 0,
     paddingHorizontal: 18,
     paddingTop: 0,
-  },
-  transcriptSheetHeader: {
-    alignItems: "center",
-    gap: 8,
-    justifyContent: "center",
-    marginHorizontal: -18,
-    marginTop: 0,
-    minHeight: 64,
-    paddingBottom: 8,
-  },
-  transcriptSheetGrip: {
-    alignSelf: "center",
-    borderRadius: 2,
-    height: 4,
-    width: 38,
-  },
-  transcriptSheetTitle: {
-    fontFamily: fonts.headline,
-    fontSize: 17,
-    fontWeight: "400",
-    letterSpacing: -0.2,
-    lineHeight: 22,
   },
 });

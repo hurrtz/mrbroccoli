@@ -77,6 +77,10 @@ framework or hiding platform behavior behind excessive abstraction.
   content scrolls inside the card instead of pushing actions off-screen.
   Dialog content that can grow tall must itself shrink (for example a
   ScrollView with `flexShrink`) so scrolling covers the full content.
+- Dialogs with text-entry footers opt into `Modal.keyboardAvoiding`. On iOS the
+  complete card, including its footer, moves above the keyboard; moving only
+  the body would still leave the commit action unreachable. Other dialogs keep
+  their existing geometry.
 - `Modal` accepts `layout="sheet"` for surfaces that benefit from full width and
   from leaving the page behind them partly visible. The sheet pins to the
   bottom edge, spans the full width, and caps its height at
@@ -84,7 +88,9 @@ framework or hiding platform behavior behind excessive abstraction.
   only in portrait; in landscape the centred dialog renders instead, because a
   full-width sheet there is a wide, short strip whose top gap costs the height
   that keeps footer actions on-screen. The sheet rises and falls symmetrically
-  and skips both animations under reduce motion. The default layout is
+  and skips both animations under reduce motion. Its backdrop mounts fully
+  formed before the card rises and stays fixed while the card moves; the
+  backdrop is never translated or faded with the sheet. The default layout is
   `"dialog"`. Because the sheet's card sits flush against the physical bottom
   edge, its bottom padding adds the bottom safe-area inset on top of the
   dialog's flat `20`, so footer actions never land inside the home-indicator
@@ -100,6 +106,12 @@ framework or hiding platform behavior behind excessive abstraction.
   of a scrolling list from one on the chrome above it. A sheet therefore
   carries a title or grabber to be draggable at all; one without either keeps
   its backdrop and its own actions. Dialogs never drag.
+- `SheetHeader` is the shared drawer headline. It centres the headline type and
+  optional supporting copy with deliberate space around them. In portrait its
+  visible grabber sits inside a labelled 44-point tap target and the parent
+  sheet attaches pull-down dismissal to that header; there is no redundant
+  close icon. In landscape, where the sheet becomes a dialog and cannot drag,
+  the header substitutes a labelled close icon.
 - `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
   whose sheet deliberately does not use the generic elevated dialog surface or
   padding. The caller still owns safe-area clearance and must keep the default

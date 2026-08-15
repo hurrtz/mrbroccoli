@@ -1106,7 +1106,7 @@ describe("SettingsModal", () => {
         screen.getByTestId("provider-connection-sheet-openai"),
       ).toBeTruthy();
       expect(
-        screen.getByTestId("provider-connection-close-openai"),
+        screen.getByTestId("provider-connection-sheet-openai-header-handle"),
       ).toBeTruthy();
       expect(screen.getByText("Test all")).toBeTruthy();
       expect(screen.getByLabelText("Test LLM")).toBeTruthy();
@@ -1118,7 +1118,9 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("System Prompt")).toBeNull();
     });
 
-    fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
+    fireEvent.press(
+      screen.getByTestId("provider-connection-sheet-openai-header-handle"),
+    );
 
     await waitFor(() => {
       expect(dismissKeyboard).toHaveBeenCalledTimes(1);
@@ -1162,7 +1164,9 @@ describe("SettingsModal", () => {
       ).toBeTruthy();
     });
 
-    fireEvent.press(screen.getByTestId("provider-connection-close-openai"));
+    fireEvent.press(
+      screen.getByTestId("provider-connection-sheet-openai-header-handle"),
+    );
 
     expect(dismissKeyboard).toHaveBeenCalledTimes(1);
     expect(screen.getByTestId("provider-connection-sheet-openai")).toBeTruthy();
@@ -1244,11 +1248,11 @@ describe("SettingsModal", () => {
     );
     expect(StyleSheet.flatten(regionHint.props.style).fontSize).toBe(12);
 
-    const sheet = screen.getByTestId(`provider-connection-sheet-${provider}`);
+    const sheet = screen.getByTestId("native-dialog-card");
     const expectedActionLabels = [
+      "Dismiss",
       "Credentials: Alibaba / Qwen",
       "About this provider: Alibaba / Qwen",
-      "Dismiss",
     ];
     const actionLabels = [
       ...new Set(

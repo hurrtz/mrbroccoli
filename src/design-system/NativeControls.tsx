@@ -4,8 +4,10 @@ import {
   ActivityIndicator,
   Animated,
   Easing,
+  KeyboardAvoidingView,
   Modal as ReactNativeModal,
   PanResponder,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -314,6 +316,7 @@ interface DialogProps {
   cardStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   footer?: DialogAction[];
+  keyboardAvoiding?: boolean;
   layout?: "dialog" | "sheet";
   maskClosable?: boolean;
   modalType?: string;
@@ -332,6 +335,7 @@ export function Modal({
   cardStyle,
   children,
   footer = [],
+  keyboardAvoiding = false,
   layout = "dialog",
   maskClosable = true,
   onClose,
@@ -478,140 +482,150 @@ export function Modal({
       transparent
       visible={isSheet ? sheetRendered : visible}
     >
-      <Animated.View
-        testID="native-dialog-overlay"
-        accessibilityViewIsModal
-        style={[
-          controlStyles.dialogOverlay,
-          isSheet ? controlStyles.sheetOverlay : null,
-          { backgroundColor: colors.overlay },
-          isSheet ? { opacity: sheetProgress } : null,
-        ]}
+      <KeyboardAvoidingView
+        behavior={
+          keyboardAvoiding && Platform.OS === "ios" ? "padding" : undefined
+        }
+        enabled={keyboardAvoiding && Platform.OS === "ios"}
+        style={controlStyles.keyboardAvoiding}
+        testID={
+          keyboardAvoiding ? "native-dialog-keyboard-avoiding-view" : undefined
+        }
       >
-        {maskClosable ? (
-          // Backdrop-only dismiss layers stay out of the accessibility tree
-          // (design-system SPEC); screen-reader users dismiss through the
-          // dialog's labeled actions instead of an anonymous button.
-          <Pressable
-            testID="native-dialog-backdrop"
-            accessible={false}
-            importantForAccessibility="no"
-            onPress={onClose}
-            style={StyleSheet.absoluteFill}
-          />
-        ) : null}
         <Animated.View
-          testID="native-dialog-card"
+          testID="native-dialog-overlay"
+          accessibilityViewIsModal
           style={[
-            controlStyles.dialogCard,
-            isSheet ? controlStyles.sheetCard : null,
-            isSheet ? { maxHeight: sheetMaxHeight } : null,
-            // dialogCard's flat padding: 20 pins the footer flush to the
-            // window edge; on devices with a home-indicator gesture band
-            // (bottom safe-area inset) that leaves the footer actions
-            // partly inside it. Only the sheet touches the physical bottom
-            // edge, so only the sheet needs the extra clearance.
-            isSheet ? { paddingBottom: 20 + insets.bottom } : null,
-            isSheet
-              ? {
-                  transform: [
-                    {
-                      translateY: Animated.add(
-                        sheetProgress.interpolate({
-                          inputRange: [0, 1],
-                          outputRange: [sheetMaxHeight, 0],
-                        }),
-                        sheetDragY,
-                      ),
-                    },
-                  ],
-                }
-              : null,
-            {
-              backgroundColor: colors.surfaceElevated,
-              borderColor: colors.border,
-              shadowColor: colors.glow,
-            },
-            cardStyle,
+            controlStyles.dialogOverlay,
+            isSheet ? controlStyles.sheetOverlay : null,
+            { backgroundColor: colors.overlay },
           ]}
         >
-          {title ? (
-            <View
-              testID={isSheet ? "native-sheet-handle" : undefined}
-              {...(isSheet ? sheetPanResponder.panHandlers : null)}
-            >
-              {typeof title === "string" ? (
-                <Text
-                  accessibilityRole="header"
-                  style={[
-                    controlStyles.dialogTitle,
-                    { color: colors.text },
-                    styles?.header,
-                  ]}
-                >
-                  {title}
-                </Text>
-              ) : (
-                title
-              )}
-            </View>
+          {maskClosable ? (
+            // Backdrop-only dismiss layers stay out of the accessibility tree
+            // (design-system SPEC); screen-reader users dismiss through the
+            // dialog's labeled actions instead of an anonymous button.
+            <Pressable
+              testID="native-dialog-backdrop"
+              accessible={false}
+              importantForAccessibility="no"
+              onPress={onClose}
+              style={StyleSheet.absoluteFill}
+            />
           ) : null}
-          <View testID="native-dialog-body" style={controlStyles.dialogBody}>
-            {children}
-          </View>
-          {footer.length > 0 ? (
-            <View style={controlStyles.dialogFooter}>
-              {footer.map((action, index) => (
-                <Pressable
-                  key={`${action.text}:${index}`}
-                  accessibilityRole="button"
-                  accessibilityState={{
-                    busy: action.loading,
-                    disabled: action.disabled || action.loading,
-                  }}
-                  disabled={action.disabled || action.loading}
-                  onPress={action.onPress}
-                  style={({ pressed }) => [
-                    controlStyles.dialogAction,
-                    action.tone === "success"
-                      ? { backgroundColor: colors.success }
-                      : null,
-                    pressed && !action.disabled && !action.loading
-                      ? controlStyles.pressed
-                      : null,
-                    action.disabled || action.loading
-                      ? controlStyles.disabled
-                      : null,
-                  ]}
-                >
-                  {action.loading ? (
-                    <ActivityIndicator
-                      testID="native-dialog-action-loading"
-                      size="small"
-                      color={colors.accent}
-                    />
-                  ) : null}
-                  <Text
-                    style={[
-                      controlStyles.dialogActionText,
+          <Animated.View
+            testID="native-dialog-card"
+            style={[
+              controlStyles.dialogCard,
+              isSheet ? controlStyles.sheetCard : null,
+              isSheet ? { maxHeight: sheetMaxHeight } : null,
+              // dialogCard's flat padding: 20 pins the footer flush to the
+              // window edge; on devices with a home-indicator gesture band
+              // (bottom safe-area inset) that leaves the footer actions
+              // partly inside it. Only the sheet touches the physical bottom
+              // edge, so only the sheet needs the extra clearance.
+              isSheet ? { paddingBottom: 20 + insets.bottom } : null,
+              isSheet
+                ? {
+                    transform: [
                       {
-                        color:
-                          action.tone === "success"
-                            ? colors.onActiveControl
-                            : colors.accent,
+                        translateY: Animated.add(
+                          sheetProgress.interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [sheetMaxHeight, 0],
+                          }),
+                          sheetDragY,
+                        ),
                       },
-                      styles?.buttonText,
-                      action.style,
+                    ],
+                  }
+                : null,
+              {
+                backgroundColor: colors.surfaceElevated,
+                borderColor: colors.border,
+                shadowColor: colors.glow,
+              },
+              cardStyle,
+            ]}
+          >
+            {title ? (
+              <View
+                testID={isSheet ? "native-sheet-handle" : undefined}
+                {...(isSheet ? sheetPanResponder.panHandlers : null)}
+              >
+                {typeof title === "string" ? (
+                  <Text
+                    accessibilityRole="header"
+                    style={[
+                      controlStyles.dialogTitle,
+                      { color: colors.text },
+                      styles?.header,
                     ]}
                   >
-                    {action.text}
+                    {title}
                   </Text>
-                </Pressable>
-              ))}
+                ) : (
+                  title
+                )}
+              </View>
+            ) : null}
+            <View testID="native-dialog-body" style={controlStyles.dialogBody}>
+              {children}
             </View>
-          ) : null}
+            {footer.length > 0 ? (
+              <View style={controlStyles.dialogFooter}>
+                {footer.map((action, index) => (
+                  <Pressable
+                    key={`${action.text}:${index}`}
+                    accessibilityRole="button"
+                    accessibilityState={{
+                      busy: action.loading,
+                      disabled: action.disabled || action.loading,
+                    }}
+                    disabled={action.disabled || action.loading}
+                    onPress={action.onPress}
+                    style={({ pressed }) => [
+                      controlStyles.dialogAction,
+                      action.tone === "success"
+                        ? { backgroundColor: colors.success }
+                        : null,
+                      pressed && !action.disabled && !action.loading
+                        ? controlStyles.pressed
+                        : null,
+                      action.disabled || action.loading
+                        ? controlStyles.disabled
+                        : null,
+                    ]}
+                  >
+                    {action.loading ? (
+                      <ActivityIndicator
+                        testID="native-dialog-action-loading"
+                        size="small"
+                        color={colors.accent}
+                      />
+                    ) : null}
+                    <Text
+                      style={[
+                        controlStyles.dialogActionText,
+                        {
+                          color:
+                            action.tone === "success"
+                              ? colors.onActiveControl
+                              : colors.accent,
+                        },
+                        styles?.buttonText,
+                        action.style,
+                      ]}
+                    >
+                      {action.text}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+          </Animated.View>
         </Animated.View>
-      </Animated.View>
+      </KeyboardAvoidingView>
     </ReactNativeModal>
   );
 }
@@ -735,6 +749,9 @@ const controlStyles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     flexDirection: "row",
     minHeight: 46,
+  },
+  keyboardAvoiding: {
+    flex: 1,
   },
   listContent: {
     flex: 1,

@@ -1,22 +1,12 @@
 import React from "react";
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { APP_MODAL_ORIENTATIONS } from "../../../constants/layout";
-import { IconButton } from "../../../design-system/IconButton";
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
-import { useLocalization } from "../../../i18n";
 import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 
 import { SettingsRow } from "./SettingsRow";
+import { SettingsSheet } from "./SettingsSheet";
 
 export type SettingsChoiceOption<T extends string = string> = {
   value: T;
@@ -43,8 +33,6 @@ export function SettingsChoiceRow<T extends string>({
   value: T;
 }) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
-  const insets = useSafeAreaInsets();
   const [visible, setVisible] = React.useState(false);
   const selected = options.find((option) => option.value === value);
 
@@ -59,181 +47,101 @@ export function SettingsChoiceRow<T extends string>({
         value={selected?.label ?? value}
         onPress={() => setVisible(true)}
       />
-      <Modal
-        animationType="slide"
-        onRequestClose={() => setVisible(false)}
-        statusBarTranslucent
-        supportedOrientations={APP_MODAL_ORIENTATIONS}
-        transparent
+      <SettingsSheet
+        contentStyle={styles.sheetContent}
+        maxHeight="78%"
+        onClose={() => setVisible(false)}
+        scrollable={false}
+        testID={testID ? `${testID}-sheet` : undefined}
+        title={label}
         visible={visible}
       >
-        <View
-          testID={testID ? `${testID}-sheet` : undefined}
-          accessibilityViewIsModal
-          style={styles.overlay}
-        >
-          <Pressable
-            accessible={false}
-            accessibilityElementsHidden
-            importantForAccessibility="no"
-            onPress={() => setVisible(false)}
-            style={[
-              StyleSheet.absoluteFill,
-              { backgroundColor: colors.overlay },
-            ]}
-          />
-          <View
-            style={[
-              styles.sheet,
-              {
-                backgroundColor: colors.background,
-                borderColor: colors.border,
-                paddingBottom: Math.max(18, insets.bottom + 10),
-              },
-            ]}
-          >
-            <View
-              style={[styles.handle, { backgroundColor: colors.borderStrong }]}
-            />
-            <View style={styles.header}>
-              <Text
-                accessibilityRole="header"
-                style={[styles.title, { color: colors.text }]}
+        <FlatList
+          data={[...options]}
+          keyExtractor={(option) => option.value}
+          contentContainerStyle={styles.list}
+          renderItem={({ item: option, index }) => {
+            const checked = option.value === value;
+            return (
+              <Pressable
+                testID={
+                  testID
+                    ? `${testID}-option-${option.value.replace(
+                        /[^a-zA-Z0-9_-]+/g,
+                        "-",
+                      )}`
+                    : undefined
+                }
+                accessibilityLabel={option.label}
+                accessibilityRole="radio"
+                accessibilityState={{ checked, disabled: option.disabled }}
+                disabled={option.disabled}
+                onPress={() => {
+                  onChange(option.value);
+                  setVisible(false);
+                }}
+                style={({ pressed }) => [
+                  styles.option,
+                  {
+                    borderBottomColor: colors.border,
+                    opacity: option.disabled ? 0.45 : 1,
+                  },
+                  index === options.length - 1 ? styles.last : null,
+                  pressed ? { backgroundColor: colors.surfaceAlt } : null,
+                ]}
               >
-                {label}
-              </Text>
-              <IconButton
-                icon="close"
-                testID={testID ? `${testID}-close` : undefined}
-                accessibilityLabel={t("dismiss")}
-                onPress={() => setVisible(false)}
-              />
-            </View>
-            <FlatList
-              data={[...options]}
-              keyExtractor={(option) => option.value}
-              contentContainerStyle={styles.list}
-              renderItem={({ item: option, index }) => {
-                const checked = option.value === value;
-                return (
-                  <Pressable
-                    testID={
-                      testID
-                        ? `${testID}-option-${option.value.replace(
-                            /[^a-zA-Z0-9_-]+/g,
-                            "-",
-                          )}`
-                        : undefined
-                    }
-                    accessibilityLabel={option.label}
-                    accessibilityRole="radio"
-                    accessibilityState={{
-                      checked,
-                      disabled: option.disabled,
-                    }}
-                    disabled={option.disabled}
-                    onPress={() => {
-                      onChange(option.value);
-                      setVisible(false);
-                    }}
-                    style={({ pressed }) => [
-                      styles.option,
-                      {
-                        borderBottomColor: colors.border,
-                        opacity: option.disabled ? 0.45 : 1,
-                      },
-                      index === options.length - 1 ? styles.last : null,
-                      pressed ? { backgroundColor: colors.surfaceAlt } : null,
-                    ]}
-                  >
+                <View
+                  style={[
+                    styles.radio,
+                    {
+                      borderColor: checked
+                        ? colors.accent
+                        : colors.borderStrong,
+                    },
+                  ]}
+                >
+                  {checked ? (
                     <View
                       style={[
-                        styles.radio,
-                        {
-                          borderColor: checked
-                            ? colors.accent
-                            : colors.borderStrong,
-                        },
+                        styles.radioDot,
+                        { backgroundColor: colors.accent },
+                      ]}
+                    />
+                  ) : null}
+                </View>
+                <View style={styles.optionCopy}>
+                  <Text style={[styles.optionLabel, { color: colors.text }]}>
+                    {option.label}
+                  </Text>
+                  {option.supporting ? (
+                    <Text
+                      style={[
+                        styles.optionSupporting,
+                        { color: colors.textSecondary },
                       ]}
                     >
-                      {checked ? (
-                        <View
-                          style={[
-                            styles.radioDot,
-                            { backgroundColor: colors.accent },
-                          ]}
-                        />
-                      ) : null}
-                    </View>
-                    <View style={styles.optionCopy}>
-                      <Text
-                        style={[styles.optionLabel, { color: colors.text }]}
-                      >
-                        {option.label}
-                      </Text>
-                      {option.supporting ? (
-                        <Text
-                          style={[
-                            styles.optionSupporting,
-                            { color: colors.textSecondary },
-                          ]}
-                        >
-                          {option.supporting}
-                        </Text>
-                      ) : null}
-                    </View>
-                    {checked ? (
-                      <PhosphorIcon
-                        name="check"
-                        size="compact"
-                        color={colors.accent}
-                      />
-                    ) : null}
-                  </Pressable>
-                );
-              }}
-            />
-          </View>
-        </View>
-      </Modal>
+                      {option.supporting}
+                    </Text>
+                  ) : null}
+                </View>
+                {checked ? (
+                  <PhosphorIcon
+                    name="check"
+                    size="compact"
+                    color={colors.accent}
+                  />
+                ) : null}
+              </Pressable>
+            );
+          }}
+        />
+      </SettingsSheet>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    maxHeight: "78%",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    overflow: "hidden",
-  },
-  handle: {
-    width: 38,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  header: {
-    minHeight: 54,
-    paddingLeft: 18,
-    paddingRight: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  title: {
-    flex: 1,
-    fontFamily: fonts.display,
-    fontSize: 17,
-    lineHeight: 22,
-  },
+  sheetContent: { paddingBottom: 0, paddingHorizontal: 0 },
   list: {
     paddingHorizontal: 18,
   },

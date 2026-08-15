@@ -71,7 +71,9 @@ receive already-derived state and callbacks.
   the introduction.
 - The route byline above the stage states who answers the next turn and at
   what effort — one line at every model count, with the model list in a sheet
-  opened from it. With a single configured model it becomes a credit line;
+  opened from it. Tapping an available model commits the selection and closes
+  the sheet immediately; there is no separate Done step. With a single
+  configured model it becomes a credit line;
   effort is named, not plotted — the word alone carries it and routes without
   an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
@@ -143,8 +145,10 @@ receive already-derived state and callbacks.
   Its accessible name still states the real message count. It opens over the
   workspace as one continuous canvas with an 18-point horizontal
   gutter. Its only chrome is the grip plus the stable transcript title; the
-  whole header is the labelled close action. It has no repeated conversation
-  title, image or conversation-setting controls, or footer close action.
+  peek and open sheet use the same centred headline typography, and the roomy
+  header is the labelled tap-and-pull close action. It has no repeated
+  conversation title, image or conversation-setting controls, or footer close
+  action.
   Expanded turn metrics are the only raised
   surface inside the script. In landscape it stays inline in the right pane.
   Actions inside the portrait sheet that open Speaking settings dismiss the

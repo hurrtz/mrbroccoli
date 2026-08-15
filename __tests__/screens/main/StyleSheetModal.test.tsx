@@ -45,7 +45,7 @@ describe("StyleSheetModal", () => {
   it("uses the theme overlay token for its backdrop scrim", () => {
     const { getByTestId } = setup();
     expect(
-      StyleSheet.flatten(getByTestId("styleSheetOverlay").props.style),
+      StyleSheet.flatten(getByTestId("native-dialog-overlay").props.style),
     ).toEqual(
       expect.objectContaining({ backgroundColor: "rgba(13, 15, 18, 0.46)" }),
     );
@@ -60,7 +60,7 @@ describe("StyleSheetModal", () => {
     ).toEqual(
       expect.objectContaining({
         fontFamily: "UnicaOne_400Regular",
-        fontSize: 20,
+        fontSize: 17,
         textAlign: "center",
       }),
     );
@@ -73,38 +73,36 @@ describe("StyleSheetModal", () => {
     expect(getByText(/Speak like a smart friend/)).toBeTruthy();
   });
 
-  it("pins the close action to the top-right of the header", () => {
-    const { getByTestId } = setup();
+  it("uses the roomy pull handle as its portrait close action", () => {
+    const { getByTestId, queryByTestId } = setup();
 
     expect(
       StyleSheet.flatten(
-        getByTestId("conversation-settings-header").props.style,
-      ),
-    ).toEqual(expect.objectContaining({ position: "relative" }));
-    expect(
-      StyleSheet.flatten(
-        getByTestId("conversation-settings-close").props.style,
+        getByTestId("conversation-settings-drawer-header").props.style,
       ),
     ).toEqual(
-      expect.objectContaining({ position: "absolute", right: 12, top: 8 }),
+      expect.objectContaining({ alignItems: "center", position: "relative" }),
     );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("conversation-settings-drawer-header-handle").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ minHeight: 44 }));
+    expect(
+      queryByTestId("conversation-settings-drawer-header-close"),
+    ).toBeNull();
   });
 
   it("renders as a full-width bottom drawer", () => {
     const { getByTestId, UNSAFE_getByType } = setup();
-    const drawer = getByTestId("conversation-settings-drawer");
-    const drawerStyle = StyleSheet.flatten(drawer.props.style);
+    const drawerStyle = StyleSheet.flatten(
+      getByTestId("native-dialog-card").props.style,
+    );
 
-    expect(UNSAFE_getByType(Modal).props.animationType).toBe("slide");
+    expect(UNSAFE_getByType(Modal).props.animationType).toBe("none");
     expect(drawerStyle.width).toBe("100%");
     expect(drawerStyle.borderTopLeftRadius).toBe(24);
     expect(drawerStyle.borderTopRightRadius).toBe(24);
-    expect(drawer.props.edges).toEqual({
-      top: "off",
-      bottom: "additive",
-      left: "additive",
-      right: "additive",
-    });
   });
 
   it("offers a one-off title generation action", () => {
@@ -261,22 +259,21 @@ describe("StyleSheetModal", () => {
     ).toBeTruthy();
   });
 
-  it("calls onClose when Done button is pressed", () => {
-    const { getByText, onClose } = setup();
-    fireEvent.press(getByText("Done"));
-    expect(onClose).toHaveBeenCalledTimes(1);
+  it("does not render a redundant Done button", () => {
+    const { queryByText } = setup();
+    expect(queryByText("Done")).toBeNull();
   });
 
-  it("calls onClose from the fixed drawer header", () => {
+  it("calls onClose from the drawer handle", () => {
     const { getByTestId, onClose } = setup();
-    fireEvent.press(getByTestId("conversation-settings-close"));
+    fireEvent.press(getByTestId("conversation-settings-drawer-header-handle"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("calls onClose when the backdrop is tapped", () => {
     const { getByTestId, onClose } = setup();
     fireEvent.press(
-      getByTestId("styleSheetBackdrop", { includeHiddenElements: true }),
+      getByTestId("native-dialog-backdrop", { includeHiddenElements: true }),
     );
     expect(onClose).toHaveBeenCalledTimes(1);
   });

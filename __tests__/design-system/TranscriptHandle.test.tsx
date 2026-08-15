@@ -29,6 +29,25 @@ describe("TranscriptHandle", () => {
     expect(screen.queryByText("No messages yet")).toBeNull();
   });
 
+  it("uses the same centred headline treatment as the open drawer", () => {
+    const screen = renderHandle();
+    const label = StyleSheet.flatten(
+      screen.getByText("Transcript").props.style,
+    );
+
+    expect(label).toEqual(
+      expect.objectContaining({
+        color: lightColors.text,
+        fontFamily: "UnicaOne_400Regular",
+        fontSize: 17,
+        letterSpacing: -0.2,
+        lineHeight: 22,
+        textAlign: "center",
+      }),
+    );
+    expect(label.textTransform).toBeUndefined();
+  });
+
   it("always states the real count in the accessible name", () => {
     const screen = renderHandle({
       accessibilityLabel: "Show transcript. 12 messages",

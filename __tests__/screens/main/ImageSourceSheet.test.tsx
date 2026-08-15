@@ -32,7 +32,7 @@ describe("ImageSourceSheet", () => {
     expect(onChooseFromPhotos).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps a labelled dismissal action", () => {
+  it("keeps a labelled dismissal action on the grabber", () => {
     const onClose = jest.fn();
     const screen = renderWithProviders(
       <ImageSourceSheet
@@ -44,7 +44,7 @@ describe("ImageSourceSheet", () => {
       />,
     );
 
-    fireEvent.press(screen.getByText("dismiss"));
+    fireEvent.press(screen.getByTestId("image-source-header-handle"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 });

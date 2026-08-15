@@ -278,10 +278,6 @@ export const styles = StyleSheet.create({
     lineHeight: 19,
     fontFamily: fonts.body,
   },
-  styleSheetOverlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
   styleSheetCard: {
     width: "100%",
     borderTopLeftRadius: 24,
@@ -307,44 +303,6 @@ export const styles = StyleSheet.create({
     gap: 12,
     paddingTop: 12,
     paddingBottom: 14,
-  },
-  styleSheetHeader: {
-    position: "relative",
-    alignItems: "center",
-    paddingHorizontal: 68,
-    paddingTop: 16,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-  },
-  styleSheetHeaderCopy: {
-    width: "100%",
-    minWidth: 0,
-    gap: 4,
-    alignItems: "center",
-  },
-  styleSheetCloseButton: {
-    position: "absolute",
-    top: 8,
-    right: 12,
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  styleSheetTitle: {
-    fontSize: 20,
-    lineHeight: 26,
-    fontFamily: fonts.headline,
-    fontWeight: "400",
-    letterSpacing: -0.2,
-    textAlign: "center",
-  },
-  styleSheetSubtitle: {
-    fontSize: 13,
-    lineHeight: 19,
-    fontFamily: fonts.body,
-    textAlign: "center",
   },
   styleSheetGroup: {
     gap: 8,
@@ -432,24 +390,6 @@ export const styles = StyleSheet.create({
   styleSheetSecondaryButtonText: {
     fontSize: 12,
     lineHeight: 16,
-    fontFamily: fonts.display,
-  },
-  styleSheetFooter: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 12,
-    borderTopWidth: 1,
-  },
-  styleSheetDoneButton: {
-    alignSelf: "stretch",
-    minHeight: 44,
-    paddingVertical: 12,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  styleSheetDoneButtonText: {
-    fontSize: 14,
     fontFamily: fonts.display,
   },
 });

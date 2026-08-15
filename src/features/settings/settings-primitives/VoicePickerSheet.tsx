@@ -1,16 +1,6 @@
 import React from "react";
-import {
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 
-import { APP_MODAL_ORIENTATIONS } from "../../../constants/layout";
-import { IconButton } from "../../../design-system/IconButton";
 import { Input } from "../../../design-system/NativeControls";
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import { useLocalization } from "../../../i18n";
@@ -18,6 +8,7 @@ import { useTheme } from "../../../theme/ThemeContext";
 import { fonts } from "../../../theme/typography";
 
 import { IconAction } from "./IconAction";
+import { SettingsSheet } from "./SettingsSheet";
 
 export type VoicePickerOption = {
   value: string;
@@ -52,7 +43,6 @@ export function VoicePickerSheet({
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const insets = useSafeAreaInsets();
   const [query, setQuery] = React.useState("");
 
   React.useEffect(() => {
@@ -71,228 +61,150 @@ export function VoicePickerSheet({
     : options;
 
   return (
-    <Modal
-      animationType="slide"
-      onRequestClose={onClose}
-      statusBarTranslucent
-      supportedOrientations={APP_MODAL_ORIENTATIONS}
-      transparent
+    <SettingsSheet
+      contentStyle={styles.sheetContent}
+      maxHeight="84%"
+      onClose={onClose}
+      scrollable={false}
+      subtitle={t("providerVoicesAvailable", {
+        count: options.length,
+        provider: title,
+      })}
+      testID={testID}
+      title={title}
       visible={visible}
     >
-      <View
-        testID={testID}
-        accessibilityViewIsModal
-        style={styles.overlay}
-      >
-        <Pressable
-          accessible={false}
-          accessibilityElementsHidden
-          importantForAccessibility="no"
-          onPress={onClose}
-          style={[StyleSheet.absoluteFill, { backgroundColor: colors.overlay }]}
-        />
-        <View
-          style={[
-            styles.sheet,
-            {
-              backgroundColor: colors.background,
-              borderColor: colors.border,
-              paddingBottom: Math.max(18, insets.bottom + 10),
-            },
-          ]}
-        >
-          <View
-            style={[styles.handle, { backgroundColor: colors.borderStrong }]}
-          />
-          <View style={styles.header}>
-            <View style={styles.headerCopy}>
-              <Text
-                accessibilityRole="header"
-                numberOfLines={1}
-                style={[styles.title, { color: colors.text }]}
-              >
-                {title}
-              </Text>
-              <Text style={[styles.count, { color: colors.textMuted }]}>
-                {t("providerVoicesAvailable", {
-                  count: options.length,
-                  provider: title,
-                })}
-              </Text>
-            </View>
-            {onRefresh ? (
-              <IconAction
-                icon="reload"
-                label={t("refreshProviderVoices", { provider: title })}
-                onPress={onRefresh}
-                testID={testID ? `${testID}-refresh` : undefined}
-              />
-            ) : null}
-            <IconButton
-              icon="close"
-              accessibilityLabel={t("dismiss")}
-              onPress={onClose}
-            />
-          </View>
-          {directoryStatus ? (
-            <Text
-              accessibilityLiveRegion="polite"
-              style={[styles.status, { color: colors.textSecondary }]}
-            >
-              {directoryStatus}
-            </Text>
-          ) : null}
-          <Input
-            testID={testID ? `${testID}-search` : undefined}
-            accessibilityLabel={t("ttsVoice")}
-            autoCapitalize="none"
-            autoCorrect={false}
-            allowClear
-            onChangeText={setQuery}
-            placeholder={t("ttsVoice")}
-            placeholderTextColor={colors.textMuted}
-            value={query}
-            styles={{ container: styles.search }}
-          />
-          <FlatList
-            data={filteredOptions}
-            keyboardShouldPersistTaps="handled"
-            keyExtractor={(option) => option.value}
-            contentContainerStyle={styles.list}
-            renderItem={({ item: option, index }) => {
-              const checked = option.value === value;
-              const busy = option.value === busyValue;
-              return (
-                <View
-                  style={[
-                    styles.option,
-                    { borderBottomColor: colors.border },
-                    index === filteredOptions.length - 1 ? styles.last : null,
-                  ]}
-                >
-                  <Pressable
-                    testID={
-                      testID
-                        ? `${testID}-option-${option.value.replace(
-                            /[^a-zA-Z0-9_-]+/g,
-                            "-",
-                          )}`
-                        : undefined
-                    }
-                    accessibilityLabel={option.label}
-                    accessibilityRole="radio"
-                    accessibilityState={{ checked }}
-                    onPress={() => onSelect(option.value)}
-                    style={({ pressed }) => [
-                      styles.choice,
-                      pressed ? { backgroundColor: colors.surfaceAlt } : null,
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.radio,
-                        {
-                          borderColor: checked
-                            ? colors.accent
-                            : colors.borderStrong,
-                        },
-                      ]}
-                    >
-                      {checked ? (
-                        <View
-                          style={[
-                            styles.radioDot,
-                            { backgroundColor: colors.accent },
-                          ]}
-                        />
-                      ) : null}
-                    </View>
-                    <View style={styles.optionCopy}>
-                      <Text
-                        numberOfLines={1}
-                        style={[styles.optionLabel, { color: colors.text }]}
-                      >
-                        {option.label}
-                      </Text>
-                      {option.meta ? (
-                        <Text
-                          numberOfLines={1}
-                          style={[
-                            styles.optionMeta,
-                            { color: colors.textSecondary },
-                          ]}
-                        >
-                          {option.meta}
-                        </Text>
-                      ) : null}
-                    </View>
-                    {checked ? (
-                      <PhosphorIcon
-                        name="check"
-                        size="compact"
-                        color={colors.accent}
-                      />
-                    ) : null}
-                  </Pressable>
-                  <IconAction
-                    icon={busy ? "stop" : "play-circle"}
-                    label={`${t("previewVoice")}: ${option.label}`}
-                    onPress={() => onPreview(option.value)}
-                    testID={
-                      testID ? `${testID}-preview-${option.value}` : undefined
-                    }
-                  />
-                </View>
-              );
-            }}
+      {onRefresh ? (
+        <View style={styles.toolbar}>
+          <IconAction
+            icon="reload"
+            label={t("refreshProviderVoices", { provider: title })}
+            onPress={onRefresh}
+            testID={testID ? `${testID}-refresh` : undefined}
           />
         </View>
-      </View>
-    </Modal>
+      ) : null}
+      {directoryStatus ? (
+        <Text
+          accessibilityLiveRegion="polite"
+          style={[styles.status, { color: colors.textSecondary }]}
+        >
+          {directoryStatus}
+        </Text>
+      ) : null}
+      <Input
+        testID={testID ? `${testID}-search` : undefined}
+        accessibilityLabel={t("ttsVoice")}
+        autoCapitalize="none"
+        autoCorrect={false}
+        allowClear
+        onChangeText={setQuery}
+        placeholder={t("ttsVoice")}
+        placeholderTextColor={colors.textMuted}
+        value={query}
+        styles={{ container: styles.search }}
+      />
+      <FlatList
+        data={filteredOptions}
+        keyboardShouldPersistTaps="handled"
+        keyExtractor={(option) => option.value}
+        contentContainerStyle={styles.list}
+        renderItem={({ item: option, index }) => {
+          const checked = option.value === value;
+          const busy = option.value === busyValue;
+          return (
+            <View
+              style={[
+                styles.option,
+                { borderBottomColor: colors.border },
+                index === filteredOptions.length - 1 ? styles.last : null,
+              ]}
+            >
+              <Pressable
+                testID={
+                  testID
+                    ? `${testID}-option-${option.value.replace(
+                        /[^a-zA-Z0-9_-]+/g,
+                        "-",
+                      )}`
+                    : undefined
+                }
+                accessibilityLabel={option.label}
+                accessibilityRole="radio"
+                accessibilityState={{ checked }}
+                onPress={() => onSelect(option.value)}
+                style={({ pressed }) => [
+                  styles.choice,
+                  pressed ? { backgroundColor: colors.surfaceAlt } : null,
+                ]}
+              >
+                <View
+                  style={[
+                    styles.radio,
+                    {
+                      borderColor: checked
+                        ? colors.accent
+                        : colors.borderStrong,
+                    },
+                  ]}
+                >
+                  {checked ? (
+                    <View
+                      style={[
+                        styles.radioDot,
+                        { backgroundColor: colors.accent },
+                      ]}
+                    />
+                  ) : null}
+                </View>
+                <View style={styles.optionCopy}>
+                  <Text
+                    numberOfLines={1}
+                    style={[styles.optionLabel, { color: colors.text }]}
+                  >
+                    {option.label}
+                  </Text>
+                  {option.meta ? (
+                    <Text
+                      numberOfLines={1}
+                      style={[
+                        styles.optionMeta,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      {option.meta}
+                    </Text>
+                  ) : null}
+                </View>
+                {checked ? (
+                  <PhosphorIcon
+                    name="check"
+                    size="compact"
+                    color={colors.accent}
+                  />
+                ) : null}
+              </Pressable>
+              <IconAction
+                icon={busy ? "stop" : "play-circle"}
+                label={`${t("previewVoice")}: ${option.label}`}
+                onPress={() => onPreview(option.value)}
+                testID={
+                  testID ? `${testID}-preview-${option.value}` : undefined
+                }
+              />
+            </View>
+          );
+        }}
+      />
+    </SettingsSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
-  sheet: {
-    maxHeight: "84%",
-    borderTopLeftRadius: 22,
-    borderTopRightRadius: 22,
-    borderWidth: StyleSheet.hairlineWidth,
-    borderBottomWidth: 0,
-    overflow: "hidden",
-  },
-  handle: {
-    width: 38,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: "center",
-    marginTop: 10,
-  },
-  header: {
-    minHeight: 58,
-    paddingLeft: 18,
-    paddingRight: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  headerCopy: {
-    flex: 1,
-    minWidth: 0,
-  },
-  title: {
-    fontFamily: fonts.display,
-    fontSize: 17,
-    lineHeight: 22,
-  },
-  count: {
-    fontFamily: fonts.body,
-    fontSize: 11,
-    lineHeight: 15,
+  sheetContent: { paddingBottom: 0, paddingHorizontal: 0 },
+  toolbar: {
+    alignItems: "flex-end",
+    paddingHorizontal: 18,
   },
   status: {
     marginHorizontal: 18,

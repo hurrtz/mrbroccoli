@@ -57,7 +57,7 @@ export function TranscriptHandle({
       testID={testID ?? "transcript-handle"}
     >
       <View style={[styles.grip, { backgroundColor: colors.borderStrong }]} />
-      <Text style={[styles.label, { color: colors.textMuted }]}>{label}</Text>
+      <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
     </Pressable>
   );
 }
@@ -80,10 +80,11 @@ const styles = StyleSheet.create({
     width: 38,
   },
   label: {
-    fontFamily: fonts.mono,
-    fontSize: 11,
-    letterSpacing: 0.75,
+    fontFamily: fonts.headline,
+    fontSize: 17,
+    fontWeight: "400",
+    letterSpacing: -0.2,
+    lineHeight: 22,
     textAlign: "center",
-    textTransform: "uppercase",
   },
 });

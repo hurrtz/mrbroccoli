@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { usePremiumEntitlement } from "../context/PremiumEntitlementContext";
 import { Modal } from "../design-system/NativeControls";
+import { SheetHeader } from "../design-system/SheetHeader";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
 import { recordDebugLogEvent } from "../services/debugLogCapture";
@@ -71,7 +72,14 @@ export function PremiumUpgradeModal({
       onDismiss={onDismiss}
       layout="sheet"
       maskClosable={!premium.busy}
-      title={t("upgradeToPremium")}
+      title={
+        <SheetHeader
+          closeAccessibilityLabel={t("dismiss")}
+          onClose={onClose}
+          testID="premium-upgrade-header"
+          title={t("upgradeToPremium")}
+        />
+      }
       footer={[
         ...(premium.isPremium
           ? []

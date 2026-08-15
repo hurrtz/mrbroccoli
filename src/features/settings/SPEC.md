@@ -160,8 +160,10 @@ capability healthy. The UI shows the capability that was actually tested.
   toggle is migrated to enabled, while the runtime continues to honor only
   explicitly persisted fallback policies and never invents a hidden fallback.
 - Single- and multi-choice rows open bottom sheets, retain native radio or
-  checkbox semantics, isolate screen-reader focus, and keep a labelled close or
-  Done action.
+  checkbox semantics, and isolate screen-reader focus. Every portrait Settings
+  sheet mounts its completed backdrop before the card rises and uses the shared
+  centred headline plus 44-point grabber target; the grabber is the labelled
+  tap-and-pull close action, so no redundant close icon is shown.
 - Modal content isolates screen-reader focus and always provides a labelled
   close action. Backdrop-only dismissal layers remain outside the
   accessibility tree.
