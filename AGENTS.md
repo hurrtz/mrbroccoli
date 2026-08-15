@@ -110,9 +110,11 @@ applies.
   `src/screens/main/useAutoSetupJob.ts` and the shared card under
   `src/components/autoSetup/`. The final step runs an ephemeral test turn
   through `src/screens/main/useIntroTestTurn.ts` — a real voice-pipeline run
-  with local-only callbacks, so nothing is persisted. First-run integrity
-  (`settings.introCompleted`) withholds the close control and gates the setup
-  and test steps until completed once. `introTheme.ts` derives the flow
+  with local-only callbacks, so nothing is persisted. The close control stays
+  available throughout every visit so a BYOK user can leave before configuring
+  on-device models; closing does not set `settings.introCompleted`. Before the
+  first completion, the live test remains gated on a ready reasoning route and
+  Done remains gated on a successful test. `introTheme.ts` derives the flow
   palette from the light/dark app theme while keeping the banner deliberately
   distinct, and `useIntroPlayback.ts` activates the audio session the voice
   pipeline leaves off while idle. Its audio examples are bundled under

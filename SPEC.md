@@ -219,12 +219,17 @@ boundary.
 - All registered interface languages are first-class. User-visible strings
   must exist in every locale dictionary, including correct RTL behavior for
   Arabic and Urdu.
+- Mr Broccoli refers to himself in the first person. Every interface locale
+  addresses the reader in its natural informal singular register and uses its
+  own idiom and sentence punctuation rather than preserving English structure.
 - Interactive controls have at least a 44-by-44-point target, modals isolate
   screen-reader focus, and dynamic announcements are rate-limited to meaningful
   state changes.
 - The three-step introduction uses one full-width 48-point bottom action on
   every page. Welcome is a fixed, non-scrolling canvas; Setup and Try scroll
-  within the pager while the action remains fixed. The welcome preview is five
+  within the pager while the action remains fixed. Its close action is always
+  available, including before setup, and closing without completion leaves the
+  invitation available. The welcome preview is five
   prompt-and-response exchanges whose final localized prompt matches the
   bundled spoken answer; earlier exchanges recede beneath an eased
   canvas-coloured veil sized as a share of the page, and the final response

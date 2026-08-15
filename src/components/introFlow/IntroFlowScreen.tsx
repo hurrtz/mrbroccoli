@@ -74,7 +74,7 @@ interface IntroFlowScreenProps {
  * Closing does not record completion, so the invitation remains available.
  * Step three stays unreachable on a first run until a reasoning model is
  * actually running, then ends in a Done that stays disabled until one
- * successful test turn. A re-entry unlocks both gates.
+ * successful test turn.
  */
 export function IntroFlowScreen({
   autoSetup,

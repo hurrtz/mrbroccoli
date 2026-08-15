@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.0.0 - 2026-08-16
+
 - The introduction's opening conversation now recedes into the heading as one
   smooth fade rather than a stepped band, so the oldest exchanges dissolve
   completely and the chat reads as having been going on for a while. The fade
@@ -31,8 +33,6 @@ the complete Play Store translations are kept in a dedicated file under
   headings no longer end with sentence punctuation, and several phrases that
   had been translated word for word now use the natural idiom in their
   language.
-
-## 4.0.0 - 2026-08-15
 
 - Bottom sheets now place their backdrop immediately and animate only the
   drawer over it. Drawer headlines use the same centred treatment, their roomy
@@ -226,9 +226,10 @@ the complete Play Store translations are kept in a dedicated file under
   stored dialogue is answered by the localized recording in your language, one
   setup screen with a single automatic path and an optional manual catalogue,
   and a live hold-to-talk test of your own setup whose reply is spoken back
-  with its response time — nothing from the test is saved. On a first run the
-  walkthrough completes before it can be closed; reopening it later is
-  unrestricted. The live test now works with the phone's native recognizer,
+  with its response time — nothing from the test is saved. The close action is
+  always available, including before setup, and leaving without completing the
+  walkthrough keeps its invitation available. The live test now works with the
+  phone's native recognizer,
   follows the configured speech fallback order, preserves a late speech error,
   and stops its own reply audio before another test or when the walkthrough
   closes. Leaving also aborts file recognition and cleans an active or late

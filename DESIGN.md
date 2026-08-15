@@ -72,7 +72,10 @@ available.
 The first-run introduction is a three-page horizontal pager. Its welcome page
 renders a fixed five-exchange localized conversation from oldest and most
 obscured to a crisp final prompt and response, then plays the bundled answer in
-the selected interface language. Welcome is a fixed View and never scrolls;
+the selected interface language. A labelled close control remains available on
+every page; closing never records completion, so BYOK users can leave without
+installing an on-device profile and the invitation remains available. Welcome
+is a fixed View and never scrolls;
 Setup and Try use vertical page scrollers so expanded setup choices and live
 test results remain reachable. One `expo-linear-gradient` veil covers the top
 share of the welcome page, running from the active canvas at full strength

@@ -53,6 +53,9 @@ initial default, but must not permanently couple those settings.
   across locales.
 - Product spelling remains “Mr Broccoli” in every locale unless a deliberate
   transliteration decision is recorded.
+- Mr Broccoli refers to himself in the first person, and each locale addresses
+  the reader in its natural informal singular register. Prefer native idiom and
+  script-specific punctuation over a literal rendering of English structure.
 - Provider and model brand names are not translated unless the brand supplies
   a localized name.
 - Copy that names an app store must name only the current platform's store
