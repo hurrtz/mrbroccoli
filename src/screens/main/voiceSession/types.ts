@@ -29,6 +29,7 @@ export interface AudioRecorderController {
   clearLastError: () => void;
   ensurePermissions: () => Promise<void>;
   inputMetering?: number | null;
+  inputMeteringSampleId?: number;
   lastError: string | null;
   startAmbientMonitoring?: () => Promise<boolean>;
   startRecording: () => Promise<void>;
@@ -42,6 +43,7 @@ export interface NativeSpeechRecognizerController {
   ensurePermissions: () => Promise<void>;
   isAvailable: boolean;
   inputMetering?: number | null;
+  inputMeteringSampleId?: number;
   lastError: string | null;
   startRecognition: () => Promise<void>;
   stopRecognition: () => Promise<string | null>;

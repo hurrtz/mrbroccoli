@@ -136,6 +136,15 @@ answers a different question: whether the mode permits continuation, whether
 the user currently authorizes it, and whether exactly one future capture has
 been requested.
 
+`useDriveSessionVoiceActivity` consumes the recorder's `(metering,
+sampleId)` pair. Native event handlers increment `sampleId` for every microphone
+sample, including consecutive equal dB readings, because the detector's attack
+and release thresholds count samples rather than distinct numeric values. Once
+speech releases, the hook's independent 200ms clock derives the ten-second
+silence countdown and calls the same `stopVoiceCapture` path as an explicit
+stop. Route-aware ambient learning seeds the next recording but never performs
+the stop itself.
+
 ## Adaptive iPad Composition
 
 `MainScreen` resolves one resize-aware `IpadLayout` from the current window,

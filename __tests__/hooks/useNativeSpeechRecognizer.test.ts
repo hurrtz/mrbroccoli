@@ -292,9 +292,15 @@ describe("useNativeSpeechRecognizer", () => {
         sessionId,
         metering: -21,
       });
+      emitNativeWaveformEvent({
+        type: "levels",
+        sessionId,
+        metering: -21,
+      });
     });
 
     expect(result.current.inputMetering).toBe(-21);
+    expect(result.current.inputMeteringSampleId).toBe(2);
   });
 
   it("subscribes to system recognition events and resolves the final transcript", async () => {
@@ -314,6 +320,7 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
       emitSpeechEvent("start", {});
       emitSpeechEvent("volumechange", { value: 5 });
+      emitSpeechEvent("volumechange", { value: 5 });
     });
 
     expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(
@@ -329,6 +336,7 @@ describe("useNativeSpeechRecognizer", () => {
     );
     expect(result.current.isRecording).toBe(true);
     expect(result.current.inputMetering).toBe(-28);
+    expect(result.current.inputMeteringSampleId).toBe(2);
 
     dateNowSpy.mockReturnValue(2_000);
     let transcriptPromise: Promise<string | null>;

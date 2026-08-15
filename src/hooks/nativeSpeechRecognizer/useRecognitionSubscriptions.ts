@@ -28,6 +28,7 @@ export function useRecognitionSubscriptions({
     resolvePendingStop,
     setIsRecording,
     setInputMetering,
+    setInputMeteringSampleId,
     stopRequestedRef,
     stopResolverRef,
   } = session;
@@ -44,6 +45,7 @@ export function useRecognitionSubscriptions({
         event.sessionId === nativeSessionIdRef.current
       ) {
         setInputMetering(event.metering);
+        setInputMeteringSampleId((sampleId) => sampleId + 1);
         return;
       }
 
@@ -66,6 +68,7 @@ export function useRecognitionSubscriptions({
     nativeSessionIdRef,
     rejectPendingStop,
     setInputMetering,
+    setInputMeteringSampleId,
     usingNativeRecorder,
   ]);
 
@@ -87,6 +90,7 @@ export function useRecognitionSubscriptions({
       "volumechange",
       (event) => {
         setInputMetering(volumeToMetering(event.value));
+        setInputMeteringSampleId((sampleId) => sampleId + 1);
       },
     );
 
@@ -136,6 +140,7 @@ export function useRecognitionSubscriptions({
     resolvePendingStop,
     setIsRecording,
     setInputMetering,
+    setInputMeteringSampleId,
     stopRequestedRef,
     stopResolverRef,
     usingNativeRecorder,

@@ -30,6 +30,9 @@ the complete Play Store translations are kept in a dedicated file under
   conflicting technical style.
 - iPhone Settings detail pages now support the standard edge swipe back in
   both left-to-right and right-to-left interfaces.
+- Drive Session now counts every microphone level sample, including consecutive
+  samples with the same measured loudness, so it reliably detects both the
+  start of speech and the ten-second end-of-speech countdown.
 - Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
   keep the phone interface; regular layouts add a persistent conversations
   sidebar, a docked transcript when all three panes fit, master-detail Settings,

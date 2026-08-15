@@ -27,6 +27,7 @@ export interface RecorderState {
   audioRoute: string | null;
   isRecording: boolean;
   inputMetering: number | null;
+  inputMeteringSampleId: number;
   lastError: string | null;
   clearLastError: () => void;
 }
@@ -68,6 +69,8 @@ export function useAudioRecorder() {
   const [nativeInputMetering, setNativeInputMetering] = useState<number | null>(
     null,
   );
+  const [nativeInputMeteringSampleId, setNativeInputMeteringSampleId] =
+    useState(0);
   const [ambientInputMetering, setAmbientInputMetering] = useState<
     number | null
   >(null);
@@ -122,6 +125,7 @@ export function useAudioRecorder() {
       ) {
         recordingMeteringSamplesRef.current.push(event.metering);
         setNativeInputMetering(event.metering);
+        setNativeInputMeteringSampleId((sampleId) => sampleId + 1);
         return;
       }
 
@@ -642,6 +646,9 @@ export function useAudioRecorder() {
     inputMetering: usingNativeRecorder
       ? nativeInputMetering
       : recorderState.metering ?? null,
+    inputMeteringSampleId: usingNativeRecorder
+      ? nativeInputMeteringSampleId
+      : recorderState.durationMillis,
     lastError,
     clearLastError,
     ensurePermissions,

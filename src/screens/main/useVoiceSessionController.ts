@@ -142,6 +142,10 @@ export function useVoiceSessionController({
       settings.sttMode === "native"
         ? nativeStt.inputMetering
         : recorder.inputMetering,
+    inputMeteringSampleId:
+      settings.sttMode === "native"
+        ? nativeStt.inputMeteringSampleId
+        : recorder.inputMeteringSampleId,
     lastCompletedReplyRef,
     mainSurfaceVisible,
     playReplyText,

@@ -12,6 +12,7 @@ type StopRejecter = (error: Error) => void;
 export interface RecognitionSession {
   isRecording: boolean;
   inputMetering: number | null;
+  inputMeteringSampleId: number;
   lastError: string | null;
   isRecordingRef: React.MutableRefObject<boolean>;
   startedAtRef: React.MutableRefObject<number>;
@@ -24,6 +25,7 @@ export interface RecognitionSession {
   nativeSessionIdRef: React.MutableRefObject<string | null>;
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>;
   setInputMetering: React.Dispatch<React.SetStateAction<number | null>>;
+  setInputMeteringSampleId: React.Dispatch<React.SetStateAction<number>>;
   setLastError: React.Dispatch<React.SetStateAction<string | null>>;
   clearPendingResolution: () => void;
   resolvePendingStop: (value: string | null) => void;
@@ -45,6 +47,7 @@ export function useRecognitionSession({
 }: UseRecognitionSessionParams): RecognitionSession {
   const [isRecording, setIsRecording] = useState(false);
   const [inputMetering, setInputMetering] = useState<number | null>(null);
+  const [inputMeteringSampleId, setInputMeteringSampleId] = useState(0);
   const [lastError, setLastError] = useState<string | null>(null);
   const isRecordingRef = useRef(false);
   const startedAtRef = useRef(0);
@@ -130,6 +133,7 @@ export function useRecognitionSession({
   return {
     isRecording,
     inputMetering,
+    inputMeteringSampleId,
     lastError,
     isRecordingRef,
     startedAtRef,
@@ -142,6 +146,7 @@ export function useRecognitionSession({
     nativeSessionIdRef,
     setIsRecording,
     setInputMetering,
+    setInputMeteringSampleId,
     setLastError,
     clearPendingResolution,
     resolvePendingStop,

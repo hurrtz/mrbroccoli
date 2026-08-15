@@ -487,6 +487,15 @@ Drive Session is an explicit state machine, not a repeating timer:
 Acoustic cues describe state changes but never substitute for visible or
 screen-reader-accessible state.
 
+An engaged recording does not auto-submit until voice activity has confirmed
+real speech and then observed ten seconds without speech. Every metering sample
+participates even when consecutive samples carry the same dB value; React value
+deduplication must not prevent the multi-sample speech attack or release from
+completing. The acoustic profile follows the active audio route,
+learns ambient and speech levels across turns, and resets when the route
+changes. Countdown cues cover only the final three seconds and do not alter the
+detector's deadline.
+
 ## Conversation-Level Controls
 
 Per-conversation instructions, style, speech behavior, privacy, title,

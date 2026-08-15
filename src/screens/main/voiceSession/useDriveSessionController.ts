@@ -31,6 +31,7 @@ interface UseDriveSessionControllerParams {
   isBusy: boolean;
   isRecording: boolean;
   inputMetering?: number | null;
+  inputMeteringSampleId?: number;
   lastCompletedReplyRef: MutableRefObject<string>;
   mainSurfaceVisible: boolean;
   playReplyText: (text: string) => Promise<void>;
@@ -58,6 +59,7 @@ export function useDriveSessionController({
   isBusy,
   isRecording,
   inputMetering = null,
+  inputMeteringSampleId = 0,
   lastCompletedReplyRef,
   mainSurfaceVisible,
   playReplyText,
@@ -117,6 +119,7 @@ export function useDriveSessionController({
     autoContinueEnabled,
     engaged,
     inputMetering,
+    inputMeteringSampleId,
     inputMode: settings.inputMode,
     isBusy,
     isRecording,

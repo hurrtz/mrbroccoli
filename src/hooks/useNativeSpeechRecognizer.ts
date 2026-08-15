@@ -49,6 +49,7 @@ export function useNativeSpeechRecognizer(
     isAvailable: ExpoSpeechRecognitionModule.isRecognitionAvailable(),
     isRecording: session.isRecording,
     inputMetering: session.inputMetering,
+    inputMeteringSampleId: session.inputMeteringSampleId,
     lastError: session.lastError,
     ensurePermissions,
     startRecognition,

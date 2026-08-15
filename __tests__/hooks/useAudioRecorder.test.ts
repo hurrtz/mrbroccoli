@@ -142,10 +142,15 @@ describe("useAudioRecorder permissions", () => {
       await result.current.startRecording();
     });
 
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     act(() => {
+      nativeWaveformListener?.({
+        type: "levels",
+        sessionId,
+        metering: -24,
+      });
       nativeWaveformListener?.({
         type: "levels",
         sessionId,
@@ -154,6 +159,7 @@ describe("useAudioRecorder permissions", () => {
     });
 
     expect(result.current.inputMetering).toBe(-24);
+    expect(result.current.inputMeteringSampleId).toBe(2);
   });
 
   it("exposes ambient levels and stops monitoring before recording", async () => {
@@ -163,8 +169,8 @@ describe("useAudioRecorder permissions", () => {
       await result.current.startAmbientMonitoring();
     });
 
-    const sessionId =
-      (startNativeAmbientMonitoring as jest.Mock).mock.calls[0][0];
+    const sessionId = (startNativeAmbientMonitoring as jest.Mock).mock
+      .calls[0][0];
     act(() => {
       nativeWaveformListener?.({
         type: "levels",
@@ -181,9 +187,7 @@ describe("useAudioRecorder permissions", () => {
       await result.current.startRecording();
     });
 
-    expect(stopNativeAmbientMonitoring).toHaveBeenCalledWith(
-      sessionId,
-    );
+    expect(stopNativeAmbientMonitoring).toHaveBeenCalledWith(sessionId);
     expect(startNativeWaveformRecording).toHaveBeenCalledTimes(1);
     expect(result.current.ambientMonitoring).toBe(false);
     expect(result.current.ambientInputMetering).toBeNull();
@@ -238,8 +242,8 @@ describe("useAudioRecorder permissions", () => {
     await act(async () => {
       await result.current.startRecording();
     });
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
     act(() => {
       [-160, -160, -160, -160].forEach((metering) => {
         nativeWaveformListener?.({
@@ -271,8 +275,8 @@ describe("useAudioRecorder permissions", () => {
     await act(async () => {
       await result.current.startRecording();
     });
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     act(() => {
       nativeWaveformListener?.({
@@ -305,8 +309,8 @@ describe("useAudioRecorder permissions", () => {
     await act(async () => {
       await result.current.startRecording();
     });
-    const sessionId =
-      (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId;
+    const sessionId = (startNativeWaveformRecording as jest.Mock).mock
+      .calls[0][0].sessionId;
 
     act(() => {
       nativeWaveformListener?.({

@@ -29,6 +29,7 @@ interface UseDriveSessionVoiceActivityParams {
   autoContinueEnabled: boolean;
   engaged: boolean;
   inputMetering: number | null;
+  inputMeteringSampleId: number;
   inputMode: Settings["inputMode"];
   isBusy: boolean;
   isRecording: boolean;
@@ -50,6 +51,7 @@ export function useDriveSessionVoiceActivity({
   autoContinueEnabled,
   engaged,
   inputMetering,
+  inputMeteringSampleId,
   inputMode,
   isBusy,
   isRecording,
@@ -63,8 +65,9 @@ export function useDriveSessionVoiceActivity({
   stopVoiceCapture,
   t,
 }: UseDriveSessionVoiceActivityParams) {
-  const [silenceCountdownSeconds, setSilenceCountdownSeconds] =
-    useState<number | null>(null);
+  const [silenceCountdownSeconds, setSilenceCountdownSeconds] = useState<
+    number | null
+  >(null);
   const [voiceActive, setVoiceActive] = useState(false);
   const voiceActivityRef = useRef<DriveVoiceActivityState | null>(null);
   const acousticProfileRef = useRef(createDriveAcousticProfile());
@@ -77,8 +80,7 @@ export function useDriveSessionVoiceActivity({
 
   const resetAcousticProfile = useCallback(() => {
     acousticProfileRef.current = createDriveAcousticProfile();
-    lastLoggedNoiseFloorDbRef.current =
-      acousticProfileRef.current.noiseFloorDb;
+    lastLoggedNoiseFloorDbRef.current = acousticProfileRef.current.noiseFloorDb;
   }, []);
 
   useEffect(() => {
@@ -228,7 +230,7 @@ export function useDriveSessionVoiceActivity({
         },
       });
     }
-  }, [inputMetering]);
+  }, [inputMetering, inputMeteringSampleId]);
 
   useEffect(() => {
     const shouldMonitorAmbient =
