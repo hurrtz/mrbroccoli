@@ -37,13 +37,9 @@ tags:
       true: ${PLATFORM == 'android'}
     commands:
       - hideKeyboard
-- runFlow:
-    when:
-      visible:
-        id: provider-connection-close-anthropic
-    commands:
-      - tapOn:
-          id: provider-connection-close-anthropic
+- tapOn:
+    id: provider-connection-sheet-anthropic-header-handle
+- waitForAnimationToEnd
 - assertVisible:
     id: settings-back-button
 - tapOn:
@@ -85,7 +81,7 @@ tags:
 - tapOn:
     id: route-picker-row-mode-1
 - assertVisible:
-    id: drive-session-controls
+    id: satellite-stop
 - takeScreenshot:
     path: ${PLATFORM}/visual/drive-three-routes-portrait
 - setOrientation: LANDSCAPE_LEFT
@@ -96,7 +92,7 @@ tags:
 - assertVisible:
     id: route-byline
 - assertVisible:
-    id: drive-session-controls
+    id: satellite-stop
 - takeScreenshot:
     path: ${PLATFORM}/visual/drive-three-routes-landscape
 - setOrientation: PORTRAIT
