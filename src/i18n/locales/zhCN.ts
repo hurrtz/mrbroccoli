@@ -135,7 +135,7 @@ export const zhCN = {
   instructionsTabDescription:
     "在任何提供商看到请求之前，塑造引导助手的隐藏指令。",
   providersTabDescription:
-    "在设备上存储外部服务凭据并配置您要使用的响应模式。",
+    "在设备上存储外部服务凭据并配置你要使用的响应模式。",
   webSearchTabDescription:
     "在回复之前配置可选的实时 Web 上下文。",
   responseModes: "模型选择",
@@ -339,14 +339,14 @@ export const zhCN = {
   setWebSearchMode: ({ mode }) => `将网页搜索模式设置为 ${mode}`,
   openWebSearchSettings: "打开网页搜索设置",
   providerSttDescription:
-    "在将语音发送到回复路由之前，使用配置的外部服务转录您的语音。",
+    "在将语音发送到回复路由之前，使用配置的外部服务转录你的语音。",
   sttProvider: "STT 提供商",
   sttProviderEnabledHint:
     "此处仅显示具有转录支持的已启用提供商。",
   sttProviderMissingHint:
     "添加支持 STT 的服务的凭据以在此处选择它。",
   nativeSttHint:
-    "系统识别的工作独立于您的提供商密钥，并且可以在设备上或通过操作系统的语音服务进行处理。",
+    "系统识别的工作独立于你的提供商密钥，并且可以在设备上或通过操作系统的语音服务进行处理。",
   replyPlayback: "回复回放",
   sentencesArrive: "逐段播放",
   sentencesArriveDescription:
@@ -359,7 +359,7 @@ export const zhCN = {
   spokenRepliesEnabledDescription:
     "当有可用的语音路由时，朗读助手的回复。",
   spokenRepliesDisabledDescription:
-    "目前仅保留文本回复。您首选的 TTS 路由会保存下来，供以后使用。",
+    "目前仅保留文本回复。你首选的 TTS 路由会保存下来，供以后使用。",
   nativeTtsDescription:
     "使用设备语音引擎进行语音回复和语音预览。",
   kokoroTtsDescription:
@@ -379,7 +379,7 @@ export const zhCN = {
     "Kokoro 目前在此支持英语和简体中文。对于其他选定的回复语言，请添加明确的回退路由，否则语音将因错误而停止。",
   kokoroRemoveTitle: "删除Kokoro模型？",
   kokoroRemoveBody: ({ installedSize }) =>
-    `这会释放大约 ${installedSize} MB。您可以随时再次下载模型。`,
+    `这会释放大约 ${installedSize} MB。你可以随时再次下载模型。`,
   removeKokoroModel: "删除Kokoro模型",
   downloadKokoroModel: "下载Kokoro模型",
   kokoroFallbackNeeded: ({ languages }) =>
@@ -427,7 +427,7 @@ export const zhCN = {
   providerVoicesAvailable: ({ count, provider }) =>
     `可从 ${provider} 获取 ${count} 个语音。`,
   providerVoicesLoadFailed:
-    "无法刷新语音列表。您当前的选择不变；您仍然可以手动输入语音 ID。",
+    "无法刷新语音列表。你当前的选择不变；你仍然可以手动输入语音 ID。",
   providerVoicesLoadFailedWithFallback:
     "无法加载账户语音。内置语音仍然可用。",
   providerVoicesErrorDetail: ({ detail }) => `原因：${detail}`,
@@ -455,12 +455,12 @@ export const zhCN = {
     "该提供商当前使用其默认语音进行预览和语音回复。",
   listenLanguages: "收听语言",
   listenLanguagesHint:
-    "选择您希望听起来不错的回复语言。我在路由语音输出时按此顺序尝试它们。",
+    "选择你希望听起来不错的回复语言。我在路由语音输出时按此顺序尝试它们。",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "已选择 1 种语言" : `已选择 ${count} 种语言`,
   localVoicePacks: "本地语音包",
   localVoicePacksHint:
-    "每种语言都有自己的本地语音。选择您想要的该语言的语音，然后仅下载您真正关心的包。",
+    "每种语言都有自己的本地语音。选择你想要的该语言的语音，然后仅下载你真正关心的包。",
   localVoiceForLanguage: ({ languageLabel }) => `${languageLabel} 的语音`,
   providerVoicePreviews: "提供商语音预览",
   providerVoicePreviewsHint:
@@ -502,7 +502,7 @@ export const zhCN = {
   localTtsPackBroken:
     "已下载，但该语音在此设备上未通过本地验证。请重新下载或选择其他语音。",
   localTtsPackMissing:
-    "尚未安装。在您下载之前，将使用云端 TTS 或系统语音。",
+    "尚未安装。在你下载之前，将使用云端 TTS 或系统语音。",
   localTtsUnsupportedLanguageFallback:
     "该语言尚无可用的本地语音包。将由云端 TTS 或系统语音处理。",
   downloadingLocalTtsPack: ({ progress }) =>
@@ -526,7 +526,7 @@ export const zhCN = {
   couldntReplayReply: "无法重播该回复。",
   replyFailed: "回复失败",
   retryReply: "重试回复",
-  replyFailedHint: "重试前，您可以在上方选择其他模型。",
+  replyFailedHint: "重试前，你可以在上方选择其他模型。",
   spokenReplyFailed: "回复已保存，但无法说出。",
   retrySpeech: "重试语音",
   openSpeakingSettings: "说话设置",
@@ -597,7 +597,7 @@ export const zhCN = {
   speechReplayCacheClearFailed: "无法清除语音缓存。",
   listeningToYourVoice: "正在聆听你的语音",
   parsingYourVoiceInput: "正在将你的语音转成文字",
-  preparingRequest: "准备您的请求",
+  preparingRequest: "准备你的请求",
   searchingTheWeb: "在网络上搜索新的上下文",
   waitingForProvider: ({ provider }) => `等待${provider}`,
   preparingVoiceWithProvider: ({ provider }) =>
@@ -623,14 +623,14 @@ export const zhCN = {
   repeatReply: "重复回复",
   renameThread: "重命名对话",
   renameThreadHint:
-    "为该对话指定一个您稍后可以快速找到的标题。",
+    "为该对话指定一个你稍后可以快速找到的标题。",
   threadTitle: "对话标题",
   noTranscriptYet: "还没有文字记录",
   previewTranscriptEmptyDescription:
-    "使用语音或文本开始。您的对话将出现在这里。",
+    "使用语音或文本开始。你的对话将出现在这里。",
   noConversationYet: "还没有对话",
   expandedTranscriptEmptyDescription:
-    "使用语音或文本开始。当您想返回主舞台时，请关闭此屏幕。",
+    "使用语音或文本开始。当你想返回主舞台时，请关闭此屏幕。",
   transcriptSelectionHint:
     "直接选择任何消息文本，或共享并复制下面的单个消息。",
   textMessagePlaceholder: "输入消息",
@@ -703,9 +703,9 @@ export const zhCN = {
   unknownUsageRoute: "未知路由",
   setupGuideConnectProviderTitle: "配置凭据",
   setupGuideConnectProviderDescription:
-    "在“设置”中添加凭据，然后选择您要使用的路由。",
+    "在“设置”中添加凭据，然后选择你要使用的路由。",
   idle: "空闲",
-  yourConversationAppearsHere: "您的对话出现在这里",
+  yourConversationAppearsHere: "你的对话出现在这里",
   defaultTranscriptEmptyDescription:
     "使用语音或文本开始对话。我会保留这段对话并在此回复。",
   delete: "删除",
@@ -722,22 +722,22 @@ export const zhCN = {
   setupGuideSubtitle: "添加凭据并在“设置”中选择路由。",
   fastestStartPreset: "最简设置",
   fastestStartDescription:
-    "在可用时使用设备语音，仅配置您需要的回复路由。",
+    "在可用时使用设备语音，仅配置你需要的回复路由。",
   fullVoicePreset: "已配置语音",
   fullVoiceDescription:
-    "在您选择时，使用已配置的服务进行回复、转录和语音输出。",
+    "在你选择时，使用已配置的服务进行回复、转录和语音输出。",
   setupGuideNote:
-    "接下来我们将打开“设置”，以便您可以粘贴和验证凭据。",
+    "接下来我们将打开“设置”，以便你可以粘贴和验证凭据。",
   useThisSetup: "使用此设置",
   notNow: "暂时不用",
   setupGuideIntroTitle: "我的工作原理",
   setupGuideIntroBody:
-    "我初始为空。请为您已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
+    "我初始为空。请为你已在使用的外部服务添加凭据，然后选择回复、语音输入、语音输出和可选网络上下文的路由方式。",
   setupGuideIntroNote:
     "设置完成后，使用主语音控制来开始和停止对话。当前文字记录会保留在主屏幕上，每条路由以后都可以在“设置”中更改。",
   setupGuideProviderTitle: "添加凭据",
   setupGuideProviderBody:
-    "选择您要配置的外部服务，然后粘贴具有回复访问权限的凭据。",
+    "选择你要配置的外部服务，然后粘贴具有回复访问权限的凭据。",
   setupGuideProviderPickerLabel: "回复服务",
   setupGuideSelectProvider: "选择提供商",
   setupGuideSelectProviderFirst: "首先选择提供商。",
@@ -757,13 +757,13 @@ export const zhCN = {
   setupGuideKokoroBody: ({ size }) =>
     `可选：下载 Kokoro（大约 ${size} MB）以获得更自然的语音回复，无需语音提供商或使用费用。`,
   setupGuideKokoroLanguageNote:
-    "该模型目前支持英语和简体中文。您可以稍后在“说话”设置中配置需要的回退路由。",
+    "该模型目前支持英语和简体中文。你可以稍后在“说话”设置中配置需要的回退路由。",
   setupGuideKokoroDownload: "下载Kokoro",
   setupGuideUseKokoro: "使用 Kokoro 进行语音回复",
   setupGuideUseKokoroSummary:
     "只要支持回复语言，就在手机上保持合成。",
   setupGuideSkipKokoro: "暂时跳过",
-  setupGuideVoiceTestTitle: "测试您的设置",
+  setupGuideVoiceTestTitle: "测试你的设置",
   setupGuideVoiceTestBody:
     "说一个简短的句子。当可接受的语音路由可用时，我将测试麦克风访问、转录、配置的回复路由和语音输出。",
   setupGuideVoiceTestNoInputBody:
@@ -784,7 +784,7 @@ export const zhCN = {
     "在此设备上，该配置无法使用语音输入。",
   setupGuideSummaryTitle: "设置完成",
   setupGuideSummaryBody:
-    "以下是我在您当前配置下将使用的路由。",
+    "以下是我在你当前配置下将使用的路由。",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "语音转文字",
   setupGuideSummaryTts: "文字转语音",
@@ -801,7 +801,7 @@ export const zhCN = {
   setupGuideWebSearchAvailableOff: ({ provider }) =>
     `通过 ${provider} 提供，目前关闭`,
   setupGuideSummaryTextOnlyNote:
-    "语音回复暂时关闭。在您启用提供商或本地语音之前，回复将以文本形式保留。",
+    "语音回复暂时关闭。在你启用提供商或本地语音之前，回复将以文本形式保留。",
   setupGuideFinish: "完成",
   searchConversationsPlaceholder: "搜索标题、模型和消息文本",
   noMatchingConversations: "没有匹配的对话",

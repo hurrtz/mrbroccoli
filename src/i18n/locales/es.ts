@@ -36,7 +36,7 @@ export const es = {
   aboutSetting: ({ setting }) => `Acerca de ${setting}`,
   unavailable: "No disponible",
   selection: "Selección",
-  chooseCompatibleProviderFirst: "Elija primero un proveedor compatible",
+  chooseCompatibleProviderFirst: "Elige primero un proveedor compatible",
   settings: "Ajustes",
   settingsReleaseVersion: ({ version }) => `Versión ${version}`,
   all: "Todos",
@@ -67,7 +67,7 @@ export const es = {
     "Revisa las conexiones y prueba la ruta de voz completa.",
   setupGuideShowInSettings: "Mostrar la configuración guiada en Ajustes",
   setupGuideShowInSettingsSummary:
-    "Muestre u oculte el acceso directo de configuración guiada en la descripción general de Ajustes.",
+    "Muestra u oculta el acceso directo de configuración guiada en la descripción general de Ajustes.",
   settingsConnectionsSummary: "Claves, validación y capacidades del proveedor.",
   settingsThinkingSummary:
     "Tarjetas de inicio, modelos, esfuerzo y aviso del sistema.",
@@ -138,19 +138,19 @@ export const es = {
   instructionsTabDescription:
     "Dé forma a la guía oculta que dirige al asistente antes de que cualquier proveedor vea la solicitud.",
   providersTabDescription:
-    "Almacene las credenciales de servicios externos en el dispositivo y configure los modos de respuesta que desea utilizar.",
+    "Almacena las credenciales de servicios externos en el dispositivo y configura los modos de respuesta que quieres utilizar.",
   webSearchTabDescription:
-    "Configure el contexto web en vivo opcional antes de las respuestas.",
+    "Configura el contexto web en vivo opcional antes de las respuestas.",
   responseModes: "Selección de modelo",
   aboutModelSelection: "Acerca de la selección del modelo",
   modelSelectionInfo:
-    "Cada tarjeta de modelo se convierte en una opción en la pantalla de inicio. Configure su proveedor, modelo y nivel de esfuerzo opcional, luego cambie de tarjeta para elegir qué modelo responde a continuación.",
+    "Cada tarjeta de modelo se convierte en una opción en la pantalla de inicio. Configura tu proveedor, modelo y nivel de esfuerzo opcional, luego cambie de tarjeta para elegir qué modelo responde a continuación.",
   responseModeItemTitle: ({ index }) => `Modelo ${index}`,
   addResponseMode: "Agregar modelo",
   removeResponseMode: "Quitar modelo",
   responseModesNoConfiguredProviders:
-    "Primero agregue las credenciales. Los controles de ruta permanecen ocultos hasta que se configura al menos un servicio compatible.",
-  useResponseMode: ({ mode }) => `Utilice ${mode}`,
+    "Primero agrega las credenciales. Los controles de ruta permanecen ocultos hasta que se configura al menos un servicio compatible.",
+  useResponseMode: ({ mode }) => `Utiliza ${mode}`,
   chooseResponseModel: "Elige un modelo",
   responseModelCount: ({ count }) => `${count} modelos disponibles`,
   ulraMode: "Modo supremo",
@@ -178,9 +178,9 @@ export const es = {
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `Fallaron ${failed} llamadas internas a modelos; la respuesta final utilizó ${succeeded} contribuciones correctas.`,
   sttTabDescription:
-    "Controle cómo se captura la voz y qué backend convierte el audio en texto antes de que llegue al modelo.",
+    "Controla cómo se captura la voz y qué backend convierte el audio en texto antes de que llegue al modelo.",
   ttsTabDescription:
-    "Controle cuándo comienzan a hablar las respuestas y qué backend maneja la salida hablada.",
+    "Controla cuándo comienzan a hablar las respuestas y qué backend maneja la salida hablada.",
   brief: "Breve",
   briefDescription:
     "Mantén la respuesta concisa. Usa el número mínimo de oraciones necesario para responder por completo al usuario.",
@@ -208,13 +208,13 @@ export const es = {
   eli5: "ELI5",
   eli5Description:
     "Explica todo de la forma más sencilla posible. Usa analogías, lenguaje cotidiano y cero jerga. No des por sentado ningún conocimiento previo sobre ningún tema.",
-  useProvider: ({ provider }) => `Utilice ${provider}`,
+  useProvider: ({ provider }) => `Utiliza ${provider}`,
   createApiKey: "Credenciales",
   apiKey: "Clave API",
   aboutThisProvider: "Acerca de este proveedor",
   openRouterOnboardingTitle: "Una clave, múltiples proveedores",
   openRouterOnboardingDescription:
-    "Cree una clave OpenRouter dedicada, péguela a continuación y utilice modelos respaldados por instantáneas de varios proveedores sin reemplazar ninguna conexión directa.",
+    "Crea una clave OpenRouter dedicada, pégala a continuación y utiliza modelos respaldados por instantáneas de varios proveedores sin reemplazar ninguna conexión directa.",
   openRouterOnboardingRoute:
     "Ruta de solicitud: este dispositivo → OpenRouter → proveedor ascendente seleccionado",
   openRouterKeys: "Claves de OpenRouter",
@@ -263,28 +263,28 @@ export const es = {
   openStyleSheet: "Abrir los ajustes de la conversación",
   conversationThinkingInstructions: "Instrucciones para pensar",
   conversationThinkingInstructionsDescription:
-    "Agregue instrucciones después del aviso del sistema global para esta conversación.",
+    "Agrega instrucciones después del aviso del sistema global para esta conversación.",
   conversationThinkingInstructionsPlaceholder:
-    "Por ejemplo: desafíe mis suposiciones y utilice ejemplos concretos.",
+    "Por ejemplo: desafía mis suposiciones y utiliza ejemplos concretos.",
   ttsInstructions: "Instrucciones de locución",
   ttsInstructionsDescription:
-    "Guíe el tono, el ritmo, el acento o la expresión utilizados por los modelos de habla compatibles.",
+    "Guía el tono, el ritmo, el acento o la expresión utilizados por los modelos de habla compatibles.",
   conversationTtsInstructionsDescription:
-    "Agregue instrucciones de locución después de las instrucciones de voz globales para esta conversación.",
+    "Agrega instrucciones de locución después de las instrucciones de voz globales para esta conversación.",
   ttsInstructionsPlaceholder:
-    "Por ejemplo: hable con calidez, claridad y ritmo relajado.",
+    "Por ejemplo: habla con calidez, claridad y ritmo relajado.",
   ttsInstructionsUnsupported:
     "La ruta de voz actual no admite instrucciones de locución.",
   conversationVoiceDescription: ({ route }) =>
     `Elige la voz utilizada por ${route} en esta conversación.`,
-  scrollToLatest: "Desplácese hasta el último mensaje",
+  scrollToLatest: "Desplázate hasta el último mensaje",
   conversationTitleGenerate: "Generar título automáticamente",
   conversationTitleGenerating: "Generando título…",
   conversationTitleGenerated: "Conversación renombrada.",
   conversationTitleNeedsContent:
-    "Inicie una conversación antes de generar un título.",
+    "Inicia una conversación antes de generar un título.",
   conversationTitleNeedsProvider:
-    "Configure el modelo seleccionado antes de generar un título.",
+    "Configura el modelo seleccionado antes de generar un título.",
   conversationTitleGenerationFailed: "No se pudo generar un título de conversación.",
   conversationTitleGenerationTimedOut:
     "La generación de títulos tomó demasiado tiempo. Por favor inténtalo de nuevo.",
@@ -292,13 +292,13 @@ export const es = {
   voiceInput: "Entrada de voz",
   pushToTalk: "Pulsar para hablar",
   pushToTalkDescription:
-    "Mantenga presionado el botón principal mientras habla, luego suéltelo para enviar.",
+    "Mantén presionado el botón principal mientras hablas, luego suéltalo para enviar.",
   toggleToTalk: "Alternar para hablar",
   toggleToTalkDescription:
-    "Toque una vez para comenzar a grabar y toque nuevamente cuando haya terminado.",
+    "Toca una vez para comenzar a grabar y toca nuevamente cuando haya terminado.",
   driveSession: "Sesión de conducción",
   driveSessionDescription:
-    "Cuando la continuación automática está activada, la grabación comienza después de cada respuesta hablada. Toque el botón principal cuando haya terminado de hablar.",
+    "Cuando la continuación automática está activada, la grabación comienza después de cada respuesta hablada. Toca el botón principal cuando haya terminado de hablar.",
   stopDriveSession: "Pausar continuación automática",
   repeatDriveReply: "Repetir la última",
   continueDriveSession: "Reanudar continuación automática",
@@ -306,25 +306,25 @@ export const es = {
   speechToText: "Voz a texto",
   appNative: "Reconocimiento del sistema",
   nativeSttDescription:
-    "Utilice el reconocedor de voz del sistema operativo.",
+    "Utiliza el reconocedor de voz del sistema operativo.",
   provider: "Proveedor",
   webSearchProvider: "Proveedor de búsqueda web",
   webSearchProviderMissingHint:
-    "Configure al menos un servicio con capacidad de búsqueda en Credenciales para habilitar aquí el contexto web.",
+    "Configura al menos un servicio con capacidad de búsqueda en Credenciales para habilitar aquí el contexto web.",
   webSearchModelHint: ({ model }) =>
     `Utiliza ${model} internamente para obtener contexto web en vivo.`,
   webSearchHomeHint:
-    "Utilice el interruptor de la pantalla de inicio para activar o desactivar el contexto web para este hilo.",
+    "Utiliza el interruptor de la pantalla de inicio para activar o desactivar el contexto web para este hilo.",
   settingsWebSearchCompactHint:
     "Opcionalmente, anteponga un contexto web nuevo antes de que responda el modelo principal.",
   webSearchAdvanced: "Controles de búsqueda avanzada",
   expandAdvancedSearch: "Ampliar los controles de búsqueda avanzada",
   collapseAdvancedSearch: "Contraer controles de búsqueda avanzada",
-  webSearchSetupNeeded: "Agregue credenciales para utilizar la búsqueda web en vivo.",
+  webSearchSetupNeeded: "Agrega credenciales para utilizar la búsqueda web en vivo.",
   webSearchEnabledDescription:
     "Se agrega contexto web nuevo antes de que el modelo responda.",
   webSearchDisabledDescription:
-    "Utilice el contexto web en vivo para este hilo cuando los hechos actuales sean importantes.",
+    "Utiliza el contexto web en vivo para este hilo cuando los hechos actuales sean importantes.",
   webSearchNobodyDescription:
     "Sin solicitudes web. Responde con lo que el modelo sabe.",
   webSearchQualityControls: "Calidad de búsqueda",
@@ -343,31 +343,31 @@ export const es = {
   setWebSearchMode: ({ mode }) => `Establecer el modo de búsqueda web en ${mode}`,
   openWebSearchSettings: "Abrir los ajustes de búsqueda web",
   providerSttDescription:
-    "Utilice un servicio externo configurado para transcribir su voz antes de enviarla a la ruta de respuesta.",
+    "Utiliza un servicio externo configurado para transcribir tu voz antes de enviarla a la ruta de respuesta.",
   sttProvider: "Proveedor STT",
   sttProviderEnabledHint:
     "Aquí solo aparecen los proveedores habilitados con soporte de transcripción.",
   sttProviderMissingHint:
-    "Agregue credenciales para un servicio con soporte STT para elegirlo aquí.",
+    "Agrega credenciales para un servicio con soporte STT para elegirlo aquí.",
   nativeSttHint:
-    "El reconocimiento del sistema funciona independientemente de las claves de su proveedor y puede procesarse en el dispositivo o mediante el servicio de voz del sistema operativo.",
+    "El reconocimiento del sistema funciona independientemente de las claves de tu proveedor y puede procesarse en el dispositivo o mediante el servicio de voz del sistema operativo.",
   replyPlayback: "Reproducción de respuesta",
   sentencesArrive: "Por párrafos",
   sentencesArriveDescription:
-    "Empiece a hablar tan pronto como esté listo un párrafo completo.",
+    "Empieza a hablar tan pronto como esté listo un párrafo completo.",
   fullReplyFirst: "Respuesta completa primero",
   fullReplyFirstDescription:
     "Primero genere la respuesta completa y luego reprodúzcala de una sola vez.",
   textToSpeech: "Texto a voz",
   spokenReplies: "Respuestas habladas",
   spokenRepliesEnabledDescription:
-    "Lea las respuestas del asistente en voz alta cuando haya una ruta de voz disponible.",
+    "Lee las respuestas del asistente en voz alta cuando haya una ruta de voz disponible.",
   spokenRepliesDisabledDescription:
-    "Mantenga las respuestas solo en texto por ahora. Su ruta TTS preferida permanece guardada para más adelante.",
+    "Mantén las respuestas solo en texto por ahora. Su ruta TTS preferida permanece guardada para más adelante.",
   nativeTtsDescription:
-    "Utilice el motor de voz del dispositivo para respuestas habladas y vista previa de voz.",
+    "Utiliza el motor de voz del dispositivo para respuestas habladas y vista previa de voz.",
   kokoroTtsDescription:
-    "Utilice una voz neuronal mucho más natural en este dispositivo. El texto de respuesta hablada se sintetiza localmente, sin clave de proveedor de voz ni cargo por uso.",
+    "Utiliza una voz neuronal mucho más natural en este dispositivo. El texto de respuesta hablada se sintetiza localmente, sin clave de proveedor de voz ni cargo por uso.",
   kokoroVoices: "Voces Kokoro en el dispositivo",
   kokoroVoicesHint: ({ size, installedSize }) =>
     `El modelo multilingüe descarga aproximadamente ${size} MB y ocupa aproximadamente ${installedSize} MB después de la instalación.`,
@@ -380,7 +380,7 @@ export const es = {
   kokoroNotInstalled:
     "Descarga y verifica el modelo antes de seleccionar o usar Kokoro. No se requiere clave de proveedor.",
   kokoroLanguageFallback:
-    "Actualmente, Kokoro habla inglés y chino simplificado aquí. Para otros idiomas de respuesta seleccionados, agregue una ruta alternativa explícita o la voz se detendrá con un error.",
+    "Actualmente, Kokoro habla inglés y chino simplificado aquí. Para otros idiomas de respuesta seleccionados, agrega una ruta alternativa explícita o la voz se detendrá con un error.",
   kokoroRemoveTitle: "¿Quitar el modelo Kokoro?",
   kokoroRemoveBody: ({ installedSize }) =>
     `Esto libera aproximadamente ${installedSize} MB. Puedes descargar el modelo nuevamente en cualquier momento.`,
@@ -396,15 +396,15 @@ export const es = {
     `Contraer la configuración de voz de ${language}`,
   remove: "Eliminar",
   voiceOutputDescription:
-    "Elija el motor de voz, los idiomas de escucha y las vistas previas de voz para las respuestas habladas.",
+    "Elige el motor de voz, los idiomas de escucha y las vistas previas de voz para las respuestas habladas.",
   localTts: "Local",
   localTtsDescription:
-    "Utilice una voz local descargada coincidente para respuestas habladas.",
+    "Utiliza una voz local descargada coincidente para respuestas habladas.",
   providerTtsDescription:
-    "Utilice el servicio configurado seleccionado para respuestas habladas.",
+    "Utiliza el servicio configurado seleccionado para respuestas habladas.",
   ttsFallbackRoutes: "Rutas alternativas",
   ttsFallbackRoutesHint:
-    "Opcional. Agregue solo las rutas que desee, en el orden en que deben probarse. Una vez que una ruta comienza a hablar, permanezco en ella durante el resto de la respuesta.",
+    "Opcional. Agrega solo las rutas que quieras, en el orden en que deben probarse. Una vez que una ruta comienza a hablar, permanezco en ella durante el resto de la respuesta.",
   ttsFallbackNone:
     "No hay ninguna ruta alternativa configurada. Se mostrará un error de voz en su lugar.",
   ttsFallbackPosition: ({ position, route }) => `${position}. ${route}`,
@@ -416,7 +416,7 @@ export const es = {
   ttsProviderEnabledHint:
     "Aquí solo aparecen los proveedores habilitados con soporte de respuesta hablada.",
   ttsProviderMissingHint:
-    "Agregue credenciales para un servicio con soporte TTS para elegirlo aquí.",
+    "Agrega credenciales para un servicio con soporte TTS para elegirlo aquí.",
   localTtsOrderHint:
     "Solo se intentan las rutas alternativas configuradas explícitamente.",
   providerTtsOrderHint:
@@ -461,16 +461,16 @@ export const es = {
     "Actualmente, este proveedor utiliza su voz predeterminada para obtener vistas previas y respuestas habladas.",
   listenLanguages: "Idiomas de escucha",
   listenLanguagesHint:
-    "Elija los idiomas de respuesta que desee que suenen bien. Los pruebo en este orden al enrutar la salida de voz.",
+    "Elige los idiomas en los que quieres que suene bien. Los pruebo en este orden al enrutar la salida de voz.",
   listenLanguagesSelected: ({ count }) =>
     count === 1 ? "1 idioma seleccionado" : `${count} idiomas seleccionados`,
   localVoicePacks: "Paquetes de voz locales",
   localVoicePacksHint:
-    "Cada idioma mantiene su propia voz local. Elija la voz que desee para ese idioma y luego descargue solo los paquetes que realmente le interesen.",
+    "Cada idioma mantiene su propia voz local. Elige la voz que quieras para ese idioma y luego descarga solo los paquetes que realmente te interesen.",
   localVoiceForLanguage: ({ languageLabel }) => `Voz para ${languageLabel}`,
   providerVoicePreviews: "Vistas previas de voz del proveedor",
   providerVoicePreviewsHint:
-    "Pruebe aquí la ruta TTS actualmente seleccionada con un texto de vista previa independiente para cada idioma de respuesta.",
+    "Prueba aquí la ruta TTS actualmente seleccionada con un texto de vista previa independiente para cada idioma de respuesta.",
   nativeVoicePreviewSection: "Vista previa de voz nativa",
   nativeVoicePreviewSectionHint:
     "Este habla directamente a través del sintetizador de voz incorporado en el teléfono para que pueda compararlo con las voces configuradas del proveedor.",
@@ -489,7 +489,7 @@ export const es = {
     "Muestra las últimas solicitudes de voz, la ruta que solicitaron, la ruta que realmente utilizaron y el motivo del cambio de ruta, si lo hubo.",
   clearSpeechDiagnostics: "Borrar actividad de habla reciente",
   speechDiagnosticsEmpty:
-    "Aún no hay solicitudes de voz recientes. Obtenga una vista previa de una voz o reproduzca una respuesta para ver los detalles de la ruta aquí.",
+    "Aún no hay solicitudes de voz recientes. Obtén una vista previa de una voz o reproduzca una respuesta para ver los detalles de la ruta aquí.",
   clearSpeechDiagnosticsConfirmationTitle:
     "¿Borrar la actividad de habla reciente?",
   clearSpeechDiagnosticsConfirmationMessage:
@@ -546,11 +546,11 @@ export const es = {
   threadPinned: "Hilo fijado.",
   threadUnpinned: "Hilo desfijado.",
   addProviderKeyToUseProvider: ({ provider }) =>
-    `Agregue credenciales para ${provider} en Ajustes antes de usar esta ruta.`,
+    `Agrega credenciales para ${provider} en Ajustes antes de usar esta ruta.`,
   configureCredentialsBeforeVoiceSession:
-    "Agregue credenciales en Ajustes antes de iniciar una sesión de voz.",
+    "Agrega credenciales en Ajustes antes de iniciar una sesión de voz.",
   endpointCredentialFormatInvalid: ({ provider }) =>
-    `Para ${provider}, ingrese la URL base del proveedor y la clave API como https://your-endpoint.example.com|your-api-key.`,
+    `Para ${provider}, ingresa la URL base del proveedor y la clave API como https://your-endpoint.example.com|your-api-key.`,
   speechRecognitionUnavailableOnDevice:
     "El reconocimiento de voz no está disponible en este dispositivo.",
   debugLogLabel: "LOG",
@@ -565,11 +565,11 @@ export const es = {
     `Se recuperó el registro de depuración anterior ${fileName} (${entryCount} entradas).`,
   debugLogCaptureFailed: "No se pudo guardar el registro de depuración.",
   chooseSttBeforeVoiceSession:
-    "Elija una ruta STT configurada en Ajustes antes de iniciar una sesión de voz.",
+    "Elige una ruta STT configurada en Ajustes antes de iniciar una sesión de voz.",
   chooseTtsBeforeSpokenReplies:
-    "Elija una ruta TTS configurada en Ajustes antes de usar respuestas habladas.",
+    "Elige una ruta TTS configurada en Ajustes antes de usar respuestas habladas.",
   stopSessionBeforeReplay:
-    "Detenga la sesión de voz activa antes de reproducir la última respuesta.",
+    "Detén la sesión de voz activa antes de reproducir la última respuesta.",
   couldntCatchThatTryAgain: "No pude captar eso, inténtalo de nuevo.",
   couldntStartVoiceInput: "No se pudo iniciar la entrada de voz.",
   couldntProcessVoiceInput: "No se pudo procesar la entrada de voz.",
@@ -578,11 +578,11 @@ export const es = {
   sttRecordingTooLarge: ({ provider, limit }) =>
     `Esa grabación es demasiado larga para la conversión de voz a texto de ${provider} (máx. ${limit}). Prueba con un mensaje más corto o cambia «Voz a texto» a «Reconocimiento del sistema».`,
   addProviderKeyToEnableProvider: ({ provider }) =>
-    `Agregue credenciales para ${provider} en Ajustes antes de usar esta ruta.`,
+    `Agrega credenciales para ${provider} en Ajustes antes de usar esta ruta.`,
   stopSessionBeforePreview:
-    "Detenga la sesión de voz activa antes de obtener una vista previa de una voz.",
+    "Detén la sesión de voz activa antes de obtener una vista previa de una voz.",
   chooseTtsToPreviewVoices:
-    "Elija una ruta TTS configurada en Ajustes para obtener una vista previa de las voces.",
+    "Elige una ruta TTS configurada en Ajustes para obtener una vista previa de las voces.",
   downloadSelectedLocalVoiceFirst: ({ languageLabel }) =>
     `Descarga primero la voz local de ${languageLabel} seleccionada.`,
   couldntPreviewVoice: "No se pudo obtener una vista previa de la voz.",
@@ -634,12 +634,12 @@ export const es = {
   threadTitle: "Título del hilo",
   noTranscriptYet: "Aún no hay transcripción",
   previewTranscriptEmptyDescription:
-    "Utilice voz o texto para comenzar. Tu conversación aparecerá aquí.",
+    "Utiliza voz o texto para comenzar. Tu conversación aparecerá aquí.",
   noConversationYet: "Aún no hay conversación",
   expandedTranscriptEmptyDescription:
-    "Utilice voz o texto para comenzar. Cierra esta pantalla cuando quieras volver al escenario principal.",
+    "Utiliza voz o texto para comenzar. Cierra esta pantalla cuando quieras volver al escenario principal.",
   transcriptSelectionHint:
-    "Seleccione cualquier texto de mensaje directamente o comparta y copie mensajes individuales a continuación.",
+    "Selecciona cualquier texto de mensaje directamente o comparte y copia mensajes individuales a continuación.",
   textMessagePlaceholder: "Escribe un mensaje",
   sendTextMessage: "Enviar mensaje",
   showVoiceInput: "Mostrar entrada de voz",
@@ -650,9 +650,9 @@ export const es = {
     "Muestra el uso estimado de tokens para respuestas y totales de conversaciones.",
   debugLogButton: "Botón de registro de depuración",
   debugLogButtonHiddenDescription:
-    "Mantenga oculto el botón LOG de la pantalla de inicio a menos que ya se esté ejecutando una captura.",
+    "Mantén oculto el botón LOG de la pantalla de inicio a menos que ya se esté ejecutando una captura.",
   debugLogButtonVisibleDescription:
-    "Muestre el botón LOG de la pantalla de inicio para iniciar y detener capturas de depuración.",
+    "Muestra el botón LOG de la pantalla de inicio para iniciar y detener capturas de depuración.",
   debugLogButtonUsageDescription:
     "Cómo utilizar el botón: al activarlo se comenzará a capturar registros. Al desactivarlo, se detendrá la captura de registros y se moverán los capturados al portapapeles.",
   estimatedUsageTitle: "Uso estimado",
@@ -712,11 +712,11 @@ export const es = {
   unknownUsageRoute: "Ruta desconocida",
   setupGuideConnectProviderTitle: "Configurar credenciales",
   setupGuideConnectProviderDescription:
-    "Agregue credenciales en Ajustes, luego elija las rutas que desea usar.",
+    "Agrega credenciales en Ajustes, luego elige las rutas que quieres usar.",
   idle: "Inactivo",
   yourConversationAppearsHere: "Tu conversación aparece aquí.",
   defaultTranscriptEmptyDescription:
-    "Utilice voz o texto para comenzar. Mantendré el hilo y responderé aquí.",
+    "Utiliza voz o texto para comenzar. Mantendré el hilo y responderé aquí.",
   delete: "Borrar",
   deleteConversationConfirmationTitle: ({ title }) => `¿Eliminar “${title}”?`,
   deleteConversationConfirmationMessage:
@@ -726,30 +726,30 @@ export const es = {
   newSession: "Nueva sesión",
   noSavedConversationsYet: "Aún no hay conversaciones guardadas",
   drawerEmptyDescription:
-    "Comience a hablar desde la vista principal y crearé una sesión automáticamente.",
+    "Comienza a hablar desde la vista principal y crearé una sesión automáticamente.",
   setupGuideTitle: "Configurar la aplicación",
-  setupGuideSubtitle: "Agregue credenciales y elija rutas en Ajustes.",
+  setupGuideSubtitle: "Agrega credenciales y elige rutas en Ajustes.",
   fastestStartPreset: "Configuración mínima",
   fastestStartDescription:
-    "Utilice la voz del dispositivo cuando esté disponible y configure solo la ruta de respuesta que necesite.",
+    "Utiliza la voz del dispositivo cuando esté disponible y configura solo la ruta de respuesta que necesite.",
   fullVoicePreset: "Voz configurada",
   fullVoiceDescription:
-    "Utilice servicios configurados para respuestas, transcripción y salida hablada cuando los elija.",
+    "Utiliza servicios configurados para respuestas, transcripción y salida hablada cuando los elige.",
   setupGuideNote:
     "A continuación abriremos Ajustes para que pueda pegar y validar las credenciales.",
-  useThisSetup: "Utilice esta configuración",
+  useThisSetup: "Utiliza esta configuración",
   notNow: "Ahora no",
   setupGuideIntroTitle: "Cómo funciono",
   setupGuideIntroBody:
-    "Empiezo en blanco. Agregue credenciales para los servicios externos que ya utiliza y luego elija cómo se enrutan las respuestas, la entrada de voz, la salida hablada y el contexto web opcional.",
+    "Empiezo en blanco. Agrega credenciales para los servicios externos que ya utiliza y luego elige cómo se enrutan las respuestas, la entrada de voz, la salida hablada y el contexto web opcional.",
   setupGuideIntroNote:
-    "Después de la configuración, use el control de voz principal para iniciar y detener una conversación. La transcripción actual permanece disponible en la pantalla de inicio y cada ruta se puede cambiar más tarde en Ajustes.",
+    "Después de la configuración, usa el control de voz principal para iniciar y detener una conversación. La transcripción actual permanece disponible en la pantalla de inicio y cada ruta se puede cambiar más tarde en Ajustes.",
   setupGuideProviderTitle: "Agregar credenciales",
   setupGuideProviderBody:
-    "Elija el servicio externo que desea configurar y luego pegue las credenciales con acceso de respuesta.",
+    "Elige el servicio externo que quieres configurar y luego pega las credenciales con acceso de respuesta.",
   setupGuideProviderPickerLabel: "Servicio de respuesta",
-  setupGuideSelectProvider: "Seleccione un proveedor",
-  setupGuideSelectProviderFirst: "Seleccione un proveedor primero.",
+  setupGuideSelectProvider: "Selecciona un proveedor",
+  setupGuideSelectProviderFirst: "Selecciona un proveedor primero.",
   setupGuideApiKeyLabel: "Clave API",
   setupGuideApiKeyPlaceholder: "Pegar credenciales",
   setupGuideContinue: "Continuar",
@@ -757,26 +757,26 @@ export const es = {
   setupGuideBack: "Atrás",
   setupGuideValidateKey: "Validar clave",
   setupGuideApiKeyRequiredOrCancel:
-    "Agregue una clave API para continuar o cancele la guía de configuración.",
+    "Agrega una clave API para continuar o cancela la guía de configuración.",
   setupGuideProviderAndApiKeyRequiredOrCancel:
-    "Elija un proveedor y agregue una clave API para continuar, o cancele la guía de configuración.",
+    "Elige un proveedor y agrega una clave API para continuar, o cancela la guía de configuración.",
   setupGuideProviderKeyNeedsLlmAccess: ({ provider }) =>
     `Estas credenciales de ${provider} no permiten solicitudes de respuesta.`,
-  setupGuideKokoroTitle: "Agregue una voz natural en el dispositivo",
+  setupGuideKokoroTitle: "Agrega una voz natural en el dispositivo",
   setupGuideKokoroBody: ({ size }) =>
-    `Opcional: descargue Kokoro (aproximadamente ${size} MB) para obtener respuestas habladas mucho más naturales sin un proveedor de voz ni cargos por uso.`,
+    `Opcional: descarga Kokoro (aproximadamente ${size} MB) para obtener respuestas habladas mucho más naturales sin un proveedor de voz ni cargos por uso.`,
   setupGuideKokoroLanguageNote:
-    "Este modelo actualmente habla inglés y chino simplificado. Configure las rutas alternativas que desee más adelante en los ajustes de voz.",
+    "Este modelo actualmente habla inglés y chino simplificado. Configura las rutas alternativas que quieras más adelante en los ajustes de voz.",
   setupGuideKokoroDownload: "Descargar Kokoro",
-  setupGuideUseKokoro: "Utilice Kokoro para respuestas habladas",
+  setupGuideUseKokoro: "Utiliza Kokoro para respuestas habladas",
   setupGuideUseKokoroSummary:
-    "Mantenga la síntesis en el teléfono siempre que se admita el idioma de respuesta.",
+    "Mantén la síntesis en el teléfono siempre que se admita el idioma de respuesta.",
   setupGuideSkipKokoro: "Saltar por ahora",
-  setupGuideVoiceTestTitle: "Pruebe su configuración",
+  setupGuideVoiceTestTitle: "Prueba tu configuración",
   setupGuideVoiceTestBody:
     "Di una frase corta. Probaré el acceso al micrófono, la transcripción, la ruta de respuesta configurada y la salida hablada cuando esté disponible una ruta de voz aceptable.",
   setupGuideVoiceTestNoInputBody:
-    "La entrada de voz no está disponible con esta configuración. Continúe revisando las rutas detectadas y luego ajuste la configuración de voz si es necesario.",
+    "La entrada de voz no está disponible con esta configuración. Continúa revisando las rutas detectadas y luego ajusta la configuración de voz si es necesario.",
   setupGuideVoiceTestTextOnlyNote:
     "Esta prueba es de solo texto porque aún no hay ninguna ruta de voz hablada aceptable lista.",
   setupGuideVoiceTestStart: "Iniciar prueba",
@@ -793,7 +793,7 @@ export const es = {
     "La entrada de voz no está disponible para esta configuración en este dispositivo.",
   setupGuideSummaryTitle: "Configuración completa",
   setupGuideSummaryBody:
-    "Aquí está la ruta que utilizaré con su configuración actual.",
+    "Aquí está la ruta que utilizaré con tu configuración actual.",
   setupGuideSummaryLlm: "LLM",
   setupGuideSummaryStt: "Voz a texto",
   setupGuideSummaryTts: "Texto a voz",
@@ -818,7 +818,7 @@ export const es = {
   searchConversationsPlaceholder: "Buscar títulos, modelos y texto de mensajes",
   noMatchingConversations: "No hay conversaciones coincidentes",
   noMatchingConversationsDescription:
-    "Pruebe con un título, ruta, modelo o frase diferente de la transcripción.",
+    "Prueba con un título, ruta, modelo o frase diferente de la transcripción.",
   noProviderYet: "Ningún proveedor todavía",
   noModelYet: "Aún no hay modelo",
   startedAt: "Inicio",
@@ -857,7 +857,7 @@ export const es = {
   providerConfiguredInSettings: ({ provider }) =>
     `${provider} no está configurado en Ajustes.`,
   providerNetworkError: ({ provider, action }) =>
-    `No se pudo comunicar con ${provider} para ${action}. Verifique la conexión y vuelva a intentarlo.`,
+    `No se pudo comunicar con ${provider} para ${action}. Verifica la conexión y vuelve a intentarlo.`,
   providerAuthError: ({ provider, action }) =>
     `${provider} rechazó las credenciales de ${action}. Verifica la clave API y los permisos.`,
   providerRateLimitError: ({ provider, action }) =>
@@ -873,7 +873,7 @@ export const es = {
   providerIncompleteReplyError: ({ provider }) =>
     `La respuesta de ${provider} finalizó antes de completarse. Inténtalo de nuevo.`,
   providerContextTooLong: ({ provider }) =>
-    `${provider} rechazó la respuesta porque la conversación se hizo demasiado larga. Inicie un hilo nuevo o acorte la solicitud.`,
+    `${provider} rechazó la respuesta porque la conversación se hizo demasiado larga. Inicia un hilo nuevo o acorte la solicitud.`,
   providerRequestRejected: ({ provider, action, detail }) =>
     detail
       ? `${provider} rechazó la solicitud ${action}: ${detail}`
@@ -895,7 +895,7 @@ export const es = {
   localTtsUnavailableForLanguage: ({ languageLabel }) =>
     `No hay ninguna ruta de voz local o en la nube lista para ${languageLabel}.`,
   chooseTextToSpeechProviderInSettings:
-    "Elija un proveedor de texto a voz en Ajustes.",
+    "Elige un proveedor de texto a voz en Ajustes.",
   ttsNotSupportedYet: ({ provider }) => `${provider} TTS aún no es compatible.`,
   ttsError: ({ provider, status, errorText }) =>
     `Error de TTS de ${provider} (${status}): ${errorText}`,
@@ -914,7 +914,7 @@ export const es = {
   nativeSttHandledInApp:
     "El STT del sistema se gestiona directamente en la aplicación.",
   chooseSpeechToTextProviderInSettings:
-    "Elija un proveedor de voz a texto en Ajustes.",
+    "Elige un proveedor de voz a texto en Ajustes.",
   sttNotSupportedYet: ({ provider }) => `${provider} STT aún no es compatible.`,
   providerNotWiredUpYet: ({ provider }) => `${provider} aún no está conectado.`,
   you: "Tú",
