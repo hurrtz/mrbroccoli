@@ -53,14 +53,17 @@ framework or hiding platform behavior behind excessive abstraction.
 ## Interaction Invariants
 
 - `VoiceOrb` is the stable home-stage affordance, including blocked states; it
-  must not be exchanged for a legacy full-width CTA. Its two rings represent a
-  whole-turn estimate and current-phase clock, with a track plus red
+  must not be exchanged for a legacy full-width CTA. Its ring footprint can
+  represent a whole-turn estimate and current-phase clock, with a track plus red
   counter-clockwise tail after the estimate. Interpolation belongs on the
   Reanimated UI thread so streamed-content renders cannot reduce ring frame
   rate; callers provide semantic values and remaining durations, never a JS
-  animation interval. Its approved anatomy is core disc, screen-coloured gap,
-  inner phase ring, then the outer whole-turn ring flush against it; no tinted
-  halo may occupy the gap.
+  animation interval. Its approved anatomy is core disc,
+  screen-coloured gap, inner phase ring, then the outer whole-turn ring flush
+  against it; no tinted halo may occupy the gap. When both bands carry the same
+  state and progress, they render as one double-width stroke centred over that
+  exact footprint so adjacent SVG edges cannot expose a raster seam. They split
+  into two strokes only while they carry different clocks.
 - Every interactive target is at least 44 by 44 points, including icon-only
   buttons. A smaller decorative glyph may sit inside that target.
 - Pressed, disabled, selected, destructive, loading, error, and focus states

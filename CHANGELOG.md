@@ -14,6 +14,8 @@ the complete Play Store translations are kept in a dedicated file under
   drawer over it. Drawer headlines use the same centred treatment, their roomy
   grabbers support tap and pull-down dismissal without a redundant close icon,
   and the home model picker applies a tapped model immediately without Done.
+- When both voice-orb rings carry the same state, they now render as one
+  continuous thicker ring so no hairline seam can appear between them.
 - Conversation length, tone, instructions, and voice now behave as saved
   per-session overrides over standard Settings defaults. Thinking exposes the
   standard length and tone, a session can return to those defaults, and the

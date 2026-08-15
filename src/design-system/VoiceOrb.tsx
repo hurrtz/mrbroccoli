@@ -103,6 +103,7 @@ function tintOf(hexColor: string): string {
 function ProgressRing({
   centre,
   radius,
+  strokeWidth = BAND,
   trackColor,
   progressColor,
   progress,
@@ -113,6 +114,7 @@ function ProgressRing({
 }: {
   centre: number;
   radius: number;
+  strokeWidth?: number;
   trackColor: string;
   progressColor?: string;
   progress?: number;
@@ -144,7 +146,7 @@ function ProgressRing({
         cy={centre}
         r={radius}
         stroke={trackColor}
-        strokeWidth={BAND}
+        strokeWidth={strokeWidth}
         fill="none"
       />
       {progressColor && (progress || progressTiming) ? (
@@ -154,7 +156,7 @@ function ProgressRing({
           cy={centre}
           r={radius}
           stroke={progressColor}
-          strokeWidth={BAND}
+          strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={[circumference, circumference]}
           transform={`rotate(-90 ${centre} ${centre})`}
@@ -169,7 +171,7 @@ function ProgressRing({
           cy={centre}
           r={radius}
           stroke={tailColor}
-          strokeWidth={BAND}
+          strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={[circumference, circumference]}
           transform={`rotate(90 ${centre} ${centre})`}
@@ -239,9 +241,9 @@ function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
  * is the current phase against itself. Past the estimate both rings fill with
  * red as they run, so a late turn is legible without reading anything.
  *
- * At rest there is no turn and no phase, so neither ring means anything —
- * the idle orb draws both bands in the same quiet tint rather than two empty
- * tracks.
+ * Whenever both bands would carry exactly the same information, the orb draws
+ * one continuous double-width band. That avoids a raster seam between two
+ * adjacent strokes while preserving the same outer and inner boundaries.
  */
 export function VoiceOrb({
   phase = "idle",
@@ -308,19 +310,17 @@ export function VoiceOrb({
     !clamp01(phaseProgress) &&
     !late;
 
-  // The two ring bands are flush. Their shared hole keeps the screen-colour
-  // gap around the proportional core; below the crossover the core is
-  // clamped so that gap survives and the orb remains circular.
+  // The ring footprint keeps one screen-colour gap around the proportional
+  // core. Distinct clocks split it into two flush bands; a shared clock uses
+  // one double-width stroke over the exact same inner and outer boundaries.
   const inner = size - BAND * 2;
   const innerHole = inner - BAND * 2;
-  const disc = Math.min(
-    innerHole - CORE_GAP * 2,
-    Math.floor(size * 0.79),
-  );
+  const disc = Math.min(innerHole - CORE_GAP * 2, Math.floor(size * 0.79));
   const iconSide = Math.round(size * 0.3);
   const centre = size / 2;
   const turnRadius = (size - BAND) / 2;
   const phaseRadius = (inner - BAND) / 2;
+  const combinedRadius = (turnRadius + phaseRadius) / 2;
 
   return (
     <Pressable
@@ -341,54 +341,32 @@ export function VoiceOrb({
         testID="voice-orb-rings"
       >
         {quiet ? (
-          // At rest both rings are faded phase colour: no clocks, and never
-          // two empty tracks. The screen-colour core gap stays unpainted.
-          <>
-            <Circle
-              cx={centre}
-              cy={centre}
-              r={turnRadius}
-              stroke={tint}
-              strokeWidth={BAND}
-              fill="none"
-            />
-            <Circle
-              cx={centre}
-              cy={centre}
-              r={phaseRadius}
-              stroke={tint}
-              strokeWidth={BAND}
-              fill="none"
-            />
-          </>
+          // No clocks exist at rest, so one quiet band carries the full ring
+          // footprint without a seam between adjacent SVG strokes.
+          <Circle
+            cx={centre}
+            cy={centre}
+            r={combinedRadius}
+            stroke={tint}
+            strokeWidth={BAND * 2}
+            fill="none"
+          />
         ) : combined ? (
           // Recording and speaking have one thing to say — how much of the
           // window is used, how much of the response has been read — so both
           // rings carry the same arc rather than two competing clocks.
-          <>
-            <ProgressRing
-              centre={centre}
-              radius={turnRadius}
-              trackColor={tint}
-              progressColor={ink}
-              progress={phaseProgress}
-              progressTiming={phaseProgressTiming}
-              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
-              tail={late}
-              tailTiming={overtimeTiming}
-            />
-            <ProgressRing
-              centre={centre}
-              radius={phaseRadius}
-              trackColor={tint}
-              progressColor={ink}
-              progress={phaseProgress}
-              progressTiming={phaseProgressTiming}
-              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
-              tail={late}
-              tailTiming={overtimeTiming}
-            />
-          </>
+          <ProgressRing
+            centre={centre}
+            radius={combinedRadius}
+            strokeWidth={BAND * 2}
+            trackColor={tint}
+            progressColor={ink}
+            progress={phaseProgress}
+            progressTiming={phaseProgressTiming}
+            tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
+            tail={late}
+            tailTiming={overtimeTiming}
+          />
         ) : (
           <>
             <ProgressRing
