@@ -1603,7 +1603,7 @@ describe("MainScreen", () => {
     expect(screen.getByTestId("conversation-settings-summary")).toBeTruthy();
     expect(
       screen.getByText(
-        "Adaptive Length: Normal · Response Tone: Professional · TTS Voice: System voice",
+        "Length: Normal · Tone: Professional · Voice: System voice",
       ),
     ).toBeTruthy();
     expect(

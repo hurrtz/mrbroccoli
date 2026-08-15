@@ -261,8 +261,9 @@ settings sentence.
 the global defaults and keeps pre-message overrides pending until the first
 conversation record is created. Its reset removes the stored override object,
 so the session resumes inheritance instead of freezing a copy of the defaults.
-The portrait summary lists the effective values in sheet order and wraps its
-text plus trailing glyph in one row-sized press target.
+The portrait summary lists exactly the effective length, tone, and voice as
+translated `Label: value` pairs separated by middle dots, in that order. It
+wraps the text plus trailing glyph in one row-sized press target.
 
 When the native font scale reaches the accessibility-large range, the portrait
 composition switches optional chrome to its existing compact forms: the

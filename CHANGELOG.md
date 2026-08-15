@@ -13,7 +13,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Conversation length, tone, instructions, and voice now behave as saved
   per-session overrides over standard Settings defaults. Thinking exposes the
   standard length and tone, a session can return to those defaults, and the
-  home summary uses the latest labelled design with the entire row clickable.
+  home summary states `Length: value · Tone: value · Voice: value` and keeps the
+  entire row clickable.
 - The transcript handle now shows one stable label instead of repeating model,
   age, or reply content; opened sheets and docked iPad transcripts carry the
   same visible heading.

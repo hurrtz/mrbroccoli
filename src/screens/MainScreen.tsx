@@ -543,27 +543,12 @@ export function MainScreen() {
   ]);
   const conversationSettingsSummary = React.useMemo(
     () =>
-      [
-        `${t("adaptiveLength")}: ${t(responseLength)}`,
-        `${t("responseTone")}: ${t(responseTone)}`,
-        `${t("ttsVoice")}: ${settingsSummaryVoice}`,
-        ttsInstructions.trim()
-          ? `${t("ttsInstructions")}: ${t("providerStatusConfigured")}`
-          : null,
-        llmInstructions.trim()
-          ? `${t("conversationThinkingInstructions")}: ${t("providerStatusConfigured")}`
-          : null,
-      ]
-        .filter((value): value is string => Boolean(value))
-        .join(" · "),
-    [
-      llmInstructions,
-      responseLength,
-      responseTone,
-      settingsSummaryVoice,
-      t,
-      ttsInstructions,
-    ],
+      t("conversationSettingsSummary", {
+        length: t(responseLength),
+        tone: t(responseTone),
+        voice: settingsSummaryVoice,
+      }),
+    [responseLength, responseTone, settingsSummaryVoice, t],
   );
   const isRecording =
     runtimeSettings.sttMode === "native"

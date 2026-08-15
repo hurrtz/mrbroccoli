@@ -17,6 +17,15 @@ const en = {
   transportResume: "Resume",
   workspaceHideTranscript: "Hide transcript",
   workspaceTranscriptTitle: "Transcript",
+  conversationSettingsSummary: ({
+    length,
+    tone,
+    voice,
+  }: {
+    length?: string | number;
+    tone?: string | number;
+    voice?: string | number;
+  }) => `Length: ${length} · Tone: ${tone} · Voice: ${voice}`,
   conversationDefaultsTitle: "Conversation defaults",
   conversationDefaultsDescription:
     "Used by new sessions and any session without its own overrides.",
@@ -50,6 +59,8 @@ export const workspaceTranslations = {
     transportResume: "استئناف",
     workspaceHideTranscript: "إخفاء النص",
     workspaceTranscriptTitle: "النص",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `الطول: ${length} · النبرة: ${tone} · الصوت: ${voice}`,
     conversationDefaultsTitle: "الإعدادات الافتراضية للمحادثة",
     conversationDefaultsDescription:
       "تُستخدم للجلسات الجديدة وأي جلسة بلا إعدادات خاصة بها.",
@@ -76,6 +87,8 @@ export const workspaceTranslations = {
     transportResume: "Pokračovat",
     workspaceHideTranscript: "Skrýt přepis",
     workspaceTranscriptTitle: "Přepis",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Délka: ${length} · Tón: ${tone} · Hlas: ${voice}`,
     conversationDefaultsTitle: "Výchozí nastavení konverzace",
     conversationDefaultsDescription:
       "Použije se pro nové relace a relace bez vlastních nastavení.",
@@ -102,6 +115,8 @@ export const workspaceTranslations = {
     transportResume: "Weiter",
     workspaceHideTranscript: "Transkript ausblenden",
     workspaceTranscriptTitle: "Transkript",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Länge: ${length} · Ton: ${tone} · Stimme: ${voice}`,
     conversationDefaultsTitle: "Standardeinstellungen für Gespräche",
     conversationDefaultsDescription:
       "Werden für neue Sitzungen und Sitzungen ohne eigene Anpassungen verwendet.",
@@ -128,6 +143,8 @@ export const workspaceTranslations = {
     transportResume: "Reanudar",
     workspaceHideTranscript: "Ocultar transcripción",
     workspaceTranscriptTitle: "Transcripción",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Longitud: ${length} · Tono: ${tone} · Voz: ${voice}`,
     conversationDefaultsTitle: "Ajustes predeterminados de conversación",
     conversationDefaultsDescription:
       "Se usan en sesiones nuevas y en sesiones sin ajustes propios.",
@@ -154,6 +171,8 @@ export const workspaceTranslations = {
     transportResume: "Continuer",
     workspaceHideTranscript: "Masquer la transcription",
     workspaceTranscriptTitle: "Transcription",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Longueur: ${length} · Ton: ${tone} · Voix: ${voice}`,
     conversationDefaultsTitle: "Réglages de conversation par défaut",
     conversationDefaultsDescription:
       "Utilisés pour les nouvelles sessions et celles sans réglages spécifiques.",
@@ -180,6 +199,8 @@ export const workspaceTranslations = {
     transportResume: "जारी",
     workspaceHideTranscript: "प्रतिलेख छिपाएँ",
     workspaceTranscriptTitle: "प्रतिलेख",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `लंबाई: ${length} · लहजा: ${tone} · आवाज़: ${voice}`,
     conversationDefaultsTitle: "बातचीत की डिफ़ॉल्ट सेटिंग",
     conversationDefaultsDescription:
       "नए सत्रों और बिना अलग सेटिंग वाले सत्रों में इस्तेमाल होती हैं।",
@@ -206,6 +227,8 @@ export const workspaceTranslations = {
     transportResume: "Folytatás",
     workspaceHideTranscript: "Átirat elrejtése",
     workspaceTranscriptTitle: "Átirat",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Hossz: ${length} · Hangnem: ${tone} · Hang: ${voice}`,
     conversationDefaultsTitle: "Alapértelmezett beszélgetési beállítások",
     conversationDefaultsDescription:
       "Új munkamenetekhez és saját beállítás nélküli munkamenetekhez használjuk.",
@@ -232,6 +255,8 @@ export const workspaceTranslations = {
     transportResume: "Riprendi",
     workspaceHideTranscript: "Nascondi trascrizione",
     workspaceTranscriptTitle: "Trascrizione",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Lunghezza: ${length} · Tono: ${tone} · Voce: ${voice}`,
     conversationDefaultsTitle: "Impostazioni predefinite della conversazione",
     conversationDefaultsDescription:
       "Usate per le nuove sessioni e per quelle senza personalizzazioni.",
@@ -258,6 +283,8 @@ export const workspaceTranslations = {
     transportResume: "再開",
     workspaceHideTranscript: "トランスクリプトを隠す",
     workspaceTranscriptTitle: "トランスクリプト",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `長さ: ${length} · トーン: ${tone} · 音声: ${voice}`,
     conversationDefaultsTitle: "会話のデフォルト設定",
     conversationDefaultsDescription:
       "新しいセッションと個別設定のないセッションで使用されます。",
@@ -284,6 +311,8 @@ export const workspaceTranslations = {
     transportResume: "Wznów",
     workspaceHideTranscript: "Ukryj transkrypcję",
     workspaceTranscriptTitle: "Transkrypcja",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Długość: ${length} · Ton: ${tone} · Głos: ${voice}`,
     conversationDefaultsTitle: "Domyślne ustawienia rozmowy",
     conversationDefaultsDescription:
       "Używane w nowych sesjach i sesjach bez własnych ustawień.",
@@ -310,6 +339,8 @@ export const workspaceTranslations = {
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
     workspaceTranscriptTitle: "Transcrição",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
     conversationDefaultsTitle: "Predefinições da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -336,6 +367,8 @@ export const workspaceTranslations = {
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
     workspaceTranscriptTitle: "Transcrição",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
     conversationDefaultsTitle: "Configurações padrão da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -362,6 +395,8 @@ export const workspaceTranslations = {
     transportResume: "Продолжить",
     workspaceHideTranscript: "Скрыть расшифровку",
     workspaceTranscriptTitle: "Стенограмма",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Длина: ${length} · Тон: ${tone} · Голос: ${voice}`,
     conversationDefaultsTitle: "Настройки разговора по умолчанию",
     conversationDefaultsDescription:
       "Используются для новых сеансов и сеансов без собственных настроек.",
@@ -388,6 +423,8 @@ export const workspaceTranslations = {
     transportResume: "Fortsätt",
     workspaceHideTranscript: "Dölj transkription",
     workspaceTranscriptTitle: "Transkription",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Längd: ${length} · Ton: ${tone} · Röst: ${voice}`,
     conversationDefaultsTitle: "Standardinställningar för samtal",
     conversationDefaultsDescription:
       "Används för nya sessioner och sessioner utan egna inställningar.",
@@ -414,6 +451,8 @@ export const workspaceTranslations = {
     transportResume: "Sürdür",
     workspaceHideTranscript: "Dökümü gizle",
     workspaceTranscriptTitle: "Döküm",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Uzunluk: ${length} · Ton: ${tone} · Ses: ${voice}`,
     conversationDefaultsTitle: "Varsayılan konuşma ayarları",
     conversationDefaultsDescription:
       "Yeni oturumlarda ve kendi ayarları olmayan oturumlarda kullanılır.",
@@ -440,6 +479,8 @@ export const workspaceTranslations = {
     transportResume: "Далі",
     workspaceHideTranscript: "Сховати розшифровку",
     workspaceTranscriptTitle: "Стенограма",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `Довжина: ${length} · Тон: ${tone} · Голос: ${voice}`,
     conversationDefaultsTitle: "Стандартні налаштування розмови",
     conversationDefaultsDescription:
       "Використовуються для нових сеансів і сеансів без власних налаштувань.",
@@ -466,6 +507,8 @@ export const workspaceTranslations = {
     transportResume: "جاری",
     workspaceHideTranscript: "نقل چھپائیں",
     workspaceTranscriptTitle: "نقل",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `لمبائی: ${length} · لہجہ: ${tone} · آواز: ${voice}`,
     conversationDefaultsTitle: "گفتگو کی طے شدہ ترتیبات",
     conversationDefaultsDescription:
       "نئے سیشنز اور اپنی الگ ترتیبات کے بغیر سیشنز میں استعمال ہوتی ہیں۔",
@@ -492,6 +535,8 @@ export const workspaceTranslations = {
     transportResume: "继续",
     workspaceHideTranscript: "隐藏文字记录",
     workspaceTranscriptTitle: "文字记录",
+    conversationSettingsSummary: ({ length, tone, voice }) =>
+      `长度: ${length} · 语气: ${tone} · 语音: ${voice}`,
     conversationDefaultsTitle: "对话默认设置",
     conversationDefaultsDescription: "用于新会话以及没有单独设置的会话。",
     useConversationDefaults: "使用对话默认设置",
