@@ -23,6 +23,14 @@ the complete Play Store translations are kept in a dedicated file under
   offering the extra-high reasoning effort above high.
 - Mr Broccoli now speaks about himself in the first person in every interface
   language, instead of referring to himself by name in the third person.
+- Every interface language now addresses you informally, the way German always
+  did. French, Portuguese, Russian, Ukrainian, Czech, Hungarian and Turkish
+  previously used their formal register, and Spanish and Chinese used both at
+  once within a single screen.
+- Hindi sentences now end with a danda instead of a Latin full stop, Urdu
+  headings no longer end with sentence punctuation, and several phrases that
+  had been translated word for word now use the natural idiom in their
+  language.
 
 ## 4.0.0 - 2026-08-15
 
