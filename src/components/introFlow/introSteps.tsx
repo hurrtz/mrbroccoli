@@ -2,6 +2,7 @@ import React from "react";
 import {
   AccessibilityInfo,
   Image,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -33,6 +34,7 @@ import {
   translations,
 } from "../../i18n/localeRegistry";
 import type { TranslateFn } from "../../screens/main/shared";
+import { withAlpha } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
 import { getIntroClip } from "./introClips";
 import { IntroBody, IntroTitle } from "./IntroPrimitives";
@@ -83,6 +85,7 @@ const dialogueHeadlineFade = require("../../../assets/intro/dialogue-headline-fa
 
 /** A stored-dialogue bubble in the app's messenger anatomy. */
 function Bubble({
+  blurRadius,
   children,
   contentDirection = "auto",
   isRtl = false,
@@ -90,6 +93,7 @@ function Bubble({
   testID,
   theme,
 }: {
+  blurRadius?: number;
   children: React.ReactNode;
   contentDirection?: "auto" | "ltr" | "rtl";
   isRtl?: boolean;
@@ -122,7 +126,10 @@ function Bubble({
         style={[
           styles.bubbleText,
           {
-            color: theme.text,
+            color:
+              Platform.OS === "ios" && blurRadius
+                ? withAlpha(theme.text, 0.04)
+                : theme.text,
             textAlign:
               contentDirection === "rtl"
                 ? "right"
@@ -131,6 +138,13 @@ function Bubble({
                   : "auto",
             writingDirection: contentDirection,
           },
+          Platform.OS === "ios" && blurRadius
+            ? {
+                textShadowColor: theme.text,
+                textShadowOffset: { height: 0, width: 0 },
+                textShadowRadius: blurRadius,
+              }
+            : null,
         ]}
       >
         {children}
@@ -171,6 +185,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
       >
         <View style={styles.dialogueFar} testID="intro-dialogue-far">
           <Bubble
+            blurRadius={30}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -180,6 +195,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueOpeningPrompt}
           </Bubble>
           <Bubble
+            blurRadius={30}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-1"
@@ -190,6 +206,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         </View>
         <View style={styles.dialogueMid} testID="intro-dialogue-mid">
           <Bubble
+            blurRadius={26}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -199,6 +216,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialogueQuestion}
           </Bubble>
           <Bubble
+            blurRadius={26}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-2"
@@ -209,6 +227,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         </View>
         <View style={styles.dialogueNear} testID="intro-dialogue-near">
           <Bubble
+            blurRadius={22}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -218,6 +237,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialoguePromptThree}
           </Bubble>
           <Bubble
+            blurRadius={22}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-3"
@@ -228,6 +248,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         </View>
         <View style={styles.dialogueSoft} testID="intro-dialogue-soft">
           <Bubble
+            blurRadius={18}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             mine
@@ -237,6 +258,7 @@ function WelcomeStep({ language, t }: IntroStepProps) {
             {preview.introDialoguePromptFour}
           </Bubble>
           <Bubble
+            blurRadius={18}
             contentDirection={previewDirection}
             isRtl={previewIsRtl}
             testID="intro-dialogue-response-4"
@@ -296,7 +318,10 @@ function WelcomeStep({ language, t }: IntroStepProps) {
         <Image
           resizeMode="stretch"
           source={dialogueHeadlineFade}
-          style={[StyleSheet.absoluteFill, { tintColor: theme.canvas }]}
+          style={[
+            StyleSheet.absoluteFill,
+            { opacity: 0.42, tintColor: theme.canvas },
+          ]}
           testID="intro-dialogue-headline-fade-image"
         />
       </View>
@@ -1011,10 +1036,12 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 18,
     borderBottomRightRadius: 5,
   },
-  // Earlier turns become more legible toward the crisp query. A stretchable
-  // alpha mask above this stack veils the oldest content with the active
-  // canvas colour on every supported native runtime and screen size.
+  // Earlier turns become more legible toward the crisp query. Android's
+  // built-in View filter softens each whole exchange; iOS uses the Text
+  // shadow renderer to draw blurred glyphs instead of crisp foreground text.
+  // The stretchable alpha mask supplies the shared canvas-colour fade.
   dialogueFar: {
+    filter: [{ blur: 8 }],
     gap: 8,
     opacity: 0.38,
   },
@@ -1025,10 +1052,12 @@ const styles = StyleSheet.create({
     right: 0,
   },
   dialogueMid: {
+    filter: [{ blur: 5 }],
     gap: 8,
     opacity: 0.56,
   },
   dialogueNear: {
+    filter: [{ blur: 2.5 }],
     gap: 8,
     opacity: 0.72,
   },

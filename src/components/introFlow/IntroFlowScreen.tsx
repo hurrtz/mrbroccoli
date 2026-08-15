@@ -69,12 +69,12 @@ interface IntroFlowScreenProps {
  * user should be dealing with, and follows the active app appearance so it
  * remains part of the same product.
  *
- * First-run integrity: on a first run there is no close control -- the three
- * steps are the way in. Step three stays unreachable until a reasoning model
- * is actually running, then ends in a Done that stays disabled until one
- * successful test turn. A re-entry restores the close control on steps one
- * and two and unlocks both gates; step three never shows close -- Done is the
- * exit.
+ * The close control remains available on every step, including the first run:
+ * a BYOK user must be able to leave without downloading an on-device model.
+ * Closing does not record completion, so the invitation remains available.
+ * Step three stays unreachable on a first run until a reasoning model is
+ * actually running, then ends in a Done that stays disabled until one
+ * successful test turn. A re-entry unlocks both gates.
  */
 export function IntroFlowScreen({
   autoSetup,
@@ -202,7 +202,6 @@ export function IntroFlowScreen({
 
   const isFirst = index === 0;
   const isLast = index === finalIndex;
-  const showClose = !firstRun && !isLast;
   const forwardDisabled = index === 1 && firstRun && !thinkingReady;
   const doneDisabled =
     firstRun && (!thinkingReady || testTurn.turn?.successful !== true);
@@ -211,7 +210,7 @@ export function IntroFlowScreen({
     <Modal
       animationType="slide"
       onDismiss={onDismiss}
-      onRequestClose={firstRun ? undefined : onClose}
+      onRequestClose={onClose}
       presentationStyle="fullScreen"
       testID="intro-flow-modal"
       visible={visible}
@@ -291,27 +290,19 @@ export function IntroFlowScreen({
                       t={t}
                     />
 
-                    {showClose ? (
-                      <Pressable
-                        accessibilityLabel={t("introBannerDismiss")}
-                        accessibilityRole="button"
-                        onPress={onClose}
-                        style={styles.headerButton}
-                        testID="intro-close"
-                      >
-                        <PhosphorIcon
-                          color={theme.textSecondary}
-                          name="close"
-                          size="navigation"
-                        />
-                      </Pressable>
-                    ) : (
-                      <View
-                        accessibilityElementsHidden
-                        importantForAccessibility="no"
-                        style={styles.headerButton}
+                    <Pressable
+                      accessibilityLabel={t("introBannerDismiss")}
+                      accessibilityRole="button"
+                      onPress={onClose}
+                      style={styles.headerButton}
+                      testID="intro-close"
+                    >
+                      <PhosphorIcon
+                        color={theme.textSecondary}
+                        name="close"
+                        size="navigation"
                       />
-                    )}
+                    </Pressable>
                   </View>
 
                   <ScrollView

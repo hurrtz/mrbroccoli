@@ -37,7 +37,7 @@ const rawIntroTranslations = {
       "They stay on this device. With a hosted model, the context needed to answer goes directly to that provider.",
     introWelcomeQuery: "How does this application work?",
     introDialoguePlayResponse:
-      "That answer makes more sense out loud. Tap play and let Mr Broccoli explain it himself.",
+      "That answer makes more sense out loud. Tap play and let me explain it to you.",
     introPlayAnswer: "Play the answer",
     introVoiceNote:
       "Pre-recorded with a partner voice. On this phone, his voice depends on the routes you choose.",
@@ -98,7 +98,7 @@ const rawIntroTranslations = {
       "تبقى على هذا الجهاز. وإذا اخترت نموذجًا مستضافًا، ينتقل سياق المحادثة اللازم للإجابة مباشرةً إلى ذلك المزوّد.",
     introWelcomeQuery: "كيف يعمل هذا التطبيق فعليًا؟",
     introDialoguePlayResponse:
-      "هذه الإجابة أوضح حين تُسمع. اضغط تشغيل ودع Mr Broccoli يشرحها بنفسه.",
+      "هذه الإجابة أوضح حين تُسمع. اضغط تشغيل ودعني أشرحها لك.",
     introPlayAnswer: "تشغيل الإجابة",
     introVoiceNote:
       "مسجَّل مسبقًا بصوت شريك. على هذا الهاتف يعتمد صوته على المسارات التي تختارها.",
@@ -158,7 +158,7 @@ const rawIntroTranslations = {
       "Zůstávají v tomto zařízení. Když zvolíš hostovaný model, potřebný kontext jde přímo danému poskytovateli.",
     introWelcomeQuery: "Jak vlastně tahle aplikace funguje?",
     introDialoguePlayResponse:
-      "Tahle odpověď dává větší smysl nahlas. Klepni na přehrát a nech Mr Broccoliho, ať to vysvětlí sám.",
+      "Tahle odpověď dává větší smysl nahlas. Klepni na přehrát a nech mě ti ji vysvětlit.",
     introPlayAnswer: "Přehrát odpověď",
     introVoiceNote:
       "Předem nahráno partnerským hlasem. Na tomto telefonu jeho hlas závisí na trasách, které zvolíte.",
@@ -219,7 +219,7 @@ const rawIntroTranslations = {
       "Sie bleiben auf diesem Gerät. Bei einem gehosteten Modell geht der nötige Gesprächskontext direkt an diesen Anbieter.",
     introWelcomeQuery: "Wie funktioniert diese App eigentlich?",
     introDialoguePlayResponse:
-      "Diese Antwort ergibt gesprochen mehr Sinn. Tippe auf Play und lass Mr Broccoli das selbst erklären.",
+      "Diese Antwort ergibt gesprochen mehr Sinn. Tippe auf Play und lass sie mich dir erklären.",
     introPlayAnswer: "Antwort abspielen",
     introVoiceNote:
       "Vorab mit einer Partnerstimme aufgenommen. Auf diesem Telefon hängt seine Stimme von den gewählten Routen ab.",
@@ -280,7 +280,7 @@ const rawIntroTranslations = {
       "Se quedan en este dispositivo. Si eliges un modelo alojado, el contexto necesario va directamente a ese proveedor.",
     introWelcomeQuery: "¿Cómo funciona esta aplicación?",
     introDialoguePlayResponse:
-      "Esta respuesta se entiende mejor en voz alta. Pulsa reproducir y deja que Mr Broccoli la explique él mismo.",
+      "Esta respuesta se entiende mejor en voz alta. Pulsa reproducir y deja que te la explique.",
     introPlayAnswer: "Reproducir la respuesta",
     introVoiceNote:
       "Pregrabado con una voz asociada. En este teléfono, su voz depende de las rutas que elijas.",
@@ -342,7 +342,7 @@ const rawIntroTranslations = {
       "Elles restent sur cet appareil. Avec un modèle hébergé, le contexte nécessaire va directement à ce fournisseur.",
     introWelcomeQuery: "Comment fonctionne cette application ?",
     introDialoguePlayResponse:
-      "Cette réponse est plus claire à l’oral. Appuyez sur lecture et laissez Mr Broccoli l’expliquer lui-même.",
+      "Cette réponse est plus claire à l’oral. Appuyez sur lecture et laissez-moi vous l’expliquer.",
     introPlayAnswer: "Écouter la réponse",
     introVoiceNote:
       "Préenregistré avec une voix partenaire. Sur ce téléphone, sa voix dépend des routes que vous choisissez.",
@@ -403,7 +403,7 @@ const rawIntroTranslations = {
       "वह इसी डिवाइस पर रहती है। होस्ट किया गया मॉडल चुनने पर जवाब के लिए ज़रूरी संदर्भ सीधे उसी प्रदाता को जाता है।",
     introWelcomeQuery: "यह ऐप असल में काम कैसे करता है?",
     introDialoguePlayResponse:
-      "यह जवाब सुनने पर ज़्यादा साफ़ होगा। प्ले दबाओ और Mr Broccoli को खुद समझाने दो।",
+      "यह जवाब सुनने पर ज़्यादा साफ़ होगा। प्ले दबाओ और मुझे तुम्हें समझाने दो।",
     introPlayAnswer: "जवाब सुनें",
     introVoiceNote:
       "एक साझेदार आवाज़ में पहले से रिकॉर्ड किया गया। इस फ़ोन पर उसकी आवाज़ आपके चुने रास्तों पर निर्भर करती है।",
@@ -464,7 +464,7 @@ const rawIntroTranslations = {
       "Ezen az eszközön maradnak. Hosztolt modellnél a válaszhoz szükséges kontextus közvetlenül ahhoz a szolgáltatóhoz kerül.",
     introWelcomeQuery: "Hogyan működik ez az alkalmazás?",
     introDialoguePlayResponse:
-      "Ez a válasz hangosan érthetőbb. Nyomd meg a lejátszást, és hagyd, hogy Mr Broccoli maga magyarázza el.",
+      "Ez a válasz hangosan érthetőbb. Nyomd meg a lejátszást, és hadd magyarázzam el neked.",
     introPlayAnswer: "Válasz lejátszása",
     introVoiceNote:
       "Előre felvéve egy partnerhanggal. Ezen a telefonon a hangja a választott útvonalaktól függ.",
@@ -525,7 +525,7 @@ const rawIntroTranslations = {
       "Restano su questo dispositivo. Se scegli un modello ospitato, il contesto necessario va direttamente a quel provider.",
     introWelcomeQuery: "Come funziona questa app?",
     introDialoguePlayResponse:
-      "Questa risposta è più chiara a voce. Tocca Play e lascia che Mr Broccoli la spieghi da sé.",
+      "Questa risposta è più chiara a voce. Tocca Play e lascia che te la spieghi.",
     introPlayAnswer: "Riproduci la risposta",
     introVoiceNote:
       "Preregistrato con una voce partner. Su questo telefono la sua voce dipende dalle rotte che scegli.",
@@ -586,7 +586,7 @@ const rawIntroTranslations = {
       "会話はこの端末に残ります。ホスト型モデルを選んだ場合だけ、回答に必要な文脈がそのプロバイダーへ直接送られます。",
     introWelcomeQuery: "このアプリは実際どうやって動いているの？",
     introDialoguePlayResponse:
-      "その答えは、声で聞くほうが分かりやすいです。再生をタップして、Mr Broccoli自身の説明を聞いてください。",
+      "その答えは、声で聞くほうが分かりやすいです。再生をタップして、私に説明させてください。",
     introPlayAnswer: "答えを再生",
     introVoiceNote:
       "パートナーの音声で事前録音されています。この電話での声は、選んだルートによって変わります。",
@@ -647,7 +647,7 @@ const rawIntroTranslations = {
       "Zostają na tym urządzeniu. Gdy wybierzesz model hostowany, potrzebny kontekst trafia bezpośrednio do jego dostawcy.",
     introWelcomeQuery: "Jak właściwie działa ta aplikacja?",
     introDialoguePlayResponse:
-      "Tę odpowiedź łatwiej zrozumieć na głos. Naciśnij odtwarzanie i pozwól Mr Broccoli wyjaśnić ją samemu.",
+      "Tę odpowiedź łatwiej zrozumieć na głos. Naciśnij odtwarzanie i pozwól, że ci ją wyjaśnię.",
     introPlayAnswer: "Odtwórz odpowiedź",
     introVoiceNote:
       "Nagrane wcześniej głosem partnera. Na tym telefonie jego głos zależy od wybranych tras.",
@@ -708,7 +708,7 @@ const rawIntroTranslations = {
       "Ficam neste dispositivo. Se escolheres um modelo alojado, o contexto necessário segue diretamente para esse fornecedor.",
     introWelcomeQuery: "Como funciona esta aplicação?",
     introDialoguePlayResponse:
-      "Esta resposta percebe-se melhor em voz alta. Toca em reproduzir e deixa o Mr Broccoli explicá-la por si.",
+      "Esta resposta percebe-se melhor em voz alta. Toca em reproduzir e deixa-me explicá-la.",
     introPlayAnswer: "Reproduzir a resposta",
     introVoiceNote:
       "Pré-gravado com uma voz parceira. Neste telemóvel, a voz dele depende das rotas que escolher.",
@@ -769,7 +769,7 @@ const rawIntroTranslations = {
       "Elas ficam neste dispositivo. Se você escolher um modelo hospedado, o contexto necessário vai direto para esse provedor.",
     introWelcomeQuery: "Como funciona esse aplicativo?",
     introDialoguePlayResponse:
-      "Essa resposta fica mais clara em voz alta. Toque em reproduzir e deixe o Mr Broccoli explicar por conta própria.",
+      "Essa resposta fica mais clara em voz alta. Toque em reproduzir e deixe que eu explique para você.",
     introPlayAnswer: "Reproduzir a resposta",
     introVoiceNote:
       "Pré-gravado com uma voz parceira. Neste telefone, a voz dele depende das rotas que você escolher.",
@@ -830,7 +830,7 @@ const rawIntroTranslations = {
       "Они остаются на этом устройстве. Если выбрана облачная модель, нужный контекст идёт прямо её провайдеру.",
     introWelcomeQuery: "Как вообще работает это приложение?",
     introDialoguePlayResponse:
-      "Этот ответ понятнее на слух. Нажми воспроизведение, и Mr Broccoli всё объяснит сам.",
+      "Этот ответ понятнее на слух. Нажми воспроизведение и позволь мне всё тебе объяснить.",
     introPlayAnswer: "Воспроизвести ответ",
     introVoiceNote:
       "Записано заранее партнёрским голосом. На этом телефоне его голос зависит от выбранных маршрутов.",
@@ -891,7 +891,7 @@ const rawIntroTranslations = {
       "De stannar på den här enheten. Med en värdbaserad modell går sammanhanget som behövs direkt till den leverantören.",
     introWelcomeQuery: "Hur fungerar den här appen egentligen?",
     introDialoguePlayResponse:
-      "Det svaret är lättare att förstå när du hör det. Tryck på spela och låt Mr Broccoli förklara själv.",
+      "Det svaret är lättare att förstå när du hör det. Tryck på spela och låt mig förklara det för dig.",
     introPlayAnswer: "Spela upp svaret",
     introVoiceNote:
       "Förinspelat med en partnerröst. På den här telefonen beror hans röst på de vägar du väljer.",
@@ -952,7 +952,7 @@ const rawIntroTranslations = {
       "Bu cihazda kalırlar. Barındırılan bir model seçersen yanıt için gereken bağlam doğrudan o sağlayıcıya gider.",
     introWelcomeQuery: "Bu uygulama aslında nasıl çalışıyor?",
     introDialoguePlayResponse:
-      "Bu yanıt sesli duyulunca daha anlamlı. Oynata dokun ve Mr Broccoli'nin kendini anlatmasına izin ver.",
+      "Bu yanıt sesli duyulunca daha anlamlı. Oynata dokun, sana ben açıklayayım.",
     introPlayAnswer: "Yanıtı çal",
     introVoiceNote:
       "Bir iş ortağı sesiyle önceden kaydedildi. Bu telefonda sesi, seçtiğin yollara bağlıdır.",
@@ -1013,7 +1013,7 @@ const rawIntroTranslations = {
       "Вони зберігаються на цьому пристрої. Якщо обрати хмарну модель, потрібний контекст надходить прямо її провайдеру.",
     introWelcomeQuery: "Як узагалі працює цей застосунок?",
     introDialoguePlayResponse:
-      "Цю відповідь краще почути. Натисни відтворення, і Mr Broccoli пояснить усе сам.",
+      "Цю відповідь краще почути. Натисни відтворення й дозволь мені все тобі пояснити.",
     introPlayAnswer: "Відтворити відповідь",
     introVoiceNote:
       "Записано заздалегідь партнерським голосом. На цьому телефоні його голос залежить від обраних маршрутів.",
@@ -1074,7 +1074,7 @@ const rawIntroTranslations = {
       "وہ اسی ڈیوائس پر رہتی ہے۔ ہوسٹڈ ماڈل چننے پر جواب کے لیے ضروری سیاق براہِ راست اسی فراہم کنندہ کو جاتا ہے۔",
     introWelcomeQuery: "یہ ایپ اصل میں کام کیسے کرتی ہے؟",
     introDialoguePlayResponse:
-      "یہ جواب سن کر زیادہ واضح ہوگا۔ پلے دباؤ اور Mr Broccoli کو خود سمجھانے دو۔",
+      "یہ جواب سن کر زیادہ واضح ہوگا۔ پلے دباؤ اور مجھے تمہیں سمجھانے دو۔",
     introPlayAnswer: "جواب سنیں",
     introVoiceNote:
       "ایک ساتھی آواز میں پہلے سے ریکارڈ شدہ۔ اس فون پر اس کی آواز آپ کے چنے ہوئے راستوں پر منحصر ہے۔",
@@ -1132,7 +1132,7 @@ const rawIntroTranslations = {
       "对话保存在这台设备上。如果选择托管模型，回答所需的上下文会直接发送给该服务商。",
     introWelcomeQuery: "这个应用到底是怎么运作的？",
     introDialoguePlayResponse:
-      "这个问题用声音回答更容易理解。点按播放，让 Mr Broccoli 亲自解释。",
+      "这个问题用声音回答更容易理解。点按播放，让我来为你解释。",
     introPlayAnswer: "播放回答",
     introVoiceNote:
       "由合作伙伴的声音预先录制。在这部手机上，他的声音取决于你选择的路线。",

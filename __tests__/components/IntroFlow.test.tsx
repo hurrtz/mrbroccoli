@@ -5,6 +5,7 @@ import {
   Platform,
   ScrollView,
   StyleSheet,
+  Text,
   useWindowDimensions,
 } from "react-native";
 import { translations } from "../../src/i18n/localeRegistry";
@@ -310,7 +311,7 @@ describe("IntroFlowScreen", () => {
     ).toBeTruthy();
   });
 
-  it("uses one stretchable headline fade over five fixed exchanges", () => {
+  it("uses native blur beneath one stretchable headline fade", () => {
     // Four faded exchanges are decoration: hidden from assistive tech and
     // stepped through the fade/opacity ladder. The final prompt and response
     // explain the play action and stay announced.
@@ -334,7 +335,33 @@ describe("IntroFlowScreen", () => {
     expect(mid).toEqual(expect.objectContaining({ opacity: 0.56 }));
     expect(near).toEqual(expect.objectContaining({ opacity: 0.72 }));
     expect(soft).toEqual(expect.objectContaining({ opacity: 0.86 }));
-    expect(far.filter).toBeUndefined();
+    expect(far).toEqual(
+      expect.objectContaining({ filter: [{ blur: 8 }], opacity: 0.38 }),
+    );
+    expect(mid).toEqual(
+      expect.objectContaining({ filter: [{ blur: 5 }], opacity: 0.56 }),
+    );
+    expect(near).toEqual(
+      expect.objectContaining({ filter: [{ blur: 2.5 }], opacity: 0.72 }),
+    );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("intro-dialogue-prompt-1", hidden).findByType(Text).props
+          .style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        color: "rgba(237, 241, 245, 0.04)",
+        textShadowColor: darkColors.text,
+        textShadowRadius: 30,
+      }),
+    );
+    expect(
+      StyleSheet.flatten(
+        getByTestId("intro-dialogue-prompt-4", hidden).findByType(Text).props
+          .style,
+      ),
+    ).toEqual(expect.objectContaining({ textShadowRadius: 18 }));
 
     const headlineFade = getByTestId("intro-dialogue-headline-fade");
     expect(headlineFade.props.pointerEvents).toBe("none");
@@ -350,7 +377,10 @@ describe("IntroFlowScreen", () => {
     expect(headlineFadeImage.props.resizeMode).toBe("stretch");
     expect(headlineFadeImage.props.source).toBeTruthy();
     expect(StyleSheet.flatten(headlineFadeImage.props.style)).toEqual(
-      expect.objectContaining({ tintColor: darkColors.background }),
+      expect.objectContaining({
+        opacity: 0.42,
+        tintColor: darkColors.background,
+      }),
     );
     expect(
       StyleSheet.flatten(
@@ -400,12 +430,12 @@ describe("IntroFlowScreen", () => {
     expect(getByText("How does this application work?")).toBeTruthy();
     expect(
       getByText(
-        "That answer makes more sense out loud. Tap play and let Mr Broccoli explain it himself.",
+        "That answer makes more sense out loud. Tap play and let me explain it to you.",
       ),
     ).toBeTruthy();
   });
 
-  it("uses the same native-independent fade on Android", () => {
+  it("uses React Native view blur and the safe fade fallback on Android", () => {
     Object.defineProperty(Platform, "OS", {
       configurable: true,
       value: "android",
@@ -415,7 +445,6 @@ describe("IntroFlowScreen", () => {
     const screen = renderScreen();
     const hidden = { includeHiddenElements: true } as const;
 
-    expect(screen.queryByTestId("intro-dialogue-headline-blur")).toBeNull();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("intro-dialogue-headline-fade-image").props.style,
@@ -425,12 +454,16 @@ describe("IntroFlowScreen", () => {
       StyleSheet.flatten(
         screen.getByTestId("intro-dialogue-far", hidden).props.style,
       ),
-    ).toEqual(expect.objectContaining({ opacity: 0.38 }));
+    ).toEqual(
+      expect.objectContaining({ filter: [{ blur: 8 }], opacity: 0.38 }),
+    );
     expect(
       StyleSheet.flatten(
         screen.getByTestId("intro-dialogue-mid", hidden).props.style,
       ),
-    ).toEqual(expect.objectContaining({ opacity: 0.56 }));
+    ).toEqual(
+      expect.objectContaining({ filter: [{ blur: 5 }], opacity: 0.56 }),
+    );
   });
 
   it("keeps bare borderless nav glyphs on 44 point targets", () => {
@@ -678,14 +711,16 @@ describe("IntroFlowScreen", () => {
     ).toBe(true);
   });
 
-  it("withholds every close control on a first run", () => {
-    // On a first run the three steps are the way in; Done is the only exit,
-    // and it stays disabled until a test turn has completed.
-    const { queryByTestId, getByTestId } = renderScreen({ firstRun: true });
+  it("keeps close available on every step of a first run", () => {
+    const { getByTestId, props } = renderScreen({ firstRun: true });
 
-    expect(queryByTestId("intro-close")).toBeNull();
+    expect(getByTestId("intro-close")).toBeTruthy();
+    fireEvent.press(getByTestId("intro-close"));
+    expect(props.onClose).toHaveBeenCalledTimes(1);
     fireEvent.press(getByTestId("intro-next"));
-    expect(queryByTestId("intro-close")).toBeNull();
+    expect(getByTestId("intro-close")).toBeTruthy();
+    fireEvent.press(getByTestId("intro-next"));
+    expect(getByTestId("intro-close")).toBeTruthy();
   });
 
   it("gates the setup step's forward action on a running reasoning model", () => {
@@ -805,8 +840,8 @@ describe("IntroFlowScreen", () => {
     expect(withTurn.props.onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it("restores close on a re-entry, but never on the final step", () => {
-    const { getByTestId, queryByTestId, props } = renderScreen({
+  it("keeps close available through the final step on a re-entry", () => {
+    const { getByTestId, props } = renderScreen({
       firstRun: false,
     });
 
@@ -814,7 +849,7 @@ describe("IntroFlowScreen", () => {
     fireEvent.press(getByTestId("intro-next"));
     expect(getByTestId("intro-close")).toBeTruthy();
     fireEvent.press(getByTestId("intro-next"));
-    expect(queryByTestId("intro-close")).toBeNull();
+    expect(getByTestId("intro-close")).toBeTruthy();
     expect(StyleSheet.flatten(getByTestId("intro-done").props.style)).toEqual(
       expect.objectContaining({ borderRadius: 10, minHeight: 48 }),
     );
