@@ -32,6 +32,10 @@ import {
 } from "../../../utils/responseModes";
 import type { LocalModelSettingsController } from "../../settings-core/useLocalModelSettings";
 import type { TextInputFocusHandler } from "../../settings-core/types";
+import {
+  getResponseLengthOptions,
+  getResponseToneOptions,
+} from "../../settings-core/helpers";
 
 import {
   LocalModelAction,
@@ -41,6 +45,7 @@ import {
 import { PremiumBand } from "../settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
+import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
 import { SettingsRow } from "../settings-primitives/SettingsRow";
 import { SettingsSheet } from "../settings-primitives/SettingsSheet";
 import { Switch } from "../../../design-system/Switch";
@@ -394,6 +399,22 @@ export function ThinkingSettingsPage({
   const readyModelCount = getAvailableResponseModes(settings).length;
   const canAdd = visibleModes.length < MAX_RESPONSE_MODES;
   const canRemove = visibleModes.length > MIN_RESPONSE_MODES;
+  const responseLengthOptions = React.useMemo(
+    () =>
+      getResponseLengthOptions(t).map(({ description, ...option }) => ({
+        ...option,
+        supporting: description,
+      })),
+    [t],
+  );
+  const responseToneOptions = React.useMemo(
+    () =>
+      getResponseToneOptions(t).map(({ description, ...option }) => ({
+        ...option,
+        supporting: description,
+      })),
+    [t],
+  );
 
   React.useEffect(() => {
     const pending = pendingProviderAdd.current;
@@ -493,6 +514,28 @@ export function ThinkingSettingsPage({
             onPress={() => setSheet({ kind: "add" })}
           />
         ) : null}
+      </SettingsGroup>
+
+      <SettingsGroup
+        testID="conversation-defaults-section"
+        title={t("conversationDefaultsTitle")}
+        footer={t("conversationDefaultsDescription")}
+      >
+        <SettingsChoiceRow
+          testID="thinking-default-response-length"
+          label={t("adaptiveLength")}
+          onChange={(responseLength) => onUpdate({ responseLength })}
+          options={responseLengthOptions}
+          value={settings.responseLength}
+        />
+        <SettingsChoiceRow
+          testID="thinking-default-response-tone"
+          label={t("responseTone")}
+          last
+          onChange={(responseTone) => onUpdate({ responseTone })}
+          options={responseToneOptions}
+          value={settings.responseTone}
+        />
       </SettingsGroup>
 
       <SettingsGroup

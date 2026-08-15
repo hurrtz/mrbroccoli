@@ -257,6 +257,13 @@ capabilities change. Landscape uses the same measurement under its lower
 ceiling, retains only Council and Web below the orb, and omits the portrait
 settings sentence.
 
+`useConversationSettings` resolves each active session's sparse overrides over
+the global defaults and keeps pre-message overrides pending until the first
+conversation record is created. Its reset removes the stored override object,
+so the session resumes inheritance instead of freezing a copy of the defaults.
+The portrait summary lists the effective values in sheet order and wraps its
+text plus trailing glyph in one row-sized press target.
+
 When the native font scale reaches the accessibility-large range, the portrait
 composition switches optional chrome to its existing compact forms: the
 introduction becomes title-only, the conversation-settings sentence becomes

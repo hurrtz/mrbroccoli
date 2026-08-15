@@ -116,9 +116,10 @@ capability healthy. The UI shows the capability that was actually tested.
   keys remain in the device keychain and are sent only to their own provider.
 - Thinking: the `Answering models` group owns up to four numbered coexisting
   answering-model slots. Each opens a focused sheet for provider/local route,
-  exact model, and that model's effort ladder. Local acquisition, benchmark,
-  selection, and swipe-removal happen in the model chooser; Model Council and
-  the system prompt live in quiet sheets.
+  exact model, and that model's effort ladder. Its Conversation defaults group
+  owns the length and tone inherited by sessions without overrides. Local
+  acquisition, benchmark, selection, and swipe-removal happen in the model
+  chooser; Model Council and the system prompt live in quiet sheets.
 - Listening: input mode, conversation languages, and one `Who listens`
   system, local, or provider recognition route group. Downloaded local models
   cannot be selected until a successful device benchmark marks them viable.

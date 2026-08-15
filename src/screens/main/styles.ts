@@ -417,7 +417,7 @@ export const styles = StyleSheet.create({
   styleSheetVoicePicker: {
     marginBottom: 0,
   },
-  styleSheetAutoRenameButton: {
+  styleSheetSecondaryButton: {
     minHeight: 44,
     alignSelf: "flex-start",
     flexDirection: "row",
@@ -429,7 +429,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  styleSheetAutoRenameButtonText: {
+  styleSheetSecondaryButtonText: {
     fontSize: 12,
     lineHeight: 16,
     fontFamily: fonts.display,

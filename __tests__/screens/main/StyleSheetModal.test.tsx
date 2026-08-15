@@ -15,6 +15,7 @@ describe("StyleSheetModal", () => {
     const utils = renderWithProviders(
       <StyleSheetModal
         canAutoRenameConversation
+        hasOverrides
         isAutoRenamingConversation={false}
         visible
         llmInstructions=""
@@ -34,6 +35,7 @@ describe("StyleSheetModal", () => {
         onTtsInstructionsChange={jest.fn()}
         onTtsVoiceChange={jest.fn()}
         onClose={onClose}
+        onUseDefaults={jest.fn()}
         {...overrides}
       />,
     );
@@ -52,9 +54,7 @@ describe("StyleSheetModal", () => {
   it("renders title, subtitle, and active option descriptions", () => {
     const { getByText } = setup();
     expect(getByText("Conversation settings").props.numberOfLines).toBe(1);
-    expect(getByText("Conversation settings").props.ellipsizeMode).toBe(
-      "tail",
-    );
+    expect(getByText("Conversation settings").props.ellipsizeMode).toBe("tail");
     expect(
       StyleSheet.flatten(getByText("Conversation settings").props.style),
     ).toEqual(
@@ -131,6 +131,7 @@ describe("StyleSheetModal", () => {
       "conversation-settings-voice",
       "conversation-settings-tts-instructions",
       "conversation-settings-thinking-instructions",
+      "use-conversation-defaults",
       "auto-rename-conversation",
     ];
     const renderedOrder = UNSAFE_root.findAll((node) =>
@@ -140,6 +141,21 @@ describe("StyleSheetModal", () => {
       .filter((testID, index, testIDs) => testID !== testIDs[index - 1]);
 
     expect(renderedOrder).toEqual(expectedOrder);
+  });
+
+  it("can discard session overrides and inherit the defaults again", () => {
+    const onUseDefaults = jest.fn();
+    const { getByTestId } = setup({ onUseDefaults });
+
+    fireEvent.press(getByTestId("use-conversation-defaults"));
+
+    expect(onUseDefaults).toHaveBeenCalledTimes(1);
+  });
+
+  it("hides the defaults action when the session has no overrides", () => {
+    const { queryByTestId } = setup({ hasOverrides: false });
+
+    expect(queryByTestId("use-conversation-defaults")).toBeNull();
   });
 
   it("disables title generation without conversation content", () => {
@@ -179,8 +195,7 @@ describe("StyleSheetModal", () => {
       ),
     ).toEqual(expect.objectContaining({ borderRadius: 6, minHeight: 44 }));
     expect(
-      getByTestId("conversation-settings-length-brief").props
-        .accessibilityRole,
+      getByTestId("conversation-settings-length-brief").props.accessibilityRole,
     ).toBe("radio");
   });
 

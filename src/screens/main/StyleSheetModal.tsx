@@ -25,9 +25,11 @@ import { AutoRenameConversationButton } from "./styleSheetModal/AutoRenameConver
 import { ConversationVoiceSection } from "./styleSheetModal/ConversationVoiceSection";
 import { InstructionSection } from "./styleSheetModal/InstructionSection";
 import { StyleChoiceGroup } from "./styleSheetModal/StyleChoiceGroup";
+import { UseConversationDefaultsButton } from "./styleSheetModal/UseConversationDefaultsButton";
 
 interface StyleSheetModalProps {
   canAutoRenameConversation: boolean;
+  hasOverrides: boolean;
   isAutoRenamingConversation: boolean;
   visible: boolean;
   llmInstructions: string;
@@ -48,10 +50,12 @@ interface StyleSheetModalProps {
   onTtsVoiceChange: (voice: string) => void;
   onAutoRenameConversation: () => void;
   onClose: () => void;
+  onUseDefaults: () => void;
 }
 
 export const StyleSheetModal = React.memo(function StyleSheetModal({
   canAutoRenameConversation,
+  hasOverrides,
   isAutoRenamingConversation,
   visible,
   llmInstructions,
@@ -68,6 +72,7 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
   onTtsVoiceChange,
   onAutoRenameConversation,
   onClose,
+  onUseDefaults,
 }: StyleSheetModalProps) {
   const { colors } = useTheme();
   const { t } = useLocalization();
@@ -227,6 +232,10 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
                 value={llmInstructions}
               />
             </View>
+
+            {hasOverrides ? (
+              <UseConversationDefaultsButton onPress={onUseDefaults} />
+            ) : null}
 
             <AutoRenameConversationButton
               canRename={canAutoRenameConversation}

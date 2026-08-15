@@ -182,6 +182,11 @@ exclusions. Removing an individual message is a canonical record mutation: it
 also invalidates the compact summary, removes app-owned attachments, rebuilds
 drawer metadata, and resynchronizes eligible derived knowledge.
 
+Global Settings own the conversation defaults. Session records store only
+explicit overrides; clearing them removes the session settings object instead
+of copying the current defaults, so later default changes continue to flow to
+that session.
+
 Branches copy messages only through a selected checkpoint, assign new message
 and attachment IDs, preserve applicable conversation settings and privacy, and
 record root/parent/checkpoint provenance. Members of one branch family exclude

@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -9,13 +10,12 @@ import {
 
 import { fonts } from "../theme/typography";
 import { useTheme } from "../theme/ThemeContext";
-import { IconButton } from "./IconButton";
-import { MIN_ICON_TOUCH_TARGET } from "./PhosphorIcon";
+import { MIN_ICON_TOUCH_TARGET, PhosphorIcon } from "./PhosphorIcon";
 
 /**
- * The conversation's settings stated as a sentence, with one control beside
- * it. A line of muted text is quieter than any number of chips, and it says
- * everything at once. Noun phrases, separated by middots, no trailing stop.
+ * The conversation's settings stated as a sentence inside one row-sized
+ * control. A line of muted text is quieter than any number of chips, and it
+ * says everything at once.
  */
 export function ConversationSettingsSummary({
   summary,
@@ -25,7 +25,7 @@ export function ConversationSettingsSummary({
   style,
   testID,
 }: {
-  /** Noun phrases joined by middots, e.g. "Balanced · Brief · Heart". */
+  /** Label/value pairs joined by middots, e.g. "Length: Brief · Tone: Balanced". */
   summary: string;
   onPress: () => void;
   /** Accessible name for the control, translated by the caller. */
@@ -38,24 +38,40 @@ export function ConversationSettingsSummary({
   const { colors } = useTheme();
 
   return (
-    <View
-      style={[styles.row, compact ? styles.rowCompact : null, style]}
-      testID={testID}
-    >
-      {compact ? null : (
-        <Text
-          numberOfLines={1}
-          style={[styles.summary, { color: colors.textSecondary }]}
-        >
-          {summary}
-        </Text>
-      )}
-      <IconButton
+    <View style={style} testID={testID}>
+      <Pressable
         accessibilityLabel={accessibilityLabel}
-        icon="control"
+        accessibilityRole="button"
         onPress={onPress}
+        style={({ pressed }) => [
+          styles.row,
+          compact ? styles.rowCompact : null,
+          pressed ? { backgroundColor: colors.surfaceAlt } : null,
+        ]}
         testID="conversation-settings-summary-control"
-      />
+      >
+        {compact ? null : (
+          <Text
+            numberOfLines={1}
+            style={[styles.summary, { color: colors.textSecondary }]}
+          >
+            {summary}
+          </Text>
+        )}
+        <View
+          accessible={false}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          pointerEvents="none"
+          style={styles.icon}
+        >
+          <PhosphorIcon
+            color={colors.textSecondary}
+            name="control"
+            size="control"
+          />
+        </View>
+      </Pressable>
     </View>
   );
 }
@@ -63,8 +79,9 @@ export function ConversationSettingsSummary({
 const styles = StyleSheet.create({
   row: {
     alignItems: "center",
+    borderRadius: 12,
     flexDirection: "row",
-    gap: 8,
+    gap: 10,
     minHeight: MIN_ICON_TOUCH_TARGET,
   },
   rowCompact: {
@@ -76,5 +93,12 @@ const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 19,
     minWidth: 0,
+    textAlign: "center",
+  },
+  icon: {
+    alignItems: "center",
+    height: MIN_ICON_TOUCH_TARGET,
+    justifyContent: "center",
+    width: MIN_ICON_TOUCH_TARGET,
   },
 });

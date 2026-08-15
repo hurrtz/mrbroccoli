@@ -10,6 +10,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Conversation length, tone, instructions, and voice now behave as saved
+  per-session overrides over standard Settings defaults. Thinking exposes the
+  standard length and tone, a session can return to those defaults, and the
+  home summary uses the latest labelled design with the entire row clickable.
 - Mr Broccoli now runs as a universal iPhone and iPad app. Compact iPad windows
   keep the phone interface; regular layouts add a persistent conversations
   sidebar, a docked transcript when all three panes fit, master-detail Settings,

@@ -852,6 +852,13 @@ describe("useConversations", () => {
     await expect(readConversation(firstId)).resolves.toMatchObject({
       settings: { responseLength: "thorough" },
     });
+
+    await act(async () => {
+      result.current.clearConversationSettings();
+    });
+
+    expect(result.current.activeConversation?.settings).toBeUndefined();
+    expect((await readConversation(firstId))?.settings).toBeUndefined();
   });
 
   it("updates a stored message in place", async () => {

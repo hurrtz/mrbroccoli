@@ -79,6 +79,7 @@ export function useConversations({
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,
+    clearConversationSettings,
   } = useConversationMutations({
     activeConversationRef,
     conversationMetas: conversations,
@@ -214,6 +215,7 @@ export function useConversations({
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,
+    clearConversationSettings,
     renameConversation,
     removeMessage,
     toggleConversationPinned,

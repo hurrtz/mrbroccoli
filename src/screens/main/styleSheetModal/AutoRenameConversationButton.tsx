@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  ActivityIndicator,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, Text, TouchableOpacity } from "react-native";
 import { useLocalization } from "../../../i18n";
 import { useTheme } from "../../../theme/ThemeContext";
 import { styles } from "../styles";
@@ -26,11 +22,9 @@ export function AutoRenameConversationButton({
     <TouchableOpacity
       testID="auto-rename-conversation"
       style={[
-        styles.styleSheetAutoRenameButton,
+        styles.styleSheetSecondaryButton,
         {
-          backgroundColor: canRename
-            ? colors.accentSoft
-            : colors.surfaceAlt,
+          backgroundColor: canRename ? colors.accentSoft : colors.surfaceAlt,
           borderColor: canRename ? colors.borderStrong : colors.border,
         },
       ]}
@@ -45,7 +39,7 @@ export function AutoRenameConversationButton({
       ) : null}
       <Text
         style={[
-          styles.styleSheetAutoRenameButtonText,
+          styles.styleSheetSecondaryButtonText,
           { color: canRename ? colors.accent : colors.textMuted },
         ]}
       >

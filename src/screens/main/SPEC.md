@@ -76,9 +76,10 @@ receive already-derived state and callbacks.
   an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
   setup card.
-- In portrait, the conversation's quick settings read as one muted
-  tone-length-voice line under the byline, with a single control opening the
-  conversation style sheet. Landscape floats that control over the stage's
+- In portrait, the conversation's quick settings read as one centred muted
+  line of labelled values under the byline, ordered as the sheet presents them.
+  The complete 44pt row opens the conversation style sheet; its trailing glyph
+  is decorative. Landscape floats that compact control over the stage's
   top-right corner as an icon instead of giving it a row: the words cost the
   orb height the narrow column cannot spare. At accessibility-large text, portrait keeps that labelled control but
   omits the decorative sentence, uses the title-only introduction banner, and
@@ -483,7 +484,11 @@ screen-reader-accessible state.
 
 Per-conversation instructions, style, speech behavior, privacy, title,
 and route overrides belong to the active conversation. Global settings remain
-defaults for new conversations unless an explicit product rule says otherwise.
+defaults for new conversations and existing conversations without an override
+unless an explicit product rule says otherwise. The home sheet exposes only
+session overrides and can remove them as a group so the session resumes
+inheriting current and future defaults; the Thinking page owns the standard
+length and tone.
 
 The sessions drawer is flat and recency-first. Pinned and Archived sessions
 live in collapsible groups around the everyday Earlier list; active state is a

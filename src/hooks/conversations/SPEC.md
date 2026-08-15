@@ -63,7 +63,9 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
   derived knowledge. Removing the final
   provider-authored message must not leave that route in drawer metadata.
 - Per-conversation length, tone, LLM instructions, TTS instructions, and voice
-  override global defaults without mutating them.
+  override global defaults without mutating them. Clearing those overrides
+  removes the conversation settings object so the session inherits current and
+  future defaults again.
 - Deleting a conversation also deletes its derived knowledge rows and
   app-owned image files.
 - Private state is canonical conversation data and immediately controls derived

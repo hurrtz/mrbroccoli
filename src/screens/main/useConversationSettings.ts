@@ -17,6 +17,7 @@ interface UseConversationSettingsParams {
   globalTtsVoice: string;
   ttsModel: string;
   ttsProvider: Provider | null;
+  clearConversationSettings: () => Conversation | null;
   updateConversationSettings: (
     partial: Partial<ConversationSettings>,
   ) => Conversation | null;
@@ -31,16 +32,25 @@ export function useConversationSettings({
   globalTtsVoice,
   ttsModel,
   ttsProvider,
+  clearConversationSettings,
   updateConversationSettings,
 }: UseConversationSettingsParams) {
-  const [pendingSettings, setPendingSettings] =
-    useState<ConversationSettings>({});
+  const [pendingSettings, setPendingSettings] = useState<ConversationSettings>(
+    {},
+  );
 
   useEffect(() => {
     setPendingSettings({});
   }, [activeConversation?.id]);
 
   const overrides = activeConversation?.settings ?? pendingSettings;
+  const hasOverrides = Boolean(
+    overrides.responseLength ||
+    overrides.responseTone ||
+    overrides.llmInstructions?.trim() ||
+    overrides.ttsInstructions?.trim() ||
+    overrides.ttsVoice,
+  );
   const responseLength = overrides.responseLength ?? globalResponseLength;
   const responseTone = overrides.responseTone ?? globalResponseTone;
   const llmInstructions = overrides.llmInstructions ?? "";
@@ -121,6 +131,15 @@ export function useConversationSettings({
     [applySettings],
   );
 
+  const resetConversationSettings = useCallback(() => {
+    if (activeConversation) {
+      clearConversationSettings();
+      return;
+    }
+
+    setPendingSettings({});
+  }, [activeConversation, clearConversationSettings]);
+
   const initialConversationSettings = useMemo(
     () =>
       !activeConversation && Object.keys(pendingSettings).length > 0
@@ -131,10 +150,12 @@ export function useConversationSettings({
 
   return {
     assistantInstructions,
+    hasOverrides,
     initialConversationSettings,
     llmInstructions,
     responseLength,
     responseTone,
+    resetConversationSettings,
     selectedTtsVoice,
     ttsInstructions,
     effectiveTtsInstructions,

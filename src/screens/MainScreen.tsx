@@ -246,6 +246,7 @@ export function MainScreen() {
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,
+    clearConversationSettings,
     renameConversation,
     removeMessage,
     toggleConversationPinned,
@@ -450,10 +451,12 @@ export function MainScreen() {
   const {
     assistantInstructions,
     effectiveTtsInstructions,
+    hasOverrides: conversationSettingsHaveOverrides,
     initialConversationSettings,
     llmInstructions,
     responseLength,
     responseTone,
+    resetConversationSettings,
     selectedTtsVoice,
     ttsInstructions,
     updateLlmInstructions,
@@ -469,6 +472,7 @@ export function MainScreen() {
     globalTtsVoice: globalSelectedTtsVoice,
     ttsModel: selectedTtsModel,
     ttsProvider,
+    clearConversationSettings,
     updateConversationSettings,
   });
   const conversationTtsControlState = React.useMemo(
@@ -537,6 +541,30 @@ export function MainScreen() {
     selectedTtsVoice,
     t,
   ]);
+  const conversationSettingsSummary = React.useMemo(
+    () =>
+      [
+        `${t("adaptiveLength")}: ${t(responseLength)}`,
+        `${t("responseTone")}: ${t(responseTone)}`,
+        `${t("ttsVoice")}: ${settingsSummaryVoice}`,
+        ttsInstructions.trim()
+          ? `${t("ttsInstructions")}: ${t("providerStatusConfigured")}`
+          : null,
+        llmInstructions.trim()
+          ? `${t("conversationThinkingInstructions")}: ${t("providerStatusConfigured")}`
+          : null,
+      ]
+        .filter((value): value is string => Boolean(value))
+        .join(" · "),
+    [
+      llmInstructions,
+      responseLength,
+      responseTone,
+      settingsSummaryVoice,
+      t,
+      ttsInstructions,
+    ],
+  );
   const isRecording =
     runtimeSettings.sttMode === "native"
       ? nativeStt.isRecording
@@ -1447,7 +1475,7 @@ export function MainScreen() {
         settingsSummary: {
           accessibilityLabel: t("openStyleSheet"),
           onPress: handleOpenConversationSettings,
-          summary: `${t(responseTone)} · ${t(responseLength)} · ${settingsSummaryVoice}`,
+          summary: conversationSettingsSummary,
         },
         transcriptSheet: {
           countLabel: statusDisplay.messageCountLabel,
@@ -1544,6 +1572,7 @@ export function MainScreen() {
       }}
       styleSheet={{
         canAutoRenameConversation: canGenerateTitle,
+        hasOverrides: conversationSettingsHaveOverrides,
         isAutoRenamingConversation: isGeneratingTitle,
         visible: styleSheetVisible,
         llmInstructions,
@@ -1560,6 +1589,7 @@ export function MainScreen() {
         onTtsInstructionsChange: updateTtsInstructions,
         onTtsVoiceChange: updateTtsVoice,
         onClose: handleCloseConversationSettings,
+        onUseDefaults: resetConversationSettings,
       }}
       surfaceTransition={{
         label: t("pleaseWait"),

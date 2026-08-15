@@ -64,6 +64,40 @@ function renderPage(
 }
 
 describe("ThinkingSettingsPage response modes", () => {
+  it("edits the defaults inherited by sessions without overrides", () => {
+    const onUpdate = jest.fn();
+    const screen = renderPage(
+      {
+        ...DEFAULT_SETTINGS,
+        responseLength: "thorough",
+        responseTone: "casual",
+      },
+      { onUpdate },
+    );
+
+    expect(screen.getByText("Conversation defaults")).toBeTruthy();
+    expect(
+      screen.getByText(
+        "Used by new sessions and any session without its own overrides.",
+      ),
+    ).toBeTruthy();
+    expect(
+      screen.getByTestId("thinking-default-response-length").props
+        .accessibilityLabel,
+    ).toBe("Adaptive Length. Thorough");
+    expect(
+      screen.getByTestId("thinking-default-response-tone").props
+        .accessibilityLabel,
+    ).toBe("Response Tone. Casual");
+
+    fireEvent.press(screen.getByTestId("thinking-default-response-length"));
+    fireEvent.press(
+      screen.getByTestId("thinking-default-response-length-option-brief"),
+    );
+
+    expect(onUpdate).toHaveBeenCalledWith({ responseLength: "brief" });
+  });
+
   it("renders numbered coexisting slots and opens a model-specific effort sheet", () => {
     const screen = renderPage({
       ...DEFAULT_SETTINGS,

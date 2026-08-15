@@ -748,6 +748,23 @@ export function useConversationMutations(params: {
     [activeConversationRef, setActiveConversationValue],
   );
 
+  const clearConversationSettings = useCallback(() => {
+    const currentConversation = activeConversationRef.current;
+
+    if (!currentConversation) {
+      return null;
+    }
+
+    const updatedConversation: Conversation = {
+      ...currentConversation,
+      settings: undefined,
+    };
+
+    setActiveConversationValue(updatedConversation);
+    saveConversation(updatedConversation);
+    return updatedConversation;
+  }, [activeConversationRef, setActiveConversationValue]);
+
   const deleteConversation = useCallback(
     (id: string) => {
       const activeConversation =
@@ -1160,5 +1177,6 @@ export function useConversationMutations(params: {
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,
+    clearConversationSettings,
   };
 }

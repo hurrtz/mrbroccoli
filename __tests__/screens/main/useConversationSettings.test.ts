@@ -27,6 +27,7 @@ function createProps(activeConversation: Conversation | null) {
     globalTtsVoice: "alloy",
     ttsModel: "gpt-4o-mini-tts",
     ttsProvider: "openai" as const,
+    clearConversationSettings: jest.fn(() => activeConversation),
     updateConversationSettings: jest.fn(() => activeConversation),
   };
 }
@@ -47,13 +48,13 @@ describe("useConversationSettings", () => {
       }),
     );
     const { result, rerender } = renderHook(
-      (props: ReturnType<typeof createProps>) =>
-        useConversationSettings(props),
+      (props: ReturnType<typeof createProps>) => useConversationSettings(props),
       { initialProps: first },
     );
 
     expect(result.current.responseLength).toBe("thorough");
     expect(result.current.responseTone).toBe("nerdy");
+    expect(result.current.hasOverrides).toBe(true);
     expect(result.current.selectedTtsVoice).toBe("nova");
     expect(result.current.assistantInstructions).toBe(
       "Keep replies spoken-friendly.\n\nUse examples from distributed systems.",
@@ -66,6 +67,7 @@ describe("useConversationSettings", () => {
 
     expect(result.current.responseLength).toBe("normal");
     expect(result.current.responseTone).toBe("professional");
+    expect(result.current.hasOverrides).toBe(false);
     expect(result.current.selectedTtsVoice).toBe("alloy");
     expect(result.current.assistantInstructions).toBe(
       "Keep replies spoken-friendly.",
@@ -138,5 +140,35 @@ describe("useConversationSettings", () => {
       },
     });
     expect(props.updateConversationSettings).not.toHaveBeenCalled();
+  });
+
+  it("clears active and pending overrides so defaults are inherited again", () => {
+    const activeProps = createProps(
+      conversation("active", { responseLength: "brief" }),
+    );
+    const active = renderHook(() => useConversationSettings(activeProps));
+
+    act(() => {
+      active.result.current.resetConversationSettings();
+    });
+
+    expect(activeProps.clearConversationSettings).toHaveBeenCalledTimes(1);
+
+    const pendingProps = createProps(null);
+    const pending = renderHook(() => useConversationSettings(pendingProps));
+    act(() => {
+      pending.result.current.updateResponseSettings({
+        responseTone: "casual",
+      });
+    });
+    expect(pending.result.current.hasOverrides).toBe(true);
+
+    act(() => {
+      pending.result.current.resetConversationSettings();
+    });
+
+    expect(pending.result.current.hasOverrides).toBe(false);
+    expect(pending.result.current.responseTone).toBe("professional");
+    expect(pending.result.current.initialConversationSettings).toBeUndefined();
   });
 });

@@ -1664,8 +1664,11 @@ describe("SettingsModal", () => {
       expect(screen.queryByText("Provider")).toBeNull();
       expect(screen.getByTestId("thinking-slot-mode-1")).toBeTruthy();
       expect(screen.getByTestId("thinking-add-model")).toBeTruthy();
-      expect(screen.queryByText("Adaptive Length")).toBeNull();
-      expect(screen.queryByText("Response Tone")).toBeNull();
+      expect(screen.getByText("Conversation defaults")).toBeTruthy();
+      expect(
+        screen.getByTestId("thinking-default-response-length"),
+      ).toBeTruthy();
+      expect(screen.getByTestId("thinking-default-response-tone")).toBeTruthy();
     });
 
     fireEvent.press(screen.getByTestId("thinking-slot-mode-1"));

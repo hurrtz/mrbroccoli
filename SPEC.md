@@ -95,6 +95,9 @@ boundary.
   remains a legible home-screen choice across native layouts.
 - Changing response modes inside a conversation preserves the conversation
   context; each assistant message records the route that actually answered.
+- Length, tone, model instructions, speech instructions, and voice are global
+  defaults. A session may persist its own overrides without changing those
+  defaults, and clearing the overrides makes it inherit them again.
 - Long threads use a rolling summary plus a bounded recent window instead of
   sending the complete transcript indefinitely.
 - Editing a user prompt changes that conversation and clears its stale compact

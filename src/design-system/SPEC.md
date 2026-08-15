@@ -38,7 +38,9 @@ framework or hiding platform behavior behind excessive abstraction.
   orb's diameter is passed in by the screen that measured its space.
   `OrbSatellite` and `ConversationSettingsSummary` also expose icon-only compact
   forms that preserve their labelled 44-point control when the owning layout
-  cannot safely render optional visible copy.
+  cannot safely render optional visible copy. The conversation summary's full
+  visible row is its one press target; the trailing control glyph is
+  decorative rather than a smaller nested action.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.
