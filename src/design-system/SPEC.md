@@ -65,7 +65,11 @@ framework or hiding platform behavior behind excessive abstraction.
   against it; no tinted halo may occupy the gap. When both bands carry the same
   state and progress, they render as one double-width stroke centred over that
   exact footprint so adjacent SVG edges cannot expose a raster seam. They split
-  into two strokes only while they carry different clocks.
+  into two strokes only while they carry different clocks. Its core glyph names
+  the action the next press performs, never the state the pipeline is in, so it
+  must agree with the action label rendered beside it. Held speech is the case
+  where those diverge: the phase stays `speaking` while the pending action
+  reverses, so the glyph resolves to resume rather than pause.
 - Every interactive target is at least 44 by 44 points, including icon-only
   buttons. A smaller decorative glyph may sit inside that target.
 - Pressed, disabled, selected, destructive, loading, error, and focus states

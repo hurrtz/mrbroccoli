@@ -151,6 +151,36 @@ describe("VoiceOrb", () => {
     ).toBeTruthy();
   });
 
+  it("offers resume rather than pause while speech is paused", () => {
+    // The glyph states the next action. Paused speech resumes on the next tap,
+    // so a pause glyph there tells the user the opposite of what happens --
+    // and contradicts the action label, which already says "resume".
+    const screen = renderOrb({ paused: true, phase: "speaking" });
+
+    expect(
+      screen.getByTestId("phosphor-icon-play", {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByTestId("phosphor-icon-pause", {
+        includeHiddenElements: true,
+      }),
+    ).toBeNull();
+  });
+
+  it("ignores paused outside the speaking phase", () => {
+    // Only speech pauses. A stale flag must not turn recording's stop glyph
+    // into a play glyph.
+    const screen = renderOrb({ paused: true, phase: "recording" });
+
+    expect(
+      screen.getByTestId("phosphor-icon-stop", {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+  });
+
   it("scales the glyph with the orb", () => {
     const screen = renderOrb({ size: 196 });
     const icon = flatten(

@@ -1093,6 +1093,15 @@ describe("MainScreenVoiceStage composer", () => {
         })}
       />,
     );
+    // Holding playback reverses the pending action, so the glyph has to follow
+    // the label from pause to resume. The phase stays `speaking` throughout.
+    expect(
+      screen.getByTestId("phosphor-icon-play", hiddenIconQuery),
+    ).toBeTruthy();
+    expect(
+      screen.queryByTestId("phosphor-icon-pause", hiddenIconQuery),
+    ).toBeNull();
+
     // The stop and barge-in actions moved to the satellites row, which the
     // workspace owns; the stage no longer mounts them.
     expect(screen.queryByTestId("voice-stage-stop-playback")).toBeNull();

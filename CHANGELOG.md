@@ -15,6 +15,9 @@ the complete Play Store translations are kept in a dedicated file under
   completely and the chat reads as having been going on for a while. The fade
   covers the same share of the page on every screen size, and on Android the
   earlier exchanges are softened as well.
+- Pausing a spoken reply now turns the voice orb's glyph into a play symbol, so
+  the orb states that the next tap resumes the reply instead of continuing to
+  offer pause.
 
 ## 4.0.0 - 2026-08-15
 

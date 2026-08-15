@@ -44,8 +44,22 @@ function getPhaseInk(phase: VoiceVisualPhase, colors: Colors): string {
   }
 }
 
-/** The glyph says what tapping does, not what the machine is doing. */
-function getPhaseIcon(phase: VoiceVisualPhase): PhosphorIconName {
+/**
+ * The glyph says what tapping does, not what the machine is doing.
+ *
+ * Paused speech is the one phase where the pending action reverses: the turn
+ * is still `speaking`, but the next tap resumes rather than pauses. The status
+ * line already reflects this through its `resume` action label, so a pause
+ * glyph here contradicts the caption sitting beside it.
+ */
+function getPhaseIcon(
+  phase: VoiceVisualPhase,
+  paused: boolean,
+): PhosphorIconName {
+  if (phase === "speaking") {
+    return paused ? "play" : "pause";
+  }
+
   switch (phase) {
     case "recording":
       return "stop";
@@ -59,8 +73,6 @@ function getPhaseIcon(phase: VoiceVisualPhase): PhosphorIconName {
       return "brain";
     case "synthesizing":
       return "customer-service";
-    case "speaking":
-      return "pause";
     default:
       return "mic";
   }
@@ -249,6 +261,7 @@ function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
  * adjacent strokes while preserving the same outer and inner boundaries.
  */
 export function VoiceOrb({
+  paused = false,
   phase = "idle",
   phaseProgress = 0,
   phaseProgressTiming,
@@ -267,6 +280,8 @@ export function VoiceOrb({
   style,
   testID,
 }: {
+  /** Speech is held rather than stopped, so the next tap resumes it. */
+  paused?: boolean;
   /** Which pipeline phase the orb is showing. Defaults to idle. */
   phase?: VoiceVisualPhase;
   /** 0–1 through the current phase. Drives the inner ring. */
@@ -437,7 +452,7 @@ export function VoiceOrb({
           ) : (
             <PhosphorIcon
               color={foreground}
-              name={getPhaseIcon(phase)}
+              name={getPhaseIcon(phase, paused)}
               visualSize={iconSide}
             />
           )}

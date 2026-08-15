@@ -199,6 +199,9 @@ export function VoiceTextInputPager({
               onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
               overtime={progress.overtime}
               overtimeTiming={progress.overtimeTiming}
+              // The orb keeps the speaking phase while held, so the glyph is
+              // what has to flip to the resume action the label already names.
+              paused={playbackPaused}
               phase={visualPhase}
               // Pausing stops a clock, but where the reply has been read to is
               // a position — it stays put until playback moves again.
