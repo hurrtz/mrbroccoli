@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.0.0 - 2026-08-15
+
 - Bottom sheets now place their backdrop immediately and animate only the
   drawer over it. Drawer headlines use the same centred treatment, their roomy
   grabbers sit against the sheet edge and support tap and pull-down dismissal
