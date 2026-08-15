@@ -47,7 +47,7 @@ tags:
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/language-picker
 - tapOn:
-    id: app-language-picker-close
+    id: app-language-picker-sheet-header-handle
 - assertVisible:
     id: settings-page-app
 
@@ -67,7 +67,7 @@ tags:
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/theme-picker
 - tapOn:
-    id: app-theme-close
+    id: app-theme-sheet-header-handle
 - assertVisible:
     id: settings-page-app
 - tapOn:
