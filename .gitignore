@@ -147,6 +147,7 @@ src/config.ts
 
 # internal tooling
 .superpowers/
+.playwright-mcp/
 provider-research/
 
 # local native build artifacts
