@@ -12,8 +12,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 - Bottom sheets now place their backdrop immediately and animate only the
   drawer over it. Drawer headlines use the same centred treatment, their roomy
-  grabbers support tap and pull-down dismissal without a redundant close icon,
-  and the home model picker applies a tapped model immediately without Done.
+  grabbers sit against the sheet edge and support tap and pull-down dismissal
+  without a redundant close icon, and the home model picker applies a tapped
+  model immediately without Done.
 - When both voice-orb rings carry the same state, they now render as one
   continuous thicker ring so no hairline seam can appear between them.
 - Conversation length, tone, instructions, and voice now behave as saved

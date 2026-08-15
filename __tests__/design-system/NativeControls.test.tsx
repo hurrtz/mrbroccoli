@@ -330,6 +330,7 @@ describe("NativeControls", () => {
       sheetScreen.getByTestId("native-dialog-card").props.style,
     );
     expect(sheetCard.transform).toEqual([{ translateY: 0 }]);
+    expect(sheetCard.paddingTop).toBe(0);
 
     const dialogScreen = renderControl(
       <Modal visible title="Details">

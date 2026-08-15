@@ -101,8 +101,9 @@ const styles = StyleSheet.create({
   grabberTarget: {
     alignItems: "center",
     alignSelf: "stretch",
-    justifyContent: "center",
+    justifyContent: "flex-start",
     minHeight: 44,
+    paddingTop: 9,
   },
   grabber: {
     borderRadius: 2,

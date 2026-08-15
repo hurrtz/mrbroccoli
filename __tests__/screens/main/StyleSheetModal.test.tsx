@@ -87,7 +87,13 @@ describe("StyleSheetModal", () => {
       StyleSheet.flatten(
         getByTestId("conversation-settings-drawer-header-handle").props.style,
       ),
-    ).toEqual(expect.objectContaining({ minHeight: 44 }));
+    ).toEqual(
+      expect.objectContaining({
+        justifyContent: "flex-start",
+        minHeight: 44,
+        paddingTop: 9,
+      }),
+    );
     expect(
       queryByTestId("conversation-settings-drawer-header-close"),
     ).toBeNull();

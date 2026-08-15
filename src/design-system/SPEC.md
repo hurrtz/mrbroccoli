@@ -111,10 +111,11 @@ framework or hiding platform behavior behind excessive abstraction.
   its backdrop and its own actions. Dialogs never drag.
 - `SheetHeader` is the shared drawer headline. It centres the headline type and
   optional supporting copy with deliberate space around them. In portrait its
-  visible grabber sits inside a labelled 44-point tap target and the parent
-  sheet attaches pull-down dismissal to that header; there is no redundant
-  close icon. In landscape, where the sheet becomes a dialog and cannot drag,
-  the header substitutes a labelled close icon.
+  visible grabber sits near the sheet edge inside a labelled 44-point tap target;
+  the sheet card adds no separate top inset, and the parent sheet attaches
+  pull-down dismissal to that header. There is no redundant close icon. In
+  landscape, where the sheet becomes a dialog and cannot drag, the header
+  substitutes a labelled close icon.
 - `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
   whose sheet deliberately does not use the generic elevated dialog surface or
   padding. The caller still owns safe-area clearance and must keep the default

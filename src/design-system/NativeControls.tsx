@@ -788,6 +788,9 @@ const controlStyles = StyleSheet.create({
     // Overrides dialogCard's 560pt cap. Set to "100%" rather than undefined,
     // because StyleSheet.create drops undefined values instead of overriding.
     maxWidth: "100%",
+    // The sheet's own header owns its top spacing. Inheriting the dialog's
+    // 20pt inset leaves a pull handle floating too far below the sheet edge.
+    paddingTop: 0,
     width: "100%",
   },
   sheetOverlay: {
