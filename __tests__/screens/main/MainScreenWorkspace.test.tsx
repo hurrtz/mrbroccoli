@@ -586,6 +586,9 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.queryByText("Balanced · Brief")).toBeNull();
     expect(screen.queryByTestId("satellite-council")).toBeNull();
     expect(
+      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
+    ).toBe("104");
+    expect(
       within(screen.getByTestId("voice-stage-idle")).getByTestId(
         "satellite-stop",
       ),

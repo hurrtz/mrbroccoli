@@ -43,7 +43,7 @@ receive already-derived state and callbacks.
   ring is only ever a gap: the screen reads through it in every phase, while
   the inner and outer rings meet flush. The orb is sized from the space the
   column actually leaves it, clamped between 96pt and its surface ceiling (196
-  phone portrait, 150 phone landscape; 168-224 across regular-iPad states), so
+  phone portrait, 104 phone landscape; 168-224 across regular-iPad states), so
   the intro banner, transcript dock, or a landscape split simply makes it
   smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make

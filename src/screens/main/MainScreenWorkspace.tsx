@@ -538,7 +538,10 @@ export function MainScreenWorkspace({
                 />
               }
               layout="landscape"
-              maxOrbSize={150}
+              // Short phone windows must retain the complete 44pt transport
+              // row above the system gesture area. Regular-width iPads use
+              // their larger, separately measured ceilings above.
+              maxOrbSize={104}
               {...voiceStage}
               // The left pane cannot fit the full notice paragraph above the
               // status line at any font scale, so landscape always takes the
