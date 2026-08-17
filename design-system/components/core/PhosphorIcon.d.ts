@@ -1,3 +1,6 @@
+/** Regular everywhere; fill is reserved for "this switch is on" — see OrbSatellite. */
+export type IconWeight = "regular" | "fill";
+
 export type IconSize = "inline" | "compact" | "control" | "navigation" | "prominent" | "feature" | "hero";
 
 export type PhosphorIconName =
@@ -8,13 +11,16 @@ export type PhosphorIconName =
   | "inbox" | "image" | "info-circle" | "key" | "left" | "line-chart" | "loading" | "lock" | "menu"
   | "message" | "mic" | "pause" | "play-circle" | "plus" | "pushpin" | "redo" | "radio-selected"
   | "radio-unselected" | "reload" | "right" | "robot" | "safety-certificate" | "search" | "send"
-  | "setting" | "share-alt" | "sliders" | "sound" | "stop" | "thunderbolt" | "up" | "warning" | "cpu";
+  | "setting" | "share-alt" | "sliders" | "sound" | "stop" | "thunderbolt" | "up" | "warning" | "cpu" | "car"
+  | "circuitry" | "text-align-left" | "text-align-right" | "user-sound";
 
 export interface PhosphorIconProps {
   /** Semantic glyph name from the app's fixed set. */
   name: PhosphorIconName;
   /** Semantic visual size. Never a raw pixel number — the control owns the touch target. */
   size?: IconSize;
+  /** `fill` is the system's on-state; it needs the Phosphor fill stylesheet loaded next to the regular one. */
+  weight?: IconWeight;
   color?: string;
   style?: React.CSSProperties;
 }

@@ -53,33 +53,67 @@ How to use: each unchecked box is one work item with its acceptance criterion. *
 
 ## F. Home screen & intro banner
 
-- [ ] Banner background: violet **gradient** `--mb-color-intro-banner-grad-a → -b` (135deg) with the slow sheen (3.6s loop; shared vocabulary with PremiumBand) — currently flat violet, no sheen. Shadow `0 6px 20px --mb-color-intro-banner-shadow`.
-- [ ] Orb steps down **196 → 156** while the banner is visible — the build keeps the orb full-size under it.
-- [ ] [verify] Dismiss (X) is withheld until the intro has been opened at least once; before that the banner ends in a chevron.
-- [ ] [verify] The whole banner is one pressable; the play circle is a drawn affordance, not a separate target.
-- [ ] [verify] Landscape collapses the banner to the single 48pt compact row.
-- ✓ Banner copy ("Set up Mr Broccoli" / "A minute of setup gets him thinking, hearing you and speaking back."), hairline play circle, placement above the orb.
+- [ ] **Header block** (`WorkspaceHeader`, owner call 2026-08): the route byline and settings sentence become **one raised block of two 44pt rows** — surface fill, hairline border, hairline between the rows inset 12pt — sitting **14pt below the top bar**. Row one: provider mark (or `cpu`), model name in the display face, the effort word, caret. Row two: the settings sentence, truncating, with the sliders glyph at the trailing edge. Portrait only; landscape keeps the byline plus the icon-only sentence.
+- [ ] The block is never an accent fill — pressable, not loud. If it competes with the orb, it is wrong.
 
-## G. Drive mode
+- [ ] **Delete the introduction banner from the home screen** (owner call, 2026-08). The walkthrough is reached from App & diagnostics → Introduction, and opens by itself on a first launch. Nothing advertises on the home screen.
+- [ ] **Delete every premium upsell surface** (the gold band and the upgrade sheet). Free edition shows locked rows and the editions row in App & diagnostics; that is the whole story.
 
-- [ ] Delete the drive dock row entirely (`DriveSessionControls.tsx`: Pause auto · Repeat last · Resume auto). Drive mode adds no controls of its own — the satellite ring carries everything.
-- [ ] Ring behaviour in drive mode: the ring shows transport in **every** phase, idle included (the loop must be stoppable at rest). **Stop** ends the hands-free loop and becomes **Resume**, which starts it again; seek verbs stay live only while speaking. The composing controls are unavailable for the session’s duration.
-- [ ] Drop "Repeat last": Restart already replays the response from its first word.
-- [ ] The silence countdown stays spoken only — no on-screen chip (the earlier chip proposal is retired with the row).
-- [ ] Headset / car-remote buttons map to the ring's Stop/Resume.
-- DS: `guidelines/surfaces/workspace.md` → Drive mode; `components/workspace/OrbSatellite.jsx`.
+## G. Hands free — the drive mode becomes a switch (owner call, 2026-08)
 
-## H2. Satellite ring — phase-owned
+Drive mode is no longer a listening mode. Its whole behaviour — VAD against the ambient profile, silence window with spoken countdown, auto-submit, auto-continue — is one on/off wrapped around whichever input mode is chosen. It ships as the **fourth control in the composing row**: car glyph, “Hands free” captioned on two 12px rows, filled + accent when on.
 
-- [ ] The ring under the orb belongs to the phase. Idle: the composing controls (image, council, web). Any turn phase: four transport verbs — Restart · Back · Forward · Stop — swapped in gently, no reflow (same 44pt geometry, same gaps).
-- [ ] Through transcribing → synthesizing the three seek verbs are `disabled` (0.38, inert); only **Stop** is live, abandoning the turn and returning to idle. In the speaking phase all four come alive; at the last word or on Stop the orb returns to idle and the composing three come back.
+- [ ] Delete the drive dock row (`DriveSessionControls.tssx` — Pause auto · Repeat last · Resume auto) AND the "Drive Session" entry in Listening's input-mode picker: two modes remain (push-to-talk, tap-to-talk).
+- [ ] Add the Hands free switch to the composing row, trailing seat, uniform 20pt gaps — no divider, no scope gap. It is the row's one session-scoped control; the row is otherwise per-question only.
+- [ ] The switch **stays live while a turn runs, in both directions** (the one exception to the row's 38% rest): off mid-answer ends the loop after Stop-like cleanup; on mid-answer arms it to continue when this answer finishes.
+- [ ] Turning it on starts listening immediately. The orb keeps its ordinary phases — no new "armed" orb state; the filled car and the settings sentence ("Hands free: on") carry the armed state.
+- [ ] The transport orbit is unchanged: Stop abandons the turn, never the loop. Remove `drive`/`driveAuto`/`onResume` usages — the component no longer has them.
+- [ ] Headset / car-remote buttons toggle the switch; the orb keeps working as the manual press.
+- [ ] Premium: in free edition the switch is present but locked, and says so on tap — no upsell sheet (retired).
+- [ ] The silence countdown stays spoken only — no on-screen chip.
+- [ ] Localise “Hands free” as a two-line caption in all 19 locales (the label may break differently or run one line per locale; two lines max).
+- DS: `guidelines/surfaces/workspace.md` → Hands free; `components/workspace/OrbSatellite.jsx` (car glyph, two-line label).
+
+## H2. Transport orbit — replaces the phase-owned ring (owner call, 2026-08)
+
+The row under the orb no longer swaps. **It is composing at every phase**; the verbs that act on a running response orbit the orb. This supersedes the phase-owned ring in every earlier note — build `OrbTransport`, not a second row.
+
+- [ ] The composing row (image, council, web, hands free) is permanent: the same controls at every phase, the per-question three dimmed to 38% and inert while a turn runs (Hands free stays live — see G). It never becomes transport, and **pausing changes nothing about it** — that flicker is the bug this removes.
+- [ ] Four transport keys orbit the orb on a circle 34pt clear of its edge: **Back** at 180° and **Forward** at 0° (flanks), **Restart** at 135° and **Stop** at 45° (lower diagonals). Keys render for turn phases only — presence means a turn is running — but **the cluster's footprint is permanent**: `OrbTransport` mounts at every phase, idle included, reserving its box so the orb never moves when a turn starts. Mounting a bare `VoiceOrb` at idle and swapping is the 15pt orb-jump bug.
+- [ ] Through transcribing → synthesizing the three seek verbs are `disabled` (0.38, inert); only **Stop** is live, abandoning the turn and returning to idle. In the speaking phase all four come alive; at the last word or on Stop the orb returns to idle.
 - [ ] Back = start of the current paragraph, or the preceding paragraph inside the first two seconds. Forward = next paragraph. Restart = first word of the response. Every jump moves the orb's reading arc with the playhead; the orb tap stays pause/resume and keeps position.
-- DS: `components/workspace/OrbSatellite.jsx` (`disabled` prop), `guidelines/surfaces/workspace.md` → Satellites.
+- [ ] The cluster reserves its own footprint from the orb diameter — 328×227 at 196pt, which fits a 4.7″ column. Do **not** step the orb down for it; measure the stage and pass a diameter that fits (portrait 196, landscape 150, 156 under the intro banner).
+- [ ] Landscape: same model, `labels={false}` — icon-only keys, so a drive session is stoppable there too.
+- DS: `components/workspace/OrbTransport.jsx`, `guidelines/surfaces/workspace.md` → Satellites and the transport orbit.
+
+## H2b. Satellite button treatment — the container describes location, never state
+
+- [ ] Remove every well from the satellites: no fill and no border in either appearance, at rest or on. The orb is the only filled object on the stage.
+- [ ] A switch that is on says so by **filling its glyph** and taking the accent, label with it (weight + hue, never colour alone). Load the Phosphor **fill** stylesheet next to the regular one; `PhosphorIcon` takes `weight="fill"`.
+- [ ] Momentary actions never fill — that is what keeps Image and Council legible as different species now that the border is gone.
+- [ ] Press state: a momentary `accent-soft` squircle under the thumb, and nothing at any other time. It is the only pressability cue a borderless target gets, so it is not optional.
+- [ ] Drop the hairline divider that used to separate Image from the two switches — species are carried by behaviour now, not chrome.
+- DS: `components/workspace/OrbSatellite.jsx`, `guidelines/foundations.md` → Control shape and size.
+
+## H2c. Images live in the Image satellite (owner call, 2026-08)
+
+Nothing is inserted between the orb and the composing row, at any count. There is no attachment strip, no tray and no second row.
+
+- [ ] At rest the control is a plain `image` glyph captioned “Image”. Tapping it opens `AttachmentPopover` on its **empty state**: one line (“No images in this conversation yet.”) and one add action.
+- [ ] The add action hands off to the **device's own picker** — camera or library, any number of pictures. Build no in-app browser for it.
+- [ ] When the picker returns with images the popup **closes itself** (the only popup in the system that dismisses on a result rather than a tap), the glyph becomes the **deck** — one tile for one image, two for two, three for three and up, each layer behind the front one smaller and fainter — and the caption becomes the localised count (“1 IMAGE”, “9 IMAGES”). **No count badge on the control**; the caption is the number.
+- [ ] Tapping the deck reopens the panel with **every** image in a horizontally scrolling row of 64pt thumbs, each with its own delete control (drawn 22pt, target 44pt), and the same add action under a 6pt band.
+- [ ] Panel geometry: 252 wide, anchored 10pt above the row with its left edge on the satellite, `AnchoredMenu`'s surface, radius, shadow and transparent click-away, no backdrop dim. Its height is **constant** — three images and forty are the same panel; only the row's scroll length changes.
+- [ ] The row's geometry does not change with the count: 232×58 at forty images exactly as at none, and the orb keeps its diameter. If adding an image resizes the orb, the deck has been built in the wrong place.
+- [ ] While a turn runs or a drive session is open the whole composing row rests at 38%, deck included, and the panel is unreachable until it ends.
+- [ ] Retire the scrolling 128×96 composer strip in `MessageImageAttachments`; the panel replaces it on the stage. The component's compact mode stays a candidate for the transcript, which is still an open decision (`explorations/images-1-to-4.html`).
+- DS: `components/workspace/AttachmentPopover.jsx`, `components/workspace/OrbSatellite.jsx` (`thumbnails`), `guidelines/surfaces/workspace.md` → Images.
 
 ## H3. The orb's rings
 
-- [ ] Ring anatomy, inside out: disc → a small gap that is only ever a gap (the screen reads through it, identical in every phase) → inner ring → outer ring flush against it, nothing between the two.
-- [ ] Per phase: **idle** both rings faded green, no clocks; **recording** both combine into one indicator — how much of the window is used before auto-submit; **transcribing → synthesizing** two clocks (outer = whole turn against estimate, neutral; inner = current phase, phase colour); **speaking** both combine as the reading indicator over the whole response. Past the estimate both fill red.
+- [ ] Anatomy, inside out: disc → a small gap that is only ever a gap (the screen reads through it, identical in every phase, ~3pt) → **one 12pt ring**. The inner/outer pair is merged (owner call, 2026-08).
+- [ ] Ring colour: **slate in every phase** (`turn-ink` fill on `turn-track`). The ring is a fill meter, not a judgement — no green on it, ever; the phase colour lives in the disc alone. Red remains the overtime fill.
+- [ ] Per phase, one meter: **idle** faded to the track, no clock; **recording** how much of the window is used before auto-submit; **transcribing → synthesizing** the whole turn against its estimate; **speaking** how much of the response has been read. Past the estimate it fills red.
 - DS: `components/workspace/VoiceOrb.jsx`, `guidelines/surfaces/workspace.md` → The orb.
 
 ## H4. Status line — removed

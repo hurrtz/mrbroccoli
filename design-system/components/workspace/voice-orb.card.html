@@ -1,38 +1,41 @@
-<!-- @dsCard group="Components" viewport="700x300" name="Voice orb" subtitle="The workspace's one loud element, its satellites, status line and transcript handle" -->
+<!-- @dsCard group="Components" viewport="760x470" name="Voice orb" subtitle="The one loud element, its bare satellites and the transport orbit" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{margin:0;padding:14px;display:flex;gap:14px;align-items:flex-start}.pane{flex:1;min-width:0;padding:12px;border-radius:14px;display:flex;flex-direction:column;gap:10px}.orbs{display:flex;gap:10px;align-items:center;justify-content:space-between}.c{display:flex;flex-direction:column;align-items:center;gap:5px}.l{font-family:var(--mb-font-mono);font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mb-color-text-muted)}.sats{display:flex;gap:4px;justify-content:center}</style>
+<style>body{margin:0;padding:14px;display:flex;gap:14px;align-items:flex-start}.pane{flex:1;min-width:0;padding:12px;border-radius:14px;display:flex;flex-direction:column;gap:12px}.orbs{display:flex;gap:8px;align-items:center;justify-content:space-between}.c{display:flex;flex-direction:column;align-items:center;gap:5px}.l{font-family:var(--mb-font-mono);font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mb-color-text-muted)}.row{display:flex;gap:10px;justify-content:center;align-items:flex-start}.clusters{display:flex;gap:10px;justify-content:space-around;align-items:flex-start}</style>
 </head><body>
-<div class="pane" data-theme="light" style="background:#FCFBF8;border:1px solid #D9D7D1">
-<div id="light"></div>
-</div>
-<div class="pane" data-theme="dark" style="background:#16181D;border:1px solid #2C3138">
-<div id="dark"></div>
-</div>
+<div class="pane" data-theme="light" style="background:#FCFBF8;border:1px solid #D9D7D1"><div id="light"></div></div>
+<div class="pane" data-theme="dark" style="background:#16181D;border:1px solid #2C3138"><div id="dark"></div></div>
 <script type="text/babel">
-const { VoiceOrb, OrbSatellite, TranscriptHandle, ConversationSettingsSummary } = window.MrBroccoliDesignSystem_62d510;
+const { VoiceOrb, OrbSatellite, OrbTransport, TranscriptHandle } = window.MrBroccoliDesignSystem_62d510;
 
 function VoiceOrbSpecimen(){
   return <>
     <div className="orbs">
-      <div className="c"><VoiceOrb size={74} /><span className="l">idle</span></div>
-      <div className="c"><VoiceOrb size={74} phase="recording" phaseProgress={0.42} turnProgress={0.10} /><span className="l">recording</span></div>
-      <div className="c"><VoiceOrb size={74} phase="searching" phaseProgress={0.66} turnProgress={0.52} /><span className="l">searching</span></div>
-      <div className="c"><VoiceOrb size={74} phase="thinking" phaseProgress={0.45} turnProgress={0.70} /><span className="l">thinking</span></div>
-      <div className="c"><VoiceOrb size={74} phase="speaking" phaseProgress={0.38} turnProgress={0.96} /><span className="l">speaking</span></div>
-      <div className="c"><VoiceOrb size={74} phase="thinking" phaseProgress={1} turnProgress={1} overtime={0.55} /><span className="l">55% late</span></div>
+      <div className="c"><VoiceOrb size={62} /><span className="l">idle</span></div>
+      <div className="c"><VoiceOrb size={62} phase="recording" phaseProgress={0.42} turnProgress={0.10} /><span className="l">recording</span></div>
+      <div className="c"><VoiceOrb size={62} phase="searching" phaseProgress={0.66} turnProgress={0.52} /><span className="l">searching</span></div>
+      <div className="c"><VoiceOrb size={62} phase="thinking" phaseProgress={0.45} turnProgress={0.70} /><span className="l">thinking</span></div>
+      <div className="c"><VoiceOrb size={62} phase="speaking" phaseProgress={0.38} turnProgress={0.96} /><span className="l">speaking</span></div>
+      <div className="c"><VoiceOrb size={62} phase="thinking" phaseProgress={1} turnProgress={1} overtime={0.55} /><span className="l">55% late</span></div>
     </div>
-    <div className="sats">
+    <div className="row">
       <OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" />
       <OrbSatellite icon="council" label="Council" kind="toggle" accessibilityLabel="Model Council" />
       <OrbSatellite icon="search" label="Web" kind="toggle" active accessibilityLabel="Web search" />
+      <OrbSatellite icon="car" label={"Hands\nfree"} kind="toggle" active accessibilityLabel="Hands-free conversation" />
+      <OrbSatellite icon="stop" label="Stop" tone="danger" />
+      <OrbSatellite icon="back" label="Back" disabled />
     </div>
-    <ConversationSettingsSummary summary="Length: Brief · Tone: Balanced · Voice: Heart" />
+    <span className="l" style={{textAlign:"center"}}>action · switch off · switch on (filled glyph, accent) · the session switch · danger · disabled</span>
+    <div className="clusters">
+      <div className="c"><OrbTransport phase="speaking" phaseProgress={0.42} orbSize={96} /><span className="l">transport orbit · speaking (all four live)</span></div>
+    </div>
     <TranscriptHandle messageCount={12} />
   </>;
 }

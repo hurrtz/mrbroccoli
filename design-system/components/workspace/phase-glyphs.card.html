@@ -1,0 +1,55 @@
+<!-- @dsCard group="Components" viewport="780x520" name="Orb phases" subtitle="Every phase: its glyph, its disc colour, and the accessible name it announces" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:14px;display:flex;gap:14px;align-items:flex-start}.pane{flex:1;min-width:0;padding:12px;border-radius:14px}.grid{display:flex;flex-wrap:wrap;gap:10px}.c{width:106px;display:flex;flex-direction:column;align-items:center;gap:5px}.l{font-family:var(--mb-font-mono);font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mb-color-text-muted);text-align:center}.n{font-family:var(--mb-font-display);font-weight:600;font-size:11px;color:var(--mb-color-text);text-align:center}</style>
+</head><body>
+<div class="pane" data-theme="light" style="background:#FCFBF8;border:1px solid #D9D7D1"><div id="light"></div></div>
+<div class="pane" data-theme="dark" style="background:#16181D;border:1px solid #2C3138"><div id="dark"></div></div>
+<script type="text/babel">
+const { VoiceOrb } = window.MrBroccoliDesignSystem_62d510;
+/* The tap line is never retyped here: each cell reads the orb's own accessible
+   name after mount, so the card cannot drift from the component. */
+const PHASES = [
+  { phase: "idle", glyph: "mic", pp: 0, tp: 0 },
+  { phase: "recording", glyph: "stop", pp: .42, tp: .1 },
+  { phase: "transcribing", glyph: "text-align-left", pp: .3, tp: .34 },
+  { phase: "thinking-briefly", glyph: "brain", pp: .5, tp: .46 },
+  { phase: "searching", glyph: "global", pp: .66, tp: .52 },
+  { phase: "thinking", glyph: "circuitry", pp: .45, tp: .7 },
+  { phase: "synthesizing", glyph: "user-sound", pp: .8, tp: .86 },
+  { phase: "speaking", glyph: "pause", pp: .38, tp: 1 },
+  { phase: "thinking", glyph: "circuitry", pp: 1, tp: 1, late: .55, label: "55% late" },
+  { phase: "transcribing", glyph: "text-align-right", pp: .3, tp: .34, rtl: true, label: "transcribing · RTL" },
+];
+function Cell({ item }) {
+  const ref = React.useRef(null);
+  const [name, setName] = React.useState("");
+  React.useEffect(() => {
+    const node = ref.current && ref.current.querySelector('[role="button"]');
+    if (node) setName(node.getAttribute("aria-label") || "");
+  }, []);
+  return (
+    <div className="c">
+      <div ref={ref}><VoiceOrb size={72} phase={item.phase} phaseProgress={item.pp} turnProgress={item.tp} overtime={item.late || 0} rtl={item.rtl} /></div>
+      <span className="n">{item.label || item.phase}</span>
+      <span className="l">{item.glyph}</span>
+      <span className="l">“{name}”</span>
+    </div>
+  );
+}
+function Specimen(){
+  return <>
+    <div className="grid">{PHASES.map((item, i) => <Cell key={i} item={item} />)}</div>
+    <p className="l" style={{marginTop:12,textAlign:"left",lineHeight:1.6}}>One 12pt slate ring, whatever the phase — a fill meter, not a judgement; red only for overtime. The glyph is a verb at the ends of a turn (mic · stop · pause) and names the work in hand through the middle, where the orb tap has no defined action and Stop lives in the orbit.</p>
+  </>;
+}
+ReactDOM.createRoot(document.getElementById("light")).render(<Specimen />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<Specimen />);
+</script>
+</body></html>

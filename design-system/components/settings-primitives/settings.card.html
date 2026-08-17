@@ -9,7 +9,7 @@
 <style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, RuntimeReadiness, Switch, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, RuntimeReadiness, Switch, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 function Demo(){
   const [search, setSearch] = React.useState(true);
   const [stats, setStats] = React.useState(false);
@@ -35,9 +35,6 @@ function Demo(){
           action={<IconAction icon="egg-cracked" label="Test again" danger />} />
         <RouteOptionRow locked label="Deepgram" meta="Via provider · your key" last />
       </SettingsGroup>
-      <div style={{borderRadius:"var(--mb-radius-card)",border:"1px solid var(--mb-color-premium-border)",overflow:"hidden"}}>
-        <PremiumBand copy="Every provider, web search, Model Council, premium voices." />
-      </div>
     </div>
   </div>;
 }

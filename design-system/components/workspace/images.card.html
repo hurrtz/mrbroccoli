@@ -1,0 +1,42 @@
+<!-- @dsCard group="Components" viewport="760x420" name="Image deck" subtitle="Attachments in the satellite that made them, and the panel behind it" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;padding:14px;display:flex;gap:14px;align-items:flex-start}.pane{flex:1;min-width:0;padding:14px;border-radius:14px;display:flex;flex-direction:column;gap:14px}.states{display:flex;gap:6px;justify-content:space-between}.l{font-family:var(--mb-font-mono);font-size:8px;letter-spacing:.5px;text-transform:uppercase;color:var(--mb-color-text-muted);text-align:center}.c{display:flex;flex-direction:column;align-items:center;gap:5px}.panels{display:flex;gap:12px;align-items:flex-start}</style>
+</head><body>
+<div class="pane" data-theme="light" style="background:#FCFBF8;border:1px solid #D9D7D1"><div id="light"></div></div>
+<div class="pane" data-theme="dark" style="background:#16181D;border:1px solid #2C3138"><div id="dark"></div></div>
+<script type="text/babel">
+const { OrbSatellite, AttachmentPopover } = window.MrBroccoliDesignSystem_62d510;
+const some = (n) => Array.from({ length: n }, (_, i) => ({ id: "a" + i, uri: null }));
+
+function ImageDeckSpecimen(){
+  return <>
+    <div className="states">
+      <div className="c"><OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" /><span className="l">none</span></div>
+      <div className="c"><OrbSatellite icon="image" label="1 image" thumbnails={[null]} accessibilityLabel="1 image attached. Show them." /><span className="l">one</span></div>
+      <div className="c"><OrbSatellite icon="image" label="2 images" thumbnails={[null,null]} accessibilityLabel="2 images attached. Show them." /><span className="l">two</span></div>
+      <div className="c"><OrbSatellite icon="image" label="3 images" thumbnails={[null,null,null]} accessibilityLabel="3 images attached. Show them." /><span className="l">three</span></div>
+      <div className="c"><OrbSatellite icon="image" label="40 images" thumbnails={some(40).map(() => null)} accessibilityLabel="40 images attached. Show them." /><span className="l">forty</span></div>
+      <div className="c"><OrbSatellite icon="image" label="3 images" thumbnails={[null,null,null]} disabled /><span className="l">resting</span></div>
+    </div>
+    <div className="panels">
+      <div style={{position:"relative",width:252,height:100}}>
+        <AttachmentPopover attachments={[]} style={{left:0,top:0}} />
+      </div>
+      <div style={{position:"relative",width:252,height:150}}>
+        <AttachmentPopover attachments={some(3)} style={{left:0,top:0}} />
+      </div>
+    </div>
+    <span className="l">empty state · three attached (a fourth shows as a sliver; the row scrolls, the panel does not grow)</span>
+  </>;
+}
+ReactDOM.createRoot(document.getElementById("light")).render(<ImageDeckSpecimen />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<ImageDeckSpecimen />);
+</script>
+</body></html>

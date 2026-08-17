@@ -36,6 +36,17 @@ function buildProviderReplyTimeoutError(
   );
 }
 
+function buildProviderCompletionLimitError(
+  provider: StreamChatParams["provider"],
+  language: StreamChatParams["language"],
+) {
+  return new Error(
+    translate(language, "providerIncompleteReplyError", {
+      provider: PROVIDER_LABELS[provider],
+    }),
+  );
+}
+
 function isLocalAndroidDevReplyEnabled(apiKey: string) {
   return (
     typeof __DEV__ !== "undefined" &&
@@ -70,6 +81,7 @@ export async function streamChat({
   spokenParagraphStreaming,
   synthesisContext,
   webSearchContext,
+  maxOutputCharacters,
   onChunk,
   onDone,
   onError,
@@ -79,6 +91,12 @@ export async function streamChat({
   let timedOut = false;
   let releaseAbortSignal: (() => void) | null = null;
   let abortRequestTransport: (() => void) | null = null;
+  const outputCharacterLimit =
+    typeof maxOutputCharacters === "number" &&
+    Number.isSafeInteger(maxOutputCharacters) &&
+    maxOutputCharacters > 0
+      ? maxOutputCharacters
+      : null;
 
   try {
     const hasImages = messages.some(
@@ -113,6 +131,10 @@ export async function streamChat({
     if (isLocalAndroidDevReplyEnabled(apiKey)) {
       const fullText = buildLocalAndroidDevReply(messages);
 
+      if (outputCharacterLimit && fullText.length > outputCharacterLimit) {
+        throw buildProviderCompletionLimitError(provider, language);
+      }
+
       onChunk(fullText);
       await onDone(
         fullText,
@@ -146,6 +168,7 @@ export async function streamChat({
 
     let rejectTimeout: ((reason?: unknown) => void) | null = null;
     let receivedStreamData = false;
+    let streamedCharacters = 0;
     const armTimeout = (timeoutMs: number) => {
       if (timeoutId) {
         clearTimeout(timeoutId);
@@ -171,6 +194,14 @@ export async function streamChat({
       }
 
       onStreamActivity();
+      if (
+        outputCharacterLimit &&
+        streamedCharacters + text.length > outputCharacterLimit
+      ) {
+        requestAbortController.abort();
+        throw buildProviderCompletionLimitError(provider, language);
+      }
+      streamedCharacters += text.length;
       provenanceStreamFilter.push(text);
     };
     const requestPromise = (async () => {
@@ -247,9 +278,7 @@ export async function streamChat({
               );
               break;
             case "gemini-generate-content":
-              fullText = await LLM_STREAM_REQUESTERS[
-                "gemini-generate-content"
-              ](
+              fullText = await LLM_STREAM_REQUESTERS["gemini-generate-content"](
                 {
                   ...requestParams,
                   onStreamActivity,

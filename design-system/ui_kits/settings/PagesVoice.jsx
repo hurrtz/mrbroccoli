@@ -1,4 +1,4 @@
-const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, PhosphorIcon, Switch } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PhosphorIcon, Switch } = window.MrBroccoliDesignSystem_62d510;
 
 /** Kit wrapper: local state around the system Switch, with the raw track as fallback. */
 function KitSwitch({ on }) {
@@ -96,8 +96,7 @@ function SpeakingPage({ onBack, onClose, isPremium = true }) {
             label={model.label} meta={model.meta} action={window.modelAction(model.action)}
             sub={model.voice ? voiceRow : null} last={last} />;
         })}
-        {!isPremium ? <PremiumBand copy="Provider voices run on your own keys. One purchase, no subscription." /> : null}
-      </SettingsGroup>
+        </SettingsGroup>
       <SettingsGroup title="Storage" footer="Spoken replies are kept so they can be replayed without synthesising again." style={{ padding: 0 }}>
         <SettingsRow icon="delete" label="Clear speech replay cache" danger control={null} last />
       </SettingsGroup>

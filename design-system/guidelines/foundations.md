@@ -75,6 +75,8 @@ On the web this system loads the same family from the official CDN:
 
 **Squircles, not circles.** Every control in the product is a squircle on the radius scale. Two exceptions, both about the voice: the workspace **orb** and the introduction's **step-1 play CTA**. Nothing else is round — not the composer send, not the drawer's plus, not toast dismiss, not the satellite toggles (state reads from their border and fill, not their shape). Decorative medallions and switch knobs are not controls and keep their circles.
 
+**Bare controls show their squircle only under the thumb.** The orb's satellites (`OrbSatellite`) carry no fill and no border at rest — the container would otherwise be read as state. They keep the 44pt target and show a momentary `accent-soft` squircle while pressed, which is the whole pressability cue a borderless control gets. State on those controls lives in the glyph: **a filled glyph means "on," and nothing else in the product fills one** (needs the Phosphor fill stylesheet loaded next to the regular one).
+
 **Pills** (`--mb-radius-pill`) are for things that are not buttons: status tags, selection chips, the fork tag, stepper dots, the wordmark badge. Every button — including compact inline ones like PremiumBand’s Upgrade, the storage Remove action and the introduction’s language switch — takes `--mb-radius-control`.
 
 **One commit button.** The full-width primary action is 48pt tall on `--mb-radius-control`, wherever it appears: `Button`, the introduction's auto-setup and Done, `AutoSetupCard`, and `Modal`'s footer — whose actions now stack full-width instead of sitting right-aligned in a row.

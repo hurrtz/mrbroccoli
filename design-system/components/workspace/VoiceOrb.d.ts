@@ -23,6 +23,8 @@ export interface VoiceOrbProps {
   overtime?: number;
   /** Diameter in points. 196 in portrait, 150 in landscape. */
   size?: number;
+  /** Right-to-left locale: the transcribing glyph mirrors to `text-align-right`. */
+  rtl?: boolean;
   /** Accessible name. Falls back to a per-phase sentence. */
   label?: string;
   onPress?: () => void;

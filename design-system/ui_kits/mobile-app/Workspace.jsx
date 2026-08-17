@@ -1,7 +1,7 @@
-const { AppWordmark, IconButton, PhosphorIcon, RouteByline, VoiceOrb, OrbSatellite,
+const { AppWordmark, IconButton, PhosphorIcon, RouteByline, WorkspaceHeader, VoiceOrb, OrbSatellite, OrbTransport, AttachmentPopover,
         ConversationSettingsSummary, TranscriptHandle,
         ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon, BackgroundTaskBar,
-        IntroBanner, IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
+        IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
 const ORB = 196;
@@ -155,7 +155,7 @@ function AutoSetupIndicator({ auto, onOpen }) {
   return null;
 }
 
-function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript , driveMode = false }) {
+function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript , handsFreeInitially = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [surface, setSurface] = React.useState("voice");
@@ -168,10 +168,24 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
   const intro = introVisible === undefined ? localIntro : introVisible;
   const setIntro = onIntroVisible || setLocalIntro;
   const [introOpened, setIntroOpened] = React.useState(false);
-  const [driveAuto, setDriveAuto] = React.useState(true);
+  const [handsFree, setHandsFree] = React.useState(!!handsFreeInitially);
   const speaking = !!turn.current && turn.current.phase === "speaking";
+  /* The per-question three rest while a turn runs and through a hands-free
+     session; the Hands free switch itself never rests. */
+  const composing = !turn.current && !handsFree;
+  /* Images live in the Image satellite: the deck replaces its glyph and the
+     caption counts. The picker is the device's; here it just hands back N. */
+  const [images, setImages] = React.useState([]);
+  const [imagesOpen, setImagesOpen] = React.useState(false);
+  const addImages = () => {
+    const from = images.length;
+    setImages(images.concat(Array.from({ length: 3 }, (_, i) => ({ id: "img" + (from + i), uri: null }))));
+    setImagesOpen(false); /* the popup closes itself when the picker returns */
+  };
 
-  const [stageRef, orbSize] = useFitSize(ORB, 96, 96);
+  /* The transport orbit claims about 31pt more height than the bare orb, on top
+     of the composing row and its gaps. */
+  const [stageRef, orbSize] = useFitSize(ORB, 96, 96, 128);
 
   const last = conversation.messages[conversation.messages.length - 1];
   const send = () => { conversation.commit(draft); setDraft(""); setSurface("voice"); };
@@ -185,49 +199,52 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
           <IconButton icon="setting" accessibilityLabel="Settings" onClick={onOpenSettings} />
         </div>
 
-        <IntroBanner visible={banner}
-          showDismiss={introOpened} onDismiss={() => setBanner(false)}
-          onOpen={() => { setIntro(true); setIntroOpened(true); }} />
-
         <AutoSetupIndicator auto={auto} onOpen={onOpenLocalModels} />
 
-        <Byline conversation={conversation} />
-        <ConversationSettingsSummary summary="Length: Brief · Tone: Balanced · Voice: Heart" onPress={onOpenSettings} />
+        <div style={{ height: 14 }} />
+        <WorkspaceHeader provider={conversation.active.provider} providerLabel={conversation.active.providerLabel}
+          modelName={conversation.active.modelLabel} effort={conversation.active.effortLabel} local={conversation.active.local}
+          switchable={window.MB_DATA.modes.length > 1} assetBase={ASSETS}
+          onSwitchRoute={() => conversation.setPicking(true)}
+          summary={(handsFree ? "Hands free: on · " : "") + "Length: Brief · Tone: Balanced · Voice: Heart"}
+          onOpenSettings={onOpenSettings} />
 
         <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
           <div ref={stageRef} style={{ flex: "1 1 auto", minHeight: 0, width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 2 }}>
             <SwipeArrow direction="left" enabled={surface === "text"} label="Show voice input" onPress={() => setSurface("voice")} />
             <div style={{ flex: 1, minWidth: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
               {surface === "voice"
-                ? <VoiceOrb size={orbSize} phase={turn.current ? turn.current.phase : "idle"}
-                    phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress} onPress={turn.start} />
+                ? <OrbTransport phase={turn.current ? turn.current.phase : "idle"} orbSize={orbSize}
+                    phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress}
+                    onOrbPress={turn.start} onStop={turn.stop} />
                 : <Composer value={draft} onChange={setDraft} onSend={send} height={orbSize} />}
             </div>
             <SwipeArrow direction="right" enabled={surface === "voice"} label="Show text input" onPress={() => setSurface("text")} />
           </div>
 
-          {/* The ring belongs to the phase: composing controls at idle, transport
-              once a turn runs. In drive mode Stop ends the loop and becomes Resume. */}
-          {(turn.current ? turn.current.phase : "idle") === "idle" && !driveMode ? (
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 8 }}>
-              <OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" />
-              <span style={{ width: 1, height: 44, background: "var(--mb-color-border)", margin: "0 6px" }} />
-              <OrbSatellite icon="council" label="Council" kind="toggle" active={council}
-                accessibilityLabel="Model Council" onPress={() => setCouncil((on) => !on)} />
-              <OrbSatellite icon="search" label="Web" kind="toggle" active={web}
-                accessibilityLabel="Web search" onPress={() => setWeb((on) => !on)} />
-            </div>
-          ) : (
-            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 18 }}>
-              <OrbSatellite icon="reload" label="Restart" disabled={!speaking} />
-              <OrbSatellite icon="left" label="Back" disabled={!speaking} />
-              <OrbSatellite icon="right" label="Forward" disabled={!speaking} />
-              {driveMode && !driveAuto
-                ? <OrbSatellite icon="play" label="Resume" tone="success" accessibilityLabel="Resume drive session" onPress={() => setDriveAuto(true)} />
-                : <OrbSatellite icon="stop" label="Stop" tone="danger" accessibilityLabel={driveMode ? "Stop the drive session" : "Stop this turn"}
-                    onPress={() => { turn.stop(); if (driveMode) setDriveAuto(false); }} />}
-            </div>
-          )}
+          {/* The row is composing, permanently: the transport verbs orbit the orb
+              instead, so this never becomes something else. The per-question three
+              rest while a turn runs; Hands free is the session's own switch and
+              stays live in both directions. */}
+          <div style={{ position: "relative", display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 20 }}>
+            <OrbSatellite icon="image" disabled={!composing}
+              label={images.length ? images.length + (images.length === 1 ? " image" : " images") : "Image"}
+              thumbnails={images.length ? images.map((image) => image.uri) : undefined}
+              accessibilityLabel={images.length
+                ? images.length + (images.length === 1 ? " image" : " images") + " attached. Show them."
+                : "Add image"}
+              onPress={() => setImagesOpen((open) => !open)} />
+            <OrbSatellite icon="council" label="Council" kind="toggle" active={council} disabled={!composing}
+              accessibilityLabel="Model Council" onPress={() => setCouncil((on) => !on)} />
+            <OrbSatellite icon="search" label="Web" kind="toggle" active={web} disabled={!composing}
+              accessibilityLabel="Web search" onPress={() => setWeb((on) => !on)} />
+            <OrbSatellite icon="car" label={"Hands\nfree"} kind="toggle" active={handsFree}
+              accessibilityLabel="Hands-free conversation" onPress={() => setHandsFree((on) => !on)} />
+            <AttachmentPopover visible={imagesOpen && composing} attachments={images}
+              onRemove={(id) => setImages(images.filter((image) => image.id !== id))}
+              onAdd={addImages} onClose={() => setImagesOpen(false)}
+              style={{ left: 0, bottom: "100%", marginBottom: 10 }} />
+          </div>
         </div>
 
       </div>
@@ -242,7 +259,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
 
       <IntroFlow visible={intro} onClose={() => setIntro(false)} autoSetup={auto ? auto.cardProps : undefined}
         onInstallLocal={onOpenLocalModels} onConnectProvider={() => setIntro(false)}
-        onOpenPremium={() => setIntro(false)} onOpenStt={onOpenSettings} onOpenTts={onOpenSettings} />
+        onOpenStt={onOpenSettings} onOpenTts={onOpenSettings} />
 
       {toast ? (
         <div style={{ position: "absolute", top: 60, left: 16, right: 16 }}>
@@ -253,19 +270,12 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
   );
 }
 
-/** Icon-only in landscape: the column has no room for labels. */
+/** Icon-only in landscape: the column has no room for labels. Same satellite,
+    same rules — bare container, filled glyph when a switch is on. */
 function LandscapeControl({ icon, label, toggle, active, disabled, tone, onPress }) {
-  const toneInk = tone === "danger" ? "var(--mb-color-danger)" : tone === "success" ? "var(--mb-color-success)" : null;
-  const tint = toneInk || (active ? "var(--mb-color-accent)" : "var(--mb-color-text-secondary)");
   return (
-    <span role={toggle ? "switch" : "button"} aria-checked={toggle ? !!active : undefined} aria-disabled={disabled ? "true" : undefined}
-      aria-label={label} onClick={disabled ? undefined : onPress}
-      style={{ width: 44, height: 44, cursor: disabled ? "default" : "pointer", opacity: disabled ? .38 : 1, borderRadius: "var(--mb-radius-icon-button)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        border: "1px solid " + (toggle ? (active ? "var(--mb-color-accent)" : "var(--mb-color-border)") : "transparent"),
-        background: toggle && active ? "var(--mb-color-accent-soft)" : "transparent" }}>
-      <PhosphorIcon name={icon} size="control" color={tint} />
-    </span>
+    <OrbSatellite icon={icon} label={label} accessibilityLabel={label} iconOnly
+      kind={toggle ? "toggle" : "action"} active={active} disabled={disabled} tone={tone} onPress={onPress} />
   );
 }
 
@@ -280,19 +290,20 @@ function LandscapeControl({ icon, label, toggle, active, disabled, tone, onPress
  * occupy. The right pane is wider, and on a fresh session the transcript beneath
  * it is empty anyway.
  */
-function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, auto, driveMode = false }) {
+function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, auto, handsFreeInitially = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
-  const [driveAuto, setDriveAuto] = React.useState(true);
+  const [handsFree, setHandsFree] = React.useState(!!handsFreeInitially);
   const [banner, setBanner] = React.useState(true);
   const [intro, setIntro] = React.useState(false);
   const [introOpened, setIntroOpened] = React.useState(false);
   // The stage holds the orb and the control row beneath it, so 54pt of its
   // height (44 control + 10 gap) is spoken for before the orb gets any.
-  const [landscapeStageRef, landscapeOrb] = useFitSize(150, 84, 0, 54);
+  const [landscapeStageRef, landscapeOrb] = useFitSize(150, 84, 0, 78);
   const landscapeSpeaking = !!turn.current && turn.current.phase === "speaking";
+  const landscapeComposing = !turn.current && !handsFree;
   return (
     <div style={{ position: "relative", display: "flex", height: "100%", padding: "0 12px 8px", background: "var(--mb-color-background)" }}>
       <div style={{ flex: "0.9 1 0", minWidth: 0, paddingRight: 12, display: "flex", flexDirection: "column" }}>
@@ -311,34 +322,21 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
             <ConversationSettingsSummary iconOnly summary="Length: Brief · Tone: Balanced · Voice: Heart" onPress={onOpenSettings} />
           </div>
           <div style={{ flexShrink: 0 }}>
-            <VoiceOrb size={landscapeOrb} phase={turn.current ? turn.current.phase : "idle"}
-              phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress} onPress={turn.start} />
+            <OrbTransport orbSize={landscapeOrb} labels={false}
+              phase={turn.current ? turn.current.phase : "idle"}
+              phaseProgress={turn.phaseProgress} turnProgress={turn.turnProgress}
+              onOrbPress={turn.start} onStop={turn.stop} />
           </div>
-          {(turn.current ? turn.current.phase : "idle") === "idle" && !driveMode ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              <LandscapeControl icon="image" label="Add image" onPress={() => {}} />
-              <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
-              <LandscapeControl icon="council" label="Model Council" toggle active={council} onPress={() => setCouncil((on) => !on)} />
-              <LandscapeControl icon="search" label="Web search" toggle active={web} onPress={() => setWeb((on) => !on)} />
-            </div>
-          ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
-              <LandscapeControl icon="reload" label="Restart" disabled={!landscapeSpeaking} onPress={() => {}} />
-              <LandscapeControl icon="left" label="Back" disabled={!landscapeSpeaking} onPress={() => {}} />
-              <LandscapeControl icon="right" label="Forward" disabled={!landscapeSpeaking} onPress={() => {}} />
-              {driveMode && !driveAuto
-                ? <LandscapeControl icon="play" tone="success" label="Resume drive session" onPress={() => setDriveAuto(true)} />
-                : <LandscapeControl icon="stop" tone="danger" label={driveMode ? "Stop the drive session" : "Stop this turn"}
-                    onPress={() => { turn.stop(); if (driveMode) setDriveAuto(false); }} />}
-            </div>
-          )}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <LandscapeControl icon="image" label="Add image" disabled={!landscapeComposing} onPress={() => {}} />
+            <LandscapeControl icon="council" label="Model Council" toggle active={council} disabled={!landscapeComposing} onPress={() => setCouncil((on) => !on)} />
+            <LandscapeControl icon="search" label="Web search" toggle active={web} disabled={!landscapeComposing} onPress={() => setWeb((on) => !on)} />
+            <LandscapeControl icon="car" label="Hands-free conversation" toggle active={handsFree} onPress={() => setHandsFree((on) => !on)} />
+          </div>
         </div>
       </div>
       <div style={{ width: 1, alignSelf: "stretch", background: "var(--mb-color-border)" }} />
       <div style={{ flex: 1, minWidth: 0, paddingLeft: 12, paddingTop: 10, display: "flex", flexDirection: "column", minHeight: 0 }}>
-        <IntroBanner visible={banner} compact
-          showDismiss={introOpened} onDismiss={() => setBanner(false)}
-          onOpen={() => { setIntro(true); setIntroOpened(true); }} />
         <ChatTranscript style={{ flex: 1, paddingBottom: 8 }}>
           {conversation.messages.map((message, index) => (
             <TranscriptRow key={message.id} message={message} isLast={index === conversation.messages.length - 1} />

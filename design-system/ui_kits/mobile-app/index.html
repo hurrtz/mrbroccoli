@@ -1,7 +1,8 @@
-<!-- @dsCard group="Mr Broccoli app" viewport="820x1850" name="Mobile app" subtitle="Voice-first workspace incl. drive session, conversations and settings, portrait and landscape" -->
+<!-- @dsCard group="Mr Broccoli app" viewport="820x1850" name="Mobile app" subtitle="Voice-first workspace incl. the hands-free switch, conversations and settings, portrait and landscape" -->
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>Mr Broccoli — mobile app</title>
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
@@ -19,7 +20,7 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 </head><body>
 <div><p class="caption">Light</p><div class="device" id="light" data-theme="light"></div></div>
 <div><p class="caption">Dark</p><div class="device" id="dark" data-theme="dark"></div></div>
-<div><p class="caption">Drive session · Stop/Resume in the ring</p><div class="device" id="drive" data-theme="light"></div></div>
+<div><p class="caption">Hands free on · the loop as a row switch</p><div class="device" id="drive" data-theme="light"></div></div>
 <div><p class="caption">In conversation · transcript open</p><div class="device" id="conversation" data-theme="dark"></div></div>
 <div><p class="caption">Landscape</p><div class="device land" id="landscape" data-theme="light"></div></div>
 <script type="text/babel" src="./Workspace.jsx"></script>
@@ -36,7 +37,7 @@ const SETTINGS_PAGES = () => ({
   listening: window.ListeningPage, speaking: window.SpeakingPage,
   data: window.DataPrivacyPage, app: window.AppPage,
 });
-function App({ initialRoute, failInstall, initialTranscript, driveMode }){
+function App({ initialRoute, failInstall, initialTranscript, handsFree }){
   const [route,setRoute]=React.useState(initialRoute||"workspace");
   const [conversation,setConversation]=React.useState(window.MB_DATA.conversations[0]);
   const [toast,setToast]=React.useState(null);
@@ -57,7 +58,7 @@ function App({ initialRoute, failInstall, initialTranscript, driveMode }){
     <div className="screen">
       {route==="workspace" ? <window.Workspace conversationTitle={conversation.title} toast={toast}
         onDismissToast={()=>setToast(null)} auto={auto} introVisible={intro} onIntroVisible={setIntro} initialTranscript={initialTranscript}
-        onOpenLocalModels={()=>{setIntro(false);setRoute("app");}} driveMode={driveMode}
+        onOpenLocalModels={()=>{setIntro(false);setRoute("app");}} handsFreeInitially={handsFree}
         onOpenDrawer={()=>setRoute("drawer")} onOpenSettings={()=>setRoute("settings")} /> : null}
       {route==="drawer" ? <window.ConversationDrawerScreen activeId={conversation.id}
         onSelect={(next)=>{setConversation(next);setRoute("workspace");}}
@@ -71,7 +72,7 @@ function App({ initialRoute, failInstall, initialTranscript, driveMode }){
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<App initialRoute="workspace" />);
 ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="app" failInstall />);
-ReactDOM.createRoot(document.getElementById("drive")).render(<App initialRoute="workspace" driveMode />);
+ReactDOM.createRoot(document.getElementById("drive")).render(<App initialRoute="workspace" handsFree />);
 ReactDOM.createRoot(document.getElementById("conversation")).render(<App initialRoute="workspace" initialTranscript />);
 ReactDOM.createRoot(document.getElementById("landscape")).render(<>
   <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>

@@ -20,20 +20,25 @@ export const PHOSPHOR_ICONS = {
   "safety-certificate": "shield-check", search: "magnifying-glass", send: "paper-plane-tilt", setting: "gear",
   "share-alt": "share-network", sliders: "sliders-horizontal", sound: "speaker-high", stop: "stop",
   thunderbolt: "lightning", up: "caret-up", warning: "warning", cpu: "cpu",
-  brain: "brain", council: "users-three", egg: "egg", "egg-cracked": "egg-crack",
+  brain: "brain", council: "users-three", car: "car", circuitry: "circuitry",
+  "text-align-left": "text-align-left", "text-align-right": "text-align-right", "user-sound": "user-sound",
+  egg: "egg", "egg-cracked": "egg-crack",
 };
 
 export function resolveIconSize(size) {
   return ICON_SIZE[size] || ICON_SIZE.control;
 }
 
-export function PhosphorIcon({ name, size = "control", color = "currentColor", style }) {
+/* Weight is a state channel, not decoration: a filled glyph means "on" and
+   nothing else in the product fills one. Needs the fill stylesheet alongside the
+   regular one — @phosphor-icons/web/src/fill/style.css. */
+export function PhosphorIcon({ name, size = "control", weight = "regular", color = "currentColor", style }) {
   const px = resolveIconSize(size);
   const glyph = PHOSPHOR_ICONS[name] || "circle";
   return (
     <i
       aria-hidden="true"
-      className={"ph ph-" + glyph}
+      className={(weight === "fill" ? "ph-fill" : "ph") + " ph-" + glyph}
       style={{ fontSize: px, lineHeight: 1, width: px, height: px, color, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0, ...style }}
     />
   );

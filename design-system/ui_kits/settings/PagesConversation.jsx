@@ -1,4 +1,4 @@
-const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, PremiumBand, ProviderIcon, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, RouteOptionRow, IconAction, ProviderIcon, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 const CONN_ASSETS = "../../assets/providers";
 
 /** The single state-driven action at a model row's edge. */
@@ -35,8 +35,7 @@ function ConnectionsPage({ onBack, onClose, isPremium = true }) {
             </div>
           );
         })}
-        {!isPremium ? <PremiumBand copy="Bring your own provider keys. One purchase, no subscription." /> : null}
-      </SettingsGroup>
+        </SettingsGroup>
     </window.SettingsFrame>
   );
 }

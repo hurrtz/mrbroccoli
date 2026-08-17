@@ -55,4 +55,69 @@ describe("internal context leak guard", () => {
       }),
     ).toBe("verbatim-internal-context");
   });
+
+  it("blocks protected text split across one-character stream chunks", () => {
+    const safePrefix = "This introduction is safe. ";
+    const protectedContext =
+      "Private council evidence must remain hidden from the visible answer, " +
+      "including participant positions, review notes, and internal synthesis " +
+      "instructions that are supplied only as untrusted model context.";
+    const chunks: string[] = [];
+    const guard = createInternalContextLeakStreamGuard({
+      hasHistoricalContext: false,
+      onChunk: (text) => chunks.push(text),
+      onLeak: () => new Error("blocked"),
+      protectedTexts: [protectedContext],
+    });
+
+    expect(() => {
+      for (const character of `${safePrefix}${protectedContext}`) {
+        guard.push(character);
+      }
+    }).toThrow("blocked");
+    expect(chunks.join("")).toBe(safePrefix);
+  });
+
+  it("does not search the complete protected context for every streamed prefix", () => {
+    const protectedContext = "PRIVATE-COUNCIL-CONTEXT-".repeat(400);
+    const chunks: string[] = [];
+    const outputChunks = Array.from(
+      { length: 100 },
+      (_, index) =>
+        `Public answer paragraph ${index} stays independent of hidden deliberation. `,
+    );
+    const fullText = outputChunks.join("");
+    const originalIncludes = String.prototype.includes;
+    let protectedContextSearches = 0;
+    const includesSpy = jest
+      .spyOn(String.prototype, "includes")
+      .mockImplementation(function (searchString, position) {
+        const value = String(this);
+        if (
+          value === protectedContext &&
+          typeof searchString === "string" &&
+          (searchString.length === 48 || searchString.length === 160)
+        ) {
+          protectedContextSearches += 1;
+        }
+        return originalIncludes.call(value, searchString, position);
+      });
+
+    try {
+      const guard = createInternalContextLeakStreamGuard({
+        hasHistoricalContext: false,
+        onChunk: (text) => chunks.push(text),
+        onLeak: () => new Error("blocked"),
+        protectedTexts: [protectedContext],
+      });
+
+      outputChunks.forEach(guard.push);
+      guard.flush(fullText);
+    } finally {
+      includesSpy.mockRestore();
+    }
+
+    expect(chunks.join("")).toBe(fullText);
+    expect(protectedContextSearches).toBeLessThan(1_000);
+  });
 });

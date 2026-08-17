@@ -420,6 +420,53 @@ describe("streamChat", () => {
     );
   });
 
+  it("aborts a streamed reply that exceeds the caller's character ceiling", async () => {
+    const encoder = new TextEncoder();
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"123456"}}]}\n\n',
+          ),
+        );
+        controller.enqueue(
+          encoder.encode(
+            'data: {"choices":[{"delta":{"content":"789012"},"finish_reason":"stop"}]}\n\n',
+          ),
+        );
+        controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+        controller.close();
+      },
+    });
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, body: stream });
+    const chunks: string[] = [];
+    const onDone = jest.fn();
+    const onError = jest.fn();
+
+    await streamChat({
+      messages: mockMessages,
+      model: "gpt-5.5-2026-04-23",
+      provider: "openai",
+      apiKey: "sk-test-key",
+      assistantInstructions: "",
+      responseLength: "normal",
+      responseTone: "professional",
+      language: "en",
+      maxOutputCharacters: 10,
+      onChunk: (text) => chunks.push(text),
+      onDone,
+      onError,
+    });
+
+    expect(chunks).toEqual(["123456"]);
+    expect(onDone).not.toHaveBeenCalled();
+    expect(onError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: expect.stringContaining("ended before it was complete"),
+      }),
+    );
+  });
+
   it("rejects an OpenAI-compatible stream without a completion marker", async () => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({

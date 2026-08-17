@@ -2816,6 +2816,7 @@ describe("runVoicePipeline", () => {
     expect(streamChat).toHaveBeenCalledWith(
       expect.objectContaining({
         model: "gpt-test",
+        maxOutputCharacters: 32_000,
         provider: "openai",
         synthesisContext: "Private Uber synthesis evidence",
         webSearchContext: "Fresh shared evidence",

@@ -1,13 +1,12 @@
-const { PhosphorIcon, IconButton, VoiceOrb, OrbSatellite, RouteByline, ConversationSettingsSummary, TranscriptHandle, TranscriptMessage } = window.MrBroccoliDesignSystem_62d510;
+const { PhosphorIcon, IconButton, VoiceOrb, OrbSatellite, OrbTransport, RouteByline, ConversationSettingsSummary, TranscriptHandle, TranscriptMessage } = window.MrBroccoliDesignSystem_62d510;
 const IPAD_ASSETS = "../../assets/providers";
 
 function Satellites() {
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 8 }}>
+    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", gap: 20 }}>
       <OrbSatellite icon="image" label="Image" accessibilityLabel="Add image" onPress={() => {}} />
-      <span style={{ width: 1, height: 44, background: "var(--mb-color-border)", margin: "0 6px" }} />
       <OrbSatellite icon="council" label="Council" kind="toggle" active={council} accessibilityLabel="Model Council" onPress={() => setCouncil((v) => !v)} />
       <OrbSatellite icon="search" label="Web" kind="toggle" active={web} accessibilityLabel="Web search" onPress={() => setWeb((v) => !v)} />
     </div>
@@ -54,7 +53,7 @@ function IpadWorkspaceContent({ compact, onOpenDrawer, orbSize = 224, showHandle
         <ConversationSettingsSummary iconOnly summary="Length: Brief · Tone: Balanced · Voice: Heart" onPress={() => {}} />
       </div>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 26 }}>
-        <VoiceOrb size={orbSize} />
+        <OrbTransport orbSize={orbSize} />
         <Satellites />
       </div>
       {showHandle ? <TranscriptHandle messageCount={12} onPress={onOpenTranscript} style={{ margin: "0 20px 20px" }} /> : null}

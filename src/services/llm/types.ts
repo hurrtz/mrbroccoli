@@ -23,6 +23,7 @@ export interface StreamChatParams {
   spokenParagraphStreaming?: boolean;
   synthesisContext?: string;
   webSearchContext?: string;
+  maxOutputCharacters?: number;
   onChunk: (text: string) => void;
   onDone: (
     fullText: string,

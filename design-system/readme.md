@@ -15,7 +15,7 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | `styles.css` | The entry point consumers link. Imports only. |
 | `tokens/` | `fonts`, `colors`, `typography`, `spacing`, `shape`, `motion`, `base` |
 | `components/` | The React primitives, grouped by concern — each with `.jsx`, `.d.ts` (normative props contract) and `.prompt.md` (usage) |
-| `templates/` | Starting folders a consuming project copies |
+| `templates/` | Starting folders a consuming project copies, incl. `app-store-gallery/` (story-mode screenshot panels) |
 | `ui_kits/mobile-app/` | Click-through recreation of the workspace |
 | `ui_kits/settings/` | The seven-page settings modal — same structure in both editions |
 | `ui_kits/intro/` | The three-step introduction: welcome, setup, ephemeral test |
@@ -36,8 +36,8 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 **Core** — `Button`, `IconButton`, `Input`, `Switch`, `TextArea`, `Tag`, `PhosphorIcon`.
 **List** — `List`, `ListItem` (with `ListItem.Brief`).
 **Overlays** — `Modal`, `Toast`, `AnchoredMenu`.
-**Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `PremiumBand`, `RuntimeReadiness`.
-**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `IntroBanner`, `PremiumUpgradeModal`, `VoiceOrb`, `OrbSatellite`, `ConversationSettingsSummary`, `TranscriptHandle`, `BackgroundTaskBar`.
+**Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `RuntimeReadiness`.
+**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `VoiceOrb`, `OrbTransport`, `OrbSatellite`, `AttachmentPopover`, `WorkspaceHeader`, `ConversationSettingsSummary`, `TranscriptHandle`, `BackgroundTaskBar`.
 **Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `AnchoredMenu` (session actions menu), `ConversationRenameModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`.
 **Brand** — `ProviderIcon`.
 **Introduction** — `IntroFlow`, `IntroStepper`, `IntroTitle`, `IntroBody`.

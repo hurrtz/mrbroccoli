@@ -16,6 +16,8 @@ import { streamLocalChat } from "../localLlm";
 import type { createVoicePipelineTtsQueue } from "./ttsQueue";
 import type { RunVoicePipelineParams } from "./types";
 
+export const MODEL_COUNCIL_MAX_COMPLETION_CHARACTERS = 32_000;
+
 interface RunPipelineResponseParams {
   turnId: string;
   abortSignal?: AbortSignal;
@@ -243,6 +245,9 @@ export async function runPipelineResponse({
         spokenRepliesEnabled && replyPlayback === "stream",
       synthesisContext,
       webSearchContext,
+      maxOutputCharacters: synthesisContext
+        ? MODEL_COUNCIL_MAX_COMPLETION_CHARACTERS
+        : undefined,
       abortSignal,
       onChunk,
       onDone,
