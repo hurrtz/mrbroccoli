@@ -1,9 +1,9 @@
 PODS:
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
-  - EXConstants (57.0.11):
+  - EXConstants (57.0.12):
     - ExpoModulesCore
-  - Expo (57.0.13):
+  - Expo (57.0.14):
     - boost
     - DoubleConversion
     - ExpoModulesCore
@@ -35,7 +35,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - SocketRocket
     - Yoga
-  - ExpoAsset (57.0.11):
+  - ExpoAsset (57.0.12):
     - ExpoModulesCore
   - ExpoAudio (57.0.3):
     - ExpoModulesCore
@@ -53,16 +53,16 @@ PODS:
     - ExpoModulesCore
   - ExpoGlassEffect (57.0.1):
     - ExpoModulesCore
-  - ExpoImageManipulator (57.0.10):
+  - ExpoImageManipulator (57.0.11):
     - ExpoModulesCore
     - SDWebImageWebPCoder
-  - ExpoImagePicker (57.0.10):
+  - ExpoImagePicker (57.0.11):
     - ExpoModulesCore
   - ExpoKeepAwake (57.0.1):
     - ExpoModulesCore
   - ExpoLinking (57.0.6):
     - ExpoModulesCore
-  - ExpoLogBox (57.0.2):
+  - ExpoLogBox (57.0.3):
     - React-Core
   - ExpoModulesCore (57.0.11):
     - boost
@@ -107,12 +107,12 @@ PODS:
     - RNWorklets
   - ExpoNetwork (57.0.1):
     - ExpoModulesCore
-  - ExpoRouter (57.0.13):
+  - ExpoRouter (57.0.14):
     - ExpoModulesCore
     - RNScreens
   - ExpoSecureStore (57.0.1):
     - ExpoModulesCore
-  - ExpoSharing (57.0.12):
+  - ExpoSharing (57.0.13):
     - ExpoModulesCore
   - ExpoSpeech (57.0.1):
     - ExpoModulesCore
@@ -3611,9 +3611,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 7e761d76ca2ce687f7cc98e698152abd03a18f90
   DoubleConversion: cb417026b2400c8f53ae97020b2be961b59470cb
-  EXConstants: 13cc6ad9324d81223386074a523d4e16aed32cd2
-  Expo: b0639d272ff1f4fcaf65d76a273bb78c23e8ea2f
-  ExpoAsset: e046c820a585f46969182c2aa03c3a822dd55b6b
+  EXConstants: 092a945e490d473e0b6aec724684b36c447dd62a
+  Expo: 1064b4f05f3c53f75dab49f636011654d3577245
+  ExpoAsset: 1a913b91ccf6db8a5f68ba0c3ab75b8683766cf1
   ExpoAudio: b69f36525132edba8d87a715b3a20c678ef78b30
   ExpoClipboard: 95055b11758f339b61d4d8064dd799df1cf03b7f
   ExpoCrypto: 366380ffafeb22cc9795438cddcbfa299e1aaf42
@@ -3622,19 +3622,19 @@ SPEC CHECKSUMS:
   ExpoFileSystem: b3fb2457e75eddc87dcadcd4cd0e237d12f79de7
   ExpoFont: 59e1faf66ba9bcd232ae1e2ce58d202a48b6f65e
   ExpoGlassEffect: 4b62afb489e6b84357701737ce002137c9d5fdbc
-  ExpoImageManipulator: a41d76647f5e456053b437ab69f2d0f067f4597b
-  ExpoImagePicker: 945c7f41749d99266d220a67118ae769b4d2af19
+  ExpoImageManipulator: 8d3f08457c2ed7fcf79b0a8d7bb5692a2f55687e
+  ExpoImagePicker: b6f0ce415819462b7cf28c47e7a9e147624ef29e
   ExpoKeepAwake: c26f14275017370cc8a4b7b43a0e23361f2053a5
   ExpoLinking: 2e8d88a5a386b47325d9500067c8e60dd4a94340
-  ExpoLogBox: 6bb73c341aca22e699bd4da6cc61afc844e1a648
+  ExpoLogBox: 2c4225a62f1cfb943e6b2df4fa4fe2d136e06fb6
   ExpoModulesCore: dd1c2d4abcd83a7a79f3a525a82413b808356e91
   ExpoModulesJSI: b20fefa4cdd9097e7e6b715466d1900b8c5d4711
   ExpoModulesWorklets: eaf2898a6621e3c9a09c0479c1a4cb5f1b368d53
   ExpoModulesWorkletsAdapter: b4765c3a7ea7f23bcddde04f981ff4b6d01c25d1
   ExpoNetwork: 973d523fe9b1f99223dd945fed9ad1226ae64920
-  ExpoRouter: 5e3858e1f94c18aebb2289c62996be55edfa7169
+  ExpoRouter: 7d6a9a8c5b1ca3085e9d84e10094e96dc5e6ad8e
   ExpoSecureStore: 94793113049a2d7478dfe1a13aa15081e9f61755
-  ExpoSharing: efb8f6341420901f6c7ecec5274dc7d389c69588
+  ExpoSharing: 1a4831b3a52dead83c3ed6a8e1541b04fef02c1d
   ExpoSpeech: 0e90904e2af5d6f166d4d2ffbdab535686597938
   ExpoSpeechRecognition: 119acf84448579e53f841d040aad76982f945e2d
   ExpoSQLite: ddd65ed74bdebcff20f6766e682f9321ecb28ab8
