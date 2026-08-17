@@ -22,6 +22,10 @@ export interface VoiceTextInputPagerProps {
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
+  /** Seconds until Hands free submits the current recording after speech. */
+  handsFreeSilenceCountdownSeconds?: number | null;
+  /** True while the adaptive detector still hears speech. */
+  handsFreeVoiceActive?: boolean;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onPress: () => void;
   onPressIn: () => void;

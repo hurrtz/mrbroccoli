@@ -52,7 +52,8 @@ initial default, but must not permanently couple those settings.
 - `workspaceTranslations.ts` owns the route header, orb satellite and
   transport labels, attachment-popover copy, and the conversation-settings
   sentence. That sentence prefixes the localized Hands free state only while
-  the session loop is enabled; otherwise it remains Length / Tone / Voice.
+  the session loop is enabled; length, tone, and voice remain unlabelled values
+  separated by middle dots.
 - Interpolation placeholders and plural/select shapes must remain consistent
   across locales.
 - Product spelling remains “Mr Broccoli” in every locale unless a deliberate

@@ -14,7 +14,7 @@ function renderSummary(
       <ConversationSettingsSummary
         accessibilityLabel="Conversation settings"
         onPress={jest.fn()}
-        summary="Length: Brief · Tone: Balanced · Voice: Heart"
+        summary="Brief · Balanced · Heart"
         testID="conversation-settings-summary"
         {...props}
       />
@@ -25,9 +25,7 @@ function renderSummary(
 describe("ConversationSettingsSummary", () => {
   it("states the settings as one muted line that truncates", () => {
     const screen = renderSummary();
-    const summary = screen.getByText(
-      "Length: Brief · Tone: Balanced · Voice: Heart",
-    );
+    const summary = screen.getByText("Brief · Balanced · Heart");
 
     expect(summary.props.numberOfLines).toBe(1);
     expect(StyleSheet.flatten(summary.props.style).color).toBe(
@@ -60,9 +58,7 @@ describe("ConversationSettingsSummary", () => {
   it("keeps the labelled control while omitting the sentence when compact", () => {
     const screen = renderSummary({ compact: true });
 
-    expect(
-      screen.queryByText("Length: Brief · Tone: Balanced · Voice: Heart"),
-    ).toBeNull();
+    expect(screen.queryByText("Brief · Balanced · Heart")).toBeNull();
     expect(
       screen.getByTestId("conversation-settings-summary-control").props
         .accessibilityLabel,

@@ -2,6 +2,7 @@ import React from "react";
 import {
   Pressable,
   StyleSheet,
+  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -265,6 +266,8 @@ function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
  * also avoids a raster seam between adjacent bands.
  */
 export function VoiceOrb({
+  coreLabel,
+  coreLabelColor,
   paused = false,
   phase = "idle",
   phaseProgress = 0,
@@ -282,6 +285,10 @@ export function VoiceOrb({
   style,
   testID,
 }: {
+  /** Temporary state rendered in the orb core instead of the phase glyph. */
+  coreLabel?: string;
+  /** Optional foreground for a temporary core label. */
+  coreLabelColor?: string;
   /** Speech is held rather than stopped, so the next tap resumes it. */
   paused?: boolean;
   /** Which pipeline phase the orb is showing. Defaults to idle. */
@@ -403,11 +410,28 @@ export function VoiceOrb({
           ]}
           testID="voice-orb-core"
         >
-          <PhosphorIcon
-            color={foreground}
-            name={getPhaseIcon(phase, paused, rtl)}
-            visualSize={iconSide}
-          />
+          {coreLabel ? (
+            <Text
+              allowFontScaling={false}
+              style={[
+                styles.coreLabel,
+                {
+                  color: coreLabelColor ?? foreground,
+                  fontSize: Math.round(size * 0.17),
+                  lineHeight: Math.round(size * 0.21),
+                },
+              ]}
+              testID="voice-orb-core-label"
+            >
+              {coreLabel}
+            </Text>
+          ) : (
+            <PhosphorIcon
+              color={foreground}
+              name={getPhaseIcon(phase, paused, rtl)}
+              visualSize={iconSide}
+            />
+          )}
         </View>
       </View>
     </Pressable>
@@ -418,5 +442,10 @@ const styles = StyleSheet.create({
   centre: {
     alignItems: "center",
     justifyContent: "center",
+  },
+  coreLabel: {
+    fontVariant: ["tabular-nums"],
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

@@ -89,15 +89,28 @@ describe("MainScreenRouteCard", () => {
         settingsSummary={{
           accessibilityLabel: "Conversation settings",
           onPress: onOpenSettings,
-          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+          summary: "Brief · Balanced · Heart",
         }}
       />,
     );
 
     expect(screen.getByTestId("workspace-header-model")).toBeTruthy();
+    expect(screen.getByText("Brief · Balanced · Heart")).toBeTruthy();
     expect(
-      screen.getByText("Length: Brief · Tone: Balanced · Voice: Heart"),
-    ).toBeTruthy();
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-header-model").props.style,
+      ),
+    ).toMatchObject({ minHeight: 56, paddingHorizontal: 16 });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-header-model-name").props.style,
+      ),
+    ).toMatchObject({ fontSize: 17, lineHeight: 22 });
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-header-effort").props.style,
+      ),
+    ).toMatchObject({ fontSize: 11, lineHeight: 16, marginLeft: "auto" });
     fireEvent.press(screen.getByTestId("workspace-header-model"));
     fireEvent.press(screen.getByTestId("workspace-header-settings"));
     expect(onOpenRoutePicker).toHaveBeenCalledTimes(1);
@@ -118,7 +131,7 @@ describe("MainScreenRouteCard", () => {
         settingsSummary={{
           accessibilityLabel: "Conversation settings",
           onPress: onOpenSettings,
-          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+          summary: "Brief · Balanced · Heart",
         }}
       />,
     );
@@ -128,9 +141,7 @@ describe("MainScreenRouteCard", () => {
         .opacity,
     ).toBe(0.38);
     expect(screen.getByTestId("workspace-header").props.role).toBe("status");
-    expect(
-      screen.getByText("Length: Brief · Tone: Balanced · Voice: Heart"),
-    ).toBeTruthy();
+    expect(screen.getByText("Brief · Balanced · Heart")).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("workspace-header-model"));
     fireEvent.press(screen.getByTestId("workspace-header-settings"));
@@ -149,7 +160,7 @@ describe("MainScreenRouteCard", () => {
         councilReport={{
           modelName: "Claude Opus 5",
           provider: "anthropic",
-          summary: "2 of 4 models done · Round 2 of 3",
+          summary: "Model 2 of 4 · Round 2 of 3",
         }}
         onOpenRoutePicker={onOpenRoutePicker}
         presentation="workspace-header"
@@ -158,7 +169,7 @@ describe("MainScreenRouteCard", () => {
         settingsSummary={{
           accessibilityLabel: "Conversation settings",
           onPress: onOpenSettings,
-          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+          summary: "Brief · Balanced · Heart",
         }}
       />,
     );
@@ -168,10 +179,8 @@ describe("MainScreenRouteCard", () => {
         .opacity,
     ).toBeUndefined();
     expect(screen.getByText("Claude Opus 5")).toBeTruthy();
-    expect(screen.getByText("2 of 4 models done · Round 2 of 3")).toBeTruthy();
-    expect(
-      screen.queryByText("Length: Brief · Tone: Balanced · Voice: Heart"),
-    ).toBeNull();
+    expect(screen.getByText("Model 2 of 4 · Round 2 of 3")).toBeTruthy();
+    expect(screen.queryByText("Brief · Balanced · Heart")).toBeNull();
 
     fireEvent.press(screen.getByTestId("workspace-header-model"));
     fireEvent.press(screen.getByTestId("workspace-header-settings"));

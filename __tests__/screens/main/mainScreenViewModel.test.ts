@@ -1,4 +1,7 @@
-import { getMainScreenViewModel } from "../../../src/screens/main/mainScreenViewModel";
+import {
+  getActiveCouncilModelPosition,
+  getMainScreenViewModel,
+} from "../../../src/screens/main/mainScreenViewModel";
 import { Conversation, DEFAULT_SETTINGS, Settings } from "../../../src/types";
 
 function t(key: any, params?: Record<string, string | number | undefined>) {
@@ -14,6 +17,13 @@ function t(key: any, params?: Record<string, string | number | undefined>) {
 }
 
 describe("getMainScreenViewModel", () => {
+  it("reports the active Council model as one-based progress", () => {
+    expect(getActiveCouncilModelPosition(0, 4)).toBe(1);
+    expect(getActiveCouncilModelPosition(1, 4)).toBe(2);
+    expect(getActiveCouncilModelPosition(4, 4)).toBe(4);
+    expect(getActiveCouncilModelPosition(0, 0)).toBe(0);
+  });
+
   it("derives streaming transcript state and the active turn phase", () => {
     const settings: Settings = {
       ...DEFAULT_SETTINGS,

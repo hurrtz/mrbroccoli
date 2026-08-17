@@ -26,7 +26,7 @@ export function ConversationSettingsSummary({
   style,
   testID,
 }: {
-  /** Label/value pairs joined by middots, e.g. "Length: Brief · Tone: Balanced". */
+  /** Effective values joined by middots, e.g. "Brief · Balanced · Heart". */
   summary: string;
   onPress: () => void;
   /** Accessible name for the control, translated by the caller. */

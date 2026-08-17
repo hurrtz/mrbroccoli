@@ -17,7 +17,10 @@ import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { resolveIpadLayout } from "../utils/ipadLayout";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
-import { getMainScreenViewModel } from "./main/mainScreenViewModel";
+import {
+  getActiveCouncilModelPosition,
+  getMainScreenViewModel,
+} from "./main/mainScreenViewModel";
 import {
   getConversationTtsControlState,
   getMainScreenRouteConfiguration,
@@ -585,11 +588,15 @@ export function MainScreen() {
             total: ulraModeConfiguration.routes.length,
           })} · ${t("councilSynthesizing")}`
         : [
-            t("councilModelsDone", {
-              completed:
+            t("councilActiveModelProgress", {
+              current: getActiveCouncilModelPosition(
                 councilProgress?.stage === "round"
                   ? councilProgress.completedModels
                   : 0,
+                councilProgress?.stage === "round"
+                  ? councilProgress.totalModels
+                  : ulraModeConfiguration.routes.length,
+              ),
               total:
                 councilProgress?.stage === "round"
                   ? councilProgress.totalModels
@@ -696,6 +703,8 @@ export function MainScreen() {
 
   const {
     handsFreeEnabled,
+    handsFreeSilenceCountdownSeconds,
+    handsFreeVoiceActive,
     handlePressIn,
     handlePressOut,
     handleStopPlayback,
@@ -1160,6 +1169,8 @@ export function MainScreen() {
           initialTextMessage: textMessageDraftRef.current,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
+          handsFreeSilenceCountdownSeconds,
+          handsFreeVoiceActive,
           onInputSurfaceChange: handleInputSurfaceChange,
           onPress: handleTogglePress,
           onPressIn: handlePressIn,

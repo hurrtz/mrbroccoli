@@ -31,6 +31,17 @@ interface GetMainScreenViewModelParams {
   visualPhaseOverride?: VoiceVisualPhase | null;
 }
 
+export function getActiveCouncilModelPosition(
+  completedModels: number,
+  totalModels: number,
+) {
+  if (totalModels <= 0) {
+    return 0;
+  }
+
+  return Math.min(Math.max(completedModels + 1, 1), totalModels);
+}
+
 export function getMainScreenViewModel({
   activeConversation,
   isRecording,

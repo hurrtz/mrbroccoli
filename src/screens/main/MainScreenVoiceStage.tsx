@@ -20,6 +20,8 @@ interface MainScreenVoiceStageProps {
   initialTextMessage?: string;
   inputMode: InputMode;
   isActive: boolean;
+  handsFreeSilenceCountdownSeconds?: number | null;
+  handsFreeVoiceActive?: boolean;
   layout?: "portrait" | "landscape";
   /** Surface-specific orb ceiling; the measured pager still shrinks below it. */
   maxOrbSize: number;
@@ -64,6 +66,8 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   initialTextMessage,
   inputMode,
   isActive,
+  handsFreeSilenceCountdownSeconds = null,
+  handsFreeVoiceActive = false,
   layout = "portrait",
   maxOrbSize,
   onInputSurfaceChange,
@@ -123,6 +127,8 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           initialTextMessage={initialTextMessage}
           inputMode={inputMode}
           isActive={isActive}
+          handsFreeSilenceCountdownSeconds={handsFreeSilenceCountdownSeconds}
+          handsFreeVoiceActive={handsFreeVoiceActive}
           maxOrbSize={maxOrbSize}
           onInputSurfaceChange={onInputSurfaceChange}
           onPress={onPress}

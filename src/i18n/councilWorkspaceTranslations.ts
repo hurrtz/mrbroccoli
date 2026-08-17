@@ -8,6 +8,8 @@ const en = {
     `Every round asks every model. ${models} × ${rounds} = ${answers} answers, one after another — minutes, and each provider bills you.`,
   councilModelsDone: ({ completed, total }: TranslationParams) =>
     `${completed} of ${total} models done`,
+  councilActiveModelProgress: ({ current, total }: TranslationParams) =>
+    `Model ${current} of ${total}`,
   councilRoundProgress: ({ current, total }: TranslationParams) =>
     `Round ${current} of ${total}`,
   councilFailedProgress: ({ count }: TranslationParams) => `${count} failed`,
@@ -27,6 +29,8 @@ export const councilWorkspaceTranslations = {
       `In jeder Runde wird jedes Modell gefragt. ${models} × ${rounds} = ${answers} Antworten nacheinander — das dauert Minuten, und jeder Provider rechnet separat ab.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} von ${total} Modellen fertig`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modell ${current} von ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Runde ${current} von ${total}`,
     councilFailedProgress: ({ count }) => `${count} fehlgeschlagen`,
@@ -40,8 +44,9 @@ export const councilWorkspaceTranslations = {
       `У кожному раунді запитується кожна модель. ${models} × ${rounds} = ${answers} відповідей по черзі — це триватиме кілька хвилин, і кожен провайдер виставить рахунок.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} з ${total} моделей завершено`,
-    councilRoundProgress: ({ current, total }) =>
-      `Раунд ${current} з ${total}`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Модель ${current} з ${total}`,
+    councilRoundProgress: ({ current, total }) => `Раунд ${current} з ${total}`,
     councilFailedProgress: ({ count }) => `${count} невдало`,
     councilSynthesizing: "Створення остаточної відповіді",
   }),
@@ -53,6 +58,8 @@ export const councilWorkspaceTranslations = {
       `हर दौर में हर मॉडल से पूछा जाता है। ${models} × ${rounds} = ${answers} जवाब, एक के बाद एक — इसमें कुछ मिनट लगेंगे और हर प्रदाता शुल्क लेगा।`,
     councilModelsDone: ({ completed, total }) =>
       `${total} में से ${completed} मॉडल पूरे`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `${total} में से मॉडल ${current}`,
     councilRoundProgress: ({ current, total }) =>
       `${total} में से दौर ${current}`,
     councilFailedProgress: ({ count }) => `${count} विफल`,
@@ -66,6 +73,8 @@ export const councilWorkspaceTranslations = {
       `Cada ronda consulta a todos los modelos. ${models} × ${rounds} = ${answers} respuestas, una tras otra: tardará minutos y cada proveedor te cobrará.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} de ${total} modelos listos`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modelo ${current} de ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Ronda ${current} de ${total}`,
     councilFailedProgress: ({ count }) => `${count} fallidos`,
@@ -79,6 +88,8 @@ export const councilWorkspaceTranslations = {
       `Chaque tour interroge chaque modèle. ${models} × ${rounds} = ${answers} réponses, l’une après l’autre — plusieurs minutes, et chaque fournisseur te facture.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} modèles sur ${total} terminés`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modèle ${current} sur ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Tour ${current} sur ${total}`,
     councilFailedProgress: ({ count }) => `${count} en échec`,
@@ -92,6 +103,8 @@ export const councilWorkspaceTranslations = {
       `Ogni round interroga ogni modello. ${models} × ${rounds} = ${answers} risposte, una dopo l’altra — servono minuti e ogni provider ti addebita il costo.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} modelli su ${total} completati`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modello ${current} di ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Round ${current} di ${total}`,
     councilFailedProgress: ({ count }) => `${count} non riusciti`,
@@ -105,6 +118,8 @@ export const councilWorkspaceTranslations = {
       `Cada ronda pergunta a cada modelo. ${models} × ${rounds} = ${answers} respostas, uma após outra — demora minutos e cada fornecedor cobra-te.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} de ${total} modelos concluídos`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modelo ${current} de ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Ronda ${current} de ${total}`,
     councilFailedProgress: ({ count }) => `${count} falharam`,
@@ -118,6 +133,8 @@ export const councilWorkspaceTranslations = {
       `Cada rodada pergunta a cada modelo. ${models} × ${rounds} = ${answers} respostas, uma após outra — leva minutos e cada provedor cobra você.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} de ${total} modelos concluídos`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modelo ${current} de ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Rodada ${current} de ${total}`,
     councilFailedProgress: ({ count }) => `${count} falharam`,
@@ -131,6 +148,8 @@ export const councilWorkspaceTranslations = {
       `В каждом раунде запрашивается каждая модель. ${models} × ${rounds} = ${answers} ответов по очереди — это займёт несколько минут, и каждый провайдер выставит счёт.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} из ${total} моделей завершено`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Модель ${current} из ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Раунд ${current} из ${total}`,
     councilFailedProgress: ({ count }) => `${count} неудачно`,
@@ -144,6 +163,8 @@ export const councilWorkspaceTranslations = {
       `每轮都会询问每个模型。${models} × ${rounds} = ${answers} 个回答，依次进行——需要几分钟，每个提供商都会计费。`,
     councilModelsDone: ({ completed, total }) =>
       `${total} 个模型中已有 ${completed} 个完成`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `第 ${current} 个模型，共 ${total} 个`,
     councilRoundProgress: ({ current, total }) =>
       `第 ${current} 轮，共 ${total} 轮`,
     councilFailedProgress: ({ count }) => `${count} 个失败`,
@@ -157,6 +178,8 @@ export const councilWorkspaceTranslations = {
       `تسأل كل جولة كل نموذج. ${models} × ${rounds} = ${answers} إجابة بالتتابع — يستغرق ذلك دقائق، ويحاسبك كل مزود.`,
     councilModelsDone: ({ completed, total }) =>
       `اكتمل ${completed} من ${total} نماذج`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `النموذج ${current} من ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `الجولة ${current} من ${total}`,
     councilFailedProgress: ({ count }) => `${count} فشلت`,
@@ -170,6 +193,8 @@ export const councilWorkspaceTranslations = {
       `各ラウンドで全モデルに質問します。${models} × ${rounds} = ${answers} 件の回答を順番に処理します。数分かかり、各プロバイダーから請求されます。`,
     councilModelsDone: ({ completed, total }) =>
       `${total} モデル中 ${completed} 完了`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `${total} モデル中 ${current}`,
     councilRoundProgress: ({ current, total }) =>
       `${total} ラウンド中 ${current}`,
     councilFailedProgress: ({ count }) => `${count} 件失敗`,
@@ -183,8 +208,9 @@ export const councilWorkspaceTranslations = {
       `Minden kör minden modellt megkérdez. ${models} × ${rounds} = ${answers} válasz egymás után — percekig tart, és minden szolgáltató számláz.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed}/${total} modell kész`,
-    councilRoundProgress: ({ current, total }) =>
-      `${current}. kör / ${total}`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `${current}. modell / ${total}`,
+    councilRoundProgress: ({ current, total }) => `${current}. kör / ${total}`,
     councilFailedProgress: ({ count }) => `${count} sikertelen`,
     councilSynthesizing: "A végső válasz összeállítása",
   }),
@@ -196,8 +222,9 @@ export const councilWorkspaceTranslations = {
       `Každé kolo se zeptá každého modelu. ${models} × ${rounds} = ${answers} odpovědí za sebou — potrvá to několik minut a každý poskytovatel účtuje zvlášť.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} z ${total} modelů hotovo`,
-    councilRoundProgress: ({ current, total }) =>
-      `Kolo ${current} z ${total}`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Model ${current} z ${total}`,
+    councilRoundProgress: ({ current, total }) => `Kolo ${current} z ${total}`,
     councilFailedProgress: ({ count }) => `${count} selhalo`,
     councilSynthesizing: "Tvorba finální odpovědi",
   }),
@@ -209,8 +236,9 @@ export const councilWorkspaceTranslations = {
       `Każda runda pyta każdy model. ${models} × ${rounds} = ${answers} odpowiedzi po kolei — potrwa to kilka minut, a każdy dostawca naliczy opłatę.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} z ${total} modeli gotowych`,
-    councilRoundProgress: ({ current, total }) =>
-      `Runda ${current} z ${total}`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Model ${current} z ${total}`,
+    councilRoundProgress: ({ current, total }) => `Runda ${current} z ${total}`,
     councilFailedProgress: ({ count }) => `${count} nieudanych`,
     councilSynthesizing: "Tworzenie odpowiedzi końcowej",
   }),
@@ -222,6 +250,8 @@ export const councilWorkspaceTranslations = {
       `Her tur her modele sorar. ${models} × ${rounds} = ${answers} yanıt art arda — dakikalar sürer ve her sağlayıcı ücretlendirir.`,
     councilModelsDone: ({ completed, total }) =>
       `${total} modelden ${completed} tanesi tamamlandı`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `${total} modelden ${current}. model`,
     councilRoundProgress: ({ current, total }) =>
       `${total} turdan ${current}. tur`,
     councilFailedProgress: ({ count }) => `${count} başarısız`,
@@ -235,6 +265,8 @@ export const councilWorkspaceTranslations = {
       `Varje omgång frågar varje modell. ${models} × ${rounds} = ${answers} svar, ett efter ett — det tar minuter och varje leverantör debiterar dig.`,
     councilModelsDone: ({ completed, total }) =>
       `${completed} av ${total} modeller klara`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `Modell ${current} av ${total}`,
     councilRoundProgress: ({ current, total }) =>
       `Omgång ${current} av ${total}`,
     councilFailedProgress: ({ count }) => `${count} misslyckades`,
@@ -248,6 +280,8 @@ export const councilWorkspaceTranslations = {
       `ہر دور ہر ماڈل سے پوچھتا ہے۔ ${models} × ${rounds} = ${answers} جوابات یکے بعد دیگرے — اس میں چند منٹ لگیں گے اور ہر فراہم کنندہ چارج کرے گا`,
     councilModelsDone: ({ completed, total }) =>
       `${total} میں سے ${completed} ماڈلز مکمل`,
+    councilActiveModelProgress: ({ current, total }) =>
+      `${total} میں سے ماڈل ${current}`,
     councilRoundProgress: ({ current, total }) =>
       `${total} میں سے دور ${current}`,
     councilFailedProgress: ({ count }) => `${count} ناکام`,

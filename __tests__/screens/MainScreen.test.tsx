@@ -991,9 +991,7 @@ describe("MainScreen", () => {
     expect(screen.getByText("route-card")).toBeTruthy();
     expect(screen.getByTestId("conversation-settings-summary")).toBeTruthy();
     expect(
-      screen.getByText(
-        "Length: Normal · Tone: Professional · Voice: System voice",
-      ),
+      screen.getByText("Normal · Professional · System voice"),
     ).toBeTruthy();
     expect(
       screen.getByTestId("conversation-settings-summary-control").props

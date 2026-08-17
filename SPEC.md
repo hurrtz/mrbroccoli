@@ -91,7 +91,8 @@ offline conversation mode.
 
 - Input supports push-to-talk and toggle-to-talk. A session-scoped Hands free
   switch wraps either input mode with adaptive voice-activity detection,
-  spoken countdown cues, auto-submit, reply playback, and automatic re-arming.
+  visible and spoken countdown cues, auto-submit, reply playback, and automatic
+  re-arming.
 - Speech recognition may use the system recognizer, a downloaded local model,
   or a capability-gated provider route.
 - Spoken replies may use system speech, downloaded Kokoro/Piper speech, or a

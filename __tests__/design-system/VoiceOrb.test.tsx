@@ -259,6 +259,28 @@ describe("VoiceOrb", () => {
     expect(icon.width).toBe(Math.round(196 * 0.3));
   });
 
+  it("replaces the phase glyph with a scaled countdown label", () => {
+    const screen = renderOrb({
+      coreLabel: "3",
+      coreLabelColor: lightColors.danger,
+      phase: "recording",
+      size: 120,
+    });
+    const label = screen.getByTestId("voice-orb-core-label");
+
+    expect(label.props.children).toBe("3");
+    expect(flatten(label.props.style)).toMatchObject({
+      color: lightColors.danger,
+      fontSize: Math.round(120 * 0.17),
+      lineHeight: Math.round(120 * 0.21),
+    });
+    expect(
+      screen.queryByTestId("phosphor-icon-stop", {
+        includeHiddenElements: true,
+      }),
+    ).toBeNull();
+  });
+
   it("exposes the translated accessible name on a button role", () => {
     const screen = renderOrb({ label: "Antippen zum Sprechen" });
     const orb = screen.getByTestId("voice-orb");

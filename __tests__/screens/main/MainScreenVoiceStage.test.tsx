@@ -873,6 +873,51 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual({ disabled: false });
   });
 
+  it("shows the Hands-free silence countdown in the active orb", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          handsFreeSilenceCountdownSeconds: 3,
+          handsFreeVoiceActive: false,
+          isActive: true,
+          statusTitle: "Tap when done",
+          visualPhase: "recording",
+        })}
+      />,
+    );
+
+    const orb = screen.getByTestId("voice-orb-active");
+    expect(orb.props.accessibilityLabel).toBe("Sends in 3…");
+    expect(screen.getByTestId("voice-orb-core-label").props.children).toBe("3");
+    expect(
+      StyleSheet.flatten(screen.getByTestId("voice-orb-core-label").props.style)
+        .color,
+    ).toBe(lightColors.danger);
+    expect(
+      within(orb).queryByTestId("phosphor-icon-stop", hiddenIconQuery),
+    ).toBeNull();
+
+    screen.rerender(
+      <MainScreenVoiceStage
+        {...createProps({
+          handsFreeSilenceCountdownSeconds: 3,
+          handsFreeVoiceActive: true,
+          isActive: true,
+          statusTitle: "Tap when done",
+          visualPhase: "recording",
+        })}
+      />,
+    );
+
+    expect(screen.queryByTestId("voice-orb-core-label")).toBeNull();
+    expect(
+      within(screen.getByTestId("voice-orb-active")).getByTestId(
+        "phosphor-icon-stop",
+        hiddenIconQuery,
+      ),
+    ).toBeTruthy();
+  });
+
   it("announces voice pipeline phase changes without announcing every ETA tick", () => {
     const announce = jest
       .spyOn(AccessibilityInfo, "announceForAccessibility")

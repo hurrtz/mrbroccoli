@@ -49,9 +49,11 @@ framework or hiding platform behavior behind excessive abstraction.
   the two-model requirement below two selections, otherwise call arithmetic.
   It uses the same leading-edge anchor as the image popup so the panel is
   visually centred over the composing row. `WorkspaceHeader` combines portrait
-  route selection and the full-row conversation-settings target, dims and
+  route selection and the full-row conversation-settings target in two
+  substantial 56-point rows, with effort at the trailing edge; it dims and
   locks both rows during an ordinary submitted turn, and reuses the same
-  full-strength geometry for live Council participant and round progress.
+  full-strength geometry for live Council participant, active-model ordinal,
+  and round progress.
   `OrbSatellite` and
   `ConversationSettingsSummary` also expose icon-only compact
   forms that preserve their labelled 44-point control when the owning layout
@@ -60,6 +62,9 @@ framework or hiding platform behavior behind excessive abstraction.
   decorative rather than a smaller nested action. `TranscriptHandle` shows a
   grip plus the translated stable transcript label; conversation name, route,
   age, and reply previews belong elsewhere in the workspace.
+- `VoiceOrb` normally presents the phase action glyph. During Hands-free
+  post-speech silence it may replace that glyph with the tabular countdown
+  number while retaining the same measured circular core and progress ring.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.

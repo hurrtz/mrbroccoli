@@ -73,15 +73,17 @@ receive already-derived state and callbacks.
   name; an explicit notice beneath the stage is the only setup action and
   opens the owning settings page.
 - Portrait places route and conversation settings in one quiet raised block,
-  14pt below the top bar: two equal 44pt rows separated by a hairline. The
-  leading row states who answers the next turn and at what effort; the second
+  14pt below the top bar: two equal 56pt rows separated by a hairline. The
+  leading row states who answers the next turn, with effort aligned at the
+  trailing edge; the second
   row states the effective conversation settings and is one complete press
   target. Releasing a voice turn or submitting text immediately makes both
   rows non-interactive and presents the unchanged block at 38% opacity until
   that ordinary turn ends. A running Model Council is the deliberate
   exception: the block stays at full strength, centers the provider and model
-  currently answering in its first row, and replaces the second row with
-  completed-model and current/total-round progress. Effort, disclosure, and
+  currently answering in its first row, and replaces the second row with the
+  one-based active-model ordinal and current/total-round progress. Effort,
+  disclosure, and
   settings glyphs are absent in that reporting state. Landscape and regular
   iPad retain the uncontained route byline plus
   compact settings control because their narrow control columns cannot carry
@@ -92,13 +94,13 @@ receive already-derived state and callbacks.
   an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
   setup card.
-- The conversation's quick settings read as one muted line of labelled values,
+- The conversation's quick settings read as one muted line of unlabelled values,
   ordered as the sheet presents them. Hands free is prefixed while enabled.
-  The complete 44pt row opens the conversation style sheet; its trailing glyph
+  The complete 56pt row opens the conversation style sheet; its trailing glyph
   is decorative. Landscape floats that compact control over the stage's
   top-right corner as an icon instead of giving it a row: the words cost the
   orb height the narrow column cannot spare. At accessibility-large text,
-  portrait keeps that labelled control but omits the decorative sentence and
+  portrait keeps that settings control but omits the decorative sentence and
   makes the satellite row icon-only. This preserves the complete blocked-route
   warning, status, and transcript affordance without overlap. Landscape keeps
   the same interactions and the warning's complete accessible name, but the
@@ -113,7 +115,9 @@ receive already-derived state and callbacks.
   every turn phase; the three seek controls become live only while speaking.
   Transport verbs tint glyph and label only, and their measured portrait
   footprint contains both possible label lines so Restart and Stop never clip.
-  The silence countdown remains spoken rather than drawn.
+  Once Hands free has heard speech and silence begins, the orb core replaces
+  the stop glyph with the visible seconds remaining; the existing spoken cues
+  remain in sync with it.
 - Restart rewinds the active playback reel to the response's first word without
   requiring the voice session to stop first, and is live only while he speaks.
 - Back and Forward move between the reply's paragraphs. Back means the start of

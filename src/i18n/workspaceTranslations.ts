@@ -35,7 +35,7 @@ const en = {
     withHandsFree(
       handsFree,
       `Hands free: ${handsFree}`,
-      `Length: ${length} · Tone: ${tone} · Voice: ${voice}`,
+      settingsValues(length, tone, voice),
     ),
   conversationDefaultsTitle: "Conversation defaults",
   conversationDefaultsDescription:
@@ -64,6 +64,14 @@ function withHandsFree(
   return handsFree ? `${enabledSummary} · ${settingsSummary}` : settingsSummary;
 }
 
+function settingsValues(
+  length: string | number | undefined,
+  tone: string | number | undefined,
+  voice: string | number | undefined,
+) {
+  return `${length} · ${tone} · ${voice}`;
+}
+
 export const workspaceTranslations = {
   en,
   ar: define({
@@ -85,7 +93,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `بدون استخدام اليدين: ${handsFree}`,
-        `الطول: ${length} · النبرة: ${tone} · الصوت: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "الإعدادات الافتراضية للمحادثة",
     conversationDefaultsDescription:
@@ -120,7 +128,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Bez rukou: ${handsFree}`,
-        `Délka: ${length} · Tón: ${tone} · Hlas: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Výchozí nastavení konverzace",
     conversationDefaultsDescription:
@@ -155,7 +163,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Freihändig: ${handsFree}`,
-        `Länge: ${length} · Ton: ${tone} · Stimme: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Standardeinstellungen für Gespräche",
     conversationDefaultsDescription:
@@ -190,7 +198,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Manos libres: ${handsFree}`,
-        `Longitud: ${length} · Tono: ${tone} · Voz: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Ajustes predeterminados de conversación",
     conversationDefaultsDescription:
@@ -225,7 +233,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Mains libres : ${handsFree}`,
-        `Longueur : ${length} · Ton : ${tone} · Voix : ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Réglages de conversation par défaut",
     conversationDefaultsDescription:
@@ -260,7 +268,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `हैंड्स-फ़्री: ${handsFree}`,
-        `लंबाई: ${length} · लहजा: ${tone} · आवाज़: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "बातचीत की डिफ़ॉल्ट सेटिंग",
     conversationDefaultsDescription:
@@ -295,7 +303,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Kihangosítás: ${handsFree}`,
-        `Hossz: ${length} · Hangnem: ${tone} · Hang: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Alapértelmezett beszélgetési beállítások",
     conversationDefaultsDescription:
@@ -330,7 +338,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Vivavoce: ${handsFree}`,
-        `Lunghezza: ${length} · Tono: ${tone} · Voce: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Impostazioni predefinite della conversazione",
     conversationDefaultsDescription:
@@ -365,7 +373,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `ハンズフリー: ${handsFree}`,
-        `長さ: ${length} · トーン: ${tone} · 音声: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "会話のデフォルト設定",
     conversationDefaultsDescription:
@@ -400,7 +408,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Bez użycia rąk: ${handsFree}`,
-        `Długość: ${length} · Ton: ${tone} · Głos: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Domyślne ustawienia rozmowy",
     conversationDefaultsDescription:
@@ -435,7 +443,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Mãos livres: ${handsFree}`,
-        `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Predefinições da conversa",
     conversationDefaultsDescription:
@@ -470,7 +478,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Mãos livres: ${handsFree}`,
-        `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Configurações padrão da conversa",
     conversationDefaultsDescription:
@@ -505,7 +513,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Без рук: ${handsFree}`,
-        `Длина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Настройки разговора по умолчанию",
     conversationDefaultsDescription:
@@ -540,7 +548,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Handsfree: ${handsFree}`,
-        `Längd: ${length} · Ton: ${tone} · Röst: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Standardinställningar för samtal",
     conversationDefaultsDescription:
@@ -575,7 +583,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Eller serbest: ${handsFree}`,
-        `Uzunluk: ${length} · Ton: ${tone} · Ses: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Varsayılan konuşma ayarları",
     conversationDefaultsDescription:
@@ -610,7 +618,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `Без рук: ${handsFree}`,
-        `Довжина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "Стандартні налаштування розмови",
     conversationDefaultsDescription:
@@ -645,7 +653,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `ہینڈز فری: ${handsFree}`,
-        `لمبائی: ${length} · لہجہ: ${tone} · آواز: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "گفتگو کی طے شدہ ترتیبات",
     conversationDefaultsDescription:
@@ -680,7 +688,7 @@ export const workspaceTranslations = {
       withHandsFree(
         handsFree,
         `免提: ${handsFree}`,
-        `长度: ${length} · 语气: ${tone} · 语音: ${voice}`,
+        settingsValues(length, tone, voice),
       ),
     conversationDefaultsTitle: "对话默认设置",
     conversationDefaultsDescription: "用于新会话以及没有单独设置的会话。",

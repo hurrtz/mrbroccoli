@@ -130,7 +130,10 @@ and release thresholds count samples rather than distinct numeric values. Once
 speech releases, the hook's independent 200ms clock derives the ten-second
 silence countdown and calls the same `stopVoiceCapture` path as an explicit
 stop. Route-aware ambient learning seeds the next recording but never performs
-the stop itself.
+the stop itself. `MainScreen` forwards the detector's live countdown and
+speech-active flag through `MainScreenVoiceStage` to `VoiceTextInputPager`,
+which replaces the recording glyph with the remaining seconds only during the
+post-speech silence window.
 
 ## Adaptive iPad Composition
 
@@ -273,14 +276,15 @@ conversation record is created. Its reset removes the stored override object,
 so the session resumes inheritance instead of freezing a copy of the defaults.
 Portrait combines the selected route and summary in `WorkspaceHeader`, a
 quiet two-row raised block 14pt below the top bar. The summary lists the
-effective length, tone, and voice as translated `Label: value` pairs separated
+effective length, tone, and voice as translated values separated
 by middle dots, prefixed with Hands free while the session switch is enabled.
 Its text plus trailing glyph is one row-sized press target. `pipelinePhase`
 leaving `idle` is the submission boundary: an ordinary turn locks both rows
 and dims the whole block without replacing its content. When the current turn
 has a Council configuration, typed `CouncilProgress` instead keeps the block
-full-strength and replaces its contents with the active participant plus
-model/round progress; synthesis reports the final route explicitly. The
+full-strength and replaces its contents with the active participant plus the
+one-based active-model ordinal and round progress; synthesis reports the final
+route explicitly. The
 Council satellite opens an anchored transparent `CouncilPopover`; selected
 membership is session-local, while its one-to-five total-round control claims
 the responder at touch-down and adapts the persisted review-round count by

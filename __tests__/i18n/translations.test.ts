@@ -180,7 +180,7 @@ describe("translations", () => {
         tone: "Nerdy",
         voice: "Eve",
       }),
-    ).toBe("Length: Thorough · Tone: Nerdy · Voice: Eve");
+    ).toBe("Thorough · Nerdy · Eve");
     expect(
       translate("en", "conversationSettingsSummary", {
         handsFree: "Enabled",
@@ -188,7 +188,20 @@ describe("translations", () => {
         tone: "Nerdy",
         voice: "Eve",
       }),
-    ).toBe("Hands free: Enabled · Length: Thorough · Tone: Nerdy · Voice: Eve");
+    ).toBe("Hands free: Enabled · Thorough · Nerdy · Eve");
+  });
+
+  it("omits conversation parameter labels in every locale", () => {
+    APP_LANGUAGES.forEach((language) => {
+      expect(
+        translate(language, "conversationSettingsSummary", {
+          handsFree: "",
+          length: "L",
+          tone: "T",
+          voice: "V",
+        }),
+      ).toBe("L · T · V");
+    });
   });
 
   it("keeps text direction in locale metadata", () => {

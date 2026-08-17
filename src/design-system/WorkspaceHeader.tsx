@@ -74,6 +74,7 @@ export function WorkspaceHeader({
         >
           {modelName}
         </Text>
+        {council ? null : <View style={styles.spacer} />}
         {effort && !council ? (
           <Text
             numberOfLines={1}
@@ -83,7 +84,6 @@ export function WorkspaceHeader({
             {effort}
           </Text>
         ) : null}
-        {council ? null : <View style={styles.spacer} />}
         {switchable && !council ? (
           <PhosphorIcon color={colors.textMuted} name="down" size="compact" />
         ) : null}
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    marginHorizontal: 12,
+    marginHorizontal: 16,
   },
   disabled: {
     opacity: 0.38,
@@ -143,17 +143,18 @@ const styles = StyleSheet.create({
   effort: {
     flexShrink: 0,
     fontFamily: fonts.mono,
-    fontSize: 9,
+    fontSize: 11,
     letterSpacing: 0.75,
-    lineHeight: 12,
+    lineHeight: 16,
+    marginLeft: "auto",
     textTransform: "uppercase",
   },
   model: {
     flexShrink: 1,
     fontFamily: fonts.display,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: "600",
-    lineHeight: 20,
+    lineHeight: 22,
     minWidth: 0,
   },
   providerIcon: {
@@ -165,9 +166,9 @@ const styles = StyleSheet.create({
   row: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 10,
-    minHeight: 44,
-    paddingHorizontal: 12,
+    gap: 12,
+    minHeight: 56,
+    paddingHorizontal: 16,
   },
   reportingRow: {
     justifyContent: "center",
@@ -182,8 +183,8 @@ const styles = StyleSheet.create({
   summary: {
     flex: 1,
     fontFamily: fonts.body,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 15,
+    lineHeight: 20,
     minWidth: 0,
   },
 });

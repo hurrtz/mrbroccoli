@@ -22,17 +22,19 @@ the complete Play Store translations are kept in a dedicated file under
   both Settings and the home picker scroll through the complete configured
   list.
 - The home workspace now matches the latest native design: its portrait model
-  and conversation settings form one two-row header, the orb uses the new phase
-  glyphs plus a close neutral ring, and a permanent orbit carries Restart,
+  and conversation settings form one roomier two-row header with the effort at
+  the trailing edge and compact unlabelled setting values, the orb uses the new
+  phase glyphs plus a close neutral ring, and a permanent orbit carries Restart,
   Back, Forward, and Stop without moving the orb between phases. The composing
   row stays stable with borderless Image, Council, Web, and Hands free controls;
   images live in a fixed thumbnail deck and anchored scrolling popover instead
   of shifting the stage.
 - Drive Session is now the session-scoped Hands free switch rather than a third
   saved input mode. It starts off, wraps push-to-talk or toggle-to-talk, starts
-  listening when enabled, keeps its adaptive ambient-level learning and spoken
-  countdown, can be toggled during an answer, and leaves Stop responsible only
-  for the current turn. Legacy Drive selections migrate to toggle-to-talk.
+  listening when enabled, keeps its adaptive ambient-level learning, shows the
+  silence countdown in the orb while retaining spoken cues, can be toggled
+  during an answer, and leaves Stop responsible only for the current turn.
+  Legacy Drive selections migrate to toggle-to-talk.
 - The voice orb's single progress ring shows only the full turn from submission
   to first speech during processing, preserves the read position while speech
   is paused, and fills red only after the learned estimate is exceeded.
@@ -58,12 +60,12 @@ the complete Play Store translations are kept in a dedicated file under
   successful responses, failures, and final synthesis stage.
 - Submitted ordinary turns now lock and dim the home model/conversation header,
   while a running Model Council reuses it at full strength to show the model
-  currently answering plus live model and round progress. The Council control
-  now opens the approved anchored model-and-round builder with permanent call
-  arithmetic; participants run sequentially so that display is truthful, and
-  the former first-use and large-run confirmations are gone. Current UI,
-  prompts, audit components, types, and localized feature names consistently
-  call the feature Model Council.
+  currently answering plus its one-based position and live round progress. The
+  Council control now opens the approved anchored model-and-round builder with
+  permanent call arithmetic; participants run sequentially so that display is
+  truthful, and the former first-use and large-run confirmations are gone.
+  Current UI, prompts, audit components, types, and localized feature names
+  consistently call the feature Model Council.
 - The Council builder now sits visually centred like the image popup, explains
   that at least two models are required when only one is selected, and tracks
   round-slider drags reliably with a correctly centred handle.
