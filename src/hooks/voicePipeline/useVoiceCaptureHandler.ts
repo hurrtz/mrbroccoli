@@ -6,6 +6,7 @@ import {
   registerDebugTurnSignal,
 } from "../../services/debugLogCapture";
 import { runVoicePipeline } from "../../services/voicePipeline";
+import type { CouncilProgress } from "../../services/ulraMode";
 import type { VoicePhaseProgress } from "../../types";
 import { createVoicePipelineEventAdapter } from "./createVoicePipelineEventAdapter";
 import {
@@ -30,6 +31,7 @@ type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
   ) => Promise<void>;
   lastCompletedReplyRef: React.MutableRefObject<string>;
   onReplyCompleted: () => void;
+  setCouncilProgress: Dispatch<SetStateAction<CouncilProgress | null>>;
   setPhaseProgress: Dispatch<SetStateAction<VoicePhaseProgress | null>>;
   setPipelinePhase: (phase: PipelinePhase) => void;
   setStreamingText: (text: string | ((prev: string) => string)) => void;
@@ -57,6 +59,7 @@ export function useVoiceCaptureHandler({
   replyPlayback,
   responseLength,
   responseTone,
+  setCouncilProgress,
   selectedSttModel,
   localSttModelId,
   selectedTtsModel,
@@ -143,6 +146,7 @@ export function useVoiceCaptureHandler({
         isCurrentRun() && !abortController.signal.aborted;
       const conversationForRun = conversationOverride ?? activeConversation;
 
+      setCouncilProgress(null);
       prepareCaptureForTurn(audioUri);
       if (previousAbortController) {
         await player.stopPlayback();
@@ -250,6 +254,7 @@ export function useVoiceCaptureHandler({
         replyPlayback,
         responseLength,
         responseTone,
+        setCouncilProgress,
         selectedSttModel,
         selectedTtsModel,
         selectedTtsVoice,
@@ -408,6 +413,7 @@ export function useVoiceCaptureHandler({
         }
         clearLatencyProgress();
         cancelStreamingRender(streamingRenderRunId);
+        setCouncilProgress(null);
         setStreamingText("");
         setPipelinePhase("idle");
         if (completedSuccessfully) {
@@ -470,6 +476,7 @@ export function useVoiceCaptureHandler({
       selectedTtsModel,
       localTtsModelId,
       selectedTtsVoice,
+      setCouncilProgress,
       setPipelinePhase,
       setStreamingText,
       showToast,

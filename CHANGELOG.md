@@ -53,6 +53,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Long Model Council syntheses no longer freeze the app during streamed
   readback: private-context leak checks now stay incremental, and runaway final
   answers stop at a provider-independent safety ceiling.
+- Model Council now publishes live structured progress for future workspace
+  presentation: the current and maximum round, active models, completed calls,
+  successful responses, failures, and final synthesis stage.
 
 ## 4.0.0 - 2026-08-16
 

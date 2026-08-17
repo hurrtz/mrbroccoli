@@ -21,7 +21,7 @@ import type {
   UsageEstimate,
 } from "../../types";
 import type { SpeechDiagnosticsContext } from "../speech/diagnostics";
-import type { UlraModeConfig } from "../ulraMode";
+import type { CouncilProgress, UlraModeConfig } from "../ulraMode";
 import type {
   LocalSttModelId,
   LocalTtsModelId,
@@ -38,6 +38,7 @@ export interface PipelineCallbacks {
   onWebSearchComplete?: () => void;
   onWebSearchFallback?: (error: Error) => void;
   onLlmStart?: () => void;
+  onCouncilProgress?: (progress: CouncilProgress) => void;
   onUlraModeComplete?: (summary: {
     failedCalls: number;
     outcome: "degraded" | "full" | "retired";

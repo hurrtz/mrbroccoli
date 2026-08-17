@@ -129,8 +129,11 @@ offline conversation mode.
 - Model Council runs independent model contributions, adversarial review
   rounds, and final synthesis. The visible synthesis is independently bounded
   so a provider cannot stream an effectively unbounded answer into the mobile
-  UI or speech queue. Its internal `ulra` identifiers are retained for data and
-  import stability.
+  UI or speech queue. While it runs, the pipeline exposes the current
+  one-based round, configured maximum rounds, active participant count, and
+  settled, successful, and failed participant counts before moving to an
+  explicit synthesis state. Its internal `ulra` identifiers are retained for
+  data and import stability.
 
   **Decision:** The English feature name is “Model Council.” The previous
   “Uber Mode” name collided with a well-known third-party trademark and was

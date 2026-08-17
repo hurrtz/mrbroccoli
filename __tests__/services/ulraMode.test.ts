@@ -7,6 +7,8 @@ import {
   ULRA_MODE_MAX_CONTRIBUTION_CHARACTERS,
   ULRA_MODE_PARTICIPANT_TIMEOUT_MS,
   ULRA_MODE_SYNTHESIS_HISTORY_TOKEN_BUDGET,
+  type CouncilProgress,
+  type CouncilRoundProgress,
   UlraModeConfig,
 } from "../../src/services/ulraMode";
 
@@ -173,6 +175,108 @@ describe("runUlraModeDeliberation", () => {
     expect(firstRoundPrompts[0]).not.toContain('"modeId":');
     expect(result.synthesisPrompt).not.toContain('"provider":');
     expect(result.synthesisPrompt).not.toContain('"model":');
+  });
+
+  it("reports round and participant progress for frontend consumers", async () => {
+    const progress: CouncilProgress[] = [];
+    let rejectBlockedParticipant: (reason: unknown) => void = () => undefined;
+    const blockedParticipant = new Promise<never>((_, reject) => {
+      rejectBlockedParticipant = reject;
+    });
+    generateInternalChatMock.mockImplementation(async (params) => {
+      if (
+        params.provider === "anthropic" &&
+        !params.systemPrompt.includes("review round")
+      ) {
+        return blockedParticipant;
+      }
+      return {
+        model: params.model,
+        text: `${params.provider} contribution`,
+        usage: {
+          kind: "reply",
+          source: "estimated",
+          promptTokens: 4,
+          completionTokens: 2,
+          totalTokens: 6,
+        },
+      };
+    });
+
+    const pending = runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 1 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+      onProgress: (value) => progress.push(value),
+    });
+
+    for (let flush = 0; flush < 20; flush += 1) {
+      await Promise.resolve();
+    }
+    const inFlightProgress = progress.at(-1);
+
+    rejectBlockedParticipant(
+      new ProviderRequestError({
+        action: "reply",
+        failureKind: "quota",
+        message: "Quota exhausted",
+        provider: "anthropic",
+        status: 429,
+      }),
+    );
+    await pending;
+    expect(inFlightProgress).toEqual({
+      completedModels: 2,
+      currentRound: 1,
+      failedModels: 0,
+      respondedModels: 2,
+      roundKind: "initial",
+      stage: "round",
+      totalModels: 3,
+      totalRounds: 2,
+    });
+
+    const initialRound = progress.filter(
+      (value): value is CouncilRoundProgress =>
+        value.stage === "round" && value.roundKind === "initial",
+    );
+    expect(initialRound.map(({ completedModels }) => completedModels)).toEqual([
+      0, 1, 2, 3,
+    ]);
+    expect(initialRound.at(-1)).toEqual({
+      completedModels: 3,
+      currentRound: 1,
+      failedModels: 1,
+      respondedModels: 2,
+      roundKind: "initial",
+      stage: "round",
+      totalModels: 3,
+      totalRounds: 2,
+    });
+
+    const reviewRound = progress.filter(
+      (value): value is CouncilRoundProgress =>
+        value.stage === "round" && value.roundKind === "review",
+    );
+    expect(reviewRound.map(({ completedModels }) => completedModels)).toEqual([
+      0, 1, 2,
+    ]);
+    expect(reviewRound.at(-1)).toEqual({
+      completedModels: 2,
+      currentRound: 2,
+      failedModels: 0,
+      respondedModels: 2,
+      roundKind: "review",
+      stage: "round",
+      totalModels: 2,
+      totalRounds: 2,
+    });
+    expect(progress.at(-1)).toEqual({
+      completedRounds: 2,
+      stage: "synthesis",
+      totalRounds: 2,
+    });
   });
 
   it("stops unused review rounds only after unanimous explicit convergence", async () => {

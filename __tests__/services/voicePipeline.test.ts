@@ -2650,6 +2650,7 @@ describe("runVoicePipeline", () => {
     const callbacks = {
       onTranscription: jest.fn(),
       onLlmStart: jest.fn(),
+      onCouncilProgress: jest.fn(),
       onUlraModeComplete: jest.fn(),
       onChunk: jest.fn(),
       onResponseDone: jest.fn(),
@@ -2711,6 +2712,7 @@ describe("runVoicePipeline", () => {
         config: ulraMode,
         conversationSummary:
           "[Conversation response provenance v1]\nThe user previously selected option B.",
+        onProgress: callbacks.onCouncilProgress,
         webSearchContext: "Fresh shared evidence",
       }),
     );

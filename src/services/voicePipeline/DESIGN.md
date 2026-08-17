@@ -61,6 +61,8 @@ events into the active controller:
 - phase callbacks drive recording/thinking/search/speech presentation;
 - `onChunk` updates the visible streamed response;
 - `onContextSummary` persists a new compact summary and its usage event;
+- `onCouncilProgress` carries typed round, participant-settlement, and
+  synthesis state into the active React controller;
 - `onResponseDone` persists the completed assistant message and metadata;
 - speech/audio-ready callbacks feed the platform playback queue; and
 - `onError` performs localized user-facing failure handling.
@@ -96,11 +98,13 @@ sequenceDiagram
     participant S as Final synthesis route
 
     P->>A: independent initial prompt per active route
+    A-->>P: round 1 progress after every settled route
     par bounded participant calls
       A-->>P: contribution or classified failure
     end
     loop configured rounds until unanimous convergence
       P->>R: immutable latest-position snapshot
+      R-->>P: current/total round and active model counts
       par bounded participant reviews
         R-->>P: challenge, converged, or failure
       end
@@ -112,7 +116,13 @@ sequenceDiagram
 
 Participant completions are logged as they settle, but round progression waits
 for all active calls. Terminal failure retirement avoids repeatedly paying for
-an unusable route. If the requested synthesis provider has an open failure
+an unusable route. `CouncilProgress` uses one-based batch numbering: the
+independent contribution batch is round one and configured review rounds
+follow it. A round update separates settled calls from usable responses and
+failures; synthesis is a distinct union member rather than a fabricated extra
+round. `useVoicePipeline` exposes the active value and clears it on new-turn
+startup and terminal cleanup so stale runs cannot remain visible. If the
+requested synthesis provider has an open failure
 circuit, the pipeline may select a successful participant route and records the
 fallback. The final visible stream also carries an app-owned character ceiling,
 so transport-specific token defaults cannot turn unusually long synthesis into

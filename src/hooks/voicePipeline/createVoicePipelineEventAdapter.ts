@@ -3,6 +3,7 @@ import type { MutableRefObject } from "react";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { LatencyRouteDescriptor } from "../../services/latencyStats";
 import type { PipelineCallbacks } from "../../services/voicePipeline/types";
+import type { CouncilProgress } from "../../services/ulraMode";
 import type {
   MessageImageAttachment,
   MessagePipelineNotice,
@@ -63,6 +64,7 @@ type EventAdapterParams = Pick<
   onError: PipelineCallbacks["onError"];
   playbackStartedRef: MutableRefObject<boolean>;
   producedAudioRef: MutableRefObject<boolean>;
+  setCouncilProgress: (progress: CouncilProgress | null) => void;
   setPipelinePhase: (phase: PipelinePhase) => void;
   setStreamingText: (text: string | ((previous: string) => string)) => void;
   state: VoiceTurnRunState;
@@ -95,6 +97,7 @@ export function createVoicePipelineEventAdapter({
   replyPlayback,
   responseLength,
   responseTone,
+  setCouncilProgress,
   selectedSttModel,
   selectedTtsModel,
   selectedTtsVoice,
@@ -367,6 +370,33 @@ export function createVoicePipelineEventAdapter({
       messageState.queueAssistantNotice(notice);
     },
     onLlmStart: handleLlmStarted,
+    onCouncilProgress: (progress) => {
+      if (!isActiveRun()) {
+        return;
+      }
+
+      recordTurnEvent({
+        event: "voice-pipeline-council-progress",
+        payload:
+          progress.stage === "round"
+            ? {
+                completedModels: progress.completedModels,
+                currentRound: progress.currentRound,
+                failedModels: progress.failedModels,
+                respondedModels: progress.respondedModels,
+                roundKind: progress.roundKind,
+                stage: progress.stage,
+                totalModels: progress.totalModels,
+                totalRounds: progress.totalRounds,
+              }
+            : {
+                completedRounds: progress.completedRounds,
+                stage: progress.stage,
+                totalRounds: progress.totalRounds,
+              },
+      });
+      setCouncilProgress(progress);
+    },
     onUlraModeComplete: ({ outcome }) => {
       if (!isActiveRun()) {
         return;

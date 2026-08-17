@@ -295,6 +295,7 @@ export async function runVoicePipeline(
         pastConversationKnowledge: pastKnowledgeResult?.context,
         language,
         messages: allMessages,
+        onProgress: callbacks.onCouncilProgress,
         webSearchContext: webSearchResult.context,
       });
 

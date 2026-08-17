@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { useReplyReplayController } from "./voicePipeline/useReplyReplayController";
 import { useVoiceCaptureHandler } from "./voicePipeline/useVoiceCaptureHandler";
 import { useVoiceLiveActivity } from "./voicePipeline/useVoiceLiveActivity";
+import type { CouncilProgress } from "../services/ulraMode";
 import type { VoicePhaseProgress } from "../types";
 import type {
   PipelinePhase,
@@ -11,6 +12,7 @@ import type {
 } from "./voicePipeline/types";
 
 export type { PipelinePhase, ReplayPhase } from "./voicePipeline/types";
+export type { CouncilProgress } from "../services/ulraMode";
 export type {
   UseVoicePipelineParams,
   UseVoicePipelineResult,
@@ -25,6 +27,8 @@ export function useVoicePipeline(
   const [phaseProgress, setPhaseProgress] = useState<VoicePhaseProgress | null>(
     null,
   );
+  const [councilProgress, setCouncilProgress] =
+    useState<CouncilProgress | null>(null);
   const [completedReplyVersion, setCompletedReplyVersion] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
   const lastCompletedReplyRef = useRef("");
@@ -71,12 +75,14 @@ export function useVoicePipeline(
     handleRepeatLastReply,
     lastCompletedReplyRef,
     onReplyCompleted: () => setCompletedReplyVersion((version) => version + 1),
+    setCouncilProgress,
     setPhaseProgress,
     setPipelinePhase,
     setStreamingText,
   });
 
   return {
+    councilProgress,
     pipelinePhase,
     setPipelinePhase,
     streamingText,

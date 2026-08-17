@@ -110,6 +110,14 @@ the configured review depth.
 
 Each private participant has a ten-minute absolute deadline. Terminally failed
 participants are retired from later rounds; successful participants continue.
+Each batch reports progress when it starts and whenever a participant settles.
+The public progress contract counts the independent contribution batch as round
+one, so `totalRounds` equals that batch plus the configured review rounds. It
+separates models that returned usable responses from failed but settled calls,
+and later rounds use only their active, non-retired participant count. After
+deliberation it changes to an explicit synthesis stage. React state clears the
+progress at the beginning and terminal cleanup of every turn.
+
 The final synthesis retains every participant's latest successful position and
 as much earlier reasoning as fits the 24,000-token estimate. Its visible
 completion has a separate 32,000-character ceiling at the shared streaming

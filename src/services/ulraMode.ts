@@ -23,6 +23,27 @@ export interface UlraModeConfig {
   routes: UlraModeRoute[];
 }
 
+export interface CouncilRoundProgress {
+  completedModels: number;
+  currentRound: number;
+  failedModels: number;
+  respondedModels: number;
+  roundKind: "initial" | "review";
+  stage: "round";
+  totalModels: number;
+  totalRounds: number;
+}
+
+export interface CouncilSynthesisProgress {
+  completedRounds: number;
+  stage: "synthesis";
+  totalRounds: number;
+}
+
+export type CouncilProgress =
+  | CouncilRoundProgress
+  | CouncilSynthesisProgress;
+
 export interface UlraModeEntry {
   modeId: string;
   model: string;
@@ -374,13 +395,16 @@ export async function runUlraModeDeliberation(params: {
   pastConversationKnowledge?: string;
   language: AppLanguage;
   messages: Pick<Message, "role" | "content" | "attachments">[];
+  onProgress?: (progress: CouncilProgress) => void;
   webSearchContext?: string;
 }): Promise<UlraModeResult> {
   const routes = params.config.routes;
   const rounds = Math.max(1, Math.floor(params.config.rounds));
+  const totalRounds = rounds + 1;
   const entries: UlraModeEntry[] = [];
   const failures: UlraModeFailure[] = [];
   const retiredParticipants = new Set<number>();
+  let completedRoundBatches = 0;
 
   if (routes.length < 2) {
     throw new Error(translate(params.language, "ulraModeNeedsTwoModels"));
@@ -412,6 +436,26 @@ export async function runUlraModeDeliberation(params: {
         route,
       }))
       .filter(({ participant }) => !retiredParticipants.has(participant));
+    let completedModels = 0;
+    let failedModels = 0;
+    let respondedModels = 0;
+    const reportRoundProgress = () => {
+      if (params.abortSignal?.aborted) {
+        return;
+      }
+      params.onProgress?.({
+        completedModels,
+        currentRound: round + 1,
+        failedModels,
+        respondedModels,
+        roundKind: round === 0 ? "initial" : "review",
+        stage: "round",
+        totalModels: activeRoutes.length,
+        totalRounds,
+      });
+    };
+
+    reportRoundProgress();
 
     recordDebugLogEvent({
       event: "ulra-mode-round-started",
@@ -500,6 +544,10 @@ export async function runUlraModeDeliberation(params: {
             },
           });
 
+          completedModels += 1;
+          respondedModels += 1;
+          reportRoundProgress();
+
           return { status: "fulfilled", value } as const;
         } catch (reason) {
           const message =
@@ -521,6 +569,10 @@ export async function runUlraModeDeliberation(params: {
             },
           });
 
+          completedModels += 1;
+          failedModels += 1;
+          reportRoundProgress();
+
           return { reason, status: "rejected" } as const;
         }
       }),
@@ -529,6 +581,7 @@ export async function runUlraModeDeliberation(params: {
     if (params.abortSignal?.aborted) {
       return { convergenceReached: false, successes: 0 };
     }
+    completedRoundBatches = round + 1;
 
     let successes = 0;
     settled.forEach((result, index) => {
@@ -636,6 +689,14 @@ export async function runUlraModeDeliberation(params: {
     if (convergenceReached) {
       break;
     }
+  }
+
+  if (!params.abortSignal?.aborted) {
+    params.onProgress?.({
+      completedRounds: completedRoundBatches,
+      stage: "synthesis",
+      totalRounds,
+    });
   }
 
   const synthesisHistory = selectSynthesisHistory(entries);

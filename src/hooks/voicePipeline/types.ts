@@ -25,7 +25,10 @@ import type {
   VoicePhaseProgress,
 } from "../../types";
 import type { useAudioPlayer } from "../useAudioPlayer";
-import type { UlraModeConfig } from "../../services/ulraMode";
+import type {
+  CouncilProgress,
+  UlraModeConfig,
+} from "../../services/ulraMode";
 import type {
   LocalSttModelId,
   LocalTtsModelId,
@@ -137,6 +140,7 @@ export interface UseVoicePipelineParams {
 }
 
 export interface UseVoicePipelineResult {
+  councilProgress: CouncilProgress | null;
   pipelinePhase: PipelinePhase;
   setPipelinePhase: (phase: PipelinePhase) => void;
   streamingText: string;

@@ -40,7 +40,8 @@ navigation or render UI.
 - `runtimeCapabilityOverrides.ts` persists only provider-confirmed exact
   incompatibilities.
 - `ulraMode.ts` implements private Model Council deliberation before final
-  synthesis.
+  synthesis and emits typed per-round participant progress for React
+  controllers without depending on presentation code.
 
 ### Speech and voice turns
 

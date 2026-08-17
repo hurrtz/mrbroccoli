@@ -1111,6 +1111,71 @@ describe("useVoicePipeline", () => {
     });
   });
 
+  it("exposes Council round progress until the turn finishes", async () => {
+    const finishPipeline = createDeferredVoid();
+    const params = createParams({ spokenRepliesEnabled: false });
+    let callbacks: any;
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks: pipelineCallbacks }: any) => {
+        callbacks = pipelineCallbacks;
+        await finishPipeline.promise;
+        callbacks.onResponseDone("Council reply");
+        return "Run Model Council";
+      },
+    );
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let pending!: Promise<void>;
+
+    await act(async () => {
+      pending = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Run Model Council",
+      });
+      await Promise.resolve();
+    });
+
+    act(() => {
+      callbacks.onCouncilProgress({
+        completedModels: 2,
+        currentRound: 2,
+        failedModels: 0,
+        respondedModels: 2,
+        roundKind: "review",
+        stage: "round",
+        totalModels: 4,
+        totalRounds: 3,
+      });
+    });
+    expect(result.current.councilProgress).toEqual({
+      completedModels: 2,
+      currentRound: 2,
+      failedModels: 0,
+      respondedModels: 2,
+      roundKind: "review",
+      stage: "round",
+      totalModels: 4,
+      totalRounds: 3,
+    });
+
+    act(() => {
+      callbacks.onCouncilProgress({
+        completedRounds: 3,
+        stage: "synthesis",
+        totalRounds: 3,
+      });
+    });
+    expect(result.current.councilProgress).toEqual({
+      completedRounds: 3,
+      stage: "synthesis",
+      totalRounds: 3,
+    });
+
+    await act(async () => {
+      finishPipeline.resolve();
+      await pending;
+    });
+    expect(result.current.councilProgress).toBeNull();
+  });
+
   it("attributes fallback overhead to the selected latency route", async () => {
     const params = createParams({
       spokenRepliesEnabled: false,
