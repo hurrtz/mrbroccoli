@@ -1,5 +1,5 @@
 export interface TranscriptMessageAction {
-  /** Semantic PhosphorIcon name, e.g. "branch", "copy", "share-alt", "sound". */
+  /** Semantic PhosphorIcon name. Shipped row order: edit, branch, copy, share-alt, sound, warning. */
   icon: string;
   label: string;
   onPress?: () => void;
@@ -23,16 +23,25 @@ export interface TranscriptMessageProps {
   council?: string[];
   /** Pre-formatted time of day, e.g. "14:12". */
   time?: string;
+  /** Corrected messages read "14:12 · edited" on the name line. */
+  edited?: boolean;
+  /** The newest row draws no thread line below its speaker. */
+  last?: boolean;
   /** Text fold state (controlled). The latest message in an ongoing session should arrive expanded. */
   expanded?: boolean;
   onToggle?: () => void;
-  /** The always-visible meta line, e.g. "3 sources · OpenRouter · 6.4 s". Omit entirely when usage stats are off. */
+  /** The meta line, e.g. "3 sources · OpenRouter · 6.4 s". Omit entirely when usage stats are off; hidden while a foldable row is collapsed. */
   meta?: string;
-  /** Full metrics for the meta disclosure (turn, route, timing, tokens, search, council). */
+  /** Turn receipt rows (route, effort, timing, tokens, search, council). Given these, the meta line ends in an info mark and opens the modal. */
   metrics?: TranscriptMessageMetric[];
   metricsOpen?: boolean;
-  onToggleMetrics?: () => void;
-  /** Shown only while expanded, as bare 44pt icon targets. */
+  onOpenMetrics?: () => void;
+  onCloseMetrics?: () => void;
+  metricsTitle?: string;
+  metricsDoneLabel?: string;
+  /** Position the receipt modal over the nearest positioned ancestor — for device frames in cards and kits. */
+  metricsInline?: boolean;
+  /** Always visible, as bare 44pt icon targets. */
   actions?: TranscriptMessageAction[];
   assetBase?: string;
 }

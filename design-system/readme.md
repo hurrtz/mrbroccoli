@@ -10,7 +10,8 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | --- | --- |
 | `guidelines/foundations.md` | Color, type, shape, motion, layout, accessibility, iconography |
 | `guidelines/content.md` | Voice and copy rules |
-| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `on-device.md`, `chat.md`, `ipad.md`, plus `announcements.md` for cross-screen interruption rules |
+| `guidelines/surfaces/` | **The normative spec, one document per screen**: `workspace.md`, `settings.md`, `intro.md`, `chat.md`, `ipad.md`, plus `announcements.md` for cross-screen interruption rules |
+| `guidelines/past-decisions.md` | What was tried and dropped, and why — the only place history lives |
 | `guidelines/*.card.html` | Foundation specimen cards |
 | `styles.css` | The entry point consumers link. Imports only. |
 | `tokens/` | `fonts`, `colors`, `typography`, `spacing`, `shape`, `motion`, `base` |
@@ -18,7 +19,6 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 | `templates/` | Starting folders a consuming project copies, incl. `app-store-gallery/` (story-mode screenshot panels) |
 | `ui_kits/mobile-app/` | Click-through recreation of the workspace |
 | `ui_kits/settings/` | The seven-page settings modal — same structure in both editions |
-| `ui_kits/intro/` | The three-step introduction: welcome, setup, ephemeral test |
 | `ui_kits/ipad-app/` | iPad direction: persistent sidebar, landscape tri-pane, compact collapse, settings master-detail |
 | `assets/` | Fonts (Unica One, Outfit), 47 provider SVGs, app icons |
 | `SKILL.md` | Agent-skill entry point |
@@ -37,13 +37,12 @@ One product: the **Mr Broccoli mobile app** (Expo / React Native, iOS and Androi
 **List** — `List`, `ListItem` (with `ListItem.Brief`).
 **Overlays** — `Modal`, `Toast`, `AnchoredMenu`.
 **Settings primitives** — `SettingsGroup`, `SettingsRow`, `RouteOptionRow`, `IconAction`, `RuntimeReadiness`.
-**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `VoiceOrb`, `OrbTransport`, `OrbSatellite`, `AttachmentPopover`, `WorkspaceHeader`, `ConversationSettingsSummary`, `TranscriptHandle`, `BackgroundTaskBar`.
-**Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `AnchoredMenu` (session actions menu), `ConversationRenameModal`, `MessageImageAttachments`, `TurnReceiptCard`, `WebSearchReferences`, `UsageCard`, `UberModeAuditCard`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`.
+**Workspace** — `AppWordmark`, `RouteByline`, `RoutePicker`, `Composer`, `Picker`, `VoiceOrb`, `OrbTransport`, `OrbSatellite`, `AttachmentPopover`, `WorkspaceHeader`, `ConversationSettingsSummary`, `TranscriptHandle`.
+**Chat** — `ChatBubble`, `ChatTranscript`, `TranscriptMessage`, `ConversationDrawerItem`, `AnchoredMenu` (session actions menu), `ConversationRenameModal`, `MessageImageAttachments`, `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator`.
 **Brand** — `ProviderIcon`.
 **Introduction** — `IntroFlow`, `IntroStepper`, `IntroTitle`, `IntroBody`.
-**On-device** — `LocalModelPerformanceSummary`, `AutoSetupCard`, `AutoSetupPlanRow`, `InstallProgress`.
 
-The inventory comes from the codebase plus the approved additions recorded in the surface docs (`RouteByline`, the orb composition, auto-setup). Which components are additions, which are replacements-on-one-screen, and which upstream pieces are deliberately not packaged is stated per surface in `guidelines/surfaces/`.
+Every component here is either shipped or an approved addition recorded in a surface doc (`RouteByline`, the orb composition, the transport orbit). Nothing retired stays compiled — dropped ideas live in `guidelines/past-decisions.md` as prose, not code. Which components are additions, which are replacements-on-one-screen, and which upstream pieces are deliberately not packaged is stated per surface in `guidelines/surfaces/`.
 
 ## Using this system
 

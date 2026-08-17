@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x600" name="Chat" subtitle="Workspace reply bubble and drawer rows — the transcript itself is TranscriptMessage" -->
+<!-- @dsCard group="Components" viewport="900x740" name="Chat" subtitle="TranscriptMessage is the app's only message anatomy — script rows, no bubbles — plus the container, empty state and drawer rows" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -6,26 +6,43 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}</style>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}.frame{border:1px solid var(--mb-color-border);border-radius:var(--mb-radius-dialog);background:var(--mb-color-background);padding:2px 14px 8px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { ChatBubble, ChatTranscript, ConversationDrawerItem } = window.MrBroccoliDesignSystem_62d510;
+const { TranscriptMessage, ChatTranscript, ConversationDrawerItem } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
+const ACTIONS = [{icon:"edit",label:"Correct transcript"},{icon:"branch",label:"Branch here"},{icon:"copy",label:"Copy"},{icon:"share-alt",label:"Share"},{icon:"sound",label:"Speak again"},{icon:"warning",label:"Report"}];
+function Rows(){
+  const [openA, setOpenA] = React.useState(true);
+  const [openB, setOpenB] = React.useState(false);
+  return <div>
+    <TranscriptMessage role="assistant" provider="xai" model="Grok 4.6" time="02:47" expanded={openA} onToggle={()=>setOpenA(!openA)}
+      paragraphs={["Kurz: Deine Intuition mit dem reibungsfreien All und dem stetigen Impulsübertrag ist richtig. Mit genug Masse und Energie kommst du beliebig nah an c.","Erreichen tust du sie nicht. Das Schiff selbst merkt die Grenze nie lokal."]}
+      meta="xAI · 250 s" metrics={[{label:"Actual",value:"xAI · Grok 4.6"},{label:"Timing",value:"model 248 s · total 250 s"}]}
+      metricsOpen={false} onOpenMetrics={()=>{}} onCloseMetrics={()=>{}} metricsInline actions={ACTIONS} assetBase={base} />
+    <TranscriptMessage role="user" time="02:54" edited expanded={openB} onToggle={()=>setOpenB(!openB)}
+      paragraphs={["aber wir brauchen ja nicht viel energie für die erzeugung dieser teilchen oder das heißt wir könnten zum beispiel über solarkollektoren permanent energie sammeln und damit den antrieb speisen"]}
+      actions={ACTIONS} assetBase={base} />
+    <TranscriptMessage role="assistant" provider="anthropic" model="Claude Sonnet 4.5" time="02:56" last expanded
+      paragraphs={["Ja, der Gedanke ist charmant."]} actions={ACTIONS} assetBase={base} />
+  </div>;
+}
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
-    <div><p className="lbl">ChatBubble · the workspace's brief reply</p>
-      <p className="note">Used for the short exchange overlaid on the home screen. The conversation transcript does not use bubbles — its rows are <strong>TranscriptMessage</strong> (spoken script, margin speakers, 3-row fold); see “Transcript in context” in the Mr Broccoli app group.</p>
-      <ChatBubble role="user" timestamp="09.08.26 · 14:11" text="When does the tide turn in Lisbon?" />
-      <ChatBubble role="assistant" provider="anthropic" model="Claude Sonnet 4.5" timestamp="09.08.26 · 14:12" assetBase={base}
-        text="High water is at 15:40 today, and the tide turns roughly every six hours after that."
-        actions={[{icon:"copy",label:"Copy"},{icon:"redo",label:"Repeat"},{icon:"branch",label:"Branch"},{icon:"share-alt",label:"Share"}]} />
-      <p className="lbl" style={{marginTop:12}}>ChatTranscript · container + empty state</p>
-      <p className="note">Still the scrolling container the transcript rows mount into; only the empty state draws anything itself.</p>
-      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)"}}>
-        <ChatTranscript isEmpty emptyTitle="No messages yet" emptyDescription="Hold the microphone and ask something." />
-      </div>
+  <div style={{display:"grid",gridTemplateColumns:"1.2fr 1fr",gap:16,alignItems:"start"}}>
+    <div>
+      <p className="lbl">TranscriptMessage · the app's message anatomy</p>
+      <p className="note">A spoken conversation renders as a <strong>script, not as bubbles</strong>: a 34pt margin column carrying YOU in accent or the provider mark, a thread line down the message (none on the newest row), the model and time on the name line with the fold chevron, and the six bare action targets under every message. User asks are italic in the secondary colour; a corrected one reads “02:54 · edited”. Collapsed rows clamp to three lines.</p>
+      <div className="frame"><Rows /></div>
+      <p className="note" style={{marginTop:12}}>The meta line and its <strong>Turn receipt</strong> modal are specimened in “Chat · turn metadata”. Bubbles survive in one place only — the introduction's stored session, which is drawn in messenger anatomy on purpose, to read as a memory rather than as the live transcript. No shipped chat surface uses them.</p>
     </div>
-    <div><p className="lbl">ConversationDrawerItem</p>
+    <div>
+      <p className="lbl">ChatTranscript · container + empty state</p>
+      <p className="note">The scrolling container the rows mount into; only the empty state draws anything itself. Its copy names no control: listening is push to talk or tap to talk on the orb, and there is no microphone button to hold.</p>
+      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)"}}>
+        <ChatTranscript isEmpty emptyTitle="No messages yet" emptyDescription="Your conversation appears here as you talk." />
+      </div>
+      <p className="lbl" style={{marginTop:14}}>ConversationDrawerItem · one flat list</p>
+      <p className="note">One row treatment for every conversation. A fork is a tag on the row, not a nested list; actions live in the anchored menu, never on the row itself.</p>
       <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-surface)",overflow:"hidden"}}>
         <ConversationDrawerItem title="Tide tables" active pinned models={[{provider:"anthropic"},{provider:"openai"}]} messageCount={12} updatedAt="09.08.26" assetBase={base} />
         <ConversationDrawerItem title="Shortlist vote" forkOf="Naming the boat" models={[{provider:"openai"},{provider:"anthropic"}]} messageCount={5} updatedAt="08.08.26" assetBase={base} />

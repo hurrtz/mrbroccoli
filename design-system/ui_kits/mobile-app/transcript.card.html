@@ -63,8 +63,8 @@ function Row({ m, i, ongoing, swipe, metricsOpenIndex }){
   const [statsOpen, setStatsOpen] = React.useState(i === metricsOpenIndex);
   const row = <TranscriptMessage role={m.role} paragraphs={m.paragraphs} model={m.model} provider={m.provider} council={m.council}
     time={m.time} expanded={open} onToggle={() => setOpen(!open)} meta={m.meta} metrics={m.metrics}
-    metricsOpen={statsOpen} onToggleMetrics={() => setStatsOpen(!statsOpen)}
-    actions={ACTIONS} assetBase={base} />;
+    metricsOpen={statsOpen} onOpenMetrics={() => setStatsOpen(true)} onCloseMetrics={() => setStatsOpen(false)} metricsInline
+    last={i === MSGS.length - 1} actions={ACTIONS} assetBase={base} />;
   if (!(swipe && m.swipeDemo)) return row;
   return <div style={{position:"relative",overflow:"hidden"}}>
     <div style={{position:"absolute",top:0,right:0,bottom:0,width:96,background:"var(--mb-color-danger)",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:4}}>
@@ -75,7 +75,7 @@ function Row({ m, i, ongoing, swipe, metricsOpenIndex }){
   </div>;
 }
 function Screen({ ongoing, swipe, metricsOpenIndex }){
-  return <div style={{display:"flex",flexDirection:"column",height:"100%",background:"var(--mb-color-overlay)"}}>
+  return <div style={{position:"relative",display:"flex",flexDirection:"column",height:"100%",background:"var(--mb-color-overlay)"}}>
     <div style={{height:56,flexShrink:0}}></div>
     <div style={{flex:1,minHeight:0,display:"flex",flexDirection:"column",background:"var(--mb-color-background)",borderRadius:"var(--mb-radius-sheet-top) var(--mb-radius-sheet-top) 0 0",border:"1px solid var(--mb-color-surface-raised-border)",borderBottom:"none",boxShadow:"var(--mb-shadow-sheet)"}}>
       <div role="button" aria-label="Pull down or tap the backdrop to close" style={{flexShrink:0,minHeight:64,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:8,paddingBottom:8,cursor:"grab"}}>

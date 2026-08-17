@@ -6,7 +6,7 @@ How to use: each unchecked box is one work item with its acceptance criterion. *
 
 ## A. Global sweeps
 
-- [ ] Purge "On-device AI" from user-facing copy — the page was retired in the settings restructure. Seen live: auto-setup card footer "You can change any of it later in On-device AI." (intro step 2 and App & diagnostics) → "…later in Settings." (DS: `components/on-device/AutoSetupCard.jsx`).
+- [ ] Purge "On-device AI" from user-facing copy — the page was retired in the settings restructure. Anywhere a string still sends a user there ("You can change any of it later in On-device AI.") it reads "…later in Settings.".
 - [ ] Drop the "· On-device AI" suffix from model names in Listening, Speaking and the Data & privacy storage list ("Whisper Small", not "Whisper Small · On-device AI") — the meta line already disambiguates ("Test passed · 925 MB" vs "Provider · gpt-4o-mini-transcribe").
 - [ ] Intro nav controls are bare borderless glyphs on 44pt targets: back is **arrow-left** (not a chevron), close is the plain X — remove the filled circles behind them (DS: `components/intro/IntroFlow.jsx`, `guidelines/surfaces/intro.md`).
 - [ ] Replace the git-branch fork glyph in message actions — it reads developer-only; use the DS transcript's settled fork action icon (see `components/transcript/`).
@@ -26,14 +26,12 @@ How to use: each unchecked box is one work item with its acceptance criterion. *
 
 ## C. Introduction · Step 2 — Don't panic
 
-- [ ] Idle state shows the uncontained hero with ONE green action, labeled **"Set up automatically"** — the recommendation/progress card (`AutoSetupCard`) appears only once the job is non-idle. Currently the full card with measured stats and "Check this phone" renders immediately.
-- [ ] Reconcile CTA vocabulary with the DS `AutoSetupCard` state labels ("Check this phone" is not in the settled vocabulary).
-- [ ] heroBody: canonical is "Mr Broccoli measures what this phone can run, shows you the set that fits, and installs it in one go. Nothing downloads before you say so." The app ships a shorter line — align one way or the other (see P).
-- [ ] Manual setup shows **every route at a glance — no second layer of drawers**: per group, the system route ("Your phone", no description — already correct), concrete on-device model rows (name + "Not installed · size" + download squircle; radio disabled until tested) and the provider row as a locked ghost in free. "Choose a model ›" reintroduces the drawer the charter removed. If the full catalogue is too long, inline the recommended model + system route and keep one "More models…" row — the default decision must be takable on this screen.
+- [ ] **Delete automatic setup** (owner call, 2026-08): no device measurement, no proposal, no bulk install, and no green "Set up automatically" action — here or on App & diagnostics. The step is the routes themselves, and a download starts only when the user taps that model's squircle.
+- [ ] heroBody: canonical is "He needs one model to think with — that download is the only requirement. Your phone already listens and speaks, so you can leave those alone and change them later." Under the routes, one quiet line: "Nothing downloads until you tap it."
+- [ ] Step 2 shows **every route at a glance — no second layer of drawers**: per group, the system route ("Your phone", no description — already correct), concrete on-device model rows (name + "Not installed · size" + download squircle; radio disabled until tested) and the provider row as a locked ghost in free. "Choose a model ›" reintroduces the drawer the charter removed. If the full catalogue is too long, inline the recommended model + system route and keep one "More models…" row — the default decision must be takable on this screen.
 - [ ] Required/Optional pills: Required = accent ring + accent-soft fill; Optional = quiet border + raised surface (screenshot's REQUIRED pill looks solid-filled — check tokens).
 - [ ] Forward orb gating (first run): disabled at 40% opacity until a reasoning model is actually running. Currently enabled while "He thinks" has nothing selected.
-- [ ] [verify] "Show manual setup" resets to off on every open of the intro.
-- ✓ Title/body ("Don't panic" / "One required download and it works."), divider, "Let's get you started", pipeline glyphs He listens · He thinks · He answers (mic/cpu/sound), switch label in regular body weight, right-aligned tags, "Manual setup" section headline.
+- ✓ Title/body ("Don't panic" / "One required download and it works."), divider, "Let's get you started", pipeline glyphs He listens · He thinks · He answers (mic/cpu/sound), right-aligned Required/Optional tags.
 
 ## D. Introduction · Step 3 — Try it out!
 
@@ -55,6 +53,8 @@ How to use: each unchecked box is one work item with its acceptance criterion. *
 
 - [ ] **Header block** (`WorkspaceHeader`, owner call 2026-08): the route byline and settings sentence become **one raised block of two 44pt rows** — surface fill, hairline border, hairline between the rows inset 12pt — sitting **14pt below the top bar**. Row one: provider mark (or `cpu`), model name in the display face, the effort word, caret. Row two: the settings sentence, truncating, with the sliders glyph at the trailing edge. Portrait only; landscape keeps the byline plus the icon-only sentence.
 - [ ] The block is never an accent fill — pressable, not loud. If it competes with the orb, it is wrong.
+- [ ] **The block goes disabled the moment voice is submitted** (`running`) — push to talk: the button is *released*; tap to talk: the button is tapped a *second* time. Not when thinking starts, not when the answer arrives. Same shape, same fill, same hairline, nothing removed and nothing moved; the rows stop being pressable and the block drops to `--mb-disabled-opacity`, which is what says the caret and the settings control are unavailable. Add `role="status" aria-live="polite"`. [verify] releasing the push-to-talk button dims it in the same frame the recording ends.
+- [ ] A council run is the **one exception**: the rows are reused as its report, so the dimming lifts — see H2d.
 
 - [ ] **Delete the introduction banner from the home screen** (owner call, 2026-08). The walkthrough is reached from App & diagnostics → Introduction, and opens by itself on a first launch. Nothing advertises on the home screen.
 - [ ] **Delete every premium upsell surface** (the gold band and the upgrade sheet). Free edition shows locked rows and the editions row in App & diagnostics; that is the whole story.
@@ -109,6 +109,20 @@ Nothing is inserted between the orb and the composing row, at any count. There i
 - [ ] Retire the scrolling 128×96 composer strip in `MessageImageAttachments`; the panel replaces it on the stage. The component's compact mode stays a candidate for the transcript, which is still an open decision (`explorations/images-1-to-4.html`).
 - DS: `components/workspace/AttachmentPopover.jsx`, `components/workspace/OrbSatellite.jsx` (`thumbnails`), `guidelines/surfaces/workspace.md` → Images.
 
+## H2d. Council — the panel, and the header as its report (owner call, 2026-08)
+
+The Council switch owns a panel of its own; a running council reports itself in the header block rather than in new furniture. Source: `explorations/council.html`, `guidelines/surfaces/workspace.md` → Council.
+
+- [ ] **`CouncilPopover`**: `AnchoredMenu` geometry, 252pt wide, opened from the Council satellite. Three parts — the enabled Thinking slots as a horizontally scrolling tile row (tap toggles membership; a member takes accent-soft fill with an accent glyph, the `RoutePicker` treatment), a rounds slider, and the cost line.
+- [ ] **Right-align the panel to the composing row**, never to the Council satellite's own left edge: at 4.7″ that anchor overflows the 16pt gutter by 6pt. Rule: only the leading satellite may left-anchor its panel; anything past the first seat aligns trailing. [verify] at 375pt width.
+- [ ] **The cost line recomputes as you tap** — "4 × 5 = 20 answers, one after another — minutes, and each provider bills you." It is permanent, not a dismissible caution, and it blocks nothing.
+- [ ] Below two members the switch reads **off**, whatever the slider says.
+- [ ] Building a council changes **nothing above the row**: the settings sentence states the conversation, not the next question.
+- [ ] **While it runs, the header block is the report**: both rows centre, the answering model's mark and name above, `"2 of 4 models done · Round 2 of 3"` below. Effort word, caret and settings control all drop; the dimming lifts (nothing is left to disable). If a progress strip, spinner or extra row appears anywhere on the stage, this has been built in the wrong place.
+- [ ] **Failures are named**: the count says *done*, with a `· 1 failed` clause only when a member has failed.
+- [ ] The orb's ring meters **the whole council**, not each answer — it must not reset per answer. Disc keeps `circuitry`; a tap abandons the turn.
+- DS: `components/workspace/WorkspaceHeader.jsx` (`running`, `council`), `guidelines/surfaces/workspace.md` → Council.
+
 ## H3. The orb's rings
 
 - [ ] Anatomy, inside out: disc → a small gap that is only ever a gap (the screen reads through it, identical in every phase, ~3pt) → **one 12pt ring**. The inner/outer pair is merged (owner call, 2026-08).
@@ -158,7 +172,6 @@ Nothing is inserted between the orb and the composing row, at any count. There i
 
 ## L. Settings — Data & privacy / App & diagnostics
 
-- [ ] Stale auto-setup footer copy (see A).
 - [ ] [verify] Free edition renders the identical seven-page tree — provider routes as locked ghosts, gold upgrade path; every capture here is premium.
 - ✓ Storage-in-models list with Remove + "this list only frees space" footer; encrypted backup import/export with exclusions note; past-conversation-knowledge toggle + explainer; Introduction re-open toggle; usage-stats toggle; diagnostics group.
 
@@ -170,9 +183,10 @@ Nothing is inserted between the orb and the composing row, at any count. There i
 
 ## N. Premium surfaces
 
-- [ ] [verify] Free edition: PremiumBand (gold, sheen) is the teaser; every surface that sells premium in detail states the keys-honesty rule — "your own keys, billed by the provider; no models, voices or credits included" (`guidelines/content.md` → Premium honesty).
+- [ ] **No upsell surface exists** (owner call, 2026-08): the gold band and the upgrade sheet are deleted. Free edition shows provider routes as locked ghost rows and the editions row in App & diagnostics — that is the whole story.
+- [ ] Where premium is explained at all, the keys-honesty rule is stated: "your own keys, billed by the provider; no models, voices or credits included" (`guidelines/content.md` → Premium honesty).
 - [ ] [verify] Premium appears nowhere inside the intro flow.
-- [ ] Animation-as-ornament stays reserved for exactly two surfaces: intro banner + premium band.
+- [ ] Animation-as-ornament is now reserved for nothing on the home screen: with the banner and the band gone, no surface ornaments itself.
 
 ## O. Localization
 

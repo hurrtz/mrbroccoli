@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x400" name="Workspace header" subtitle="The header block, and the landscape byline and sentence it supersedes in portrait" -->
+<!-- @dsCard group="Components" viewport="760x700" name="Workspace header" subtitle="Portrait's two-row block at rest and during a turn, and the byline landscape uses instead" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -7,33 +7,40 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
+<style>body{padding:18px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 7px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:18px;color:var(--mb-color-text-secondary);margin:7px 0 0;max-width:64ch;text-wrap:pretty}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
 const { AppWordmark, RouteByline, ConversationSettingsSummary, WorkspaceHeader, IconButton } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <div style={{display:"flex",flexDirection:"column",gap:16}}>
+  <div style={{display:"flex",flexDirection:"column",gap:20}}>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
       <IconButton icon="menu" accessibilityLabel="Conversations" />
       <AppWordmark />
       <IconButton icon="setting" accessibilityLabel="Settings" />
     </div>
-    <div><p className="lbl">WorkspaceHeader · portrait · one block, two 44pt rows, 14pt below the bar</p>
+    <div><p className="lbl">Portrait · WorkspaceHeader</p>
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         <WorkspaceHeader provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="High" assetBase={base}
           summary="Length: Brief · Tone: Balanced · Voice: Heart" />
         <WorkspaceHeader local modelName="On device · Qwen 2.5 1.5B" effort="Normal" switchable={false}
           summary="Hands free: on · Length: Brief · Tone: Balanced · Voice: Heart" />
-      </div></div>
-    <div><p className="lbl">RouteByline · landscape and iPad · effort is named, never plotted</p><div style={{display:"flex",flexDirection:"column",gap:14}}>
-      <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5" effort="Medium" assetBase={base} />
-      <RouteByline provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="High" assetBase={base} />
-      <RouteByline local modelName="On device · Qwen 2.5 1.5B" effort="Normal" switchable={false} />
-    </div></div>
-    <div><p className="lbl">ConversationSettingsSummary · landscape's icon-only form</p>
-      <ConversationSettingsSummary summary="Length: Brief · Tone: Balanced · Voice: Heart" />
-      <ConversationSettingsSummary iconOnly summary="Length: Brief · Tone: Balanced · Voice: Heart" /></div>
+      </div>
+      <p className="note">One raised block of two 44pt rows, 14pt under the top bar. Row one changes the answer: provider mark (<code>cpu</code> on device), model name in the display face, the effort word — named, never plotted. Row two states the conversation as “Label: value” pairs and opens the settings sheet; it truncates at the end rather than wrapping. A single configured model drops the caret and the press target, as in the second row here.</p></div>
+    <div><p className="lbl">During a turn · running, and the council exception</p>
+      <div style={{display:"flex",flexDirection:"column",gap:10}}>
+        <WorkspaceHeader running provider="openai" providerLabel="OpenAI" modelName="GPT-5" effort="High" assetBase={base}
+          summary="Length: Brief · Tone: Balanced · Voice: Heart" />
+        <WorkspaceHeader running council provider="google-vertex-ai-studio" providerLabel="Google" modelName="Gemini 2.5 answering" assetBase={base}
+          summary="2 of 4 models done · Round 2 of 3" />
+      </div>
+      <p className="note">The block goes disabled the moment voice is submitted — push to talk: the button is <em>released</em>; tap to talk: the button is tapped a <em>second</em> time. Not when thinking starts, not when the answer arrives. It keeps its shape, fill and hairline exactly and drops to 38%: neither row is pressable, because neither choice can be changed mid-turn. A council is the one exception — the two rows are reused as its report, centred, so the dimming lifts; these lines are the only account of a wait that runs for minutes.</p></div>
+    <div><p className="lbl">Landscape and iPad · RouteByline + ConversationSettingsSummary</p>
+      <div style={{maxWidth:330,display:"flex",flexDirection:"column",gap:12}}>
+        <RouteByline provider="anthropic" providerLabel="Anthropic" modelName="Claude Sonnet 4.5" effort="Medium" assetBase={base} />
+        <ConversationSettingsSummary iconOnly summary="Length: Brief · Tone: Balanced · Voice: Heart" />
+      </div>
+      <p className="note">The left pane is narrow, so the two rows stand apart instead of sharing a block: no fill, no border, a closing hairline saying the whole row is the target, and the settings line goes icon-only.</p></div>
   </div>
 );
 </script></body></html>

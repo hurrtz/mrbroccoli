@@ -10,9 +10,9 @@ Row anatomy: a 34pt margin column carries the speaker — YOU in accent for the 
 
 **The fold.** Every message clamps to three lines with a plain ellipsis; the fold chevron sits right-aligned on the name line, and tapping the message toggles it. Session-aware defaults: in an ongoing session the latest message arrives expanded and folds when the next turn starts; a reopened past session is entirely collapsed.
 
-**Actions** (branch, copy, share, speak again) appear only on expanded messages, as bare 44pt icon targets — expanding is already the “I care about this one” gesture. The upstream report action is deliberately not carried.
+**Actions** are **always present** under every message, expanded or folded, as six bare 44pt icon targets in a fixed order: edit (correct the transcript), branch, copy, share, speak again, report. The copy target confirms with a check for three seconds once the clipboard accepts; speak again becomes stop while that message is speaking and a loading glyph while it prepares. They are not a hover, long-press or expansion affordance. (This supersedes the earlier "actions only while expanded" rule and the earlier omission of the report action — both are settled by the shipped row.)
 
-**Metadata.** With usage stats on (Settings → App & diagnostics), one mono meta line sits under each answer, always visible (“3 sources · OpenRouter · 6.4 s”), and is its own disclosure: tapping it opens the full metrics panel — turn details, route, timing, tokens in/out/total, web search and council details. With the setting off, the meta line disappears entirely. The meta line and metrics panel are the transcript's rendering of what `TurnReceiptCard`, `UsageCard`, `WebSearchReferences` and `UberModeAuditCard` carry — those components remain in the system for non-transcript surfaces, but the transcript itself uses the meta disclosure. `ReplyFailureCard` and `PipelineNotices` still mount under a failed or noisy turn; `MessageBranchIndicator` stays as branch metadata.
+**Metadata — the turn receipt is a modal.** With usage stats on (Settings → App & diagnostics), a 44pt mono meta line sits under each answer (“3 sources · OpenRouter · 250 s”) ending in an `info-circle` mark; tapping it opens **Turn receipt** as a titled dialogue with a Done action, its label/value rows scrolling inside the card. Nothing expands under the message: the row keeps its height, so the transcript never reflows under your thumb while you read. The receipt carries requested route, actual route (gateway → upstream), effort, the timing chain, estimated usage, the search summary with one row per source, and the council audit. The meta line shows when the row is expanded or too short to fold, and with the setting off there is no meta line at all. (This supersedes the earlier inline metrics panel.) The receipt is the transcript's rendering of what `TurnReceiptCard`, `UsageCard`, `WebSearchReferences` and `UberModeAuditCard` carried upstream. `ReplyFailureCard`, `PipelineNotices`, `MessageBranchIndicator` and the knowledge references mount directly under the row — `TranscriptMessage` renders them itself, with no bubble wrapping them.
 
 **Swipe to remove.** Any message swipes away (danger action, “Remove”): removing an irrelevant turn drops it from the context sent with every future request, so tossing redundancy directly saves tokens.
 
@@ -35,21 +35,17 @@ Rows the real data produces, all first-class: untitled sessions use their first 
 
 ## Message sub-cards
 
-Seven sub-cards exist upstream inside `ChatBubble`'s content tree (plus a conversation-memory modal, parked with the memory feature); this system carries the seven, redesigned — and in the transcript, four of them (receipt, usage, search references, council audit) surface through `TranscriptMessage`'s meta disclosure rather than as in-row cards. The components remain for surfaces that need them standalone (`ChatBubble` still accepts them through `children`); `ChatBubble` itself remains the rail-style message row for non-script contexts:
+Seven sub-cards exist upstream inside `ChatBubble`'s content tree (plus a conversation-memory modal, parked with the memory feature). Four of them — receipt, usage, search references, council audit — are **not packaged**: their content is the Turn receipt modal, and the components were deleted (`guidelines/past-decisions.md`). Three mount bare under the transcript row. `ChatBubble` itself is mounted by no shipped surface: the app's `ChatBubble.tsx` has no importer, and this system keeps it only for the introduction's stored session, which is drawn in messenger anatomy on purpose so it reads as a memory rather than as the live transcript.
 
 | Piece | What it carries |
 | --- | --- |
-| `TurnReceiptCard` | The turn's route, effort, duration and cost |
-| `WebSearchReferences` | Sources a searching turn used |
-| `UsageCard` | Token counts for the turn |
-| `UberModeAuditCard` | Model Council's per-model votes |
 | `ReplyFailureCard` | A failed turn, with retry |
 | `PipelineNotices` | Warnings the pipeline raised mid-turn |
 | `MessageBranchIndicator` | Where a conversation branched |
 
-`ChatBubble` accepts them through `children`. Content and behaviour follow the upstream implementations in `MrBroccoli/src/components/chatBubble/`; appearance follows this system. All values arrive pre-formatted from the app's locale keys — these components lay text out and never compose it; the same is true of `TranscriptMessage`'s `meta` string and `metrics` rows.
+The three survivors need no wrapper. Content and behaviour follow the upstream implementations in `MrBroccoli/src/components/chatBubble/`; appearance follows this system. All values arrive pre-formatted from the app's locale keys — these components lay text out and never compose it; the same is true of `TranscriptMessage`'s `meta` string and `metrics` rows.
 
-The shared grammar: disclosure sections (receipt, search, council) are 44pt toggle rows — accent glyph, display-face title, mono summary, chevron — above label/value content; the usage line is bare mono; failure is the one danger-inked section and sits on the user's message; branches are chips because they are metadata, not speech.
+The shared grammar: failure is the one danger-inked section and sits on the user's message; notices carry a stage label and their own actions; branches are chips because they are metadata, not speech. Receipt content is mono label/value rows in the modal — the old 44pt disclosure-toggle grammar retires with the four cards.
 
 ## Register
 

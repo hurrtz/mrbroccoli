@@ -14,7 +14,7 @@ Three rungs, by how much the user must care. Escalating a rung is a design decis
 
 - **Errors during a voice turn never toast.** The turn's own surfaces carry them (`ReplyFailureCard`, `PipelineNotices`, orb overtime) — a toast over the orb would announce the same failure twice.
 - Success is quiet: an action whose result is visible (a row renamed, a message sent) gets no toast at all. Toast success only when the evidence is off-screen (export written, backup finished).
-- Auto-setup and model downloads announce through `BackgroundTaskBar` and `InstallProgress`, not toasts — long-running work gets a persistent surface, not a repeating transient one.
+- Model downloads report in the row that started them — percentage in the row's meta line, cancel at its edge — never as a toast: long-running work belongs to the surface that owns it, not to a transient one.
 - Toasts render above the workspace, below sheets: an open sheet's job is focus, so a toast waits for the sheet to close if it isn't about the sheet's own action.
 - The stripe and glyph carry the tone; message text stays in the normal text colour (`Toast` already enforces this). No exclamation marks in the copy — the tone colour is the exclamation.
 - Spoken announcements (the voice pipeline reading an error aloud) follow `guidelines/content.md`'s spoken register and only fire for turn-level failures the user would otherwise wait on silently.

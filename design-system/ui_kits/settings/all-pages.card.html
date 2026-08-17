@@ -18,7 +18,6 @@ body{margin:0;padding:24px;background:#8f8d86;font-family:var(--mb-font-body)}
 </head><body>
 <div id="root"></div>
 <script type="text/babel" src="SettingsFrame.jsx"></script>
-<script type="text/babel" src="AutoSetup.jsx"></script>
 <script type="text/babel" src="SettingsOverview.jsx"></script>
 <script type="text/babel" src="PagesConversation.jsx"></script>
 <script type="text/babel" src="PagesVoice.jsx"></script>
@@ -30,13 +29,12 @@ function Cell({ caption, theme = "light", children }){
     <div className="device" data-theme={theme}>{children}</div></div>;
 }
 function Page({ Component, isPremium = true }){
-  const auto = window.useAutoSetupFlow ? window.useAutoSetupFlow({}) : undefined;
-  return <Component onBack={noop} onClose={noop} auto={auto} isPremium={isPremium} />;
+  return <Component onBack={noop} onClose={noop} isPremium={isPremium} />;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(<>
   <div className="row">
-    <Cell caption="Overview · premium · light"><window.SettingsOverview isPremium onOpenPage={noop} onOpenPremium={noop} onClose={noop} /></Cell>
-    <Cell caption="Overview · free edition · dark" theme="dark"><window.SettingsOverview isPremium={false} onOpenPage={noop} onOpenPremium={noop} onClose={noop} /></Cell>
+    <Cell caption="Overview · premium · light"><window.SettingsOverview isPremium onOpenPage={noop} onClose={noop} /></Cell>
+    <Cell caption="Overview · free edition · dark" theme="dark"><window.SettingsOverview isPremium={false} onOpenPage={noop} onClose={noop} /></Cell>
     <Cell caption="Connections · premium"><Page Component={window.ConnectionsPage} /></Cell>
     <Cell caption="Thinking · premium" theme="dark"><Page Component={window.ThinkingPage} /></Cell>
   </div>

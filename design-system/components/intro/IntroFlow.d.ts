@@ -2,7 +2,7 @@ export type IntroStep = "welcome" | "setup" | "try";
 export declare const INTRO_STEPS: IntroStep[];
 export declare const INTRO_COPY: Record<string, string>;
 
-export interface IntroManualRow {
+export interface IntroSetupRow {
   id: string;
   label: string;
   /** Mono meta: install state · size, or provider attribution. Omit for system routes. */
@@ -15,13 +15,13 @@ export interface IntroManualRow {
   /** "download" renders the IconAction download squircle. */
   action?: "download" | null;
 }
-export interface IntroManualGroup {
+export interface IntroSetupGroup {
   label: string;
   required?: boolean;
-  rows: IntroManualRow[];
+  rows: IntroSetupRow[];
 }
 /** Pipeline-ordered defaults: He listens · He thinks (required) · He answers. */
-export declare const DEFAULT_MANUAL_GROUPS: IntroManualGroup[];
+export declare const DEFAULT_SETUP_GROUPS: IntroSetupGroup[];
 
 export interface IntroTestTurn {
   question: string;
@@ -43,9 +43,7 @@ export interface IntroFlowProps {
   demoTurn?: IntroTestTurn | null;
   /** String overrides merged over INTRO_COPY (translation). */
   copy?: Record<string, string>;
-  /** AutoSetupCard cardProps; the hero button calls autoSetup.onStart, and any non-idle state renders the card. */
-  autoSetup?: object;
-  manualGroups?: IntroManualGroup[];
+  setupGroups?: IntroSetupGroup[];
   /** Display label of the intro-recording language, e.g. "English". */
   language?: string;
   onChangeLanguage?: () => void;

@@ -23,6 +23,10 @@ export interface WorkspaceHeaderProps {
   summary?: string;
   /** Opens the conversation settings sheet. */
   onOpenSettings?: () => void;
+  /** A turn is in flight: the block keeps its shape, fill and hairline exactly and drops to disabled strength — neither row is pressable. */
+  running?: boolean;
+  /** This running turn is a council: both rows centre and strip to the report — the answering model above, "2 of 4 models done · Round 2 of 3" below (plus a "1 failed" clause only when one has). No effort word, no caret, no settings control — and no dimming, since nothing is left to disable and this is the only report of a long wait. */
+  council?: boolean;
   style?: React.CSSProperties;
 }
 

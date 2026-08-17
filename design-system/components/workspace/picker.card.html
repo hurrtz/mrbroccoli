@@ -1,5 +1,5 @@
-<!-- @dsCard group="Components" viewport="700x260" name="Picker and intro banner" subtitle="The workspace dropdown, and the one violet surface in the product" -->
-<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<!-- @dsCard group="Components" viewport="760x300" name="Picker" subtitle="The one dropdown in the product — label above, mono role label inside, native list on tap" -->
+<!DOCTYPE html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css">
@@ -7,18 +7,23 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}</style>
-</head><body><div id="root"></div>
+<style>body{margin:0;padding:18px;display:flex;gap:18px;font-family:var(--mb-font-body)}.pane{flex:1;min-width:320px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:0}</style>
+</head><body>
+<div class="pane" data-theme="light" id="light"></div>
+<div class="pane" data-theme="dark" id="dark" style="background:#16181D;border:1px solid #2C3138"></div>
 <script type="text/babel">
-const { Picker, IntroBanner } = window.MrBroccoliDesignSystem_62d510;
-function Demo(){
-  return <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16,alignItems:"start"}}>
-    <div><p className="lbl">Picker</p>
-      <Picker label="Voice" value="heart" dropdownLabel="Selection" onChange={()=>{}}
-        options={[{value:"heart",label:"Heart · American female"},{value:"river",label:"River · British female"}]} /></div>
-    <div><p className="lbl">IntroBanner</p>
-      <IntroBanner /></div>
-  </div>;
+const { Picker } = window.MrBroccoliDesignSystem_62d510;
+const VOICES = [{value:"heart",label:"Heart · American female"},{value:"river",label:"River · British female"},{value:"puck",label:"Puck · American male"}];
+function Specimen(){
+  const [voice, setVoice] = React.useState("heart");
+  return <>
+    <p className="lbl">Picker · selected</p>
+    <Picker label="Voice" value={voice} dropdownLabel="Selection" onChange={setVoice} options={VOICES} />
+    <p className="lbl">Disabled · no route to pick from</p>
+    <Picker label="Voice" value="heart" dropdownLabel="Selection" onChange={()=>{}} options={VOICES} disabled />
+    <p className="note">Settings use rows, not dropdowns — a picker appears only where a single value comes from a long list the app cannot lay out as rows, and the list itself is the platform's own. The intro banner that used to share this card is retired: the home screen advertises nothing.</p>
+  </>;
 }
-ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+ReactDOM.createRoot(document.getElementById("light")).render(<Specimen />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<Specimen />);
 </script></body></html>

@@ -22,7 +22,7 @@
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.IconButton" icon="setting" accessibility-label="Settings" hint-size="44px,44px"></x-import>
 </div>
 <div style="height:14px"></div>
-<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.WorkspaceHeader" provider="openai" provider-label="OpenAI" model-name="GPT-5" effort="Extra high" summary="{{ summary }}" asset-base="../../assets/providers" hint-size="100%,90px"></x-import>
+<x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.WorkspaceHeader" provider="openai" provider-label="OpenAI" model-name="GPT-5" effort="Extra high" summary="{{ summary }}" running="{{ running }}" asset-base="../../assets/providers" hint-size="100%,90px"></x-import>
 <div style="flex:1;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:12px 0">
 <x-import component-from-global-scope="MrBroccoliDesignSystem_62d510.OrbTransport" phase="{{ phase }}" orb-size="{{ orbSize }}" phase-progress="{{ phaseProgress }}" turn-progress="{{ phaseProgress }}" hint-size="328px,227px"></x-import>
 <div style="display:flex;align-items:flex-start;justify-content:center;gap:20px">
@@ -49,6 +49,7 @@ class Component extends DCLogic {
     return {
       handsFree,
       handsFreeLabel: "Hands\nfree",
+      running: busy,
       summary: (handsFree ? "Hands free: on · " : "") + "Length: Brief · Tone: Balanced · Voice: Heart",
       thumbs: images ? Array.from({ length: images }, () => null) : undefined,
       imageLabel: images ? images + (images === 1 ? " image" : " images") : "Image",

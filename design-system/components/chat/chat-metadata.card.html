@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="860x640" name="Chat · turn metadata" subtitle="Turn reporting lives in TranscriptMessage's metrics; failure, notices and branches stay standalone" -->
+<!-- @dsCard group="Components" viewport="900x780" name="Chat · turn metadata" subtitle="The meta line opens the turn receipt as a modal; failure, notices and branch chips mount bare under the row" -->
 <!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -6,55 +6,57 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}</style>
+<style>body{padding:16px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0 0 6px}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:6px 0 12px}.frame{position:relative;overflow:hidden;border:1px solid var(--mb-color-border);border-radius:var(--mb-radius-dialog);background:var(--mb-color-background);padding:2px 14px 6px}</style>
 </head><body><div id="root"></div>
 <script type="text/babel">
-const { TranscriptMessage, ChatBubble, TurnReceiptCard, WebSearchReferences, UberModeAuditCard, UsageCard, PipelineNotices, ReplyFailureCard, MessageBranchIndicator } = window.MrBroccoliDesignSystem_62d510;
+const { TranscriptMessage, PipelineNotices, ReplyFailureCard, MessageBranchIndicator } = window.MrBroccoliDesignSystem_62d510;
 const base = "../../assets/providers";
-function MetricsSpecimen(){
+const ACTIONS = [{icon:"edit",label:"Correct transcript"},{icon:"branch",label:"Branch here"},{icon:"copy",label:"Copy"},{icon:"share-alt",label:"Share"},{icon:"sound",label:"Speak again"},{icon:"warning",label:"Report"}];
+const RECEIPT = [
+  { label: "Requested", value: "xAI · Grok 4.6" },
+  { label: "Actual", value: "OpenRouter → xAI · Grok 4.6" },
+  { label: "Effort", value: "High" },
+  { label: "Timing", value: "stt 0.8 s · context 0.2 s · search 1.2 s · model 248 s · total 250 s" },
+  { label: "Usage", value: "~6.2k prompt · 2.3k completion · ~8.5k total" },
+  { label: "Web search", value: "Timetables agree on the turn at 15:40." },
+  { label: "Sources 1", value: "tides.pt · https://tides.pt/lisbon" },
+  { label: "Council", value: "3 rounds · 11 successful · 1 failed" },
+];
+const PARAGRAPHS = ["High water is at 15:40 on Saturday, and the tide turns roughly every six hours after that.", "Three of the four models agreed on the time; the fourth did not answer."];
+function Turn({ open, setOpen, last }){
+  return <TranscriptMessage role="assistant" provider="xai" model="Grok 4.6" time="14:12" last={last} expanded onToggle={()=>{}}
+    paragraphs={PARAGRAPHS} meta="3 sources · OpenRouter · 250 s" metrics={RECEIPT}
+    metricsOpen={open} onOpenMetrics={()=>setOpen(true)} onCloseMetrics={()=>setOpen(false)} metricsInline
+    actions={ACTIONS} assetBase={base} />;
+}
+function Left(){
   const [open, setOpen] = React.useState(true);
-  return <TranscriptMessage role="assistant" provider="anthropic" model="Claude Sonnet 4.5" time="14:12" expanded onToggle={()=>{}}
-    paragraphs={["High water is at 15:40 on Saturday, and the tide turns roughly every six hours after that."]}
-    meta="3 sources · OpenRouter · 6.4 s" metricsOpen={open} onToggleMetrics={()=>setOpen(!open)}
-    metrics={[
-      { label: "Turn", value: "Anthropic · Claude Sonnet 4.5 · High" },
-      { label: "Timing", value: "stt 0.8 s · search 1.2 s · model 4.1 s · total 6.4 s" },
-      { label: "Tokens in", value: "1,214" }, { label: "Tokens out", value: "482" }, { label: "Tokens total", value: "1,696" },
-      { label: "Web search", value: "1 query · 3 sources kept" },
-      { label: "Council", value: "—" },
-    ]} assetBase={base} />;
+  const [shut, setShut] = React.useState(false);
+  return <div>
+    <p className="lbl">The receipt · a modal, not a panel</p>
+    <p className="note">Tapping the meta line opens <strong>Turn receipt</strong> as a titled dialogue with a Done action — label/value rows in mono, scrolling inside the card. Nothing expands under the message, so the row keeps its height and the transcript never reflows beneath your thumb.</p>
+    <div className="frame" style={{height:330}}><Turn open={open} setOpen={setOpen} /></div>
+    <p className="lbl" style={{marginTop:14}}>The trigger, closed</p>
+    <p className="note">A 44pt row of mono text ending in an <code>info-circle</code>: <strong>“3 sources · OpenRouter · 250 s”</strong>. It reports what the turn cost you; the receipt explains it. Present only when usage stats are on, and hidden while a foldable row is collapsed.</p>
+    <div className="frame"><Turn open={shut} setOpen={setShut} last /></div>
+  </div>;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <div style={{display:"grid",gridTemplateColumns:"1.1fr 1fr",gap:16,alignItems:"start"}}>
+  <div style={{display:"grid",gridTemplateColumns:"1.25fr 1fr",gap:16,alignItems:"start"}}>
+    <Left />
     <div>
-      <p className="lbl">Turn reporting · the metrics disclosure</p>
-      <p className="note">In the transcript, route, timing, tokens, search and council reporting is the meta line under each answer, expanding to the full metrics — one <strong>TranscriptMessage</strong> prop, no sub-cards. Shown live in “Transcript in context”.</p>
-      <div style={{border:"1px solid var(--mb-color-border)",borderRadius:"var(--mb-radius-dialog)",background:"var(--mb-color-background)",padding:"2px 14px 6px"}}><MetricsSpecimen /></div>
-      <p className="lbl" style={{marginTop:14}}>Superseded in the transcript · kept for reference</p>
-      <p className="note">The upstream per-turn cards — receipt, search references, council audit, usage line — are replaced by the disclosure above. They remain compiled for the workspace's brief bubble and legacy mounts.</p>
-      <ChatBubble role="assistant" provider="openai" model="Council of 3" timestamp="09.08.26 · 14:15" assetBase={base}
-        text="All three models agree the schedule holds.">
-        <TurnReceiptCard summary="OpenRouter · 6.4 s" rows={[{label:"Requested",value:"Anthropic · Claude Sonnet 4.5 · High"}]} />
-        <WebSearchReferences countLabel="3 sources" query="lisbon tide table saturday"
-          summary="Timetables agree on the turn at 15:40."
-          sources={[{title:"tides.pt",url:"#1"},{title:"portodelisboa.pt",url:"#2"},{title:"windy.com",url:"#3"}]} />
-        <UberModeAuditCard summary="2 rounds · 7 calls · 0 failed" outcome="Convergence reached after round 2."
-          details={["7 successful · 0 failed · 0 retired"]} routes={["#1 · Anthropic · Claude Sonnet 4.5","#2 · OpenAI · GPT-5","#3 · Mistral · Mistral Large"]} />
-        <UsageCard text="~1.2k prompt · 480 completion · ~1.7k total" />
-      </ChatBubble>
-    </div>
-    <div>
-      <p className="lbl">Reply failure, on the user's message</p>
-      <ChatBubble role="user" timestamp="09.08.26 · 14:18" text="And the last ferry back?">
-        <ReplyFailureCard message="Anthropic returned 529: overloaded."
-          hint="Your message was kept. Retrying sends it again unchanged." onRetry={() => {}} />
-      </ChatBubble>
+      <p className="lbl">What mounts under the row</p>
+      <p className="note">These are not children of a bubble — <strong>TranscriptMessage</strong> mounts them itself, in this order, under the message they belong to.</p>
+      <p className="lbl" style={{marginTop:12}}>Reply failure</p>
+      <ReplyFailureCard message="Anthropic returned 529: overloaded."
+        hint="Your message was kept. Retrying sends it again unchanged." onRetry={() => {}} />
       <p className="lbl" style={{marginTop:12}}>Pipeline notice</p>
       <PipelineNotices notices={[{stageLabel:"Text to speech",level:"error",
         message:"ElevenLabs rejected the request.",detail:"Voice quota exhausted",
         actions:[{icon:"sound",label:"Retry speech"},{icon:"setting",label:"Speaking settings",tone:"quiet"}]}]} />
       <p className="lbl" style={{marginTop:12}}>Branch provenance chips</p>
       <MessageBranchIndicator originLabel="Context kept from 'Naming the boat'" onOpenSource={() => {}} branchesLabel="2 branches" onOpenBranches={() => {}} />
+      <p className="note" style={{marginTop:14}}>Three sub-cards, and only three: everything a turn did that used to sit in its own disclosure is a row in the Turn receipt modal.</p>
     </div>
   </div>
 );

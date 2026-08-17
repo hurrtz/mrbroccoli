@@ -38,12 +38,11 @@ const PAGES = {
 /** Regular width: sidebar master-detail. `onBack` is deliberately withheld from the page — selection happens in the list, there is nothing to back out of. */
 function IpadSettingsRegular({ active, onSelect, isPremium, onClose }) {
   const Page = PAGES[active];
-  const auto = window.useAutoSetupFlow();
   return (
     <div style={{ display: "flex", height: "100%" }}>
       <CategoryNav active={active} onSelect={onSelect} />
       <div style={{ flex: 1, position: "relative" }}>
-        <Page onClose={onClose} isPremium={isPremium} auto={auto} />
+        <Page onClose={onClose} isPremium={isPremium} />
       </div>
     </div>
   );
@@ -52,10 +51,9 @@ function IpadSettingsRegular({ active, onSelect, isPremium, onClose }) {
 /** Compact width collapses to exactly the phone's own overview → page push — reused unmodified, not a bespoke narrow layout. */
 function IpadSettingsCompact({ isPremium, onClose }) {
   const [page, setPage] = React.useState(null);
-  const auto = window.useAutoSetupFlow();
   if (!page) return <window.SettingsOverview isPremium={isPremium} onOpenPage={setPage} onOpenPremium={() => {}} onClose={onClose} />;
   const Page = PAGES[page];
-  return <Page onBack={() => setPage(null)} onClose={onClose} isPremium={isPremium} auto={auto} />;
+  return <Page onBack={() => setPage(null)} onClose={onClose} isPremium={isPremium} />;
 }
 
 Object.assign(window, { IpadSettingsRegular, IpadSettingsCompact });

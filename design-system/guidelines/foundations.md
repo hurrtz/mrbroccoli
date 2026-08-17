@@ -79,6 +79,6 @@ On the web this system loads the same family from the official CDN:
 
 **Pills** (`--mb-radius-pill`) are for things that are not buttons: status tags, selection chips, the fork tag, stepper dots, the wordmark badge. Every button — including compact inline ones like PremiumBand’s Upgrade, the storage Remove action and the introduction’s language switch — takes `--mb-radius-control`.
 
-**One commit button.** The full-width primary action is 48pt tall on `--mb-radius-control`, wherever it appears: `Button`, the introduction's auto-setup and Done, `AutoSetupCard`, and `Modal`'s footer — whose actions now stack full-width instead of sitting right-aligned in a row.
+**One commit button.** The full-width primary action is 48pt tall on `--mb-radius-control`, wherever it appears: `Button`, the introduction's Done, and `Modal`'s footer — whose actions now stack full-width instead of sitting right-aligned in a row.
 
 **44 is the floor, always.** No control is shorter than `--mb-touch-target`, including `Button size="small"`, every chip and pill, `Switch` (a 46×28 track inside a 44 target) and the transcript drawer’s grab handle. Where the drawn size must stay smaller, the visual sits inside a 44 target (precedent: `IconAction`, the fork tag).

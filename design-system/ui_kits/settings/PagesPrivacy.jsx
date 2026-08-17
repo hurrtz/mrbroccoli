@@ -1,4 +1,4 @@
-const { SettingsGroup, SettingsRow, AutoSetupCard, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
+const { SettingsGroup, SettingsRow, PhosphorIcon } = window.MrBroccoliDesignSystem_62d510;
 
 /** Data & privacy — everything the app keeps on disk: knowledge, archive, backups, models. */
 function DataPrivacyPage({ onBack, onClose }) {
@@ -29,20 +29,22 @@ function DataPrivacyPage({ onBack, onClose }) {
   );
 }
 
-/** App & diagnostics — appearance, home-screen toggles, diagnostics. */
-function AppPage({ onBack, onClose, auto }) {
+/** App & diagnostics — the walkthrough, appearance, home-screen toggles, diagnostics. */
+function AppPage({ onBack, onClose, onOpenIntro, isPremium = true }) {
   return (
     <window.SettingsFrame title="App & diagnostics" onBack={onBack} onClose={onClose}>
-      <SettingsGroup title="Automatic setup" footer="Measures this phone and installs an on-device set that fits it. Also offered from the introduction." style={{ padding: 0 }}>
-        <div style={{ padding: "12px 14px" }}><AutoSetupCard showHeader={false} {...(auto ? auto.cardProps : {})} /></div>
+      <SettingsGroup title="Introduction" footer="The three-step walkthrough. It opens by itself on a first launch; this is the way back to it." style={{ padding: 0 }}>
+        <SettingsRow icon="info-circle" label="Walk through the app" chevron onPress={onOpenIntro} last />
       </SettingsGroup>
       <SettingsGroup title="Appearance" style={{ padding: 0 }}>
         <SettingsRow icon="eye" label="Theme" value="Dark" />
         <SettingsRow icon="global" label="App language" value="English" last />
       </SettingsGroup>
       <SettingsGroup title="Home screen" style={{ padding: 0 }}>
-        <SettingsRow icon="info-circle" label="Introduction banner" control={<window.KitSwitch />} />
         <SettingsRow icon="line-chart" label="Usage stats in transcripts" control={<window.KitSwitch on />} last />
+      </SettingsGroup>
+      <SettingsGroup title="Editions" footer={isPremium ? "Premium is active on this device." : "Premium unlocks provider routes, web search, Model Council and premium voices. Your own keys, billed by the provider — no models, voices or credits included."} style={{ padding: 0 }}>
+        <SettingsRow icon="safety-certificate" label="Edition" value={isPremium ? "Premium" : "Free"} chevron last />
       </SettingsGroup>
       <SettingsGroup title="Diagnostics" style={{ padding: 0 }}>
         <SettingsRow icon="audio" label="Speech diagnostics" value="3 recent" />

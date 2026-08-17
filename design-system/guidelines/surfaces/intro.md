@@ -1,6 +1,6 @@
 # Surface: the introduction
 
-The normative description of the first-launch walkthrough. Living demo: `ui_kits/intro/`. Component: `components/intro/IntroFlow.jsx` (steps, copy defaults, manual catalogue, gating).
+The normative description of the first-launch walkthrough. Component: `components/intro/IntroFlow.jsx` (steps, copy defaults, setup routes, gating) — the whole flow, mounted by the app on first launch and from App & diagnostics. This surface has no click-through kit: the flow is one component, so the component is the demo.
 
 ## Steps
 
@@ -16,16 +16,14 @@ Under the headline, the **stored intro session** emerges from blur (4 → 2.4 �
 
 ## Step 2 · Don't panic
 
-Title "Don't panic", body "One required download and it works.", hairline divider. The uncontained hero: "Let's get you started", the promise in prose (measuring first — nothing downloads unseen), the three pipeline glyphs (**He listens · He thinks · He answers** — persona pronoun per `guidelines/content.md`), and one green **Set up automatically** button that hands off to the auto-setup job (any non-idle state renders `AutoSetupCard`, `showHeader={false}`; the device probe lives inside that job's measure step). Beneath, right-aligned: **"Show manual setup"** in regular body type with an OS-native switch — off by default, reset on every open. Toggled on, a "Manual setup" headline introduces the pipeline-ordered groups, each captioned with a right-aligned Required/Optional tag pill and built from the settings primitives (`RouteOptionRow` + `IconAction`): system routes are plain "Your phone" rows (selected, no meta), models carry name + "Not installed · size" + the download squircle, the provider route is a locked ghost. The settings lifecycle applies verbatim: download → test → radio unlocks; removal by swipe.
+Title "Don't panic", body "One required download and it works.", hairline divider. The uncontained hero: "Let's get you started", the promise in prose (one model to think with is the only requirement; the phone already listens and speaks), and the three pipeline glyphs (**He listens · He thinks · He answers** — persona pronoun per `guidelines/content.md`). Then the routes themselves, with no switch in front of them: pipeline-ordered groups, each captioned with a right-aligned Required/Optional tag pill and built from the settings primitives (`RouteOptionRow` + `IconAction`) — system routes are plain "Your phone" rows (selected, no meta), models carry name + "Not installed · size" + the download squircle, the provider route is a locked ghost. Under them one quiet line, "Nothing downloads until you tap it.", and it is literal: this screen starts no work of its own. The settings lifecycle applies verbatim: download → test → radio unlocks; removal by swipe.
 
 ## Step 3 · Try it out!
 
 Body: "Your setup is running — ask something and hear how he answers. Not happy with it? Step back, change it, try again." Divider, then the **ephemeral test**: hold-to-talk mic (76pt, "Hold to talk" beneath), the user's words transcribed as an accent-soft bubble, the spoken reply as an incoming bubble, and a meta row "**2.4 s to first word · 🔊 Replay**" (latency = release-to-speech; the number that improves when routes change). Nothing is saved. A turn that completes unlocks Done. Integration note: the test turn runs on the user's configured model — free and local on the default path; show a caution only if a provider key is already active.
 
-## The way in — no banner
+## The way in
 
-The walkthrough is reached from **App & diagnostics → Introduction**, and on a first launch it opens by itself. The violet `IntroBanner` that used to advertise it on the home screen is retired (owner call, 2026-08): the home screen advertises nothing. The violet/gold question dies with it.
+The walkthrough is reached from **App & diagnostics → Introduction**, and on a first launch it opens by itself. Nothing on the home screen advertises it.
 
-## Superseded
-
-`IntroBanner`, and before it the seven-step wizard (welcome / requirements / auto / llm / stt / tts / premium) with its step-layout parts — `IntroPanel`, `IntroPanelDivider`, `IntroPoint`, `IntroDivider`, `IntroButton`, `IntroVoicePicker` — are retired: all of them were **deleted** from the system in 2026-08 (removed 2026-08) are superseded by this design. The primitives remain compiled for specimen cards and ad-hoc use until the app migration retires them. Upstream `IntroFlowScreen.tsx` swipe-paging maps to three pages now.
+Upstream `IntroFlowScreen.tsx` swipe-paging maps to three pages now. What this design replaced — the seven-step wizard, the violet banner, automatic setup — is recorded in `guidelines/past-decisions.md`.

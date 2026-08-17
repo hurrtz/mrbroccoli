@@ -1,6 +1,6 @@
 const { AppWordmark, IconButton, PhosphorIcon, RouteByline, WorkspaceHeader, VoiceOrb, OrbSatellite, OrbTransport, AttachmentPopover,
         ConversationSettingsSummary, TranscriptHandle,
-        ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon, BackgroundTaskBar,
+        ChatBubble, ChatTranscript, TranscriptMessage, Toast, Modal, ProviderIcon,
         IntroFlow, RoutePicker, Composer } = window.MrBroccoliDesignSystem_62d510;
 
 const ASSETS = "../../assets/providers";
@@ -8,8 +8,8 @@ const ORB = 196;
 
 /**
  * The orb takes the space the column actually leaves it rather than a size
- * guessed from what else is on screen. Anything that shortens the column — the
- * introduction banner, a landscape split, a longer byline — simply makes the
+ * guessed from what else is on screen. Anything that shortens the column — a
+ * landscape split, a longer byline — simply makes the
  * orb smaller instead of pushing it over its neighbours.
  */
 function useFitSize(max, min, insetWidth = 0, insetHeight = 0) {
@@ -137,25 +137,7 @@ function TranscriptSheet({ visible, title, messages, onClose }) {
   );
 }
 
-/**
- * The one row on the home screen that reports work the user started somewhere
- * else. Nothing renders while nothing is running.
- */
-function AutoSetupIndicator({ auto, onOpen }) {
-  if (!auto) return null;
-  if (auto.state === "installing") {
-    return <BackgroundTaskBar title="Installing on-device AI"
-      detail={"Step " + auto.reading.step + " of " + auto.reading.stepCount + " · " + auto.reading.remaining}
-      fraction={auto.fraction} onPress={onOpen} />;
-  }
-  if (auto.state === "failed") {
-    return <BackgroundTaskBar tone="danger" icon="warning" title="On-device install stopped"
-      detail="Tap to see what failed" onPress={onOpen} />;
-  }
-  return null;
-}
-
-function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, toast, onDismissToast, auto, introVisible, onIntroVisible, initialTranscript , handsFreeInitially = false }) {
+function Workspace({ onOpenDrawer, onOpenSettings, conversationTitle, toast, onDismissToast, introVisible, onIntroVisible, initialTranscript , handsFreeInitially = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [surface, setSurface] = React.useState("voice");
@@ -163,11 +145,9 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
   const [transcript, setTranscript] = React.useState(!!initialTranscript);
-  const [banner, setBanner] = React.useState(true);
   const [localIntro, setLocalIntro] = React.useState(false);
   const intro = introVisible === undefined ? localIntro : introVisible;
   const setIntro = onIntroVisible || setLocalIntro;
-  const [introOpened, setIntroOpened] = React.useState(false);
   const [handsFree, setHandsFree] = React.useState(!!handsFreeInitially);
   const speaking = !!turn.current && turn.current.phase === "speaking";
   /* The per-question three rest while a turn runs and through a hands-free
@@ -199,12 +179,11 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
           <IconButton icon="setting" accessibilityLabel="Settings" onClick={onOpenSettings} />
         </div>
 
-        <AutoSetupIndicator auto={auto} onOpen={onOpenLocalModels} />
-
         <div style={{ height: 14 }} />
         <WorkspaceHeader provider={conversation.active.provider} providerLabel={conversation.active.providerLabel}
           modelName={conversation.active.modelLabel} effort={conversation.active.effortLabel} local={conversation.active.local}
           switchable={window.MB_DATA.modes.length > 1} assetBase={ASSETS}
+          running={!!turn.current}
           onSwitchRoute={() => conversation.setPicking(true)}
           summary={(handsFree ? "Hands free: on · " : "") + "Length: Brief · Tone: Balanced · Voice: Heart"}
           onOpenSettings={onOpenSettings} />
@@ -257,9 +236,7 @@ function Workspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversati
       <TranscriptSheet visible={transcript} title={conversationTitle}
         messages={conversation.messages} onClose={() => setTranscript(false)} />
 
-      <IntroFlow visible={intro} onClose={() => setIntro(false)} autoSetup={auto ? auto.cardProps : undefined}
-        onInstallLocal={onOpenLocalModels} onConnectProvider={() => setIntro(false)}
-        onOpenStt={onOpenSettings} onOpenTts={onOpenSettings} />
+      <IntroFlow visible={intro} onClose={() => setIntro(false)} thinkingReady />
 
       {toast ? (
         <div style={{ position: "absolute", top: 60, left: 16, right: 16 }}>
@@ -283,22 +260,14 @@ function LandscapeControl({ icon, label, toggle, active, disabled, tone, onPress
  * Landscape sheds only the swipe pager, because there is no second input page
  * to swipe to. The settings sentence and the attach control stay: an orientation
  * is not a reason to make an action unreachable or to leave an icon unexplained.
- *
- * The introduction banner lives in the right pane here, not the left. Compact or
- * not, it renders ~156pt tall in a ~320pt-wide column, which is half the control
- * column's height — stacking it there leaves the orb and its controls nothing to
- * occupy. The right pane is wider, and on a fresh session the transcript beneath
- * it is empty anyway.
  */
-function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, conversationTitle, auto, handsFreeInitially = false }) {
+function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, conversationTitle, handsFreeInitially = false }) {
   const conversation = useConversation();
   const turn = useTurnScript(conversation.commit);
   const [council, setCouncil] = React.useState(false);
   const [web, setWeb] = React.useState(true);
   const [handsFree, setHandsFree] = React.useState(!!handsFreeInitially);
-  const [banner, setBanner] = React.useState(true);
   const [intro, setIntro] = React.useState(false);
-  const [introOpened, setIntroOpened] = React.useState(false);
   // The stage holds the orb and the control row beneath it, so 54pt of its
   // height (44 control + 10 gap) is spoken for before the orb gets any.
   const [landscapeStageRef, landscapeOrb] = useFitSize(150, 84, 0, 78);
@@ -312,7 +281,6 @@ function LandscapeWorkspace({ onOpenDrawer, onOpenSettings, onOpenLocalModels, c
           <AppWordmark />
           <IconButton icon="setting" accessibilityLabel="Settings" onClick={onOpenSettings} />
         </div>
-        <AutoSetupIndicator auto={auto} onOpen={onOpenLocalModels} />
         <Byline conversation={conversation} />
         {/* The settings control floats over the stage's top-right corner instead of
             taking a row, so the orb owns everything between the byline hairline

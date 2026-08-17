@@ -1,4 +1,4 @@
-<!-- @dsCard group="Components" viewport="700x420" name="Introduction pieces" subtitle="Banner, stepper, step heading and body — the three-step flow's parts" -->
+<!-- @dsCard group="Components" viewport="760x400" name="Introduction chrome" subtitle="Stepper, step heading and body — the parts IntroFlow composes into the three-step first run" -->
 <!DOCTYPE html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="../../styles.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css">
@@ -7,11 +7,7 @@
 <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
 <script src="../../_ds_bundle.js"></script>
-<style>
-body{margin:0;padding:18px;display:flex;gap:18px;flex-wrap:wrap;font-family:var(--mb-font-body)}
-.pane{flex:1;min-width:300px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:14px;background:var(--mb-color-background)}
-.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0}
-</style>
+<style>body{margin:0;padding:18px;display:flex;gap:18px;font-family:var(--mb-font-body)}.pane{flex:1;min-width:300px;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--mb-color-background)}.lbl{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted);margin:0}.note{font-family:var(--mb-text-supporting-family);font-size:12px;line-height:17px;color:var(--mb-color-text-secondary);margin:0}</style>
 </head><body>
 <div class="pane" data-theme="light" id="light"></div>
 <div class="pane" data-theme="dark" id="dark" style="background:#16181D;border:1px solid #2C3138"></div>
@@ -21,10 +17,12 @@ function Specimen(){
   const [step, setStep] = React.useState(1);
   return <>
     <p className="lbl">IntroStepper · three steps</p>
-    <div style={{display:"flex",justifyContent:"center"}}><IntroStepper count={3} index={step} onSelect={setStep} /></div>
-    <p className="lbl">IntroTitle + IntroBody</p>
+    <p className="note">Welcome, setup, test. It sits between the back glyph and the close glyph at the foot of every step, and it is navigable — tapping a dot walks the flow in either direction. On a first run there is no close control and the forward gates hold: step 2 until a reasoning model is running, step 3 until one test turn has succeeded.</p>
+    <div style={{display:"flex",justifyContent:"center",padding:"4px 0"}}><IntroStepper count={3} index={step} onSelect={setStep} /></div>
+    <p className="lbl" style={{marginTop:4}}>IntroTitle + IntroBody</p>
     <IntroTitle>Don't panic</IntroTitle>
     <IntroBody>One required download and it works.</IntroBody>
+    <p className="note" style={{marginTop:6}}>The whole flow — blurred stored session, the green automatic path, the ephemeral test turn — is specimened in situ under <strong>Introduction</strong> in the Mr Broccoli app group. The home screen advertises none of it: the violet banner is retired.</p>
   </>;
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<Specimen />);

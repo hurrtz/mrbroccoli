@@ -1,4 +1,4 @@
-const { PhosphorIcon, IconButton, RuntimeReadiness, PremiumBand, SettingsGroup } = window.MrBroccoliDesignSystem_62d510;
+const { PhosphorIcon, RuntimeReadiness, SettingsGroup } = window.MrBroccoliDesignSystem_62d510;
 
 /** Each capability opens the page that configures it. */
 const READINESS_PAGE = { think: "thinking", listen: "listening", speak: "speaking", search: "search" };
@@ -7,24 +7,14 @@ const READINESS_PAGE = { think: "thinking", listen: "listening", speak: "speakin
  * The settings overview. Same structure in both editions — the free edition
  * keeps every row and page; premium contents unlock in place. Rows report
  * LIVE STATE ("Kokoro · Heart · as it arrives"), so most visits end here.
+ * The overview advertises nothing: no premium card, no upsell band. The
+ * edition is stated once, in App & diagnostics.
  */
-function SettingsOverview({ isPremium, onOpenPage, onOpenPremium, onClose }) {
+function SettingsOverview({ isPremium, onOpenPage, onClose }) {
   const rows = window.MB_SETTINGS.rows;
   const free = window.MB_SETTINGS.freeRows;
-  const [showPremiumCard, setShowPremiumCard] = React.useState(true);
   return (
     <window.SettingsFrame title="Settings" onClose={onClose}>
-      {isPremium && showPremiumCard ? (
-        <div style={{ borderRadius: "var(--mb-radius-card)", border: "1px solid var(--mb-color-premium-border)", background: "var(--mb-color-premium-soft)", padding: "14px 16px", display: "flex", alignItems: "flex-start", gap: 12 }}>
-          <PhosphorIcon name="check-circle" size="feature" color="var(--mb-color-premium)" />
-          <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: 3, paddingTop: 2 }}>
-            <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 16, lineHeight: "22px", color: "var(--mb-color-text)" }}>Premium unlocked</span>
-            <span style={{ fontFamily: "var(--mb-text-body-family)", fontSize: 14, lineHeight: "20px", color: "var(--mb-color-text-secondary)" }}>Bring your own providers, cloud models, and web search.</span>
-          </div>
-          <IconButton icon="close" accessibilityLabel="Dismiss the Premium card" onClick={() => setShowPremiumCard(false)} />
-        </div>
-      ) : null}
-
       <RuntimeReadiness readiness={window.MB_SETTINGS.readiness} onSelect={(step) => onOpenPage(READINESS_PAGE[step])} />
 
       {window.MB_SETTINGS.groups.map((group) => (
@@ -46,11 +36,6 @@ function SettingsOverview({ isPremium, onOpenPage, onOpenPremium, onClose }) {
         </SettingsGroup>
       ))}
 
-      {!isPremium ? (
-        <div style={{ borderRadius: "var(--mb-radius-card)", border: "1px solid var(--mb-color-premium-border)", overflow: "hidden" }}>
-          <PremiumBand copy="Every provider, web search, Model Council, premium voices." onPress={onOpenPremium} />
-        </div>
-      ) : null}
 
       <span style={{ fontFamily: "var(--mb-text-caption-family)", fontSize: "var(--mb-text-caption-size)", lineHeight: "var(--mb-text-caption-line-height)", textAlign: "center", paddingBottom: 4, color: "var(--mb-color-text-muted)" }}>Version {window.MB_SETTINGS.version}</span>
     </window.SettingsFrame>

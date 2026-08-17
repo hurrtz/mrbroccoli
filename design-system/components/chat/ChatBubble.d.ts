@@ -18,7 +18,7 @@ export interface ChatBubbleProps {
   timestamp?: string;
   edited?: boolean;
   actions?: ChatBubbleAction[];
-  /** Receipts, references, usage and notice cards belong here, under the text. */
+  /** A notice under the text. The receipt-style sub-cards are retired — turn reporting is TranscriptMessage's receipt modal. */
   children?: React.ReactNode;
   assetBase?: string;
 }

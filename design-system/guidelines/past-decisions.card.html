@@ -1,0 +1,49 @@
+<!-- @dsCard group="Past decisions" viewport="1100x900" name="What was dropped, and why" subtitle="Nothing here is buildable — the record exists so settled questions stay settled" -->
+<!DOCTYPE html><html data-theme="light"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body{margin:0;padding:34px 38px;background:var(--mb-color-background);font-family:var(--mb-font-body)}
+.wrap{max-width:1000px;display:flex;flex-direction:column;gap:22px}
+h1{font-family:var(--mb-font-display);font-weight:600;font-size:26px;letter-spacing:-.3px;color:var(--mb-color-text);margin:0}
+.intro{font-family:var(--mb-text-supporting-family);font-size:14px;line-height:21px;color:var(--mb-color-text-secondary);margin:0;max-width:70ch;text-wrap:pretty}
+.item{display:grid;grid-template-columns:230px 1fr;gap:26px;padding-top:18px;border-top:1px solid var(--mb-color-border)}
+.what{display:flex;flex-direction:column;gap:6px}
+.name{font-family:var(--mb-font-display);font-weight:600;font-size:15px;line-height:21px;color:var(--mb-color-text)}
+.when{font-family:var(--mb-font-mono);font-size:10px;letter-spacing:.9px;text-transform:uppercase;color:var(--mb-color-text-muted)}
+.why{font-family:var(--mb-text-supporting-family);font-size:13px;line-height:20px;color:var(--mb-color-text-secondary);margin:0;text-wrap:pretty}
+.gone{font-family:var(--mb-font-mono);font-size:10.5px;line-height:17px;color:var(--mb-color-text-muted);margin:8px 0 0}
+a{color:var(--mb-color-accent)}a:hover{color:var(--mb-color-accent);text-decoration:underline}
+</style>
+</head><body>
+<div class="wrap">
+<h1>Past decisions</h1>
+<p class="intro">The full record is <code>guidelines/past-decisions.md</code>. It is the only place history lives: every other document, component and card in this system describes the status quo. When an idea is dropped its components are deleted rather than parked — a retired component that stays compiled gets used.</p>
+
+<div class="item"><div class="what"><span class="name">Automatic on-device setup</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">One button measured the phone, proposed three models, and installed them in one go. It was a second acquisition path beside the per-model lifecycle the stage pages already own, and it had to speak for a device it could only guess at. Introduction step 2 now shows the routes themselves; nothing downloads until the user taps it. Evidence before verdict survives as a rule in the model rows.</p><p class="gone">AutoSetupCard · AutoSetupPlanRow · InstallProgress · LocalModelPerformanceSummary · BackgroundTaskBar · surfaces/on-device.md</p></div></div>
+
+<div class="item"><div class="what"><span class="name">The violet introduction banner</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">A violet card advertised the walkthrough on the home screen and was the last thing that made the orb step down from 196 to 156. The home screen advertises nothing now; the walkthrough opens itself on a first launch and lives in App &amp; diagnostics afterwards. The violet-versus-gold question died with it.</p><p class="gone">IntroBanner</p></div></div>
+
+<div class="item"><div class="what"><span class="name">Premium upsell surfaces</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">A gold band with a sweeping sheen, and a detailed upgrade sheet behind every premium mention. Free edition shows locked ghost rows and the editions row, and that is the whole story. The keys-honesty rule survives wherever premium is explained.</p><p class="gone">PremiumBand · PremiumUpgradeModal</p></div></div>
+
+<div class="item"><div class="what"><span class="name">Drive mode as a listening mode</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">Hands-free was a third input mode with its own dock row and orb states. It is one switch in the composing row now, wrapped around whichever input mode is chosen and live in both directions mid-turn.</p><p class="gone">DriveSessionControls · OrbTransport drive props</p></div></div>
+
+<div class="item"><div class="what"><span class="name">The satellite ring that changed meaning</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">The four controls under the orb swapped between composing actions and transport verbs by phase. A row that means two things has to be read every time. The composing three stay put and rest at 38%; the transport verbs took their own orbit, whose footprint is permanent so the orb never moves.</p></div></div>
+
+<div class="item"><div class="what"><span class="name">The phase-coloured double ring</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">Two concentric rings, tinted per phase, told one story twice. One 12pt slate ring remains — a fill meter, not a judgement. Red still means late.</p></div></div>
+
+<div class="item"><div class="what"><span class="name">The seven-step introduction wizard</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">Seven pages of prose about what the app would do, ending in a premium pitch. Three steps that demonstrate replaced it: an answer that plays, one setup screen, a test turn the user judges.</p><p class="gone">IntroPanel · IntroPanelDivider · IntroPoint · IntroDivider · IntroButton · IntroVoicePicker</p></div></div>
+
+<div class="item"><div class="what"><span class="name">The Ant-styled settings recreation</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">Eight pages of card-based radio sections built from Ant primitives. Replaced by seven pages of this system's own primitives, split into pages that decide and pages that manage. The upstream On-device AI page went with it.</p><p class="gone">Ant* primitives · OnDeviceSettingsPage</p></div></div>
+
+<div class="item"><div class="what"><span class="name">Message sub-cards inside the bubble</span><span class="when">Dropped 2026-08</span></div>
+<div><p class="why">Four disclosures lived in the assistant bubble: receipt, usage, search references, council audit. Their content is rows in one Turn receipt modal now, opened from the meta line, so a message stays a message. Three sub-cards survive and mount bare under the row.</p><p class="gone">TurnReceiptCard · WebSearchReferences · UsageCard · UberModeAuditCard</p></div></div>
+</div>
+</body></html>

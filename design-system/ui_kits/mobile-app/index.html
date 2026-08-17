@@ -25,7 +25,6 @@ body{margin:0;background:#8f8d86;display:flex;align-items:flex-start;justify-con
 <div><p class="caption">Landscape</p><div class="device land" id="landscape" data-theme="light"></div></div>
 <script type="text/babel" src="./Workspace.jsx"></script>
 <script type="text/babel" src="../settings/SettingsFrame.jsx"></script>
-<script type="text/babel" src="../settings/AutoSetup.jsx"></script>
 <script type="text/babel" src="../settings/SettingsOverview.jsx"></script>
 <script type="text/babel" src="../settings/PagesConversation.jsx"></script>
 <script type="text/babel" src="../settings/PagesVoice.jsx"></script>
@@ -37,28 +36,17 @@ const SETTINGS_PAGES = () => ({
   listening: window.ListeningPage, speaking: window.SpeakingPage,
   data: window.DataPrivacyPage, app: window.AppPage,
 });
-function App({ initialRoute, failInstall, initialTranscript, handsFree }){
+function App({ initialRoute, initialTranscript, handsFree }){
   const [route,setRoute]=React.useState(initialRoute||"workspace");
   const [conversation,setConversation]=React.useState(window.MB_DATA.conversations[0]);
   const [toast,setToast]=React.useState(null);
   const [intro,setIntro]=React.useState(false);
-  // The toast exists for the case the user is neither in the walkthrough nor on
-  // the page that owns the install: in both of those places the outcome is
-  // already stated in full, and a toast on top of it would say it twice.
-  const place=React.useRef({route,intro});
-  place.current={route,intro};
-  const elsewhere=()=>place.current.route!=="app"&&!place.current.intro;
-  const auto=window.useAutoSetupFlow({
-    failAt: failInstall?0.55:undefined,
-    onFinished:()=>{ if(elsewhere()) setToast({tone:"success",message:"On-device AI is ready. Three models installed."}); },
-    onFailed:()=>{ if(elsewhere()) setToast({tone:"danger",message:"Whisper Small failed to install. The other model finished."}); },
-  });
   return <>
     <div className="status"><span>9:41</span><span>Mr Broccoli</span><span>100%</span></div>
     <div className="screen">
       {route==="workspace" ? <window.Workspace conversationTitle={conversation.title} toast={toast}
-        onDismissToast={()=>setToast(null)} auto={auto} introVisible={intro} onIntroVisible={setIntro} initialTranscript={initialTranscript}
-        onOpenLocalModels={()=>{setIntro(false);setRoute("app");}} handsFreeInitially={handsFree}
+        onDismissToast={()=>setToast(null)} introVisible={intro} onIntroVisible={setIntro} initialTranscript={initialTranscript}
+        handsFreeInitially={handsFree}
         onOpenDrawer={()=>setRoute("drawer")} onOpenSettings={()=>setRoute("settings")} /> : null}
       {route==="drawer" ? <window.ConversationDrawerScreen activeId={conversation.id}
         onSelect={(next)=>{setConversation(next);setRoute("workspace");}}
@@ -66,12 +54,13 @@ function App({ initialRoute, failInstall, initialTranscript, handsFree }){
       {route==="settings" ? <window.SettingsOverview isPremium onOpenPage={setRoute}
         onOpenPremium={()=>{}} onClose={()=>setRoute("workspace")} /> : null}
       {SETTINGS_PAGES()[route] ? React.createElement(SETTINGS_PAGES()[route], {
-        auto, onBack: ()=>setRoute("settings"), onClose: ()=>setRoute("workspace") }) : null}
+        onOpenIntro: ()=>{setRoute("workspace");setIntro(true);},
+        onBack: ()=>setRoute("settings"), onClose: ()=>setRoute("workspace") }) : null}
     </div>
   </>;
 }
 ReactDOM.createRoot(document.getElementById("light")).render(<App initialRoute="workspace" />);
-ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="app" failInstall />);
+ReactDOM.createRoot(document.getElementById("dark")).render(<App initialRoute="app" />);
 ReactDOM.createRoot(document.getElementById("drive")).render(<App initialRoute="workspace" handsFree />);
 ReactDOM.createRoot(document.getElementById("conversation")).render(<App initialRoute="workspace" initialTranscript />);
 ReactDOM.createRoot(document.getElementById("landscape")).render(<>

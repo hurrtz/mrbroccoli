@@ -1,7 +1,7 @@
 import React from "react";
 
 export interface ChatTranscriptProps {
-  /** ChatBubble rows, oldest first. */
+  /** TranscriptMessage rows, oldest first. */
   children?: React.ReactNode;
   emptyTitle?: string;
   emptyDescription?: string;

@@ -17,7 +17,6 @@ body{margin:0;padding:24px;background:#8f8d86;font-family:var(--mb-font-body)}
 </head><body>
 <div id="root"></div>
 <script type="text/babel" src="SettingsFrame.jsx"></script>
-<script type="text/babel" src="AutoSetup.jsx"></script>
 <script type="text/babel" src="SettingsOverview.jsx"></script>
 <script type="text/babel" src="PagesConversation.jsx"></script>
 <script type="text/babel" src="PagesVoice.jsx"></script>
@@ -33,20 +32,19 @@ const PAGES = {
   app: window.AppPage,
 };
 
-function SettingsApp({ isPremium, failInstall }) {
+function SettingsApp({ isPremium }) {
   const [page, setPage] = React.useState("overview");
-  const auto = window.useAutoSetupFlow({ failAt: failInstall ? 0.55 : undefined });
   const back = () => setPage("overview");
   const close = () => setPage("overview");
   if (page === "overview") {
-    return <window.SettingsOverview isPremium={isPremium} onOpenPage={setPage} onOpenPremium={() => {}} onClose={close} />;
+    return <window.SettingsOverview isPremium={isPremium} onOpenPage={setPage} onClose={close} />;
   }
   const Page = PAGES[page];
-  return <Page onBack={back} onClose={close} auto={auto} isPremium={isPremium} />;
+  return <Page onBack={back} onClose={close} isPremium={isPremium} />;
 }
 
-function Frame({ theme, isPremium, failInstall }) {
-  return <div className="device" data-theme={theme}><SettingsApp isPremium={isPremium} failInstall={failInstall} /></div>;
+function Frame({ theme, isPremium }) {
+  return <div className="device" data-theme={theme}><SettingsApp isPremium={isPremium} /></div>;
 }
 
 ReactDOM.createRoot(document.getElementById("root")).render(

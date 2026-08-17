@@ -9,8 +9,7 @@ One column in portrait: top bar, the header block, the orb with its transport or
 - Top bar is 62pt, the wordmark absolutely centred, menu and settings icon buttons pinned to the edges so a long localised title never pushes them around.
 - The top third stays quiet: wordmark, one-line byline, one line of settings. The orb is the screen's single loud element — never more than one loud thing per view.
 - Three whole-screen compositions were explored (central orb, docked orb, split stage); the central orb won because it keeps the top third quiet and makes the transcript suggested rather than shown.
-- `BackgroundTaskBar`, when an install is running, sits directly under the top bar; in landscape it belongs in the left pane, above the route byline.
-- **Retired from this surface (owner call, 2026-08):** the violet `IntroBanner` and every premium upsell surface (`PremiumBand`, `PremiumUpgradeModal`). The introduction is reachable from App & diagnostics; premium gating shows as locked rows in settings and nothing else. Nothing advertises on the home screen.
+- **Nothing else mounts on this screen.** No banner, no upsell, no task row: the home screen advertises nothing and reports no work started elsewhere (see `guidelines/past-decisions.md`). The introduction is reachable from App & diagnostics; premium gating shows as locked rows in settings and nothing else. Nothing advertises on the home screen.
 
 ## Header (`WorkspaceHeader`)
 
@@ -21,6 +20,8 @@ Who answers the next turn, and what this conversation is set to — **one raised
 - **Row one leads** because it changes the answer: provider mark (or `cpu` for on-device), model name in the display face, the effort **word** — named, never plotted; the dot ladder stays retired — and a caret. `switchable={false}` for a single configured model drops the caret and the press target; the row becomes a credit line.
 - **Row two** states the conversation as "Label: value" pairs and opens the settings sheet. It truncates at the end rather than wrapping, so a narrow screen shows less. Settings are state, not actions — that principle survives; what changed is that the row now looks like the target it always was.
 - Two rows, one silhouette: unequal in content, equal in shape. Evenly sized cards were explored and rejected — they imply the two choices are equally important, and they are not.
+- **The block goes disabled the moment voice is submitted** (`running`) — push to talk: the button is *released*; tap to talk: the button is tapped a *second* time. Not when the answer starts arriving, not when thinking begins: from that moment neither the model nor the conversation's settings can be changed, so the block stops being pressable. It keeps its shape, its fill and its hairline exactly — nothing moves, nothing is removed — and drops to **disabled strength**, which is what says the caret and the settings control are unavailable. `role="status" aria-live="polite"`, so what changes inside it is announced.
+- **A council is the exception** (`council`): the two rows are reused as its report, so the dimming lifts. See Council below.
 
 Landscape keeps `RouteByline` and the icon-only `ConversationSettingsSummary` instead: the ~300pt column has no room for a block, and the settings control floats over the stage's top-right corner there. Both components stay in the system for that use.
 
@@ -87,6 +88,20 @@ The panel follows `AnchoredMenu` (252 wide, panel radius, elevated surface, 6pt 
 
 **Still open:** how a message with images renders in the transcript — see `explorations/images-1-to-4.html`. `MessageImageAttachments` keeps its compact mode for that decision; its scrolling 128×96 composer strip is superseded here.
 
+## Council (`CouncilPopover`)
+
+Several models answer the same question, in turn, for a number of rounds. The switch in the composing row turns it on; the panel behind that switch says what "it" is. Decisions from `explorations/council.html`:
+
+- **The panel borrows the image deck's shape** — `AnchoredMenu` geometry, 252pt, opened from its own satellite — and holds three parts: the enabled Thinking slots as a horizontally scrolling row of tiles (tap to toggle membership; a member takes accent-soft with an accent glyph, the `RoutePicker` treatment), a rounds slider, and the cost line.
+- **It is right-aligned to the composing row**, not hung off the Council switch's own left edge: at 4.7″ that switch sits 84pt into a 316pt row, and a 252pt panel anchored there crosses the 16pt gutter. The image deck escapes this only because Image is the leading satellite. **Anything past the first seat aligns to the row's trailing edge.**
+- **The cost line is permanent arithmetic, not a one-time caution**: "4 × 5 = 20 answers, one after another — minutes, and each provider bills you." It recomputes as you tap, so the price of a fourth member is visible *before* you commit. Nothing is blocked and nothing is dismissed forever.
+- **Below two members it is not a council**: the switch reads off whatever the slider says.
+- **Nothing above the row changes as you build one.** The settings sentence states the *conversation* — length, tone, voice; a council is a property of the *next question*, so the filled switch says it is on and the panel says what it is. The header stays out of it.
+- **While it runs, the header is the report** — no progress strip was invented. Both rows centre and strip to what is true: the answering model's mark and name above, `"2 of 4 models done · Round 2 of 3"` below. The effort word, the caret and the settings control all go, because none is available or true mid-council; with nothing left to disable, **the dimming lifts** — these two lines are the only report of a wait that runs for minutes and must not be the faintest thing on the screen.
+- **A failure is named, never hidden**: the count says *done*, and a `· 1 failed` clause appears only when a member has failed. A council that lost two providers must not read like one that answered well.
+- **The orb's ring meters the whole council**, not each answer, so it advances steadily instead of resetting twelve times. The disc keeps `circuitry` — the machine is working, and a tap still abandons the turn.
+- **Still open:** whether 5 is the rounds ceiling; whether membership is remembered per conversation or reset each turn; and whether the transcript names each model's contribution per round or only the final answer.
+
 ## Status line — removed
 
 The upstream status line (phase dot · activity · conversation meta under the orb) is removed from the product (owner call, 2026-08): it read as alien and duplicated what the orb’s phase states, the settings sentence and the transcript handle already carry. Phase feedback lives in the orb; the transcript handle’s meta line owns conversation name and age.
@@ -108,9 +123,6 @@ What it opens is a **sheet over the workspace**, not a new screen: the route and
 
 Landscape keeps the same model — one composing row, transport in orbit, permanent footprint — icon-only, no labels, so a hands-free session can be ended there too. The settings control floats over the stage's top-right corner rather than taking a row of its own (`iconOnly`): the words cost the orb height the narrow column cannot spare, and the orb then owns everything between the byline's hairline and the control row, centred in it. Beyond that it sheds what it does not need: no swipe pager, no attach control, no settings sentence — and because the right pane has room, the transcript stops hiding. The orb sits centred in its column at 150pt with the icon controls pinned to the column's right edge. The left column is roughly 300pt after gutters; everything in it must hold at that width, one line tall.
 
-## Retired with this design
-
-`ResponseModeToggle` (the four-layout model switcher) and `PhaseAwareVoiceAction` (the phase-coloured voice bar) were **deleted** from the system in 2026-08. The orb plus the route byline replace both, at every model count and every phase; there is no small-orb variant to fall back to — give the orb its room. `WorkspaceStatusLine` and `DriveSessionControls` are gone for the same reason: their jobs moved into the orb and its satellite ring.
 ## Hands free
 
 The hands-free loop (formerly "Drive Session", premium): voice activity detection against an ambient acoustic profile, a silence window with spoken countdown cues, auto-submit, auto-continue. **It is a switch, not a listening mode** (owner call, 2026-08): it wraps whichever input mode is chosen — push-to-talk or tap-to-talk — and turning it off resumes that mode. It sits in the composing row as the fourth control: the **car glyph**, captioned **“Hands free” on two 12px rows**, filling and taking the accent when on like every switch. No divider and no gap sets it apart — by species the boundary would fall after Image, by scope before Hands free, and one line cannot draw both — so the boundary is carried by behaviour instead.

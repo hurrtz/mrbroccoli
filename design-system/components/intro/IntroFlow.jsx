@@ -3,9 +3,7 @@ import { PhosphorIcon } from "../core/PhosphorIcon";
 import { IntroTitle } from "./IntroTitle";
 import { IntroBody } from "./IntroBody";
 import { IntroStepper } from "./IntroStepper";
-import { AutoSetupCard } from "../on-device/AutoSetupCard";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
-import { Switch } from "../core/Switch";
 import { IconAction } from "../settings-primitives/IconAction";
 
 export const INTRO_STEPS = ["welcome", "setup", "try"];
@@ -22,12 +20,10 @@ export const INTRO_COPY = {
   setupTitle: "Don't panic",
   setupBody: "One required download and it works.",
   heroTitle: "Let's get you started",
-  heroBody: "Mr Broccoli measures what this phone can run, shows you the set that fits, and installs it in one go. Nothing downloads before you say so.",
+  heroBody: "He needs one model to think with — that download is the only requirement. Your phone already listens and speaks, so you can leave those alone and change them later.",
   glyphListen: "He listens", glyphThink: "He thinks", glyphAnswer: "He answers",
-  autoAction: "Set up automatically",
-  manualSwitch: "Show manual setup",
-  manualTitle: "Manual setup",
   tagRequired: "Required", tagOptional: "Optional",
+  routeHint: "Nothing downloads until you tap it.",
   tryTitle: "Try it out!",
   tryBody: "Your setup is running — ask something and hear how he answers. Not happy with it? Step back, change it, try again.",
   holdToTalk: "Hold to talk",
@@ -36,8 +32,8 @@ export const INTRO_COPY = {
   done: "Done", back: "Back", next: "Next", dismiss: "Dismiss introduction",
 };
 
-/** The manual-setup catalogue, pipeline-ordered. Override via `manualGroups` to mirror the real device state. */
-export const DEFAULT_MANUAL_GROUPS = [
+/** The setup catalogue, pipeline-ordered. Override via `setupGroups` to mirror the real device state. */
+export const DEFAULT_SETUP_GROUPS = [
   { label: "He listens", rows: [
     { id: "listen-phone", label: "Your phone", selected: true },
     { id: "listen-whisper", label: "Whisper Small", meta: "Not installed · 466 MB", disabled: true, action: "download" },
@@ -115,23 +111,12 @@ function WelcomeStep({ copy, played, onPlay, language, onChangeLanguage }) {
   );
 }
 
-function FlowSwitch({ on, onToggle, label }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 11, minHeight: 44, padding: "0 2px" }}>
-      <span style={bodyText}>{label}</span>
-      <Switch value={on} onChange={onToggle} accessibilityLabel={label} />
-    </div>
-  );
-}
-
 /**
- * Step two: "Don't panic". One green action does everything (the automatic job
- * measures first — nothing downloads unseen); the manual catalogue waits behind
- * an off-by-default switch so the screen greets rather than interrogates.
+ * Step two: "Don't panic". The promise in prose, the pipeline it describes, then
+ * the routes themselves — one required download, everything else already
+ * answered by the phone. No screen in the flow downloads anything on its own.
  */
-function SetupStep({ copy, autoSetup, manualOpen, onToggleManual, groups, onSelectRoute, onDownloadModel }) {
-  const auto = autoSetup || {};
-  const autoActive = auto.state && auto.state !== "idle";
+function SetupStep({ copy, groups, onSelectRoute, onDownloadModel }) {
   const glyphs = [["mic", copy.glyphListen], ["cpu", copy.glyphThink], ["sound", copy.glyphAnswer]];
   return (
     <React.Fragment>
@@ -149,19 +134,9 @@ function SetupStep({ copy, autoSetup, manualOpen, onToggleManual, groups, onSele
             </span>
           ))}
         </div>
-        {autoActive ? (
-          <AutoSetupCard {...auto} showHeader={false} />
-        ) : (
-          <button type="button" onClick={auto.onStart}
-            style={{ minHeight: 48, borderRadius: "var(--mb-radius-control)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--mb-color-accent)" }}>
-            <span style={{ fontFamily: "var(--mb-font-display)", fontWeight: 600, fontSize: 15, color: "var(--mb-color-on-accent)" }}>{copy.autoAction}</span>
-          </button>
-        )}
-        <FlowSwitch on={manualOpen} onToggle={onToggleManual} label={copy.manualSwitch} />
+        <span style={{ ...supText, color: "var(--mb-color-text-muted)" }}>{copy.routeHint}</span>
       </div>
-      {manualOpen ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingTop: 6 }}>
-          <span style={heroTitleText}>{copy.manualTitle}</span>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, paddingTop: 6 }}>
           {groups.map((group) => (
             <div key={group.label}>
               <p style={{ margin: "0 0 6px 2px", display: "flex", alignItems: "center", gap: 8, justifyContent: "space-between" }}>
@@ -178,8 +153,7 @@ function SetupStep({ copy, autoSetup, manualOpen, onToggleManual, groups, onSele
               </div>
             </div>
           ))}
-        </div>
-      ) : null}
+      </div>
     </React.Fragment>
   );
 }
@@ -240,8 +214,7 @@ export function IntroFlow({
   thinkingReady = false,
   demoTurn = null,
   copy: overrides,
-  autoSetup,
-  manualGroups = DEFAULT_MANUAL_GROUPS,
+  setupGroups = DEFAULT_SETUP_GROUPS,
   language = "English",
   onChangeLanguage,
   onClose,
@@ -253,11 +226,10 @@ export function IntroFlow({
   const copy = React.useMemo(() => ({ ...INTRO_COPY, ...overrides }), [overrides]);
   const [index, setIndex] = React.useState(initialStep);
   const [played, setPlayed] = React.useState(false);
-  const [manualOpen, setManualOpen] = React.useState(false);
   const [localTurn, setLocalTurn] = React.useState(null);
 
   React.useEffect(() => {
-    if (visible) { setIndex(initialStep); setPlayed(false); setManualOpen(false); setLocalTurn(null); }
+    if (visible) { setIndex(initialStep); setPlayed(false); setLocalTurn(null); }
   }, [initialStep, visible]);
   if (!visible) return null;
 
@@ -289,7 +261,7 @@ export function IntroFlow({
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, minHeight: "100%", padding: "6px 22px 24px", boxSizing: "border-box" }}>
           {step === "welcome" ? <WelcomeStep copy={copy} played={played} onPlay={() => setPlayed(true)} language={language} onChangeLanguage={onChangeLanguage} /> : null}
-          {step === "setup" ? <SetupStep copy={copy} autoSetup={autoSetup} manualOpen={manualOpen} onToggleManual={() => setManualOpen(!manualOpen)} groups={manualGroups} onSelectRoute={onSelectRoute} onDownloadModel={onDownloadModel} /> : null}
+          {step === "setup" ? <SetupStep copy={copy} groups={setupGroups} onSelectRoute={onSelectRoute} onDownloadModel={onDownloadModel} /> : null}
           {step === "try" ? <TryStep copy={copy} turn={turn} onPressMic={onPressMic || (() => setLocalTurn(DEMO_TURN))} /> : null}
         </div>
       </div>
