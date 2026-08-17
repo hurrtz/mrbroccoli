@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const ar = {
   ...conversationArtifactTranslations.ar,
   ...interruptionTranslations.ar,
   ...ulraAuditTranslations.ar,
+  ...councilWorkspaceTranslations.ar,
   ...dataBackupTranslations.ar,
   ...conversationKnowledgeTranslations.ar,
   ...imagePromptTranslations.ar,
@@ -147,28 +149,28 @@ export const ar = {
   useResponseMode: ({ mode }) => `استخدم ${mode}`,
   chooseResponseModel: "اختر نموذجًا",
   responseModelCount: ({ count }) => `${count} نماذج متوفرة`,
-  ulraMode: "الوضع الفائق",
-  ulraModeHomeLabel: "إظهار الوضع الفائق على الشاشة الرئيسية",
+  ulraMode: "مجلس النماذج",
+  ulraModeHomeLabel: "إظهار مجلس النماذج على الشاشة الرئيسية",
   ulraModeSettingsDescription:
     "يتيح التشاور بين عدة نماذج عندما يكون نموذجان على الأقل من نماذج الشاشة الرئيسية جاهزين.",
   ulraModeInfo:
-    "يسأل الوضع الفائق أولاً كل نموذج جاهز على الشاشة الرئيسية بشكل مستقل. وفي كل جولة مراجعة، تتحدى النماذج أحدث موقف لكل مشارك، وتتوقف الجولات غير المستخدمة بعد تقارب صريح بالإجماع. ويجمع النموذج المحدد الإجابة النهائية من الجولات الناجحة، مع الاحتفاظ دائمًا بأحدث موقف لكل نموذج. تتم مشاركة محتوى التشاور مع جميع المزوّدين المشاركين.",
+    "يسأل مجلس النماذج أولاً كل نموذج جاهز على الشاشة الرئيسية بشكل مستقل. وفي كل جولة مراجعة، تتحدى النماذج أحدث موقف لكل مشارك، وتتوقف الجولات غير المستخدمة بعد تقارب صريح بالإجماع. ويجمع النموذج المحدد الإجابة النهائية من الجولات الناجحة، مع الاحتفاظ دائمًا بأحدث موقف لكل نموذج. تتم مشاركة محتوى التشاور مع جميع المزوّدين المشاركين.",
   ulraModeRounds: "جولات المراجعة",
   ulraModeCallEstimate: ({ count }) =>
     `حتى ${count} استدعاءً للنماذج لكل رسالة بالإعداد الحالي.`,
   ulraModeThresholdWarning:
     "قد يستغرق استخدام أكثر من 4 نماذج أو 3 جولات وقتًا طويلاً جدًا، ويستهلك رموزًا كثيرة، ويبلغ حدود السياق أو معدل الطلبات لدى المزوّدين. هذا تحذير فقط.",
-  ulraModeFirstUseTitle: "هل تريد تفعيل الوضع الفائق؟",
+  ulraModeFirstUseTitle: "هل تريد تفعيل مجلس النماذج؟",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `باستخدام ${models} نماذج وما يصل إلى ${rounds} جولات مراجعة، قد تنفذ الرسالة الواحدة حتى ${calls} استدعاءً للنماذج. قد تستغرق وقتًا أطول بكثير، وتكلف أكثر، وتشارك التشاور مع جميع المزوّدين المشاركين.`,
-  ulraModeHighRiskTitle: "تشغيل كبير للوضع الفائق",
+  ulraModeHighRiskTitle: "تشغيل كبير لمجلس النماذج",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `قد تنفذ ${models} نماذج و${rounds} جولات مراجعة ما يصل إلى ${calls} استدعاءً للنماذج. قد يستغرق ذلك وقتًا طويلاً جدًا، ويستخدم رموزًا كثيرة، ويبلغ حدود المزوّدين. هل تريد المتابعة رغم ذلك؟`,
   ulraModeEnableAction: "تفعيل",
   ulraModeNeedsTwoModels:
-    "يتطلب الوضع الفائق نموذجين جاهزين على الأقل في الشاشة الرئيسية.",
+    "يتطلب مجلس النماذج نموذجين جاهزين على الأقل في الشاشة الرئيسية.",
   ulraModeAllModelsFailed:
-    "فشلت جميع نماذج الوضع الفائق قبل أن يمكن توليف رد.",
+    "فشلت جميع نماذج مجلس النماذج قبل أن يمكن توليف رد.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `فشل ${failed} من استدعاءات النماذج الداخلية؛ استخدم الرد النهائي ${succeeded} مساهمات ناجحة.`,
   sttTabDescription:

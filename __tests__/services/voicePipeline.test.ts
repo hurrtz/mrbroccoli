@@ -2559,7 +2559,7 @@ describe("runVoicePipeline", () => {
     expect(searchWeb).not.toHaveBeenCalled();
   });
 
-  it("reuses one web result for private Uber deliberation and the selected final model", async () => {
+  it("reuses one web result for private Council deliberation and the selected final model", async () => {
     (searchWeb as jest.Mock).mockResolvedValueOnce({
       context: "Fresh shared evidence",
       model: "gpt-4.1-mini",
@@ -2621,7 +2621,7 @@ describe("runVoicePipeline", () => {
       ],
       retiredParticipants: 1,
       roundsCompleted: 1,
-      synthesisPrompt: "Private Uber synthesis evidence",
+      synthesisPrompt: "Private Council synthesis evidence",
     });
     (streamChat as jest.Mock).mockImplementation(
       async ({
@@ -2716,12 +2716,20 @@ describe("runVoicePipeline", () => {
         webSearchContext: "Fresh shared evidence",
       }),
     );
+    expect(callbacks.onCouncilProgress).toHaveBeenLastCalledWith({
+      completedRounds: 2,
+      modeId: "mode-1",
+      model: "gpt-test",
+      provider: "openai",
+      stage: "synthesis",
+      totalRounds: 2,
+    });
     expect(streamChat).toHaveBeenCalledWith(
       expect.objectContaining({
         model: "gpt-test",
         maxOutputCharacters: 32_000,
         provider: "openai",
-        synthesisContext: "Private Uber synthesis evidence",
+        synthesisContext: "Private Council synthesis evidence",
         webSearchContext: "Fresh shared evidence",
       }),
     );
@@ -2769,7 +2777,7 @@ describe("runVoicePipeline", () => {
     );
   });
 
-  it("moves Uber synthesis to a successful participant when the selected provider circuit opens", async () => {
+  it("moves Council synthesis to a successful participant when the selected provider circuit opens", async () => {
     await expect(
       executeProviderModelRequest({
         candidateModels: ["gpt-test"],

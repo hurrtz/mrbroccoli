@@ -549,19 +549,19 @@ export function ThinkingSettingsPage({
             <Text
               style={[pageStyles.sheetCaption, { color: colors.textMuted }]}
             >
-              {t("ulraModeRounds")}
+              {t("councilRounds")}
             </Text>
             <View accessibilityRole="radiogroup" style={pageStyles.chips}>
               {[1, 2, 3, 4, 5].map((rounds) => {
-                const selected = settings.ulraModeRounds === rounds;
+                const selected = settings.ulraModeRounds + 1 === rounds;
                 return (
                   <Pressable
                     key={rounds}
                     testID={`thinking-council-rounds-${rounds}`}
-                    accessibilityLabel={`${t("ulraModeRounds")}: ${rounds}`}
+                    accessibilityLabel={`${t("councilRounds")}: ${rounds}`}
                     accessibilityRole="radio"
                     accessibilityState={{ checked: selected }}
-                    onPress={() => onUpdate({ ulraModeRounds: rounds })}
+                    onPress={() => onUpdate({ ulraModeRounds: rounds - 1 })}
                     style={({ pressed }) => [
                       pageStyles.chipTarget,
                       pressed ? pageStyles.pressed : null,
@@ -595,7 +595,7 @@ export function ThinkingSettingsPage({
                 count: readyModelCount * (settings.ulraModeRounds + 1) + 1,
               })}
             </Text>
-            {readyModelCount > 4 || settings.ulraModeRounds > 3 ? (
+            {readyModelCount > 4 || settings.ulraModeRounds + 1 > 4 ? (
               <Text
                 testID="ulra-mode-threshold-warning"
                 accessibilityRole="alert"

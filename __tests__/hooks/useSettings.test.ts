@@ -132,7 +132,7 @@ describe("useSettings", () => {
       showDebugLogButton: "true",
       ulraModeEnabled: "yes",
       ulraModeActive: "yes",
-      ulraModeRounds: 0,
+      ulraModeRounds: -1,
       ulraModeWarningAcknowledged: "yes",
       ttsListenLanguages: ["fr", "unknown-language", "fr"],
     };
@@ -179,7 +179,7 @@ describe("useSettings", () => {
     expect(result.current.settings.spokenRepliesEnabled).toBe(true);
   });
 
-  it("preserves large Uber Mode rounds without imposing a product cap", async () => {
+  it("caps legacy Council settings at five total rounds", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -194,11 +194,25 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     expect(result.current.settings.ulraModeActive).toBe(true);
-    expect(result.current.settings.ulraModeRounds).toBe(10);
+    expect(result.current.settings.ulraModeRounds).toBe(4);
     expect(result.current.settings.ulraModeWarningAcknowledged).toBe(true);
   });
 
-  it("deactivates Uber Mode when the feature is disabled", async () => {
+  it("preserves zero review rounds for a one-round Council", async () => {
+    (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
+      JSON.stringify({
+        ...DEFAULT_SETTINGS,
+        ulraModeRounds: 0,
+      }),
+    );
+
+    const { result } = renderHook(() => useSettings());
+    await flushSettingsLoad();
+
+    expect(result.current.settings.ulraModeRounds).toBe(0);
+  });
+
+  it("deactivates Model Council when the feature is disabled", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,

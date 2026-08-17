@@ -77,9 +77,9 @@ function getStoredBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
 }
 
-function getStoredPositiveInteger(value: unknown, fallback: number) {
-  return typeof value === "number" && Number.isSafeInteger(value) && value >= 1
-    ? value
+function getStoredCouncilReviewRounds(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isSafeInteger(value) && value >= 0
+    ? Math.min(4, value)
     : fallback;
 }
 
@@ -289,7 +289,7 @@ export function normalizeStoredScalarSettings(
         storedSettings?.ulraModeActive,
         DEFAULT_SETTINGS.ulraModeActive,
       ),
-    ulraModeRounds: getStoredPositiveInteger(
+    ulraModeRounds: getStoredCouncilReviewRounds(
       storedSettings?.ulraModeRounds,
       DEFAULT_SETTINGS.ulraModeRounds,
     ),

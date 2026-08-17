@@ -22,6 +22,7 @@ export function ConversationSettingsSummary({
   onPress,
   accessibilityLabel,
   compact = false,
+  disabled = false,
   style,
   testID,
 }: {
@@ -32,21 +33,23 @@ export function ConversationSettingsSummary({
   accessibilityLabel: string;
   /** Icon-only form for a vertically constrained accessibility layout. */
   compact?: boolean;
+  disabled?: boolean;
   style?: StyleProp<ViewStyle>;
   testID?: string;
 }) {
   const { colors } = useTheme();
 
   return (
-    <View style={style} testID={testID}>
+    <View style={[style, disabled ? styles.disabled : null]} testID={testID}>
       <Pressable
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="button"
-        onPress={onPress}
+        disabled={disabled}
+        onPress={disabled ? undefined : onPress}
         style={({ pressed }) => [
           styles.row,
           compact ? styles.rowCompact : null,
-          pressed ? { backgroundColor: colors.surfaceAlt } : null,
+          pressed && !disabled ? { backgroundColor: colors.surfaceAlt } : null,
         ]}
         testID="conversation-settings-summary-control"
       >
@@ -77,6 +80,9 @@ export function ConversationSettingsSummary({
 }
 
 const styles = StyleSheet.create({
+  disabled: {
+    opacity: 0.38,
+  },
   row: {
     alignItems: "center",
     borderRadius: 12,

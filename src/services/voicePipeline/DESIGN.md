@@ -36,9 +36,9 @@ flowchart TD
     Search -->|search| SearchCall[Provider web search]
     Search -->|skip| Deliberation
     SearchCall --> Deliberation{Model Council?}
-    Deliberation -->|yes| Uber[Contributions and review rounds]
+    Deliberation -->|yes| Council[Contributions and review rounds]
     Deliberation -->|no| Response
-    Uber --> Response[Provider final stream]
+    Council --> Response[Provider final stream]
     Response --> Guard[Internal-context leak guard]
     Guard --> Persist[onResponseDone and turn receipt]
     Guard --> Queue[TTS paragraph queue]
@@ -99,14 +99,14 @@ sequenceDiagram
 
     P->>A: independent initial prompt per active route
     A-->>P: round 1 progress after every settled route
-    par bounded participant calls
-      A-->>P: contribution or classified failure
+    loop active participant routes in configured order
+      A-->>P: one contribution or classified failure
     end
     loop configured rounds until unanimous convergence
       P->>R: immutable latest-position snapshot
       R-->>P: current/total round and active model counts
-      par bounded participant reviews
-        R-->>P: challenge, converged, or failure
+      loop active participant routes in configured order
+        R-->>P: one challenge, convergence marker, or failure
       end
       P->>P: retire terminal failures and test convergence
     end
@@ -114,9 +114,10 @@ sequenceDiagram
     S-->>P: bounded streamed final response
 ```
 
-Participant completions are logged as they settle, but round progression waits
-for all active calls. Terminal failure retirement avoids repeatedly paying for
-an unusable route. `CouncilProgress` uses one-based batch numbering: the
+Participant calls start sequentially in configured order and are logged as
+they settle; round progression waits for all active routes. Terminal failure
+retirement avoids repeatedly paying for an unusable route. `CouncilProgress`
+includes the active route and uses one-based batch numbering: the
 independent contribution batch is round one and configured review rounds
 follow it. A round update separates settled calls from usable responses and
 failures; synthesis is a distinct union member rather than a fabricated extra
@@ -165,8 +166,8 @@ their timers and release listeners or abort-linking functions in their own
 | Summary update fails                       | continue with bounded recent messages                                                       |
 | Knowledge retrieval fails                  | continue without cross-session excerpts                                                     |
 | Web search fails                           | continue without search and persist an inline assistant notice                              |
-| Some Uber participants fail                | continue with successful routes; report degraded/retired outcome                            |
-| All Uber participants fail                 | final synthesis cannot proceed normally                                                     |
+| Some Council participants fail             | continue with successful routes; report degraded/retired outcome                            |
+| All Council participants fail              | final synthesis cannot proceed normally                                                     |
 | Final synthesis exceeds its output ceiling | abort the provider stream and report an incomplete reply                                    |
 | Primary LLM route fails                    | bounded candidate fallback or user-visible error                                            |
 | TTS route fails                            | follow explicit fallback order or keep readable text reply, with an inline assistant notice |

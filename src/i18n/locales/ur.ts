@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const ur = {
   ...conversationArtifactTranslations.ur,
   ...interruptionTranslations.ur,
   ...ulraAuditTranslations.ur,
+  ...councilWorkspaceTranslations.ur,
   ...dataBackupTranslations.ur,
   ...conversationKnowledgeTranslations.ur,
   ...imagePromptTranslations.ur,
@@ -145,28 +147,28 @@ export const ur = {
   useResponseMode: ({ mode }) => `${mode} استعمال کریں۔`,
   chooseResponseModel: "ایک ماڈل منتخب کریں۔",
   responseModelCount: ({ count }) => `${count} ماڈل دستیاب ہیں۔`,
-  ulraMode: "اعلیٰ موڈ",
-  ulraModeHomeLabel: "ہوم اسکرین پر اعلیٰ موڈ دکھائیں",
+  ulraMode: "ماڈل کونسل",
+  ulraModeHomeLabel: "ہوم اسکرین پر ماڈل کونسل دکھائیں",
   ulraModeSettingsDescription:
     "جب ہوم اسکرین کے کم از کم دو ماڈل تیار ہوں تو متعدد ماڈلز کے درمیان غور و فکر کی اجازت دیتا ہے۔",
   ulraModeInfo:
-    "اعلیٰ موڈ پہلے ہوم اسکرین کے ہر تیار ماڈل سے الگ الگ جواب لیتا ہے۔ ہر جائزہ مرحلے میں ماڈلز ہر شریک کی تازہ ترین رائے کو تنقیدی طور پر پرکھتے ہیں؛ واضح متفقہ ہم آہنگی کے بعد باقی مراحل چھوڑ دیے جاتے ہیں۔ منتخب ماڈل ہر ماڈل کی تازہ ترین رائے کو ہمیشہ برقرار رکھتے ہوئے کامیاب مراحل سے آخری جواب تیار کرتا ہے۔ غور و فکر تمام شامل فراہم کنندگان کے ساتھ شیئر کیا جاتا ہے۔",
+    "ماڈل کونسل پہلے ہوم اسکرین کے ہر تیار ماڈل سے الگ الگ جواب لیتی ہے۔ ہر جائزہ مرحلے میں ماڈلز ہر شریک کی تازہ ترین رائے کو تنقیدی طور پر پرکھتے ہیں؛ واضح متفقہ ہم آہنگی کے بعد باقی مراحل چھوڑ دیے جاتے ہیں۔ منتخب ماڈل ہر ماڈل کی تازہ ترین رائے کو ہمیشہ برقرار رکھتے ہوئے کامیاب مراحل سے آخری جواب تیار کرتا ہے۔ غور و فکر تمام شامل فراہم کنندگان کے ساتھ شیئر کیا جاتا ہے۔",
   ulraModeRounds: "جائزہ مراحل",
   ulraModeCallEstimate: ({ count }) =>
     `موجودہ ترتیب کے ساتھ فی پیغام زیادہ سے زیادہ ${count} ماڈل کالز۔`,
   ulraModeThresholdWarning:
     "4 سے زیادہ ماڈل یا 3 سے زیادہ مراحل بہت وقت لے سکتے ہیں، بہت سے ٹوکن استعمال کر سکتے ہیں اور فراہم کنندہ کی سیاق یا رفتار کی حدود تک پہنچ سکتے ہیں۔ یہ صرف ایک انتباہ ہے۔",
-  ulraModeFirstUseTitle: "اعلیٰ موڈ فعال کریں؟",
+  ulraModeFirstUseTitle: "ماڈل کونسل فعال کریں؟",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models} ماڈلز اور زیادہ سے زیادہ ${rounds} جائزہ مراحل کے ساتھ ایک پیغام زیادہ سے زیادہ ${calls} ماڈل کالز کر سکتا ہے۔ اس میں بہت زیادہ وقت اور لاگت لگ سکتی ہے اور غور و فکر تمام شامل فراہم کنندگان کے ساتھ شیئر ہوگا۔`,
-  ulraModeHighRiskTitle: "بڑا اعلیٰ موڈ رن",
+  ulraModeHighRiskTitle: "بڑا ماڈل کونسل رن",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} ماڈلز اور ${rounds} جائزہ مراحل زیادہ سے زیادہ ${calls} ماڈل کالز کر سکتے ہیں۔ اس میں بہت وقت لگ سکتا ہے، بہت سے ٹوکن استعمال ہو سکتے ہیں اور فراہم کنندہ کی حدود پوری ہو سکتی ہیں۔ پھر بھی جاری رکھیں؟`,
   ulraModeEnableAction: "فعال کریں",
   ulraModeNeedsTwoModels:
-    "اعلیٰ موڈ کے لیے ہوم اسکرین پر کم از کم دو تیار ماڈلز درکار ہیں۔",
+    "ماڈل کونسل کے لیے ہوم اسکرین پر کم از کم دو تیار ماڈلز درکار ہیں۔",
   ulraModeAllModelsFailed:
-    "جواب تیار ہونے سے پہلے اعلیٰ موڈ کے تمام ماڈلز ناکام ہو گئے۔",
+    "جواب تیار ہونے سے پہلے ماڈل کونسل کے تمام ماڈلز ناکام ہو گئے۔",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} اندرونی ماڈل کالز ناکام ہوئیں؛ حتمی جواب میں ${succeeded} کامیاب آرا استعمال ہوئیں۔`,
   sttTabDescription:

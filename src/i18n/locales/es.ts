@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const es = {
   ...conversationArtifactTranslations.es,
   ...interruptionTranslations.es,
   ...ulraAuditTranslations.es,
+  ...councilWorkspaceTranslations.es,
   ...dataBackupTranslations.es,
   ...conversationKnowledgeTranslations.es,
   ...imagePromptTranslations.es,
@@ -148,28 +150,28 @@ export const es = {
   useResponseMode: ({ mode }) => `Utiliza ${mode}`,
   chooseResponseModel: "Elige un modelo",
   responseModelCount: ({ count }) => `${count} modelos disponibles`,
-  ulraMode: "Modo supremo",
-  ulraModeHomeLabel: "Mostrar el Modo supremo en la pantalla de inicio",
+  ulraMode: "Consejo de modelos",
+  ulraModeHomeLabel: "Mostrar el Consejo de modelos en la pantalla de inicio",
   ulraModeSettingsDescription:
     "Permite la deliberación entre varios modelos cuando hay al menos dos modelos de inicio listos.",
   ulraModeInfo:
-    "El Modo supremo consulta por separado a cada modelo listo de la pantalla de inicio. En cada ronda, los modelos cuestionan la última posición de cada participante; las rondas restantes se omiten tras una convergencia unánime y explícita. El modelo seleccionado sintetiza las rondas completadas correctamente, conservando siempre la última posición de cada modelo. La deliberación se comparte con todos los proveedores implicados.",
+    "El Consejo de modelos consulta por separado a cada modelo listo de la pantalla de inicio. En cada ronda, los modelos cuestionan la última posición de cada participante; las rondas restantes se omiten tras una convergencia unánime y explícita. El modelo seleccionado sintetiza las rondas completadas correctamente, conservando siempre la última posición de cada modelo. La deliberación se comparte con todos los proveedores implicados.",
   ulraModeRounds: "Rondas de revisión",
   ulraModeCallEstimate: ({ count }) =>
     `Hasta ${count} llamadas a modelos por mensaje con la configuración actual.`,
   ulraModeThresholdWarning:
     "Más de 4 modelos o 3 rondas pueden tardar mucho, consumir muchos tokens y alcanzar los límites de contexto o de solicitudes del proveedor. Esto es solo una advertencia.",
-  ulraModeFirstUseTitle: "¿Activar el Modo supremo?",
+  ulraModeFirstUseTitle: "¿Activar el Consejo de modelos?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Con ${models} modelos y hasta ${rounds} rondas de revisión, un mensaje puede realizar hasta ${calls} llamadas a modelos. Puede tardar mucho más, costar bastante más y compartir la deliberación con todos los proveedores implicados.`,
-  ulraModeHighRiskTitle: "Ejecución extensa del Modo supremo",
+  ulraModeHighRiskTitle: "Ejecución extensa del Consejo de modelos",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos y ${rounds} rondas de revisión pueden realizar hasta ${calls} llamadas a modelos. Puede tardar mucho, usar muchos tokens y alcanzar límites del proveedor. ¿Continuar de todos modos?`,
   ulraModeEnableAction: "Activar",
   ulraModeNeedsTwoModels:
-    "El Modo supremo necesita al menos dos modelos listos en la pantalla de inicio.",
+    "El Consejo de modelos necesita al menos dos modelos listos en la pantalla de inicio.",
   ulraModeAllModelsFailed:
-    "Todos los modelos del Modo supremo fallaron antes de poder sintetizar una respuesta.",
+    "Todos los modelos del Consejo de modelos fallaron antes de poder sintetizar una respuesta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `Fallaron ${failed} llamadas internas a modelos; la respuesta final utilizó ${succeeded} contribuciones correctas.`,
   sttTabDescription:

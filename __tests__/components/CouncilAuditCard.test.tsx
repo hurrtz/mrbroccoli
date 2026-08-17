@@ -1,14 +1,14 @@
 import React from "react";
 import { fireEvent } from "@testing-library/react-native";
 
-import { UberModeAuditCard } from "../../src/components/chatBubble/UberModeAuditCard";
+import { CouncilAuditCard } from "../../src/components/chatBubble/CouncilAuditCard";
 import type { Message } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
-describe("UberModeAuditCard", () => {
+describe("CouncilAuditCard", () => {
   it("shows an expandable audit without exposing private contribution text", () => {
     const message: Message = {
-      id: "assistant-uber",
+      id: "assistant-council",
       role: "assistant",
       content: "Final answer",
       model: "gpt-5.4",
@@ -62,13 +62,15 @@ describe("UberModeAuditCard", () => {
         },
       },
     };
-    const screen = renderWithProviders(<UberModeAuditCard message={message} />);
+    const screen = renderWithProviders(<CouncilAuditCard message={message} />);
 
     expect(screen.getByText("Model Council audit")).toBeTruthy();
     expect(
       screen.queryByText("Reviews: 1 challenged · 0 converged · 0 unmarked"),
     ).toBeNull();
-    fireEvent.press(screen.getByTestId("uber-audit-toggle-assistant-uber"));
+    fireEvent.press(
+      screen.getByTestId("council-audit-toggle-assistant-council"),
+    );
 
     expect(
       screen.getByText(

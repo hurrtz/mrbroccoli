@@ -73,7 +73,7 @@ describe("latencyStats", () => {
     ).toBeGreaterThanOrEqual(40_000);
   });
 
-  it("separates and scales Uber response latency estimates", () => {
+  it("separates and scales Council response latency estimates", () => {
     const standardDescriptor = {
       phase: "llm-response" as const,
       provider: "openai" as const,
@@ -97,7 +97,7 @@ describe("latencyStats", () => {
     );
   });
 
-  it("separates Uber learning by participant routes and run outcome", () => {
+  it("separates Council learning by participant routes and run outcome", () => {
     const routes = [
       {
         provider: "openai" as const,
@@ -144,7 +144,7 @@ describe("latencyStats", () => {
     expect(changedRouteKey).not.toBe(fullKey);
   });
 
-  it("bases cold Uber estimates on the slowest configured participant", () => {
+  it("bases cold Council estimates on every sequential participant", () => {
     const createDescriptor = (participantModel: string) => ({
       phase: "llm-response" as const,
       provider: "xai" as const,
@@ -174,6 +174,23 @@ describe("latencyStats", () => {
         createDescriptor("claude-haiku-4-5-20251001"),
       ),
     );
+  });
+
+  it("includes a one-round Council in cold estimates", () => {
+    const standardDescriptor = {
+      phase: "llm-response" as const,
+      provider: "openai" as const,
+      model: "gpt-5.6-sol",
+      responseLength: "normal" as const,
+    };
+
+    expect(
+      getDefaultLatencyEstimateMs({
+        ...standardDescriptor,
+        ulraModelCount: 2,
+        ulraRounds: 0,
+      }),
+    ).toBe(getDefaultLatencyEstimateMs(standardDescriptor) * 3);
   });
 
   it("gives xhigh effort its own estimate between high and max", () => {

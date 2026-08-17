@@ -275,7 +275,16 @@ Portrait combines the selected route and summary in `WorkspaceHeader`, a
 quiet two-row raised block 14pt below the top bar. The summary lists the
 effective length, tone, and voice as translated `Label: value` pairs separated
 by middle dots, prefixed with Hands free while the session switch is enabled.
-Its text plus trailing glyph is one row-sized press target. Landscape and
+Its text plus trailing glyph is one row-sized press target. `pipelinePhase`
+leaving `idle` is the submission boundary: an ordinary turn locks both rows
+and dims the whole block without replacing its content. When the current turn
+has a Council configuration, typed `CouncilProgress` instead keeps the block
+full-strength and replaces its contents with the active participant plus
+model/round progress; synthesis reports the final route explicitly. The
+Council satellite opens an anchored transparent `CouncilPopover`; selected
+membership is session-local, while its one-to-five total-round control adapts
+the persisted review-round count by adding or subtracting the initial answer
+round. Landscape and
 regular iPad retain the byline plus compact conversation-settings control.
 
 When the native font scale reaches the accessibility-large range, the portrait

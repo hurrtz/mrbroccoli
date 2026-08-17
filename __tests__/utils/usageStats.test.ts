@@ -127,7 +127,7 @@ describe("usageStats", () => {
     );
   });
 
-  it("attributes Uber contributions to their actual model routes", () => {
+  it("attributes Council contributions to their actual model routes", () => {
     const routes = aggregateConversationUsageByRoute({
       messages: [
         {

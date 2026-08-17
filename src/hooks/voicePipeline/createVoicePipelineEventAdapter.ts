@@ -380,6 +380,9 @@ export function createVoicePipelineEventAdapter({
         payload:
           progress.stage === "round"
             ? {
+                activeModeId: progress.activeModeId,
+                activeModel: progress.activeModel,
+                activeProvider: progress.activeProvider,
                 completedModels: progress.completedModels,
                 currentRound: progress.currentRound,
                 failedModels: progress.failedModels,
@@ -391,6 +394,9 @@ export function createVoicePipelineEventAdapter({
               }
             : {
                 completedRounds: progress.completedRounds,
+                modeId: progress.modeId,
+                model: progress.model,
+                provider: progress.provider,
                 stage: progress.stage,
                 totalRounds: progress.totalRounds,
               },

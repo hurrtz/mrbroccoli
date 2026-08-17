@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const en = {
   ...conversationArtifactTranslations.en,
   ...interruptionTranslations.en,
   ...ulraAuditTranslations.en,
+  ...councilWorkspaceTranslations.en,
   ...dataBackupTranslations.en,
   ...conversationKnowledgeTranslations.en,
   ...imagePromptTranslations.en,

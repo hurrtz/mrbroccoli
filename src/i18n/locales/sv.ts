@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const sv = {
   ...conversationArtifactTranslations.sv,
   ...interruptionTranslations.sv,
   ...ulraAuditTranslations.sv,
+  ...councilWorkspaceTranslations.sv,
   ...dataBackupTranslations.sv,
   ...conversationKnowledgeTranslations.sv,
   ...imagePromptTranslations.sv,
@@ -146,28 +148,28 @@ export const sv = {
   useResponseMode: ({ mode }) => `Använd ${mode}`,
   chooseResponseModel: "Välj en modell",
   responseModelCount: ({ count }) => `${count} modeller tillgängliga`,
-  ulraMode: "Superläge",
-  ulraModeHomeLabel: "Visa Superläge på startskärmen",
+  ulraMode: "Modellråd",
+  ulraModeHomeLabel: "Visa Modellrådet på startskärmen",
   ulraModeSettingsDescription:
     "Tillåter överläggning mellan flera modeller när minst två modeller på startskärmen är redo.",
   ulraModeInfo:
-    "Superläget frågar först varje redo modell på startskärmen var för sig. I varje omgång ifrågasätter modellerna varje deltagares senaste ståndpunkt; återstående omgångar hoppas över efter uttrycklig enhällig samsyn. Den valda modellen sammanställer slutsvaret från lyckade omgångar och behåller alltid varje modells senaste ståndpunkt. Överläggningen delas med alla berörda leverantörer.",
+    "Modellrådet frågar först varje redo modell på startskärmen var för sig. I varje omgång ifrågasätter modellerna varje deltagares senaste ståndpunkt; återstående omgångar hoppas över efter uttrycklig enhällig samsyn. Den valda modellen sammanställer slutsvaret från lyckade omgångar och behåller alltid varje modells senaste ståndpunkt. Överläggningen delas med alla berörda leverantörer.",
   ulraModeRounds: "Granskningsomgångar",
   ulraModeCallEstimate: ({ count }) =>
     `Upp till ${count} modellanrop per meddelande med den aktuella konfigurationen.`,
   ulraModeThresholdWarning:
     "Fler än 4 modeller eller 3 omgångar kan ta mycket lång tid, använda många token och nå leverantörernas kontext- eller hastighetsgränser. Detta är bara en varning.",
-  ulraModeFirstUseTitle: "Aktivera Superläge?",
+  ulraModeFirstUseTitle: "Aktivera Modellrådet?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Med ${models} modeller och upp till ${rounds} granskningsomgångar kan ett meddelande göra upp till ${calls} modellanrop. Det kan ta mycket längre tid, kosta betydligt mer och dela överläggningen med alla berörda leverantörer.`,
-  ulraModeHighRiskTitle: "Stor körning i Superläge",
+  ulraModeHighRiskTitle: "Stor körning i Modellrådet",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modeller och ${rounds} granskningsomgångar kan göra upp till ${calls} modellanrop. Det kan ta mycket lång tid, använda många token och nå leverantörsgränser. Fortsätta ändå?`,
   ulraModeEnableAction: "Aktivera",
   ulraModeNeedsTwoModels:
-    "Superläget behöver minst två redo modeller på startskärmen.",
+    "Modellrådet behöver minst två redo modeller på startskärmen.",
   ulraModeAllModelsFailed:
-    "Alla modeller i Superläget misslyckades innan ett svar kunde sammanställas.",
+    "Alla modeller i Modellrådet misslyckades innan ett svar kunde sammanställas.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interna modellanrop misslyckades; det slutliga svaret använde ${succeeded} lyckade bidrag.`,
   sttTabDescription:

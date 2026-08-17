@@ -32,7 +32,7 @@ framework or hiding platform behavior behind excessive abstraction.
   target. It is shared by settings and workspace features rather than being
   feature-specific.
 - `VoiceOrb.tsx`, `OrbTransport.tsx`, `OrbSatellite.tsx`,
-  `AttachmentPopover.tsx`, `WorkspaceHeader.tsx`,
+  `AttachmentPopover.tsx`, `CouncilPopover.tsx`, `WorkspaceHeader.tsx`,
   `ConversationSettingsSummary.tsx`, and `TranscriptHandle.tsx` own the orb-centred
   workspace controls introduced by the approved design system. They are
   presentation-only: every string arrives translated from the caller, and the
@@ -40,8 +40,13 @@ framework or hiding platform behavior behind excessive abstraction.
   `OrbTransport` permanently reserves the orb plus four-key orbit footprint so
   phase changes cannot move the primary action. `AttachmentPopover` is an
   anchored, transparent, horizontally scrolling image-management surface.
-  `WorkspaceHeader` combines portrait route selection and the full-row
-  conversation-settings target. `OrbSatellite` and
+  `CouncilPopover` is the matching undimmed, anchored Council builder with
+  horizontally scrolling model membership, an accessible one-to-five-round
+  control, and permanent call arithmetic. `WorkspaceHeader` combines portrait
+  route selection and the full-row conversation-settings target, dims and
+  locks both rows during an ordinary submitted turn, and reuses the same
+  full-strength geometry for live Council participant and round progress.
+  `OrbSatellite` and
   `ConversationSettingsSummary` also expose icon-only compact
   forms that preserve their labelled 44-point control when the owning layout
   cannot safely render optional visible copy. The conversation summary's full

@@ -10,7 +10,6 @@ import {
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
 import { getProviderCircuitState } from "../../services/providerResilience";
-import type { UlraModeConfig } from "../../services/ulraMode";
 import type { AppLanguage, Provider, Settings } from "../../types";
 import {
   getEnabledSttProviders,
@@ -34,24 +33,16 @@ export function getMainScreenRouteConfiguration(
   const modelEffort = activeResponseRoute.effort;
   const availableResponseModes = getAvailableResponseModes(settings);
   const availableResponseModeSet = new Set(availableResponseModes);
-  const ulraMode: UlraModeConfig | undefined =
-    settings.ulraModeEnabled && settings.ulraModeActive
-      ? {
-          rounds: settings.ulraModeRounds,
-          routes: settings.responseModes
-            .filter(({ id }) => availableResponseModeSet.has(id))
-            .filter(
-              ({ route }) => !getProviderCircuitState(route.provider, "llm"),
-            )
-            .map(({ id, route }) => ({
-              apiKey: settings.apiKeys[route.provider].trim(),
-              modeId: id,
-              model: route.model,
-              modelEffort: route.effort,
-              provider: route.provider,
-            })),
-        }
-      : undefined;
+  const councilRoutes = settings.responseModes
+    .filter(({ id }) => availableResponseModeSet.has(id))
+    .filter(({ route }) => !getProviderCircuitState(route.provider, "llm"))
+    .map(({ id, route }) => ({
+      apiKey: settings.apiKeys[route.provider].trim(),
+      modeId: id,
+      model: route.model,
+      modelEffort: route.effort,
+      provider: route.provider,
+    }));
   const availableSttProviders = getEnabledSttProviders(settings);
   const availableTtsProviders = getEnabledTtsProviders(settings);
   const sttProvider =
@@ -93,6 +84,7 @@ export function getMainScreenRouteConfiguration(
   return {
     activeResponseMode,
     availableResponseModes,
+    councilRoutes,
     availableSttProviders,
     availableTtsProviders,
     globalSelectedTtsVoice,
@@ -107,7 +99,6 @@ export function getMainScreenRouteConfiguration(
     sttProvider,
     ttsApiKey,
     ttsProvider,
-    ulraMode: ulraMode && ulraMode.routes.length > 1 ? ulraMode : undefined,
     voiceInputDisabled:
       !conversationsLoaded ||
       !hasProviderCredentialForCapability(provider, providerApiKey, "llm"),

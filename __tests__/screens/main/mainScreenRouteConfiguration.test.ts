@@ -99,7 +99,7 @@ describe("mainScreenRouteConfiguration", () => {
     expect(result.globalSelectedTtsVoice).toBe("com.apple.voice.samantha");
   });
 
-  it("builds Uber routes only from ready home-screen models", () => {
+  it("builds Council routes only from ready home-screen models", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       activeResponseMode: "mode-1",
@@ -136,24 +136,23 @@ describe("mainScreenRouteConfiguration", () => {
       },
     };
 
-    expect(getMainScreenRouteConfiguration(settings, true).ulraMode).toEqual({
-      rounds: 5,
-      routes: [
-        {
-          apiKey: "openai-key",
-          modeId: "mode-1",
-          model: "gpt-test",
-          modelEffort: "high",
-          provider: "openai",
-        },
-        {
-          apiKey: "anthropic-key",
-          modeId: "mode-2",
-          model: "claude-test",
-          provider: "anthropic",
-        },
-      ],
-    });
+    expect(
+      getMainScreenRouteConfiguration(settings, true).councilRoutes,
+    ).toEqual([
+      {
+        apiKey: "openai-key",
+        modeId: "mode-1",
+        model: "gpt-test",
+        modelEffort: "high",
+        provider: "openai",
+      },
+      {
+        apiKey: "anthropic-key",
+        modeId: "mode-2",
+        model: "claude-test",
+        provider: "anthropic",
+      },
+    ]);
   });
 
   it("prefers live account voices for a directory-backed TTS provider", () => {

@@ -23,10 +23,12 @@ import {
  * model with no effort control reads "Normal".
  */
 export function MainScreenRouteByline({
+  disabled = false,
   mode,
   onPress,
   switchable,
 }: {
+  disabled?: boolean;
   mode: ResponseModeConfig;
   onPress: () => void;
   /** false when only one model is configured — the row becomes a credit line. */
@@ -46,10 +48,14 @@ export function MainScreenRouteByline({
       accessibilityLabel={
         `${modelName}. ${displayedEffortLabel}`
       }
-      accessibilityRole={switchable ? "button" : undefined}
-      disabled={!switchable}
-      onPress={switchable ? onPress : undefined}
-      style={[styles.row, { borderBottomColor: colors.border }]}
+      accessibilityRole={!disabled && switchable ? "button" : undefined}
+      disabled={disabled || !switchable}
+      onPress={!disabled && switchable ? onPress : undefined}
+      style={[
+        styles.row,
+        { borderBottomColor: colors.border },
+        disabled ? styles.disabled : null,
+      ]}
       testID="route-byline"
     >
       <ProviderIcon
@@ -114,5 +120,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     width: 44,
+  },
+  disabled: {
+    opacity: 0.38,
   },
 });

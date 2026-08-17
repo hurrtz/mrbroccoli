@@ -11,6 +11,7 @@ import { useBatteryDiagnostics } from "../hooks/useBatteryDiagnostics";
 import { useKokoroModel } from "../hooks/useKokoroModel";
 import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { getKokoroVoiceOptions } from "../constants/kokoro";
+import { getProviderModelName } from "../constants/models";
 import { getLocalModel } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -39,7 +40,7 @@ import { useProviderAvailabilityGuards } from "./main/useProviderAvailabilityGua
 import { useProviderConnectionValidation } from "./main/useProviderConnectionValidation";
 import { useTextTurnSubmitController } from "./main/useTextTurnSubmitController";
 import { useVoiceSessionController } from "./main/useVoiceSessionController";
-import { useUlraModeControl } from "./main/useUlraModeControl";
+import { useCouncilControl } from "./main/useCouncilControl";
 import { getKokoroPromptBlockState } from "./main/kokoroPromptBlockState";
 import { isSpeechInputUnavailable } from "./main/speechInputAvailability";
 import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
@@ -211,6 +212,7 @@ export function MainScreen() {
     availableResponseModes,
     availableSttProviders,
     availableTtsProviders,
+    councilRoutes,
     globalSelectedTtsVoice,
     model,
     modelEffort,
@@ -223,7 +225,6 @@ export function MainScreen() {
     sttProvider,
     ttsApiKey,
     ttsProvider,
-    ulraMode: ulraModeConfiguration,
     voiceInputDisabled,
     webSearchActive,
     webSearchApiKey,
@@ -264,12 +265,29 @@ export function MainScreen() {
       closeTranscriptSheet();
     }
   }, [closeTranscriptSheet, transcriptModalAvailable, transcriptSheetVisible]);
-  const ulraMode = useUlraModeControl({
-    availableModelCount: presentationAvailableResponseModes.length,
+  const council = useCouncilControl({
+    activeResponseMode,
+    availableModeIds: presentationAvailableResponseModes,
     settings: runtimeSettings,
-    t,
     updateSettings,
   });
+  const ulraModeConfiguration = React.useMemo(() => {
+    if (!council.active) {
+      return undefined;
+    }
+    const selectedModeIds = new Set(council.selectedModeIds);
+    const routes = councilRoutes.filter(({ modeId }) =>
+      selectedModeIds.has(modeId),
+    );
+    return routes.length > 1
+      ? { rounds: runtimeSettings.ulraModeRounds, routes }
+      : undefined;
+  }, [
+    council.active,
+    council.selectedModeIds,
+    councilRoutes,
+    runtimeSettings.ulraModeRounds,
+  ]);
   const {
     assistantInstructions,
     effectiveTtsInstructions,
@@ -457,6 +475,7 @@ export function MainScreen() {
 
   const {
     completedReplyVersion,
+    councilProgress,
     phaseProgress,
     pipelinePhase,
     setPipelinePhase,
@@ -526,6 +545,88 @@ export function MainScreen() {
 
   const isBusy = pipelinePhase !== "idle";
 
+  const councilModels = React.useMemo(
+    () =>
+      councilRoutes.map((route) => ({
+        id: route.modeId,
+        label: getProviderModelName(route.provider, route.model),
+        provider: route.provider,
+        selected: council.selectedModeIds.includes(route.modeId),
+      })),
+    [council.selectedModeIds, councilRoutes],
+  );
+  const councilHeaderReport = React.useMemo(() => {
+    if (!isBusy || !ulraModeConfiguration) {
+      return undefined;
+    }
+    const fallbackRoute = ulraModeConfiguration.routes[0];
+    const reportedRoute =
+      councilProgress?.stage === "round" &&
+      councilProgress.activeModel &&
+      councilProgress.activeProvider
+        ? {
+            model: councilProgress.activeModel,
+            provider: councilProgress.activeProvider,
+          }
+        : councilProgress?.stage === "synthesis"
+          ? {
+              model: councilProgress.model,
+              provider: councilProgress.provider,
+            }
+          : fallbackRoute;
+    const activeRoute = reportedRoute ?? fallbackRoute;
+    if (!activeRoute) {
+      return undefined;
+    }
+    const summary =
+      councilProgress?.stage === "synthesis"
+        ? `${t("councilModelsDone", {
+            completed: ulraModeConfiguration.routes.length,
+            total: ulraModeConfiguration.routes.length,
+          })} · ${t("councilSynthesizing")}`
+        : [
+            t("councilModelsDone", {
+              completed:
+                councilProgress?.stage === "round"
+                  ? councilProgress.completedModels
+                  : 0,
+              total:
+                councilProgress?.stage === "round"
+                  ? councilProgress.totalModels
+                  : ulraModeConfiguration.routes.length,
+            }),
+            councilProgress?.stage === "round" &&
+            councilProgress.failedModels > 0
+              ? t("councilFailedProgress", {
+                  count: councilProgress.failedModels,
+                })
+              : null,
+            t("councilRoundProgress", {
+              current:
+                councilProgress?.stage === "round"
+                  ? councilProgress.currentRound
+                  : 1,
+              total:
+                councilProgress?.stage === "round"
+                  ? councilProgress.totalRounds
+                  : runtimeSettings.ulraModeRounds + 1,
+            }),
+          ]
+            .filter(Boolean)
+            .join(" · ");
+    return {
+      modelName: getProviderModelName(activeRoute.provider, activeRoute.model),
+      provider: activeRoute.provider,
+      summary,
+    };
+  }, [
+    councilProgress,
+    isBusy,
+    runtimeSettings.ulraModeRounds,
+    t,
+    ulraModeConfiguration,
+  ]);
+
   const imageRoutes = React.useMemo(
     () => [
       { provider, model },
@@ -552,7 +653,6 @@ export function MainScreen() {
     drawerModalVisible ||
     imageSourceVisible ||
     Boolean(imagePromptSubmission.consent) ||
-    Boolean(ulraMode.confirmation) ||
     routePickerVisible ||
     settingsVisible ||
     styleSheetVisible ||
@@ -941,16 +1041,6 @@ export function MainScreen() {
   return (
     <MainScreenPresentation
       colors={colors}
-      councilDisclosure={{
-        cancelLabel: t("cancel"),
-        confirmLabel: t("ulraModeEnableAction"),
-        message: ulraMode.confirmation?.message ?? "",
-        onCancel: ulraMode.cancelConfirmation,
-        onConfirm: ulraMode.confirmEnable,
-        testID: "model-council-disclosure-message",
-        title: ulraMode.confirmation?.title ?? t("ulraMode"),
-        visible: Boolean(ulraMode.confirmation),
-      }}
       imageConsent={{
         cancelLabel: t("dismiss"),
         confirmLabel: t("imageProviderConsentConfirm"),
@@ -1005,8 +1095,10 @@ export function MainScreen() {
           availableResponseModes: loaded
             ? presentationAvailableResponseModes
             : [],
+          councilReport: councilHeaderReport,
           onOpenRoutePicker: openRoutePicker,
           responseModes: runtimeSettings.responseModes,
+          running: isBusy,
           t,
         },
         routePicker: {
@@ -1019,15 +1111,24 @@ export function MainScreen() {
         },
         satellites: {
           attachments: pendingImages.attachments,
-          councilActive: ulraMode.active,
-          councilAvailable: ulraMode.available,
+          councilActive: council.active,
+          councilAvailable: council.available,
+          councilCostSummary: t("councilCostSummary", {
+            answers: council.selectedModeIds.length * council.totalRounds,
+            models: council.selectedModeIds.length,
+            rounds: council.totalRounds,
+          }),
+          councilModels,
+          councilRounds: council.totalRounds,
+          councilRoundsLabel: t("councilRounds"),
           disabled: voiceStageActive,
           handsFreeActive: handsFreeEnabled,
           imageAvailable: imageAttachmentAvailable,
           imageDisabled: imageAttachmentDisabled,
           onAddImage: imagePromptSubmission.handleAddImage,
           onRemoveImage: pendingImages.handleRemoveImage,
-          onToggleCouncil: ulraMode.handleToggle,
+          onChangeCouncilRounds: council.setTotalRounds,
+          onToggleCouncilModel: council.toggleMode,
           onToggleHandsFree: handleToggleHandsFree,
           onToggleWeb: handleToggleWebSearch,
           t,

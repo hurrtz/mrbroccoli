@@ -26,7 +26,7 @@ const define = (value: UlraAuditTranslations) => value;
 const rawUlraAuditTranslations = {
   en,
   de: define({
-    ulraAuditTitle: "Übermodus-Prüfpfad",
+    ulraAuditTitle: "Modellrat-Prüfpfad",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} erfolgreich · ${failed} fehlgeschlagen · ${rounds} Prüfrunden`,
     ulraAuditConverged: "Alle aktiven Prüfenden sind ausdrücklich konvergiert.",
@@ -40,11 +40,11 @@ const rawUlraAuditTranslations = {
       `Syntheseverlauf: ${retained} behalten · ${omitted} ausgelassen · ${tokens} Zwischentokens`,
     ulraAuditRoutes: "Teilnehmerrouten",
     ulraAuditContract: ({ contract }) => `Synthesevertrag: ${contract}`,
-    expandUlraAudit: "Übermodus-Prüfpfad anzeigen",
-    collapseUlraAudit: "Übermodus-Prüfpfad ausblenden",
+    expandUlraAudit: "Modellrat-Prüfpfad anzeigen",
+    collapseUlraAudit: "Modellrat-Prüfpfad ausblenden",
   }),
   uk: define({
-    ulraAuditTitle: "Аудит Суперрежиму",
+    ulraAuditTitle: "Аудит Ради моделей",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} успішно · ${failed} невдало · ${rounds} раундів перегляду`,
     ulraAuditConverged: "Усі активні рецензенти явно дійшли згоди.",
@@ -58,11 +58,11 @@ const rawUlraAuditTranslations = {
       `Історія синтезу: ${retained} збережено · ${omitted} пропущено · ${tokens} проміжних токенів`,
     ulraAuditRoutes: "Маршрути учасників",
     ulraAuditContract: ({ contract }) => `Контракт синтезу: ${contract}`,
-    expandUlraAudit: "Показати аудит Суперрежиму",
-    collapseUlraAudit: "Сховати аудит Суперрежиму",
+    expandUlraAudit: "Показати аудит Ради моделей",
+    collapseUlraAudit: "Сховати аудит Ради моделей",
   }),
   hi: define({
-    ulraAuditTitle: "सर्वोच्च मोड ऑडिट",
+    ulraAuditTitle: "मॉडल परिषद ऑडिट",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} सफल · ${failed} विफल · ${rounds} समीक्षा दौर`,
     ulraAuditConverged: "सभी सक्रिय समीक्षक स्पष्ट रूप से सहमत हुए।",
@@ -76,11 +76,11 @@ const rawUlraAuditTranslations = {
       `संश्लेषण इतिहास: ${retained} रखे · ${omitted} छोड़े · ${tokens} मध्यवर्ती टोकन`,
     ulraAuditRoutes: "प्रतिभागी रूट",
     ulraAuditContract: ({ contract }) => `संश्लेषण अनुबंध: ${contract}`,
-    expandUlraAudit: "सर्वोच्च मोड ऑडिट दिखाएँ",
-    collapseUlraAudit: "सर्वोच्च मोड ऑडिट छिपाएँ",
+    expandUlraAudit: "मॉडल परिषद ऑडिट दिखाएँ",
+    collapseUlraAudit: "मॉडल परिषद ऑडिट छिपाएँ",
   }),
   es: define({
-    ulraAuditTitle: "Auditoría de Modo supremo",
+    ulraAuditTitle: "Auditoría del Consejo de modelos",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} correctas · ${failed} fallidas · ${rounds} rondas de revisión`,
     ulraAuditConverged:
@@ -95,11 +95,11 @@ const rawUlraAuditTranslations = {
       `Historial de síntesis: ${retained} retenidas · ${omitted} omitidas · ${tokens} tokens intermedios`,
     ulraAuditRoutes: "Rutas participantes",
     ulraAuditContract: ({ contract }) => `Contrato de síntesis: ${contract}`,
-    expandUlraAudit: "Mostrar auditoría de Modo supremo",
-    collapseUlraAudit: "Ocultar auditoría de Modo supremo",
+    expandUlraAudit: "Mostrar auditoría del Consejo de modelos",
+    collapseUlraAudit: "Ocultar auditoría del Consejo de modelos",
   }),
   fr: define({
-    ulraAuditTitle: "Audit Mode suprême",
+    ulraAuditTitle: "Audit du Conseil des modèles",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} réussis · ${failed} échoués · ${rounds} tours de révision`,
     ulraAuditConverged:
@@ -114,11 +114,11 @@ const rawUlraAuditTranslations = {
       `Historique de synthèse : ${retained} retenues · ${omitted} omises · ${tokens} jetons intermédiaires`,
     ulraAuditRoutes: "Routes participantes",
     ulraAuditContract: ({ contract }) => `Contrat de synthèse : ${contract}`,
-    expandUlraAudit: "Afficher l’audit Mode suprême",
-    collapseUlraAudit: "Masquer l’audit Mode suprême",
+    expandUlraAudit: "Afficher l’audit du Conseil des modèles",
+    collapseUlraAudit: "Masquer l’audit du Conseil des modèles",
   }),
   it: define({
-    ulraAuditTitle: "Audit Modalità suprema",
+    ulraAuditTitle: "Audit del Consiglio dei modelli",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} riuscite · ${failed} fallite · ${rounds} round di revisione`,
     ulraAuditConverged:
@@ -133,11 +133,11 @@ const rawUlraAuditTranslations = {
       `Cronologia sintesi: ${retained} mantenuti · ${omitted} omessi · ${tokens} token intermedi`,
     ulraAuditRoutes: "Percorsi dei partecipanti",
     ulraAuditContract: ({ contract }) => `Contratto di sintesi: ${contract}`,
-    expandUlraAudit: "Mostra audit Modalità suprema",
-    collapseUlraAudit: "Nascondi audit Modalità suprema",
+    expandUlraAudit: "Mostra audit del Consiglio dei modelli",
+    collapseUlraAudit: "Nascondi audit del Consiglio dei modelli",
   }),
   pt: define({
-    ulraAuditTitle: "Auditoria do Modo Supremo",
+    ulraAuditTitle: "Auditoria do Conselho de Modelos",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} bem-sucedidas · ${failed} falhadas · ${rounds} rondas de revisão`,
     ulraAuditConverged: "Todos os revisores ativos convergiram explicitamente.",
@@ -151,11 +151,11 @@ const rawUlraAuditTranslations = {
       `Histórico de síntese: ${retained} mantidas · ${omitted} omitidas · ${tokens} tokens intermédios`,
     ulraAuditRoutes: "Rotas dos participantes",
     ulraAuditContract: ({ contract }) => `Contrato de síntese: ${contract}`,
-    expandUlraAudit: "Mostrar auditoria do Modo Supremo",
-    collapseUlraAudit: "Ocultar auditoria do Modo Supremo",
+    expandUlraAudit: "Mostrar auditoria do Conselho de Modelos",
+    collapseUlraAudit: "Ocultar auditoria do Conselho de Modelos",
   }),
   ptBR: define({
-    ulraAuditTitle: "Auditoria do Modo Supremo",
+    ulraAuditTitle: "Auditoria do Conselho de Modelos",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} bem-sucedidas · ${failed} com falha · ${rounds} rodadas de revisão`,
     ulraAuditConverged: "Todos os revisores ativos convergiram explicitamente.",
@@ -169,11 +169,11 @@ const rawUlraAuditTranslations = {
       `Histórico de síntese: ${retained} mantidas · ${omitted} omitidas · ${tokens} tokens intermediários`,
     ulraAuditRoutes: "Rotas dos participantes",
     ulraAuditContract: ({ contract }) => `Contrato de síntese: ${contract}`,
-    expandUlraAudit: "Mostrar auditoria do Modo Supremo",
-    collapseUlraAudit: "Ocultar auditoria do Modo Supremo",
+    expandUlraAudit: "Mostrar auditoria do Conselho de Modelos",
+    collapseUlraAudit: "Ocultar auditoria do Conselho de Modelos",
   }),
   ru: define({
-    ulraAuditTitle: "Аудит Суперрежима",
+    ulraAuditTitle: "Аудит Совета моделей",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} успешно · ${failed} неудачно · ${rounds} раундов проверки`,
     ulraAuditConverged: "Все активные рецензенты явно достигли согласия.",
@@ -187,11 +187,11 @@ const rawUlraAuditTranslations = {
       `История синтеза: ${retained} сохранено · ${omitted} пропущено · ${tokens} промежуточных токенов`,
     ulraAuditRoutes: "Маршруты участников",
     ulraAuditContract: ({ contract }) => `Контракт синтеза: ${contract}`,
-    expandUlraAudit: "Показать аудит Суперрежима",
-    collapseUlraAudit: "Скрыть аудит Суперрежима",
+    expandUlraAudit: "Показать аудит Совета моделей",
+    collapseUlraAudit: "Скрыть аудит Совета моделей",
   }),
   "zh-CN": define({
-    ulraAuditTitle: "终极模式审计",
+    ulraAuditTitle: "模型委员会审计",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} 次成功 · ${failed} 次失败 · ${rounds} 轮复核`,
     ulraAuditConverged: "所有活跃审查者均明确达成一致。",
@@ -204,11 +204,11 @@ const rawUlraAuditTranslations = {
       `综合历史：保留 ${retained} 条 · 省略 ${omitted} 条 · ${tokens} 个中间令牌`,
     ulraAuditRoutes: "参与者路由",
     ulraAuditContract: ({ contract }) => `综合规则：${contract}`,
-    expandUlraAudit: "显示终极模式审计",
-    collapseUlraAudit: "隐藏终极模式审计",
+    expandUlraAudit: "显示模型委员会审计",
+    collapseUlraAudit: "隐藏模型委员会审计",
   }),
   ar: define({
-    ulraAuditTitle: "تدقيق الوضع الفائق",
+    ulraAuditTitle: "تدقيق مجلس النماذج",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} ناجحة · ${failed} فاشلة · ${rounds} جولات مراجعة`,
     ulraAuditConverged: "توصل جميع المراجعين النشطين إلى توافق صريح.",
@@ -222,11 +222,11 @@ const rawUlraAuditTranslations = {
       `سجل التوليف: ${retained} محفوظة · ${omitted} محذوفة · ${tokens} رموز وسيطة`,
     ulraAuditRoutes: "مسارات المشاركين",
     ulraAuditContract: ({ contract }) => `عقد التوليف: ${contract}`,
-    expandUlraAudit: "إظهار تدقيق الوضع الفائق",
-    collapseUlraAudit: "إخفاء تدقيق الوضع الفائق",
+    expandUlraAudit: "إظهار تدقيق مجلس النماذج",
+    collapseUlraAudit: "إخفاء تدقيق مجلس النماذج",
   }),
   ja: define({
-    ulraAuditTitle: "究極モード 監査",
+    ulraAuditTitle: "モデル評議会 監査",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `成功 ${successful} 件 · 失敗 ${failed} 件 · レビュー ${rounds} ラウンド`,
     ulraAuditConverged: "すべての有効なレビュアーが明示的に収束しました。",
@@ -240,11 +240,11 @@ const rawUlraAuditTranslations = {
       `統合履歴：保持 ${retained} 件 · 省略 ${omitted} 件 · 中間トークン ${tokens}`,
     ulraAuditRoutes: "参加ルート",
     ulraAuditContract: ({ contract }) => `統合契約：${contract}`,
-    expandUlraAudit: "究極モード 監査を表示",
-    collapseUlraAudit: "究極モード 監査を非表示",
+    expandUlraAudit: "モデル評議会 監査を表示",
+    collapseUlraAudit: "モデル評議会 監査を非表示",
   }),
   hu: define({
-    ulraAuditTitle: "Szuper mód audit",
+    ulraAuditTitle: "Modelltanács-audit",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} sikeres · ${failed} sikertelen · ${rounds} felülvizsgálati kör`,
     ulraAuditConverged: "Minden aktív ellenőrző kifejezetten egyetértett.",
@@ -258,11 +258,11 @@ const rawUlraAuditTranslations = {
       `Szintézistörténet: ${retained} megtartva · ${omitted} kihagyva · ${tokens} köztes token`,
     ulraAuditRoutes: "Résztvevői útvonalak",
     ulraAuditContract: ({ contract }) => `Szintézisszerződés: ${contract}`,
-    expandUlraAudit: "Szuper mód audit megjelenítése",
-    collapseUlraAudit: "Szuper mód audit elrejtése",
+    expandUlraAudit: "Modelltanács-audit megjelenítése",
+    collapseUlraAudit: "Modelltanács-audit elrejtése",
   }),
   cs: define({
-    ulraAuditTitle: "Audit Superrežimu",
+    ulraAuditTitle: "Audit Rady modelů",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} úspěšných · ${failed} neúspěšných · ${rounds} kol kontroly`,
     ulraAuditConverged:
@@ -277,11 +277,11 @@ const rawUlraAuditTranslations = {
       `Historie syntézy: ${retained} zachováno · ${omitted} vynecháno · ${tokens} průběžných tokenů`,
     ulraAuditRoutes: "Trasy účastníků",
     ulraAuditContract: ({ contract }) => `Pravidla syntézy: ${contract}`,
-    expandUlraAudit: "Zobrazit audit Superrežimu",
-    collapseUlraAudit: "Skrýt audit Superrežimu",
+    expandUlraAudit: "Zobrazit audit Rady modelů",
+    collapseUlraAudit: "Skrýt audit Rady modelů",
   }),
   pl: define({
-    ulraAuditTitle: "Audyt Supertrybu",
+    ulraAuditTitle: "Audyt Rady modeli",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} udanych · ${failed} nieudanych · ${rounds} rund przeglądu`,
     ulraAuditConverged:
@@ -296,11 +296,11 @@ const rawUlraAuditTranslations = {
       `Historia syntezy: ${retained} zachowano · ${omitted} pominięto · ${tokens} tokenów pośrednich`,
     ulraAuditRoutes: "Trasy uczestników",
     ulraAuditContract: ({ contract }) => `Kontrakt syntezy: ${contract}`,
-    expandUlraAudit: "Pokaż audyt Supertrybu",
-    collapseUlraAudit: "Ukryj audyt Supertrybu",
+    expandUlraAudit: "Pokaż audyt Rady modeli",
+    collapseUlraAudit: "Ukryj audyt Rady modeli",
   }),
   tr: define({
-    ulraAuditTitle: "Süper Mod denetimi",
+    ulraAuditTitle: "Model Konseyi denetimi",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} başarılı · ${failed} başarısız · ${rounds} inceleme turu`,
     ulraAuditConverged: "Tüm etkin inceleyiciler açıkça uzlaştı.",
@@ -314,11 +314,11 @@ const rawUlraAuditTranslations = {
       `Sentez geçmişi: ${retained} tutuldu · ${omitted} atlandı · ${tokens} ara token`,
     ulraAuditRoutes: "Katılımcı rotaları",
     ulraAuditContract: ({ contract }) => `Sentez sözleşmesi: ${contract}`,
-    expandUlraAudit: "Süper Mod denetimini göster",
-    collapseUlraAudit: "Süper Mod denetimini gizle",
+    expandUlraAudit: "Model Konseyi denetimini göster",
+    collapseUlraAudit: "Model Konseyi denetimini gizle",
   }),
   sv: define({
-    ulraAuditTitle: "Superläge-granskning",
+    ulraAuditTitle: "Modellrådsgranskning",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} lyckade · ${failed} misslyckade · ${rounds} granskningsomgångar`,
     ulraAuditConverged: "Alla aktiva granskare nådde uttrycklig samsyn.",
@@ -332,11 +332,11 @@ const rawUlraAuditTranslations = {
       `Synteshistorik: ${retained} behållna · ${omitted} utelämnade · ${tokens} mellanliggande token`,
     ulraAuditRoutes: "Deltagarrutter",
     ulraAuditContract: ({ contract }) => `Synteskontrakt: ${contract}`,
-    expandUlraAudit: "Visa Superläge-granskning",
-    collapseUlraAudit: "Dölj Superläge-granskning",
+    expandUlraAudit: "Visa Modellrådsgranskning",
+    collapseUlraAudit: "Dölj Modellrådsgranskning",
   }),
   ur: define({
-    ulraAuditTitle: "اعلیٰ موڈ آڈٹ",
+    ulraAuditTitle: "ماڈل کونسل آڈٹ",
     ulraAuditSummary: ({ failed, rounds, successful }) =>
       `${successful} کامیاب · ${failed} ناکام · ${rounds} جائزہ ادوار`,
     ulraAuditConverged: "تمام فعال جائزہ کار واضح طور پر متفق ہوئے۔",
@@ -350,46 +350,46 @@ const rawUlraAuditTranslations = {
       `ترکیبی تاریخ: ${retained} محفوظ · ${omitted} چھوڑے گئے · ${tokens} درمیانی ٹوکن`,
     ulraAuditRoutes: "شرکاء کے راستے",
     ulraAuditContract: ({ contract }) => `ترکیبی معاہدہ: ${contract}`,
-    expandUlraAudit: "اعلیٰ موڈ آڈٹ دکھائیں",
-    collapseUlraAudit: "اعلیٰ موڈ آڈٹ چھپائیں",
+    expandUlraAudit: "ماڈل کونسل آڈٹ دکھائیں",
+    collapseUlraAudit: "ماڈل کونسل آڈٹ چھپائیں",
   }),
 } as const;
 
-type UberAuditTranslations = {
-  uberAuditTitle: UlraAuditTranslations["ulraAuditTitle"];
-  uberAuditSummary: UlraAuditTranslations["ulraAuditSummary"];
-  uberAuditConverged: UlraAuditTranslations["ulraAuditConverged"];
-  uberAuditUnresolved: UlraAuditTranslations["ulraAuditUnresolved"];
-  uberAuditCalls: UlraAuditTranslations["ulraAuditCalls"];
-  uberAuditReviews: UlraAuditTranslations["ulraAuditReviews"];
-  uberAuditHistory: UlraAuditTranslations["ulraAuditHistory"];
-  uberAuditRoutes: UlraAuditTranslations["ulraAuditRoutes"];
-  uberAuditContract: UlraAuditTranslations["ulraAuditContract"];
-  expandUberAudit: UlraAuditTranslations["expandUlraAudit"];
-  collapseUberAudit: UlraAuditTranslations["collapseUlraAudit"];
+type CouncilAuditTranslations = {
+  councilAuditTitle: UlraAuditTranslations["ulraAuditTitle"];
+  councilAuditSummary: UlraAuditTranslations["ulraAuditSummary"];
+  councilAuditConverged: UlraAuditTranslations["ulraAuditConverged"];
+  councilAuditUnresolved: UlraAuditTranslations["ulraAuditUnresolved"];
+  councilAuditCalls: UlraAuditTranslations["ulraAuditCalls"];
+  councilAuditReviews: UlraAuditTranslations["ulraAuditReviews"];
+  councilAuditHistory: UlraAuditTranslations["ulraAuditHistory"];
+  councilAuditRoutes: UlraAuditTranslations["ulraAuditRoutes"];
+  councilAuditContract: UlraAuditTranslations["ulraAuditContract"];
+  expandCouncilAudit: UlraAuditTranslations["expandUlraAudit"];
+  collapseCouncilAudit: UlraAuditTranslations["collapseUlraAudit"];
 };
 
-const exposeUberAuditTranslations = (
+const exposeCouncilAuditTranslations = (
   value: UlraAuditTranslations,
-): UberAuditTranslations => ({
-  uberAuditTitle: value.ulraAuditTitle,
-  uberAuditSummary: value.ulraAuditSummary,
-  uberAuditConverged: value.ulraAuditConverged,
-  uberAuditUnresolved: value.ulraAuditUnresolved,
-  uberAuditCalls: value.ulraAuditCalls,
-  uberAuditReviews: value.ulraAuditReviews,
-  uberAuditHistory: value.ulraAuditHistory,
-  uberAuditRoutes: value.ulraAuditRoutes,
-  uberAuditContract: value.ulraAuditContract,
-  expandUberAudit: value.expandUlraAudit,
-  collapseUberAudit: value.collapseUlraAudit,
+): CouncilAuditTranslations => ({
+  councilAuditTitle: value.ulraAuditTitle,
+  councilAuditSummary: value.ulraAuditSummary,
+  councilAuditConverged: value.ulraAuditConverged,
+  councilAuditUnresolved: value.ulraAuditUnresolved,
+  councilAuditCalls: value.ulraAuditCalls,
+  councilAuditReviews: value.ulraAuditReviews,
+  councilAuditHistory: value.ulraAuditHistory,
+  councilAuditRoutes: value.ulraAuditRoutes,
+  councilAuditContract: value.ulraAuditContract,
+  expandCouncilAudit: value.expandUlraAudit,
+  collapseCouncilAudit: value.collapseUlraAudit,
 });
 
 export const ulraAuditTranslations = Object.fromEntries(
   Object.entries(rawUlraAuditTranslations).map(([locale, value]) => [
     locale,
-    exposeUberAuditTranslations(value),
+    exposeCouncilAuditTranslations(value),
   ]),
 ) as {
-  [Locale in keyof typeof rawUlraAuditTranslations]: UberAuditTranslations;
+  [Locale in keyof typeof rawUlraAuditTranslations]: CouncilAuditTranslations;
 };

@@ -7,6 +7,10 @@ import {
   type AttachmentPopoverAnchor,
 } from "../../design-system/AttachmentPopover";
 import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
+import {
+  CouncilPopover,
+  type CouncilPopoverModel,
+} from "../../design-system/CouncilPopover";
 import { IconButton } from "../../design-system/IconButton";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
 import { TranscriptHandle } from "../../design-system/TranscriptHandle";
@@ -31,14 +35,19 @@ interface WorkspaceSatellitesProps {
   compact?: boolean;
   councilActive: boolean;
   councilAvailable: boolean;
+  councilCostSummary: string;
+  councilModels: CouncilPopoverModel[];
+  councilRounds: number;
+  councilRoundsLabel: string;
   disabled: boolean;
   imageAvailable: boolean;
   imageDisabled: boolean;
   handsFreeActive: boolean;
   onAddImage?: () => void;
+  onChangeCouncilRounds: (rounds: number) => void;
   onRemoveImage?: (attachmentId: string) => void;
   onToggleHandsFree: () => void;
-  onToggleCouncil?: () => void;
+  onToggleCouncilModel: (modeId: string) => void;
   onToggleWeb?: () => void;
   t: TranslateFn;
   turnActive: boolean;
@@ -56,14 +65,19 @@ function WorkspaceSatellites({
   compact = false,
   councilActive,
   councilAvailable,
+  councilCostSummary,
+  councilModels,
+  councilRounds,
+  councilRoundsLabel,
   handsFreeActive,
   disabled,
   imageAvailable,
   imageDisabled,
   onAddImage,
+  onChangeCouncilRounds,
   onRemoveImage,
   onToggleHandsFree,
-  onToggleCouncil,
+  onToggleCouncilModel,
   onToggleWeb,
   t,
   turnActive,
@@ -71,14 +85,25 @@ function WorkspaceSatellites({
   webAvailable,
 }: WorkspaceSatellitesProps) {
   const imageAnchorRef = React.useRef<View>(null);
+  const councilAnchorRef = React.useRef<View>(null);
   const previousAttachmentCountRef = React.useRef(attachments.length);
   const [imagePopoverAnchor, setImagePopoverAnchor] =
     React.useState<AttachmentPopoverAnchor | null>(null);
   const [imagePopoverVisible, setImagePopoverVisible] = React.useState(false);
+  const [councilPopoverAnchor, setCouncilPopoverAnchor] =
+    React.useState<AttachmentPopoverAnchor | null>(null);
+  const [councilPopoverVisible, setCouncilPopoverVisible] =
+    React.useState(false);
   const openImagePopover = React.useCallback(() => {
     imageAnchorRef.current?.measureInWindow((x, y, width, height) => {
       setImagePopoverAnchor({ height, width, x, y });
       setImagePopoverVisible(true);
+    });
+  }, []);
+  const openCouncilPopover = React.useCallback(() => {
+    councilAnchorRef.current?.measureInWindow((x, y, width, height) => {
+      setCouncilPopoverAnchor({ height, width, x, y });
+      setCouncilPopoverVisible(true);
     });
   }, []);
 
@@ -93,6 +118,7 @@ function WorkspaceSatellites({
   React.useEffect(() => {
     if (turnActive) {
       setImagePopoverVisible(false);
+      setCouncilPopoverVisible(false);
     }
   }, [turnActive]);
 
@@ -101,6 +127,8 @@ function WorkspaceSatellites({
   return (
     <>
       <View
+        collapsable={false}
+        ref={councilAnchorRef}
         style={[
           workspaceStyles.satellites,
           compact ? workspaceStyles.satellitesCompact : null,
@@ -132,7 +160,7 @@ function WorkspaceSatellites({
           icon="council"
           kind="toggle"
           label={t("workspaceCouncilLabel")}
-          onPress={councilAvailable ? onToggleCouncil : undefined}
+          onPress={councilAvailable ? openCouncilPopover : undefined}
           testID="satellite-council"
         />
         <OrbSatellite
@@ -174,6 +202,17 @@ function WorkspaceSatellites({
           visible={imagePopoverVisible}
         />
       ) : null}
+      <CouncilPopover
+        anchor={councilPopoverAnchor}
+        costSummary={councilCostSummary}
+        models={councilModels}
+        onChangeRounds={onChangeCouncilRounds}
+        onClose={() => setCouncilPopoverVisible(false)}
+        onToggleModel={onToggleCouncilModel}
+        rounds={councilRounds}
+        roundsLabel={councilRoundsLabel}
+        visible={councilPopoverVisible}
+      />
     </>
   );
 }
@@ -258,13 +297,18 @@ export function MainScreenWorkspace({
     attachments,
     councilActive,
     councilAvailable,
+    councilCostSummary,
+    councilModels,
+    councilRounds,
+    councilRoundsLabel,
     disabled: satellitesDisabled,
     handsFreeActive,
     imageAvailable,
     imageDisabled,
     onAddImage,
+    onChangeCouncilRounds,
     onRemoveImage,
-    onToggleCouncil,
+    onToggleCouncilModel,
     onToggleHandsFree,
     onToggleWeb,
     t: translateSatellite,
@@ -278,13 +322,18 @@ export function MainScreenWorkspace({
         compact={useAccessibilityCompactLayout}
         councilActive={councilActive}
         councilAvailable={councilAvailable}
+        councilCostSummary={councilCostSummary}
+        councilModels={councilModels}
+        councilRounds={councilRounds}
+        councilRoundsLabel={councilRoundsLabel}
         disabled={satellitesDisabled}
         handsFreeActive={handsFreeActive}
         imageAvailable={imageAvailable}
         imageDisabled={imageDisabled}
         onAddImage={onAddImage}
+        onChangeCouncilRounds={onChangeCouncilRounds}
         onRemoveImage={onRemoveImage}
-        onToggleCouncil={onToggleCouncil}
+        onToggleCouncilModel={onToggleCouncilModel}
         onToggleHandsFree={onToggleHandsFree}
         onToggleWeb={onToggleWeb}
         t={translateSatellite}
@@ -297,12 +346,17 @@ export function MainScreenWorkspace({
       attachments,
       councilActive,
       councilAvailable,
+      councilCostSummary,
+      councilModels,
+      councilRounds,
+      councilRoundsLabel,
       handsFreeActive,
       imageAvailable,
       imageDisabled,
       onAddImage,
+      onChangeCouncilRounds,
       onRemoveImage,
-      onToggleCouncil,
+      onToggleCouncilModel,
       onToggleHandsFree,
       onToggleWeb,
       satellitesDisabled,
@@ -348,6 +402,7 @@ export function MainScreenWorkspace({
             <ConversationSettingsSummary
               accessibilityLabel={settingsSummary.accessibilityLabel}
               compact
+              disabled={routeCardProps.running}
               onPress={settingsSummary.onPress}
               summary={settingsSummary.summary}
               testID="conversation-settings-summary"
@@ -470,6 +525,7 @@ export function MainScreenWorkspace({
             <ConversationSettingsSummary
               accessibilityLabel={settingsSummary.accessibilityLabel}
               compact
+              disabled={routeCardProps.running}
               onPress={settingsSummary.onPress}
               style={workspaceStyles.landscapeSettingsControl}
               summary={settingsSummary.summary}

@@ -138,7 +138,7 @@ describe("ThinkingSettingsPage response modes", () => {
         },
         responseModes,
         ulraModeEnabled: true,
-        ulraModeRounds: 5,
+        ulraModeRounds: 4,
       },
       { onUpdate },
     );
@@ -149,11 +149,11 @@ describe("ThinkingSettingsPage response modes", () => {
     expect(screen.getByTestId("ulra-mode-threshold-warning")).toBeTruthy();
     expect(
       screen.getByText(
-        "Up to 25 model calls per message with the current setup.",
+        "Up to 21 model calls per message with the current setup.",
       ),
     ).toBeTruthy();
 
     fireEvent.press(screen.getByTestId("thinking-council-rounds-3"));
-    expect(onUpdate).toHaveBeenCalledWith({ ulraModeRounds: 3 });
+    expect(onUpdate).toHaveBeenCalledWith({ ulraModeRounds: 2 });
   });
 });

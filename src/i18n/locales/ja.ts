@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const ja = {
   ...conversationArtifactTranslations.ja,
   ...interruptionTranslations.ja,
   ...ulraAuditTranslations.ja,
+  ...councilWorkspaceTranslations.ja,
   ...dataBackupTranslations.ja,
   ...conversationKnowledgeTranslations.ja,
   ...imagePromptTranslations.ja,
@@ -146,28 +148,28 @@ export const ja = {
   useResponseMode: ({ mode }) => `${mode}を使用`,
   chooseResponseModel: "モデルを選択",
   responseModelCount: ({ count }) => `${count}件のモデルを利用できます`,
-  ulraMode: "究極モード",
-  ulraModeHomeLabel: "ホーム画面に究極モードを表示",
+  ulraMode: "モデル評議会",
+  ulraModeHomeLabel: "ホーム画面にモデル評議会を表示",
   ulraModeSettingsDescription:
     "ホーム画面のモデルが2件以上使用可能なときに、複数モデルによる検討を有効にします。",
   ulraModeInfo:
-    "究極モードは、まずホーム画面で使用可能な各モデルに個別に回答を求めます。各レビューラウンドでは、全モデルが各参加者の最新の見解を批判的に検証し、明示的な全員一致に達すると残りのラウンドを省略します。選択中のモデルが各モデルの最新見解を必ず保持しながら、成功したラウンドから最終回答をまとめます。検討内容は関係するすべてのプロバイダーと共有されます。",
+    "モデル評議会は、まずホーム画面で使用可能な各モデルに個別に回答を求めます。各レビューラウンドでは、全モデルが各参加者の最新の見解を批判的に検証し、明示的な全員一致に達すると残りのラウンドを省略します。選択中のモデルが各モデルの最新見解を必ず保持しながら、成功したラウンドから最終回答をまとめます。検討内容は関係するすべてのプロバイダーと共有されます。",
   ulraModeRounds: "レビューラウンド",
   ulraModeCallEstimate: ({ count }) =>
     `現在の設定では、1メッセージあたり最大${count}回のモデル呼び出しです。`,
   ulraModeThresholdWarning:
     "モデルが4件を超える場合、またはラウンドが3回を超える場合、非常に時間がかかり、多くのトークンを消費し、プロバイダーのコンテキストやレート制限に達する可能性があります。これは警告のみです。",
-  ulraModeFirstUseTitle: "究極モードを有効にしますか？",
+  ulraModeFirstUseTitle: "モデル評議会を有効にしますか？",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models}件のモデルと最大${rounds}回のレビューラウンドでは、1メッセージで最大${calls}回のモデル呼び出しが行われる可能性があります。大幅に時間と費用が増え、検討内容が関係するすべてのプロバイダーと共有されます。`,
-  ulraModeHighRiskTitle: "大規模な究極モード実行",
+  ulraModeHighRiskTitle: "大規模なモデル評議会実行",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models}件のモデルと${rounds}回のレビューラウンドでは、最大${calls}回のモデル呼び出しが行われる可能性があります。非常に時間がかかり、多くのトークンを使用し、プロバイダーの制限に達する場合があります。それでも続行しますか？`,
   ulraModeEnableAction: "有効にする",
   ulraModeNeedsTwoModels:
-    "究極モードには、ホーム画面で使用可能なモデルが2つ以上必要です。",
+    "モデル評議会には、ホーム画面で使用可能なモデルが2つ以上必要です。",
   ulraModeAllModelsFailed:
-    "回答を統合する前に、究極モードのすべてのモデルが失敗しました。",
+    "回答を統合する前に、モデル評議会のすべてのモデルが失敗しました。",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed}件の内部モデル呼び出しが失敗しました。最終回答には${succeeded}件の成功した提案を使用しました。`,
   sttTabDescription:

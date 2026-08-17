@@ -24,7 +24,6 @@ import { styles } from "./styles";
 interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
-  councilDisclosure: React.ComponentProps<typeof DisclosureDialog>;
   imageConsent: React.ComponentProps<typeof DisclosureDialog>;
   imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
@@ -41,7 +40,6 @@ interface MainScreenPresentationProps {
 export function MainScreenPresentation({
   colors,
   conversationDrawer,
-  councilDisclosure,
   imageConsent,
   imageSource,
   isDark,
@@ -128,7 +126,6 @@ export function MainScreenPresentation({
       ) : null}
 
       <ImageSourceSheet {...imageSource} />
-      <DisclosureDialog {...councilDisclosure} />
       <DisclosureDialog {...imageConsent} />
 
       <StyleSheetModal {...styleSheet} />

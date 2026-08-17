@@ -67,7 +67,7 @@ describe("runUlraModeDeliberation", () => {
     }));
   });
 
-  it("runs independent answers, barrier-synchronized rounds, and a synthesis prompt", async () => {
+  it("runs answers sequentially within barrier-synchronized rounds and builds a synthesis prompt", async () => {
     const result = await runUlraModeDeliberation({
       assistantInstructions: "Be precise.",
       config,
@@ -132,7 +132,7 @@ describe("runUlraModeDeliberation", () => {
     expect(result.synthesisPrompt).toContain('"round":1');
     expect(result.synthesisPrompt).toContain('"round":2');
     expect(result.synthesisPrompt).toContain(
-      "retained successful private Uber Mode history",
+      "retained successful private Model Council history",
     );
     expect(result.synthesisPrompt).toContain(
       "highest available round as its current position",
@@ -160,7 +160,7 @@ describe("runUlraModeDeliberation", () => {
       "Unanimous explicit convergence reached: no.",
     );
     expect(firstRoundPrompts[0]).toContain("Actively stress-test");
-    expect(firstRoundPrompts[0]).toContain("UBER_REVIEW: CHALLENGE");
+    expect(firstRoundPrompts[0]).toContain("COUNCIL_REVIEW: CHALLENGE");
     expect(firstRoundPrompts[0]).toContain("never manufacture disagreement");
     expect(
       generateInternalChatMock.mock.calls.every(
@@ -175,6 +175,49 @@ describe("runUlraModeDeliberation", () => {
     expect(firstRoundPrompts[0]).not.toContain('"modeId":');
     expect(result.synthesisPrompt).not.toContain('"provider":');
     expect(result.synthesisPrompt).not.toContain('"model":');
+  });
+
+  it("does not start the next Council model until the current model settles", async () => {
+    let releaseFirst: () => void = () => undefined;
+    const firstRequest = new Promise<void>((resolve) => {
+      releaseFirst = resolve;
+    });
+    generateInternalChatMock.mockImplementation(async (params) => {
+      if (params.provider === "openai") {
+        await firstRequest;
+      }
+      return {
+        model: params.model,
+        text: `${params.provider} contribution`,
+        usage: {
+          kind: "reply",
+          source: "estimated",
+          promptTokens: 4,
+          completionTokens: 2,
+          totalTokens: 6,
+        },
+      };
+    });
+
+    const pending = runUlraModeDeliberation({
+      assistantInstructions: "",
+      config: { ...config, rounds: 0 },
+      language: "en",
+      messages: [{ role: "user", content: "Question" }],
+    });
+
+    await Promise.resolve();
+    expect(generateInternalChatMock).toHaveBeenCalledTimes(1);
+    expect(generateInternalChatMock.mock.calls[0]?.[0].provider).toBe(
+      "openai",
+    );
+
+    releaseFirst();
+    await pending;
+
+    expect(
+      generateInternalChatMock.mock.calls.map(([request]) => request.provider),
+    ).toEqual(["openai", "anthropic", "gemini"]);
   });
 
   it("reports round and participant progress for frontend consumers", async () => {
@@ -227,10 +270,13 @@ describe("runUlraModeDeliberation", () => {
     );
     await pending;
     expect(inFlightProgress).toEqual({
-      completedModels: 2,
+      activeModeId: "mode-2",
+      activeModel: "claude-test",
+      activeProvider: "anthropic",
+      completedModels: 1,
       currentRound: 1,
       failedModels: 0,
-      respondedModels: 2,
+      respondedModels: 1,
       roundKind: "initial",
       stage: "round",
       totalModels: 3,
@@ -241,49 +287,62 @@ describe("runUlraModeDeliberation", () => {
       (value): value is CouncilRoundProgress =>
         value.stage === "round" && value.roundKind === "initial",
     );
-    expect(initialRound.map(({ completedModels }) => completedModels)).toEqual([
-      0, 1, 2, 3,
-    ]);
-    expect(initialRound.at(-1)).toEqual({
-      completedModels: 3,
-      currentRound: 1,
-      failedModels: 1,
-      respondedModels: 2,
-      roundKind: "initial",
-      stage: "round",
-      totalModels: 3,
-      totalRounds: 2,
-    });
+    expect(initialRound).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          activeModeId: "mode-1",
+          completedModels: 0,
+        }),
+        expect.objectContaining({
+          activeModeId: "mode-2",
+          completedModels: 1,
+        }),
+        expect.objectContaining({
+          activeModeId: "mode-3",
+          completedModels: 2,
+          failedModels: 1,
+        }),
+      ]),
+    );
+    expect(initialRound.at(-1)).toEqual(
+      expect.objectContaining({
+        activeModeId: "mode-3",
+        completedModels: 3,
+        currentRound: 1,
+        failedModels: 1,
+        respondedModels: 2,
+        roundKind: "initial",
+        stage: "round",
+        totalModels: 3,
+        totalRounds: 2,
+      }),
+    );
 
     const reviewRound = progress.filter(
       (value): value is CouncilRoundProgress =>
         value.stage === "round" && value.roundKind === "review",
     );
-    expect(reviewRound.map(({ completedModels }) => completedModels)).toEqual([
-      0, 1, 2,
-    ]);
-    expect(reviewRound.at(-1)).toEqual({
-      completedModels: 2,
-      currentRound: 2,
-      failedModels: 0,
-      respondedModels: 2,
-      roundKind: "review",
-      stage: "round",
-      totalModels: 2,
-      totalRounds: 2,
-    });
-    expect(progress.at(-1)).toEqual({
-      completedRounds: 2,
-      stage: "synthesis",
-      totalRounds: 2,
-    });
+    expect(reviewRound.at(-1)).toEqual(
+      expect.objectContaining({
+        activeModeId: "mode-3",
+        completedModels: 2,
+        currentRound: 2,
+        failedModels: 0,
+        respondedModels: 2,
+        roundKind: "review",
+        stage: "round",
+        totalModels: 2,
+        totalRounds: 2,
+      }),
+    );
+    expect(progress.at(-1)).toEqual(reviewRound.at(-1));
   });
 
   it("stops unused review rounds only after unanimous explicit convergence", async () => {
     generateInternalChatMock.mockImplementation(async (params) => ({
       model: params.model,
       text: params.systemPrompt.includes("review round")
-        ? "UBER_REVIEW: CONVERGED\nThe positions survive stress-testing."
+        ? "COUNCIL_REVIEW: CONVERGED\nThe positions survive stress-testing."
         : `${params.provider} independent position`,
       usage: {
         kind: "reply",
@@ -305,7 +364,7 @@ describe("runUlraModeDeliberation", () => {
     expect(result.entries).toHaveLength(6);
     expect(result.roundsCompleted).toBe(1);
     expect(result.convergenceReached).toBe(true);
-    expect(result.synthesisPrompt).not.toContain("UBER_REVIEW");
+    expect(result.synthesisPrompt).not.toContain("COUNCIL_REVIEW");
     expect(result.synthesisPrompt).toContain('"round":0');
     expect(result.synthesisPrompt).toContain('"round":1');
     expect(result.synthesisPrompt.match(/"participant":/g)).toHaveLength(6);
@@ -319,7 +378,7 @@ describe("runUlraModeDeliberation", () => {
     generateInternalChatMock.mockImplementation(async (params) => ({
       model: params.model,
       text: params.systemPrompt.includes("review round 1")
-        ? "UBER_REVIEW: CHALLENGE\nA material assumption remains unsupported."
+        ? "COUNCIL_REVIEW: CHALLENGE\nA material assumption remains unsupported."
         : params.systemPrompt.includes("review round 2")
           ? "The marker was omitted, so convergence is unproven."
           : `${params.provider} independent position`,
@@ -493,7 +552,7 @@ describe("runUlraModeDeliberation", () => {
         recordDebugLogEventMock.mock.calls.filter(
           ([event]) => event.event === "ulra-mode-participant-completed",
         ),
-      ).toHaveLength(2);
+      ).toHaveLength(1);
       expect(
         recordDebugLogEventMock.mock.calls.some(
           ([event]) => event.event === "ulra-mode-round-completed",

@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const tr = {
   ...conversationArtifactTranslations.tr,
   ...interruptionTranslations.tr,
   ...ulraAuditTranslations.tr,
+  ...councilWorkspaceTranslations.tr,
   ...dataBackupTranslations.tr,
   ...conversationKnowledgeTranslations.tr,
   ...imagePromptTranslations.tr,
@@ -145,28 +147,28 @@ export const tr = {
   useResponseMode: ({ mode }) => `${mode} seçeneğini kullan`,
   chooseResponseModel: "Bir model seç",
   responseModelCount: ({ count }) => `${count} model mevcut`,
-  ulraMode: "Süper Mod",
-  ulraModeHomeLabel: "Süper Modu ana ekranda göster",
+  ulraMode: "Model Konseyi",
+  ulraModeHomeLabel: "Model Konseyini ana ekranda göster",
   ulraModeSettingsDescription:
     "Ana ekrandaki en az iki model hazır olduğunda çok modelli değerlendirmeye izin verir.",
   ulraModeInfo:
-    "Süper Mod önce ana ekrandaki her hazır modele ayrı ayrı sorar. Her turda modeller, her katılımcının en son görüşünü eleştirel biçimde sınar; açık ve oybirliğiyle uzlaşma sağlanırsa kalan turlar atlanır. Seçili model, her modelin en son görüşünü daima koruyarak başarılı turlardan nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
+    "Model Konseyi önce ana ekrandaki her hazır modele ayrı ayrı sorar. Her turda modeller, her katılımcının en son görüşünü eleştirel biçimde sınar; açık ve oybirliğiyle uzlaşma sağlanırsa kalan turlar atlanır. Seçili model, her modelin en son görüşünü daima koruyarak başarılı turlardan nihai yanıtı sentezler. Değerlendirme, ilgili tüm sağlayıcılarla paylaşılır.",
   ulraModeRounds: "İnceleme turları",
   ulraModeCallEstimate: ({ count }) =>
     `Mevcut ayarla mesaj başına en fazla ${count} model çağrısı.`,
   ulraModeThresholdWarning:
     "4'ten fazla model veya 3'ten fazla tur çok uzun sürebilir, çok sayıda token tüketebilir ve sağlayıcıların bağlam ya da hız sınırlarına ulaşabilir. Bu yalnızca bir uyarıdır.",
-  ulraModeFirstUseTitle: "Süper Mod etkinleştirilsin mi?",
+  ulraModeFirstUseTitle: "Model Konseyi etkinleştirilsin mi?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models} model ve en fazla ${rounds} inceleme turuyla bir mesaj en fazla ${calls} model çağrısı yapabilir. Çok daha uzun sürebilir, belirgin biçimde daha pahalı olabilir ve değerlendirmeyi ilgili tüm sağlayıcılarla paylaşabilir.`,
-  ulraModeHighRiskTitle: "Büyük Süper Mod çalıştırması",
+  ulraModeHighRiskTitle: "Büyük Model Konseyi çalıştırması",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} model ve ${rounds} inceleme turu en fazla ${calls} model çağrısı yapabilir. Bu çok uzun sürebilir, çok sayıda token kullanabilir ve sağlayıcı sınırlarına ulaşabilir. Yine de devam edilsin mi?`,
   ulraModeEnableAction: "Etkinleştir",
   ulraModeNeedsTwoModels:
-    "Süper Mod için ana ekranda en az iki hazır model gerekir.",
+    "Model Konseyi için ana ekranda en az iki hazır model gerekir.",
   ulraModeAllModelsFailed:
-    "Bir yanıt sentezlenemeden önce tüm Süper Mod modelleri başarısız oldu.",
+    "Bir yanıt sentezlenemeden önce tüm Model Konseyi modelleri başarısız oldu.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} dahili model çağrısı başarısız oldu; son yanıt ${succeeded} başarılı katkıyı kullandı.`,
   sttTabDescription:

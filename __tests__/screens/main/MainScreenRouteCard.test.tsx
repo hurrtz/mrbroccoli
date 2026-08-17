@@ -1,5 +1,6 @@
 import React from "react";
 import { fireEvent, within } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import { MainScreenRouteCard } from "../../../src/screens/main/MainScreenRouteCard";
 import { renderWithProviders } from "../../test-utils/renderWithProviders";
@@ -101,6 +102,82 @@ describe("MainScreenRouteCard", () => {
     fireEvent.press(screen.getByTestId("workspace-header-settings"));
     expect(onOpenRoutePicker).toHaveBeenCalledTimes(1);
     expect(onOpenSettings).toHaveBeenCalledTimes(1);
+  });
+
+  it("dims and locks the route and conversation settings after submission", () => {
+    const onOpenRoutePicker = jest.fn();
+    const onOpenSettings = jest.fn();
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1", "mode-2"]}
+        onOpenRoutePicker={onOpenRoutePicker}
+        presentation="workspace-header"
+        responseModes={responseModes}
+        running
+        settingsSummary={{
+          accessibilityLabel: "Conversation settings",
+          onPress: onOpenSettings,
+          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+        }}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("workspace-header").props.style)
+        .opacity,
+    ).toBe(0.38);
+    expect(screen.getByTestId("workspace-header").props.role).toBe("status");
+    expect(
+      screen.getByText("Length: Brief · Tone: Balanced · Voice: Heart"),
+    ).toBeTruthy();
+
+    fireEvent.press(screen.getByTestId("workspace-header-model"));
+    fireEvent.press(screen.getByTestId("workspace-header-settings"));
+
+    expect(onOpenRoutePicker).not.toHaveBeenCalled();
+    expect(onOpenSettings).not.toHaveBeenCalled();
+  });
+
+  it("reuses the full-strength header for live Council progress", () => {
+    const onOpenRoutePicker = jest.fn();
+    const onOpenSettings = jest.fn();
+    const screen = renderWithProviders(
+      <MainScreenRouteCard
+        activeResponseMode="mode-1"
+        availableResponseModes={["mode-1", "mode-2"]}
+        councilReport={{
+          modelName: "Claude Opus 5",
+          provider: "anthropic",
+          summary: "2 of 4 models done · Round 2 of 3",
+        }}
+        onOpenRoutePicker={onOpenRoutePicker}
+        presentation="workspace-header"
+        responseModes={responseModes}
+        running
+        settingsSummary={{
+          accessibilityLabel: "Conversation settings",
+          onPress: onOpenSettings,
+          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+        }}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("workspace-header").props.style)
+        .opacity,
+    ).toBeUndefined();
+    expect(screen.getByText("Claude Opus 5")).toBeTruthy();
+    expect(screen.getByText("2 of 4 models done · Round 2 of 3")).toBeTruthy();
+    expect(
+      screen.queryByText("Length: Brief · Tone: Balanced · Voice: Heart"),
+    ).toBeNull();
+
+    fireEvent.press(screen.getByTestId("workspace-header-model"));
+    fireEvent.press(screen.getByTestId("workspace-header-settings"));
+
+    expect(onOpenRoutePicker).not.toHaveBeenCalled();
+    expect(onOpenSettings).not.toHaveBeenCalled();
   });
 
   it("removes the old provider card when no route is ready", () => {

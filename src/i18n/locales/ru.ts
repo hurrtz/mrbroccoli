@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const ru = {
   ...conversationArtifactTranslations.ru,
   ...interruptionTranslations.ru,
   ...ulraAuditTranslations.ru,
+  ...councilWorkspaceTranslations.ru,
   ...dataBackupTranslations.ru,
   ...conversationKnowledgeTranslations.ru,
   ...imagePromptTranslations.ru,
@@ -148,28 +150,28 @@ export const ru = {
   useResponseMode: ({ mode }) => `Использовать ${mode}`,
   chooseResponseModel: "Выбери модель",
   responseModelCount: ({ count }) => `Доступно моделей: ${count}`,
-  ulraMode: "Суперрежим",
-  ulraModeHomeLabel: "Показывать суперрежим на главном экране",
+  ulraMode: "Совет моделей",
+  ulraModeHomeLabel: "Показывать Совет моделей на главном экране",
   ulraModeSettingsDescription:
     "Разрешает совместное обсуждение несколькими моделями, когда готовы как минимум две модели главного экрана.",
   ulraModeInfo:
-    "Суперрежим сначала отдельно опрашивает каждую готовую модель с главного экрана. В каждом раунде модели критически проверяют последнюю позицию каждого участника; оставшиеся раунды пропускаются после явного единогласного согласия. Выбранная модель формирует итоговый ответ из успешных раундов, всегда сохраняя последнюю позицию каждой модели. Материалы обсуждения передаются всем задействованным провайдерам.",
+    "Совет моделей сначала отдельно опрашивает каждую готовую модель с главного экрана. В каждом раунде модели критически проверяют последнюю позицию каждого участника; оставшиеся раунды пропускаются после явного единогласного согласия. Выбранная модель формирует итоговый ответ из успешных раундов, всегда сохраняя последнюю позицию каждой модели. Материалы обсуждения передаются всем задействованным провайдерам.",
   ulraModeRounds: "Раунды проверки",
   ulraModeCallEstimate: ({ count }) =>
     `При текущих настройках до ${count} вызовов моделей на сообщение.`,
   ulraModeThresholdWarning:
     "Более 4 моделей или 3 раундов могут занять много времени, израсходовать много токенов и достичь ограничений контекста или частоты запросов провайдеров. Это только предупреждение.",
-  ulraModeFirstUseTitle: "Включить суперрежим?",
+  ulraModeFirstUseTitle: "Включить Совет моделей?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `При ${models} моделях и до ${rounds} раундов проверки одно сообщение может выполнить до ${calls} вызовов моделей. Это может занять намного больше времени, заметно увеличить стоимость и передать обсуждение всем задействованным провайдерам.`,
-  ulraModeHighRiskTitle: "Большой запуск суперрежима",
+  ulraModeHighRiskTitle: "Большой запуск Совета моделей",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} моделей и ${rounds} раундов проверки могут выполнить до ${calls} вызовов моделей. Это может занять очень много времени, израсходовать много токенов и достичь лимитов провайдеров. Всё равно продолжить?`,
   ulraModeEnableAction: "Включить",
   ulraModeNeedsTwoModels:
-    "Для суперрежима нужны как минимум две готовые модели на главном экране.",
+    "Для Совета моделей нужны как минимум две готовые модели на главном экране.",
   ulraModeAllModelsFailed:
-    "Все модели суперрежима завершились с ошибкой до того, как удалось составить ответ.",
+    "Все модели Совета моделей завершились с ошибкой до того, как удалось составить ответ.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} внутренних вызовов моделей завершились с ошибкой; итоговый ответ использовал ${succeeded} успешных вкладов.`,
   sttTabDescription:

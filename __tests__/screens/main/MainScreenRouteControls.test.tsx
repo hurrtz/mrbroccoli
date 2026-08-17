@@ -135,7 +135,7 @@ describe("MainScreenRouteControls", () => {
     expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
-  it("shows the Uber Mode switch on the portrait left side only", () => {
+  it("shows the Model Council switch on the portrait left side only", () => {
     const onToggleUlraMode = jest.fn();
     const screen = render(
       <MainScreenRouteControls

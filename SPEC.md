@@ -126,20 +126,20 @@ offline conversation mode.
 - Eight hosted LLM-capable routes are supported: OpenAI, OpenRouter,
   Anthropic, Google Gemini, xAI, Mistral, DeepSeek, and Alibaba Qwen. ElevenLabs
   is an additional speech-only provider.
-- Model Council runs independent model contributions, adversarial review
-  rounds, and final synthesis. The visible synthesis is independently bounded
+- Model Council runs model contributions sequentially in configured order,
+  adversarial review rounds over immutable snapshots, and final synthesis. The
+  visible synthesis is independently bounded
   so a provider cannot stream an effectively unbounded answer into the mobile
   UI or speech queue. While it runs, the pipeline exposes the current
-  one-based round, configured maximum rounds, active participant count, and
-  settled, successful, and failed participant counts before moving to an
-  explicit synthesis state. Its internal `ulra` identifiers are retained for
+  one-based round, configured maximum rounds, current participant route, active
+  participant count, and settled, successful, and failed participant counts
+  before moving to an explicit synthesis state. Its internal `ulra`
+  identifiers are retained for
   data and import stability.
 
-  **Decision:** The English feature name is “Model Council.” The previous
-  “Uber Mode” name collided with a well-known third-party trademark and was
-  retired from all user-facing copy before store submission; other locales
-  keep their established localized names (for example “Übermodus,”
-  “Superrežim”).
+  **Decision:** “Model Council” is the feature name in code and copy. Older
+  terminology is accepted only by persistence migrations and is never exposed
+  by current runtime types, diagnostics, prompts, or UI.
 
 - Optional past-conversation knowledge retrieves small, source-linked excerpts
   from other eligible conversations on device.

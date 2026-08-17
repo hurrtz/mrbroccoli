@@ -76,7 +76,14 @@ receive already-derived state and callbacks.
   14pt below the top bar: two equal 44pt rows separated by a hairline. The
   leading row states who answers the next turn and at what effort; the second
   row states the effective conversation settings and is one complete press
-  target. Landscape and regular iPad retain the uncontained route byline plus
+  target. Releasing a voice turn or submitting text immediately makes both
+  rows non-interactive and presents the unchanged block at 38% opacity until
+  that ordinary turn ends. A running Model Council is the deliberate
+  exception: the block stays at full strength, centers the provider and model
+  currently answering in its first row, and replaces the second row with
+  completed-model and current/total-round progress. Effort, disclosure, and
+  settings glyphs are absent in that reporting state. Landscape and regular
+  iPad retain the uncontained route byline plus
   compact settings control because their narrow control columns cannot carry
   the block. The model list opens in a scrolling sheet; tapping an available
   model commits and closes immediately, with no Done step. With one configured
@@ -199,10 +206,12 @@ receive already-derived state and callbacks.
   and uses a bounded Android fallback, so native pickers never compete with an
   existing modal controller. A fresh image-provider recipient still requires
   explicit app-owned disclosure before the turn continues.
-- Model Council first-use and high-call-count warnings are app-owned,
-  non-dismissible disclosures with explicit cancel and enable actions. They
-  suppress workspace toasts while visible and must preserve the exact model,
-  round, and call count that the user reviewed.
+- The Council satellite opens a 252pt anchored, undimmed popover aligned to the
+  composing row's trailing edge. It scrolls every ready home model
+  horizontally, selects membership directly, exposes one to five total rounds,
+  and permanently states the resulting sequential answer count and provider
+  billing consequence. Fewer than two selected models means Council is off;
+  no first-use or high-call confirmation interrupts this builder.
 - Toast feedback is presented above the active native surface, including the
   transcript drawer, settings sheets, and receipt modal; it is never queued
   invisibly behind them.

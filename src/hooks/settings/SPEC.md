@@ -94,6 +94,10 @@ errors must not permanently remove a model or effort.
 - Removing the active mode selects a remaining mode atomically.
 - Provider/model updates normalize reasoning effort and capability before
   becoming active.
+- The legacy-named `ulraModeRounds` field persists Council review rounds. The
+  UI presents total rounds (`review rounds + 1`), so zero is a valid stored
+  value for a one-round Council and legacy values above four are capped at five
+  total rounds.
 - Portable restore merges only the approved public subset and preserves local
   secrets and operational diagnostics.
 

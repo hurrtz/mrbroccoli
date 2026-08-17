@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const fr = {
   ...conversationArtifactTranslations.fr,
   ...interruptionTranslations.fr,
   ...ulraAuditTranslations.fr,
+  ...councilWorkspaceTranslations.fr,
   ...dataBackupTranslations.fr,
   ...conversationKnowledgeTranslations.fr,
   ...imagePromptTranslations.fr,
@@ -147,28 +149,28 @@ export const fr = {
   useResponseMode: ({ mode }) => `Utilise ${mode}`,
   chooseResponseModel: "Choisis un modèle",
   responseModelCount: ({ count }) => `${count} modèles disponibles`,
-  ulraMode: "Mode suprême",
-  ulraModeHomeLabel: "Afficher le Mode suprême sur l’écran d’accueil",
+  ulraMode: "Conseil des modèles",
+  ulraModeHomeLabel: "Afficher le Conseil des modèles sur l’écran d’accueil",
   ulraModeSettingsDescription:
     "Autorise une délibération entre plusieurs modèles lorsque au moins deux modèles de l’accueil sont prêts.",
   ulraModeInfo:
-    "Le Mode suprême interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, les modèles remettent en question la dernière position de chaque participant ; les tours restants sont évités après une convergence unanime explicite. Le modèle sélectionné synthétise les tours réussis en conservant toujours la dernière position de chaque modèle. La délibération est partagée avec tous les fournisseurs concernés.",
+    "Le Conseil des modèles interroge d’abord séparément chaque modèle prêt de l’écran d’accueil. À chaque tour, les modèles remettent en question la dernière position de chaque participant ; les tours restants sont évités après une convergence unanime explicite. Le modèle sélectionné synthétise les tours réussis en conservant toujours la dernière position de chaque modèle. La délibération est partagée avec tous les fournisseurs concernés.",
   ulraModeRounds: "Tours de révision",
   ulraModeCallEstimate: ({ count }) =>
     `Jusqu’à ${count} appels de modèles par message avec la configuration actuelle.`,
   ulraModeThresholdWarning:
     "Plus de 4 modèles ou 3 tours peuvent prendre beaucoup de temps, consommer de nombreux jetons et atteindre les limites de contexte ou de débit des fournisseurs. Ceci n’est qu’un avertissement.",
-  ulraModeFirstUseTitle: "Activer le Mode suprême ?",
+  ulraModeFirstUseTitle: "Activer le Conseil des modèles ?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Avec ${models} modèles et jusqu’à ${rounds} tours de révision, un message peut effectuer jusqu’à ${calls} appels de modèles. Cela peut prendre bien plus de temps, coûter nettement plus cher et partager la délibération avec tous les fournisseurs concernés.`,
-  ulraModeHighRiskTitle: "Exécution volumineuse du Mode suprême",
+  ulraModeHighRiskTitle: "Exécution volumineuse du Conseil des modèles",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modèles et ${rounds} tours de révision peuvent effectuer jusqu’à ${calls} appels de modèles. Cela peut être très long, consommer beaucoup de jetons et atteindre les limites des fournisseurs. Continuer quand même ?`,
   ulraModeEnableAction: "Activer",
   ulraModeNeedsTwoModels:
-    "Le Mode suprême nécessite au moins deux modèles prêts sur l’écran d’accueil.",
+    "Le Conseil des modèles nécessite au moins deux modèles prêts sur l’écran d’accueil.",
   ulraModeAllModelsFailed:
-    "Tous les modèles du Mode suprême ont échoué avant qu’une réponse puisse être synthétisée.",
+    "Tous les modèles du Conseil des modèles ont échoué avant qu’une réponse puisse être synthétisée.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} appels internes ont échoué ; la réponse finale a utilisé ${succeeded} contributions réussies.`,
   sttTabDescription:

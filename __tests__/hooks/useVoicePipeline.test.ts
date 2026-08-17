@@ -1044,7 +1044,7 @@ describe("useVoicePipeline", () => {
     });
   });
 
-  it("keeps Uber dimensions in the ETA and learned latency route", async () => {
+  it("keeps Council dimensions in the ETA and learned latency route", async () => {
     const ulraMode = {
       rounds: 2,
       routes: [
@@ -1083,8 +1083,8 @@ describe("useVoicePipeline", () => {
           retiredParticipants: 1,
           successfulCalls: 6,
         });
-        callbacks.onResponseDone("Uber reply");
-        return "Run Uber Mode";
+        callbacks.onResponseDone("Council reply");
+        return "Run Model Council";
       },
     );
 
@@ -1092,7 +1092,7 @@ describe("useVoicePipeline", () => {
 
     await act(async () => {
       await result.current.handleVoiceCaptureDone({
-        transcriptionOverride: "Run Uber Mode",
+        transcriptionOverride: "Run Model Council",
       });
     });
 
@@ -1135,6 +1135,9 @@ describe("useVoicePipeline", () => {
 
     act(() => {
       callbacks.onCouncilProgress({
+        activeModeId: "mode-2",
+        activeModel: "claude-test",
+        activeProvider: "anthropic",
         completedModels: 2,
         currentRound: 2,
         failedModels: 0,
@@ -1146,6 +1149,9 @@ describe("useVoicePipeline", () => {
       });
     });
     expect(result.current.councilProgress).toEqual({
+      activeModeId: "mode-2",
+      activeModel: "claude-test",
+      activeProvider: "anthropic",
       completedModels: 2,
       currentRound: 2,
       failedModels: 0,
@@ -1159,12 +1165,18 @@ describe("useVoicePipeline", () => {
     act(() => {
       callbacks.onCouncilProgress({
         completedRounds: 3,
+        modeId: "mode-1",
+        model: "gpt-test",
+        provider: "openai",
         stage: "synthesis",
         totalRounds: 3,
       });
     });
     expect(result.current.councilProgress).toEqual({
       completedRounds: 3,
+      modeId: "mode-1",
+      model: "gpt-test",
+      provider: "openai",
       stage: "synthesis",
       totalRounds: 3,
     });

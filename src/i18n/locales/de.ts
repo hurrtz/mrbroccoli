@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const de = {
   ...conversationArtifactTranslations.de,
   ...interruptionTranslations.de,
   ...ulraAuditTranslations.de,
+  ...councilWorkspaceTranslations.de,
   ...dataBackupTranslations.de,
   ...conversationKnowledgeTranslations.de,
   ...imagePromptTranslations.de,
@@ -149,28 +151,28 @@ export const de = {
   useResponseMode: ({ mode }) => `${mode} verwenden`,
   chooseResponseModel: "Modell auswählen",
   responseModelCount: ({ count }) => `${count} Modelle verfügbar`,
-  ulraMode: "Übermodus",
-  ulraModeHomeLabel: "Übermodus auf dem Startbildschirm anzeigen",
+  ulraMode: "Modellrat",
+  ulraModeHomeLabel: "Modellrat auf dem Startbildschirm anzeigen",
   ulraModeSettingsDescription:
     "Erlaubt Beratungen mit mehreren Modellen, sobald mindestens zwei Modelle auf dem Startbildschirm bereit sind.",
   ulraModeInfo:
-    "Der Übermodus fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Prüfrunde hinterfragen die Modelle die letzte Position jedes Teilnehmers; bei ausdrücklicher einstimmiger Übereinstimmung entfallen ungenutzte Runden. Das ausgewählte Modell fasst die erfolgreichen Runden zur endgültigen Antwort zusammen, wobei die letzte Position jedes Modells immer erhalten bleibt. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
+    "Der Modellrat fragt jedes bereite Modell auf dem Startbildschirm zunächst unabhängig. In jeder Prüfrunde hinterfragen die Modelle die letzte Position jedes Teilnehmers; bei ausdrücklicher einstimmiger Übereinstimmung entfallen ungenutzte Runden. Das ausgewählte Modell fasst die erfolgreichen Runden zur endgültigen Antwort zusammen, wobei die letzte Position jedes Modells immer erhalten bleibt. Die Beratung wird mit allen beteiligten Anbietern geteilt.",
   ulraModeRounds: "Prüfrunden",
   ulraModeCallEstimate: ({ count }) =>
     `Mit der aktuellen Konfiguration bis zu ${count} Modellaufrufe pro Nachricht.`,
   ulraModeThresholdWarning:
     "Mehr als 4 Modelle oder 3 Runden können sehr lange dauern, viele Tokens verbrauchen und Kontext- oder Ratenlimits der Anbieter erreichen. Dies ist nur eine Warnung.",
-  ulraModeFirstUseTitle: "Übermodus aktivieren?",
+  ulraModeFirstUseTitle: "Modellrat aktivieren?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Mit ${models} Modellen und bis zu ${rounds} Prüfrunden kann eine Nachricht bis zu ${calls} Modellaufrufe auslösen. Das kann erheblich länger dauern, deutlich mehr kosten und die Beratung mit allen beteiligten Anbietern teilen.`,
-  ulraModeHighRiskTitle: "Großer Übermodus-Durchlauf",
+  ulraModeHighRiskTitle: "Großer Modellrat-Durchlauf",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} Modelle und ${rounds} Prüfrunden können bis zu ${calls} Modellaufrufe auslösen. Das kann sehr lange dauern, viele Tokens verbrauchen und Anbieterlimits erreichen. Trotzdem fortfahren?`,
   ulraModeEnableAction: "Aktivieren",
   ulraModeNeedsTwoModels:
-    "Der Übermodus benötigt mindestens zwei einsatzbereite Modelle auf dem Startbildschirm.",
+    "Der Modellrat benötigt mindestens zwei einsatzbereite Modelle auf dem Startbildschirm.",
   ulraModeAllModelsFailed:
-    "Alle Modelle im Übermodus sind fehlgeschlagen, bevor eine Antwort zusammengeführt werden konnte.",
+    "Alle Modelle im Modellrat sind fehlgeschlagen, bevor eine Antwort zusammengeführt werden konnte.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interne Modellaufrufe sind fehlgeschlagen; die endgültige Antwort nutzt ${succeeded} erfolgreiche Beiträge.`,
   sttTabDescription:

@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const uk = {
   ...conversationArtifactTranslations.uk,
   ...interruptionTranslations.uk,
   ...ulraAuditTranslations.uk,
+  ...councilWorkspaceTranslations.uk,
   ...dataBackupTranslations.uk,
   ...conversationKnowledgeTranslations.uk,
   ...imagePromptTranslations.uk,
@@ -155,28 +157,28 @@ export const uk = {
   useResponseMode: ({ mode }) => `Використати ${mode}`,
   chooseResponseModel: "Вибери модель",
   responseModelCount: ({ count }) => `Доступно моделей: ${count}`,
-  ulraMode: "Суперрежим",
-  ulraModeHomeLabel: "Показувати Суперрежим на головному екрані",
+  ulraMode: "Рада моделей",
+  ulraModeHomeLabel: "Показувати Раду моделей на головному екрані",
   ulraModeSettingsDescription:
     "Дозволяє спільне обговорення кількома моделями, коли готові щонайменше дві моделі головного екрана.",
   ulraModeInfo:
-    "Суперрежим спочатку окремо опитує кожну готову модель із головного екрана. У кожному раунді моделі критично перевіряють останню позицію кожного учасника; решта раундів пропускається після явної одностайної згоди. Вибрана модель створює підсумкову відповідь з успішних раундів, завжди зберігаючи останню позицію кожної моделі. Матеріали обговорення передаються всім залученим провайдерам.",
+    "Рада моделей спочатку окремо опитує кожну готову модель із головного екрана. У кожному раунді моделі критично перевіряють останню позицію кожного учасника; решта раундів пропускається після явної одностайної згоди. Вибрана модель створює підсумкову відповідь з успішних раундів, завжди зберігаючи останню позицію кожної моделі. Матеріали обговорення передаються всім залученим провайдерам.",
   ulraModeRounds: "Раунди перегляду",
   ulraModeCallEstimate: ({ count }) =>
     `За поточних налаштувань до ${count} викликів моделей на повідомлення.`,
   ulraModeThresholdWarning:
     "Понад 4 моделі або 3 раунди можуть тривати дуже довго, використати багато токенів і досягти обмежень контексту чи частоти запитів провайдерів. Це лише попередження.",
-  ulraModeFirstUseTitle: "Увімкнути Суперрежим?",
+  ulraModeFirstUseTitle: "Увімкнути Раду моделей?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `За ${models} моделей і до ${rounds} раундів перегляду одне повідомлення може виконати до ${calls} викликів моделей. Це може тривати значно довше, коштувати набагато більше й передати обговорення всім залученим провайдерам.`,
-  ulraModeHighRiskTitle: "Великий запуск Суперрежиму",
+  ulraModeHighRiskTitle: "Великий запуск Ради моделей",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} моделей і ${rounds} раундів перегляду можуть виконати до ${calls} викликів моделей. Це може тривати дуже довго, використати багато токенів і досягти лімітів провайдерів. Усе одно продовжити?`,
   ulraModeEnableAction: "Увімкнути",
   ulraModeNeedsTwoModels:
-    "Для Суперрежиму потрібні щонайменше дві готові моделі на головному екрані.",
+    "Для Ради моделей потрібні щонайменше дві готові моделі на головному екрані.",
   ulraModeAllModelsFailed:
-    "Усі моделі Суперрежиму завершилися помилкою до того, як вдалося сформувати відповідь.",
+    "Усі моделі Ради моделей завершилися помилкою до того, як вдалося сформувати відповідь.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} внутрішніх викликів моделей завершилися помилкою; остаточна відповідь використала ${succeeded} успішних внесків.`,
   sttTabDescription:

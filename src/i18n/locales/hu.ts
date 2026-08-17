@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const hu = {
   ...conversationArtifactTranslations.hu,
   ...interruptionTranslations.hu,
   ...ulraAuditTranslations.hu,
+  ...councilWorkspaceTranslations.hu,
   ...dataBackupTranslations.hu,
   ...conversationKnowledgeTranslations.hu,
   ...imagePromptTranslations.hu,
@@ -149,28 +151,28 @@ export const hu = {
   useResponseMode: ({ mode }) => `${mode} használata`,
   chooseResponseModel: "Modell kiválasztása",
   responseModelCount: ({ count }) => `${count} modell érhető el`,
-  ulraMode: "Szuper mód",
-  ulraModeHomeLabel: "Szuper mód megjelenítése a kezdőképernyőn",
+  ulraMode: "Modelltanács",
+  ulraModeHomeLabel: "Modelltanács megjelenítése a kezdőképernyőn",
   ulraModeSettingsDescription:
     "Több modell közös mérlegelését engedélyezi, ha legalább két kezdőképernyős modell készen áll.",
   ulraModeInfo:
-    "A Szuper mód először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Minden körben a modellek kritikusan vizsgálják az egyes résztvevők legutóbbi álláspontját; a fennmaradó körök egyértelmű egyhangú konvergencia után kimaradnak. A kiválasztott modell a sikeres körökből készíti el a végső választ úgy, hogy minden modell legutóbbi álláspontja mindig megmarad. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
+    "A Modelltanács először külön-külön megkérdezi a kezdőképernyő minden elérhető modelljét. Minden körben a modellek kritikusan vizsgálják az egyes résztvevők legutóbbi álláspontját; a fennmaradó körök egyértelmű egyhangú konvergencia után kimaradnak. A kiválasztott modell a sikeres körökből készíti el a végső választ úgy, hogy minden modell legutóbbi álláspontja mindig megmarad. A mérlegelés minden érintett szolgáltatóval megosztásra kerül.",
   ulraModeRounds: "Felülvizsgálati körök",
   ulraModeCallEstimate: ({ count }) =>
     `A jelenlegi beállítással üzenetenként legfeljebb ${count} modellhívás.`,
   ulraModeThresholdWarning:
     "4-nél több modell vagy 3-nál több kör sokáig tarthat, sok tokent használhat, és elérheti a szolgáltatók kontextus- vagy sebességkorlátait. Ez csak figyelmeztetés.",
-  ulraModeFirstUseTitle: "Bekapcsolod a Szuper módot?",
+  ulraModeFirstUseTitle: "Bekapcsolod a Modelltanácsot?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models} modell és legfeljebb ${rounds} felülvizsgálati kör esetén egy üzenet legfeljebb ${calls} modellhívást indíthat. Ez jóval tovább tarthat, jelentősen többe kerülhet, és megosztja a mérlegelést minden érintett szolgáltatóval.`,
-  ulraModeHighRiskTitle: "Nagyszabású Szuper mód-futtatás",
+  ulraModeHighRiskTitle: "Nagyszabású Modelltanács-futtatás",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modell és ${rounds} felülvizsgálati kör legfeljebb ${calls} modellhívást indíthat. Ez nagyon sokáig tarthat, sok tokent használhat, és elérheti a szolgáltatói korlátokat. Mégis folytatja?`,
   ulraModeEnableAction: "Bekapcsolás",
   ulraModeNeedsTwoModels:
-    "A Szuper módhoz legalább két használatra kész kezdőképernyős modell szükséges.",
+    "A Modelltanácshoz legalább két használatra kész kezdőképernyős modell szükséges.",
   ulraModeAllModelsFailed:
-    "A Szuper mód összes modellhívása sikertelen volt, mielőtt elkészülhetett volna az összegzett válasz.",
+    "A Modelltanács összes modellhívása sikertelen volt, mielőtt elkészülhetett volna az összegzett válasz.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} belső modellhívás meghiúsult; a végső válasz ${succeeded} sikeres hozzájárulást használt fel.`,
   sttTabDescription:

@@ -237,8 +237,8 @@ function getTranscriptMetrics(
 
   if (council) {
     rows.push({
-      label: t("uberAuditTitle"),
-      value: t("uberAuditSummary", {
+      label: t("councilAuditTitle"),
+      value: t("councilAuditSummary", {
         failed: council.failedCalls,
         rounds: council.roundsCompleted,
         successful: council.successfulCalls,

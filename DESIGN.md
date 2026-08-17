@@ -101,7 +101,7 @@ sequenceDiagram
     participant Screen as MainScreen controllers
     participant Pipeline as runVoicePipeline
     participant Context as Context and knowledge
-    participant Intelligence as Search, Uber, and LLM
+    participant Intelligence as Search, Council, and LLM
     participant Speech as TTS queue and player
     participant Store as Conversation store
 
@@ -111,7 +111,7 @@ sequenceDiagram
     Pipeline->>Store: append user message
     Pipeline->>Context: compact thread and retrieve eligible history
     Context-->>Pipeline: bounded context plus source metadata
-    Pipeline->>Intelligence: optional web search / Uber deliberation
+    Pipeline->>Intelligence: optional web search / Council deliberation
     Pipeline->>Intelligence: stream final provider response
     Intelligence-->>Pipeline: chunks, actual route, usage metadata
     Pipeline->>Speech: queue complete paragraphs or final response

@@ -120,13 +120,34 @@ describe("translations", () => {
   });
 
   it("uses localized Model Council naming in every interface language", () => {
+    const legacyCouncilNames = [
+      "Übermodus",
+      "Суперрежим",
+      "सर्वोच्च मोड",
+      "Modo supremo",
+      "Mode suprême",
+      "Modalità suprema",
+      "Modo Supremo",
+      "终极模式",
+      "الوضع الفائق",
+      "究極モード",
+      "Szuper mód",
+      "Superrežim",
+      "Supertryb",
+      "Süper Mod",
+      "Superläge",
+      "اعلیٰ موڈ",
+    ];
     Object.values(translations).forEach((dictionary) => {
       expect(dictionary.ulraMode).not.toContain("Ulra");
       expect(JSON.stringify(dictionary)).not.toContain("Ulra");
       expect(JSON.stringify(dictionary)).not.toContain("Ultra");
+      legacyCouncilNames.forEach((name) => {
+        expect(JSON.stringify(dictionary)).not.toContain(name);
+      });
     });
     expect(translations.en.ulraMode).toBe("Model Council");
-    expect(translations.de.ulraMode).toBe("Übermodus");
+    expect(translations.de.ulraMode).toBe("Modellrat");
   });
 
   it("validates language IDs and falls back only for optional resources", () => {

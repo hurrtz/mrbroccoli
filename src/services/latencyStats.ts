@@ -310,7 +310,10 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
   ) {
     estimateMs += 4_000;
   }
-  if (descriptor.ulraRoutes?.length && descriptor.ulraRounds) {
+  if (
+    descriptor.ulraRoutes?.length &&
+    typeof descriptor.ulraRounds === "number"
+  ) {
     const synthesisEstimateMs = estimateMs;
     const participantEstimates = descriptor.ulraRoutes.map((route) =>
       getLlmResponseEstimateMs({
@@ -324,10 +327,9 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
         ulraRoutes: undefined,
       }),
     );
-    const slowestParticipantMs = Math.max(...participantEstimates);
-    const concurrentTailFactor = Math.min(
-      1.6,
-      1 + (descriptor.ulraRoutes.length - 1) * 0.18,
+    const participantRoundEstimateMs = participantEstimates.reduce(
+      (total, participantEstimate) => total + participantEstimate,
+      0,
     );
     const reviewContextFactor = 1 + descriptor.ulraRounds * 0.12;
     const outcomeFactor =
@@ -339,25 +341,22 @@ function getLlmResponseEstimateMs(descriptor: LatencyRouteDescriptor) {
 
     estimateMs =
       synthesisEstimateMs +
-      slowestParticipantMs *
+      participantRoundEstimateMs *
         (descriptor.ulraRounds + 1) *
-        concurrentTailFactor *
         reviewContextFactor *
         outcomeFactor;
-  } else if (descriptor.ulraModelCount && descriptor.ulraRounds) {
-    // Participants run concurrently, but every review round carries a larger
-    // shared deliberation and completes at the pace of its slowest route. The
-    // selected model then performs one final synthesis. Keep this cold-start
-    // prior deliberately conservative; route-specific observations replace it
-    // after the first successful Uber turns.
-    const sequentialStages = descriptor.ulraRounds + 2;
-    const participantTailFactor = Math.min(
-      2.05,
-      1 + (descriptor.ulraModelCount - 1) * 0.35,
-    );
+  } else if (
+    descriptor.ulraModelCount &&
+    typeof descriptor.ulraRounds === "number"
+  ) {
+    // Each round asks every participant sequentially, then the selected model
+    // performs one final synthesis. Keep this cold-start prior deliberately
+    // conservative; route-specific observations replace it after the first
+    // successful Council turns.
+    const sequentialStages =
+      descriptor.ulraModelCount * (descriptor.ulraRounds + 1) + 1;
     const reviewContextFactor = 1 + descriptor.ulraRounds * 0.12;
-    estimateMs *=
-      sequentialStages * participantTailFactor * reviewContextFactor;
+    estimateMs *= sequentialStages * reviewContextFactor;
   }
 
   return Math.round(estimateMs);

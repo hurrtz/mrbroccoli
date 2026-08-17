@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const cs = {
   ...conversationArtifactTranslations.cs,
   ...interruptionTranslations.cs,
   ...ulraAuditTranslations.cs,
+  ...councilWorkspaceTranslations.cs,
   ...dataBackupTranslations.cs,
   ...conversationKnowledgeTranslations.cs,
   ...imagePromptTranslations.cs,
@@ -148,28 +150,28 @@ export const cs = {
   chooseResponseModel: "Vyber si model",
   responseModelCount: ({ count }) =>
     `K dispozici: ${count} ${Number(count) === 1 ? "model" : Number(count) < 5 ? "modely" : "modelů"}`,
-  ulraMode: "Superrežim",
-  ulraModeHomeLabel: "Zobrazit Superrežim na domovské obrazovce",
+  ulraMode: "Rada modelů",
+  ulraModeHomeLabel: "Zobrazit Radu modelů na domovské obrazovce",
   ulraModeSettingsDescription:
     "Povolí společné uvažování více modelů, když jsou připraveny alespoň dva modely z domovské obrazovky.",
   ulraModeInfo:
-    "Superrežim nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole modely kriticky posoudí nejnovější stanovisko každého účastníka; nevyužitá kola skončí po výslovné jednomyslné shodě. Vybraný model vytvoří závěrečnou odpověď z úspěšných kol a vždy zachová nejnovější stanovisko každého modelu. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
+    "Rada modelů nejprve osloví každý připravený model z domovské obrazovky samostatně. V každém kole modely kriticky posoudí nejnovější stanovisko každého účastníka; nevyužitá kola skončí po výslovné jednomyslné shodě. Vybraný model vytvoří závěrečnou odpověď z úspěšných kol a vždy zachová nejnovější stanovisko každého modelu. Obsah uvažování se sdílí se všemi zapojenými poskytovateli.",
   ulraModeRounds: "Kola kontroly",
   ulraModeCallEstimate: ({ count }) =>
     `Při aktuálním nastavení nejvýše ${count} volání modelů na zprávu.`,
   ulraModeThresholdWarning:
     "Více než 4 modely nebo 3 kola mohou trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity kontextu či frekvence poskytovatelů. Jde pouze o upozornění.",
-  ulraModeFirstUseTitle: "Zapnout Superrežim?",
+  ulraModeFirstUseTitle: "Zapnout Radu modelů?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Při ${models} modelech a nejvýše ${rounds} kolech kontroly může jedna zpráva provést až ${calls} volání modelů. Může trvat výrazně déle, stát podstatně více a sdílet uvažování se všemi zapojenými poskytovateli.`,
-  ulraModeHighRiskTitle: "Rozsáhlý běh Superrežimu",
+  ulraModeHighRiskTitle: "Rozsáhlý běh Rady modelů",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelů a ${rounds} kol kontroly může provést až ${calls} volání modelů. Může to trvat velmi dlouho, spotřebovat mnoho tokenů a narazit na limity poskytovatelů. Přesto pokračovat?`,
   ulraModeEnableAction: "Zapnout",
   ulraModeNeedsTwoModels:
-    "Superrežim vyžaduje alespoň dva připravené modely na domovské obrazovce.",
+    "Rada modelů vyžaduje alespoň dva připravené modely na domovské obrazovce.",
   ulraModeAllModelsFailed:
-    "Všechny modely Superrežimu selhaly dříve, než bylo možné sestavit odpověď.",
+    "Všechny modely Rady modelů selhaly dříve, než bylo možné sestavit odpověď.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} interních volání modelů selhalo; konečná odpověď využila ${succeeded} úspěšných příspěvků.`,
   sttTabDescription:

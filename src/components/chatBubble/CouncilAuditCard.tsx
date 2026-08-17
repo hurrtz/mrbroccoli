@@ -8,7 +8,7 @@ import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { Message } from "../../types";
 
-export function UberModeAuditCard({ message }: { message: Message }) {
+export function CouncilAuditCard({ message }: { message: Message }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
   const [expanded, setExpanded] = useState(false);
@@ -54,20 +54,20 @@ export function UberModeAuditCard({ message }: { message: Message }) {
 
   return (
     <View
-      testID={`uber-audit-${message.id}`}
+      testID={`council-audit-${message.id}`}
       style={[
         styles.card,
         { backgroundColor: colors.surfaceAlt, borderColor: colors.border },
       ]}
     >
       <TouchableOpacity
-        testID={`uber-audit-toggle-${message.id}`}
+        testID={`council-audit-toggle-${message.id}`}
         onPress={() => setExpanded((current) => !current)}
         activeOpacity={0.76}
         accessibilityRole="button"
         accessibilityState={{ expanded }}
         accessibilityLabel={
-          expanded ? t("collapseUberAudit") : t("expandUberAudit")
+          expanded ? t("collapseCouncilAudit") : t("expandCouncilAudit")
         }
         style={styles.toggle}
       >
@@ -79,10 +79,10 @@ export function UberModeAuditCard({ message }: { message: Message }) {
           />
           <View style={styles.titleCopy}>
             <Text style={[styles.title, { color: colors.text }]}>
-              {t("uberAuditTitle")}
+              {t("councilAuditTitle")}
             </Text>
             <Text style={[styles.summary, { color: colors.textMuted }]}>
-              {t("uberAuditSummary", {
+              {t("councilAuditSummary", {
                 failed: audit.failedCalls,
                 rounds: audit.roundsCompleted,
                 successful: audit.successfulCalls,
@@ -101,25 +101,25 @@ export function UberModeAuditCard({ message }: { message: Message }) {
         <View style={[styles.details, { borderTopColor: colors.border }]}>
           <Text style={[styles.outcome, { color: colors.text }]}>
             {audit.convergenceReached
-              ? t("uberAuditConverged")
-              : t("uberAuditUnresolved")}
+              ? t("councilAuditConverged")
+              : t("councilAuditUnresolved")}
           </Text>
           <Text style={[styles.detail, { color: colors.textSecondary }]}>
-            {t("uberAuditCalls", {
+            {t("councilAuditCalls", {
               failed: audit.failedCalls,
               retired: audit.retiredParticipants ?? 0,
               successful: audit.successfulCalls,
             })}
           </Text>
           <Text style={[styles.detail, { color: colors.textSecondary }]}>
-            {t("uberAuditReviews", {
+            {t("councilAuditReviews", {
               challenges,
               converged,
               unmarked,
             })}
           </Text>
           <Text style={[styles.detail, { color: colors.textSecondary }]}>
-            {t("uberAuditHistory", {
+            {t("councilAuditHistory", {
               omitted,
               retained,
               tokens: synthesisTokens.toLocaleString(),
@@ -127,7 +127,7 @@ export function UberModeAuditCard({ message }: { message: Message }) {
           </Text>
           {audit.synthesisContract ? (
             <Text style={[styles.detail, { color: colors.textSecondary }]}>
-              {t("uberAuditContract", {
+              {t("councilAuditContract", {
                 contract: audit.synthesisContract,
               })}
             </Text>
@@ -135,7 +135,7 @@ export function UberModeAuditCard({ message }: { message: Message }) {
           {routes.length > 0 ? (
             <View style={styles.routes}>
               <Text style={[styles.routeLabel, { color: colors.textMuted }]}>
-                {t("uberAuditRoutes")}
+                {t("councilAuditRoutes")}
               </Text>
               {routes.map((route) => (
                 <Text

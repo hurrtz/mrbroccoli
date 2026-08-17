@@ -56,6 +56,14 @@ the complete Play Store translations are kept in a dedicated file under
 - Model Council now publishes live structured progress for future workspace
   presentation: the current and maximum round, active models, completed calls,
   successful responses, failures, and final synthesis stage.
+- Submitted ordinary turns now lock and dim the home model/conversation header,
+  while a running Model Council reuses it at full strength to show the model
+  currently answering plus live model and round progress. The Council control
+  now opens the approved anchored model-and-round builder with permanent call
+  arithmetic; participants run sequentially so that display is truthful, and
+  the former first-use and large-run confirmations are gone. Current UI,
+  prompts, audit components, types, and localized feature names consistently
+  call the feature Model Council.
 - Encrypted backups now attach reliably in iOS mail clients by using JSON file
   and share metadata, and restoring an archived backup no longer creates
   duplicate sessions because of an obsolete pinned-state bit.

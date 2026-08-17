@@ -8,44 +8,55 @@ import { useTheme } from "../theme/ThemeContext";
 import { PhosphorIcon } from "./PhosphorIcon";
 
 export function WorkspaceHeader({
+  council = false,
   effort,
   modelAccessibilityLabel,
   modelName,
   onOpenSettings,
   onSwitchRoute,
   provider,
+  running = false,
   settingsAccessibilityLabel,
   summary,
   switchable,
 }: {
+  council?: boolean;
   effort?: string;
   modelAccessibilityLabel: string;
   modelName: string;
   onOpenSettings: () => void;
   onSwitchRoute: () => void;
   provider: Provider;
+  running?: boolean;
   settingsAccessibilityLabel: string;
   summary: string;
   switchable: boolean;
 }) {
   const { colors } = useTheme();
+  const disabled = running && !council;
 
   return (
     <View
+      accessibilityLiveRegion={running ? "polite" : undefined}
+      role={running ? "status" : undefined}
       style={[
         styles.card,
         { backgroundColor: colors.surface, borderColor: colors.border },
+        disabled ? styles.disabled : null,
       ]}
       testID="workspace-header"
     >
       <Pressable
-        accessibilityLabel={modelAccessibilityLabel}
-        accessibilityRole={switchable ? "button" : undefined}
-        disabled={!switchable}
-        onPress={switchable ? onSwitchRoute : undefined}
+        accessibilityLabel={running ? undefined : modelAccessibilityLabel}
+        accessibilityRole={!running && switchable ? "button" : undefined}
+        disabled={running || !switchable}
+        onPress={!running && switchable ? onSwitchRoute : undefined}
         style={({ pressed }) => [
           styles.row,
-          pressed && switchable ? { backgroundColor: colors.surfaceAlt } : null,
+          council ? styles.reportingRow : null,
+          pressed && !running && switchable
+            ? { backgroundColor: colors.surfaceAlt }
+            : null,
         ]}
         testID="workspace-header-model"
       >
@@ -63,7 +74,7 @@ export function WorkspaceHeader({
         >
           {modelName}
         </Text>
-        {effort ? (
+        {effort && !council ? (
           <Text
             numberOfLines={1}
             style={[styles.effort, { color: colors.textSecondary }]}
@@ -72,8 +83,8 @@ export function WorkspaceHeader({
             {effort}
           </Text>
         ) : null}
-        <View style={styles.spacer} />
-        {switchable ? (
+        {council ? null : <View style={styles.spacer} />}
+        {switchable && !council ? (
           <PhosphorIcon color={colors.textMuted} name="down" size="compact" />
         ) : null}
       </Pressable>
@@ -83,22 +94,34 @@ export function WorkspaceHeader({
         style={[styles.divider, { backgroundColor: colors.border }]}
       />
       <Pressable
-        accessibilityLabel={settingsAccessibilityLabel}
-        accessibilityRole="button"
-        onPress={onOpenSettings}
+        accessibilityLabel={running ? undefined : settingsAccessibilityLabel}
+        accessibilityRole={running ? undefined : "button"}
+        disabled={running}
+        onPress={running ? undefined : onOpenSettings}
         style={({ pressed }) => [
           styles.row,
-          pressed ? { backgroundColor: colors.surfaceAlt } : null,
+          council ? styles.reportingRow : null,
+          pressed && !running ? { backgroundColor: colors.surfaceAlt } : null,
         ]}
         testID="workspace-header-settings"
       >
         <Text
           numberOfLines={1}
-          style={[styles.summary, { color: colors.textSecondary }]}
+          style={[
+            styles.summary,
+            council ? styles.reportingSummary : null,
+            { color: colors.textSecondary },
+          ]}
         >
           {summary}
         </Text>
-        <PhosphorIcon color={colors.textMuted} name="control" size="compact" />
+        {council ? null : (
+          <PhosphorIcon
+            color={colors.textMuted}
+            name="control"
+            size="compact"
+          />
+        )}
       </Pressable>
     </View>
   );
@@ -113,6 +136,9 @@ const styles = StyleSheet.create({
   divider: {
     height: StyleSheet.hairlineWidth,
     marginHorizontal: 12,
+  },
+  disabled: {
+    opacity: 0.38,
   },
   effort: {
     flexShrink: 0,
@@ -142,6 +168,13 @@ const styles = StyleSheet.create({
     gap: 10,
     minHeight: 44,
     paddingHorizontal: 12,
+  },
+  reportingRow: {
+    justifyContent: "center",
+  },
+  reportingSummary: {
+    flex: 0,
+    textAlign: "center",
   },
   spacer: {
     flex: 1,

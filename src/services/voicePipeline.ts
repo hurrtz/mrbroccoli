@@ -336,6 +336,23 @@ export async function runVoicePipeline(
           });
         }
       }
+      callbacks.onCouncilProgress?.({
+        completedRounds:
+          deliberation.entries.reduce(
+            (highest, entry) => Math.max(highest, entry.round),
+            0,
+          ) + 1,
+        modeId:
+          ulraMode.routes.find(
+            (route) =>
+              route.provider === synthesisProvider &&
+              route.model === synthesisModel,
+          )?.modeId ?? ulraMode.routes[0]?.modeId ?? "synthesis",
+        model: synthesisModel,
+        provider: synthesisProvider,
+        stage: "synthesis",
+        totalRounds: ulraMode.rounds + 1,
+      });
       const retiredParticipants = deliberation.retiredParticipants ?? 0;
       callbacks.onUlraModeComplete?.({
         failedCalls: deliberation.failures.length,

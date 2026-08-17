@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const pt = {
   ...conversationArtifactTranslations.pt,
   ...interruptionTranslations.pt,
   ...ulraAuditTranslations.pt,
+  ...councilWorkspaceTranslations.pt,
   ...dataBackupTranslations.pt,
   ...conversationKnowledgeTranslations.pt,
   ...imagePromptTranslations.pt,
@@ -147,28 +149,28 @@ export const pt = {
   useResponseMode: ({ mode }) => `Utilizar ${mode}`,
   chooseResponseModel: "Escolhe um modelo",
   responseModelCount: ({ count }) => `${count} modelos disponíveis`,
-  ulraMode: "Modo Supremo",
-  ulraModeHomeLabel: "Mostrar o modo Supremo no ecrã inicial",
+  ulraMode: "Conselho de Modelos",
+  ulraModeHomeLabel: "Mostrar o Conselho de Modelos no ecrã inicial",
   ulraModeSettingsDescription:
     "Permite a deliberação entre vários modelos quando pelo menos dois modelos do ecrã inicial estão prontos.",
   ulraModeInfo:
-    "O modo Supremo consulta separadamente cada modelo pronto no ecrã inicial. Em cada ronda, os modelos contestam a posição mais recente de cada participante; as rondas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza as rondas concluídas com êxito, mantendo sempre a posição mais recente de cada modelo. A deliberação é partilhada com todos os fornecedores envolvidos.",
+    "O Conselho de Modelos consulta separadamente cada modelo pronto no ecrã inicial. Em cada ronda, os modelos contestam a posição mais recente de cada participante; as rondas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza as rondas concluídas com êxito, mantendo sempre a posição mais recente de cada modelo. A deliberação é partilhada com todos os fornecedores envolvidos.",
   ulraModeRounds: "Rondas de revisão",
   ulraModeCallEstimate: ({ count }) =>
     `Até ${count} chamadas a modelos por mensagem com a configuração atual.`,
   ulraModeThresholdWarning:
     "Mais de 4 modelos ou 3 rondas podem demorar muito, consumir muitos tokens e atingir limites de contexto ou de pedidos dos fornecedores. Isto é apenas um aviso.",
-  ulraModeFirstUseTitle: "Ativar o modo Supremo?",
+  ulraModeFirstUseTitle: "Ativar o Conselho de Modelos?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Com ${models} modelos e até ${rounds} rondas de revisão, uma mensagem pode fazer até ${calls} chamadas a modelos. Pode demorar muito mais, custar bastante mais e partilhar a deliberação com todos os fornecedores envolvidos.`,
-  ulraModeHighRiskTitle: "Execução extensa do modo Supremo",
+  ulraModeHighRiskTitle: "Execução extensa do Conselho de Modelos",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos e ${rounds} rondas de revisão podem fazer até ${calls} chamadas a modelos. Isto pode demorar muito, usar muitos tokens e atingir limites dos fornecedores. Continuar mesmo assim?`,
   ulraModeEnableAction: "Ativar",
   ulraModeNeedsTwoModels:
-    "O modo Supremo precisa de pelo menos dois modelos prontos no ecrã inicial.",
+    "O Conselho de Modelos precisa de pelo menos dois modelos prontos no ecrã inicial.",
   ulraModeAllModelsFailed:
-    "Todos os modelos do modo Supremo falharam antes de ser possível sintetizar uma resposta.",
+    "Todos os modelos do Conselho de Modelos falharam antes de ser possível sintetizar uma resposta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chamadas internas a modelos falharam; a resposta final usou ${succeeded} contributos bem-sucedidos.`,
   sttTabDescription:

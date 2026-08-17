@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const hi = {
   ...conversationArtifactTranslations.hi,
   ...interruptionTranslations.hi,
   ...ulraAuditTranslations.hi,
+  ...councilWorkspaceTranslations.hi,
   ...dataBackupTranslations.hi,
   ...conversationKnowledgeTranslations.hi,
   ...imagePromptTranslations.hi,
@@ -147,28 +149,28 @@ export const hi = {
   useResponseMode: ({ mode }) => `${mode} का प्रयोग करें`,
   chooseResponseModel: "एक मॉडल चुनें",
   responseModelCount: ({ count }) => `${count} मॉडल उपलब्ध हैं`,
-  ulraMode: "सर्वोच्च मोड",
-  ulraModeHomeLabel: "होम स्क्रीन पर सर्वोच्च मोड दिखाएँ",
+  ulraMode: "मॉडल परिषद",
+  ulraModeHomeLabel: "होम स्क्रीन पर मॉडल परिषद दिखाएँ",
   ulraModeSettingsDescription:
     "जब होम स्क्रीन के कम से कम दो मॉडल तैयार हों, तब कई मॉडलों के बीच विचार-विमर्श की अनुमति देता है।",
   ulraModeInfo:
-    "सर्वोच्च मोड पहले होम स्क्रीन के हर तैयार मॉडल से अलग-अलग उत्तर माँगता है। हर समीक्षा दौर में मॉडल प्रत्येक प्रतिभागी की नवीनतम स्थिति को चुनौती देते हैं; स्पष्ट सर्वसम्मति होने पर बची हुई दौर रोक दी जाती हैं। चुना गया मॉडल हर मॉडल की नवीनतम स्थिति को हमेशा रखते हुए सफल दौरों से अंतिम उत्तर तैयार करता है। विचार-विमर्श सभी शामिल प्रदाताओं के साथ साझा किया जाता है।",
+    "मॉडल परिषद पहले होम स्क्रीन के हर तैयार मॉडल से अलग-अलग उत्तर माँगती है। हर समीक्षा दौर में मॉडल प्रत्येक प्रतिभागी की नवीनतम स्थिति को चुनौती देते हैं; स्पष्ट सर्वसम्मति होने पर बची हुई दौर रोक दी जाती हैं। चुना गया मॉडल हर मॉडल की नवीनतम स्थिति को हमेशा रखते हुए सफल दौरों से अंतिम उत्तर तैयार करता है। विचार-विमर्श सभी शामिल प्रदाताओं के साथ साझा किया जाता है।",
   ulraModeRounds: "समीक्षा दौर",
   ulraModeCallEstimate: ({ count }) =>
     `मौजूदा सेटअप में प्रति संदेश अधिकतम ${count} मॉडल कॉल।`,
   ulraModeThresholdWarning:
     "4 से अधिक मॉडल या 3 से अधिक दौर बहुत समय ले सकते हैं, बहुत से टोकन खर्च कर सकते हैं और प्रदाता की कॉन्टेक्स्ट या दर सीमा तक पहुँच सकते हैं। यह केवल चेतावनी है।",
-  ulraModeFirstUseTitle: "सर्वोच्च मोड चालू करें?",
+  ulraModeFirstUseTitle: "मॉडल परिषद चालू करें?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `${models} मॉडल और अधिकतम ${rounds} समीक्षा दौर के साथ एक संदेश अधिकतम ${calls} मॉडल कॉल कर सकता है। इसमें बहुत अधिक समय और लागत लग सकती है तथा विचार-विमर्श सभी शामिल प्रदाताओं के साथ साझा होगा।`,
-  ulraModeHighRiskTitle: "बड़ा सर्वोच्च मोड रन",
+  ulraModeHighRiskTitle: "बड़ा मॉडल परिषद रन",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} मॉडल और ${rounds} समीक्षा दौर अधिकतम ${calls} मॉडल कॉल कर सकते हैं। इसमें बहुत समय लग सकता है, बहुत से टोकन खर्च हो सकते हैं और प्रदाता सीमाएँ पूरी हो सकती हैं। फिर भी जारी रखें?`,
   ulraModeEnableAction: "चालू करें",
   ulraModeNeedsTwoModels:
-    "सर्वोच्च मोड के लिए होम स्क्रीन पर कम से कम दो तैयार मॉडल चाहिए।",
+    "मॉडल परिषद के लिए होम स्क्रीन पर कम से कम दो तैयार मॉडल चाहिए।",
   ulraModeAllModelsFailed:
-    "उत्तर तैयार होने से पहले सर्वोच्च मोड के सभी मॉडल विफल हो गए।",
+    "उत्तर तैयार होने से पहले मॉडल परिषद के सभी मॉडल विफल हो गए।",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} आंतरिक मॉडल कॉल विफल हुए; अंतिम उत्तर में ${succeeded} सफल योगदान इस्तेमाल हुए।`,
   sttTabDescription:

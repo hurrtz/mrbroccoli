@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const it = {
   ...conversationArtifactTranslations.it,
   ...interruptionTranslations.it,
   ...ulraAuditTranslations.it,
+  ...councilWorkspaceTranslations.it,
   ...dataBackupTranslations.it,
   ...conversationKnowledgeTranslations.it,
   ...imagePromptTranslations.it,
@@ -148,28 +150,28 @@ export const it = {
   useResponseMode: ({ mode }) => `Usa ${mode}`,
   chooseResponseModel: "Scegli un modello",
   responseModelCount: ({ count }) => `${count} modelli disponibili`,
-  ulraMode: "Modalità suprema",
-  ulraModeHomeLabel: "Mostra la Modalità suprema nella schermata iniziale",
+  ulraMode: "Consiglio dei modelli",
+  ulraModeHomeLabel: "Mostra il Consiglio dei modelli nella schermata iniziale",
   ulraModeSettingsDescription:
     "Consente il confronto tra più modelli quando almeno due modelli della schermata iniziale sono pronti.",
   ulraModeInfo:
-    "La Modalità suprema interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, i modelli mettono alla prova l’ultima posizione di ciascun partecipante; i round inutilizzati vengono saltati dopo una convergenza unanime esplicita. Il modello selezionato sintetizza i round completati con successo, conservando sempre l’ultima posizione di ogni modello. Il confronto viene condiviso con tutti i provider coinvolti.",
+    "Il Consiglio dei modelli interroga separatamente ogni modello pronto nella schermata iniziale. A ogni round, i modelli mettono alla prova l’ultima posizione di ciascun partecipante; i round inutilizzati vengono saltati dopo una convergenza unanime esplicita. Il modello selezionato sintetizza i round completati con successo, conservando sempre l’ultima posizione di ogni modello. Il confronto viene condiviso con tutti i provider coinvolti.",
   ulraModeRounds: "Round di revisione",
   ulraModeCallEstimate: ({ count }) =>
     `Fino a ${count} chiamate ai modelli per messaggio con la configurazione attuale.`,
   ulraModeThresholdWarning:
     "Più di 4 modelli o 3 round possono richiedere molto tempo, consumare molti token e raggiungere i limiti di contesto o frequenza dei provider. Questo è solo un avviso.",
-  ulraModeFirstUseTitle: "Attivare la Modalità suprema?",
+  ulraModeFirstUseTitle: "Attivare il Consiglio dei modelli?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Con ${models} modelli e fino a ${rounds} round di revisione, un messaggio può effettuare fino a ${calls} chiamate ai modelli. Potrebbe richiedere molto più tempo, costare sensibilmente di più e condividere il confronto con tutti i provider coinvolti.`,
-  ulraModeHighRiskTitle: "Esecuzione estesa della Modalità suprema",
+  ulraModeHighRiskTitle: "Esecuzione estesa del Consiglio dei modelli",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelli e ${rounds} round di revisione possono effettuare fino a ${calls} chiamate ai modelli. Potrebbe richiedere molto tempo, usare molti token e raggiungere i limiti dei provider. Continuare comunque?`,
   ulraModeEnableAction: "Attiva",
   ulraModeNeedsTwoModels:
-    "La Modalità suprema richiede almeno due modelli pronti nella schermata iniziale.",
+    "Il Consiglio dei modelli richiede almeno due modelli pronti nella schermata iniziale.",
   ulraModeAllModelsFailed:
-    "Tutti i modelli della Modalità suprema hanno fallito prima che fosse possibile sintetizzare una risposta.",
+    "Tutti i modelli del Consiglio dei modelli hanno fallito prima che fosse possibile sintetizzare una risposta.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chiamate interne ai modelli non sono riuscite; la risposta finale ha usato ${succeeded} contributi riusciti.`,
   sttTabDescription:

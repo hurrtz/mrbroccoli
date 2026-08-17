@@ -4,6 +4,7 @@ import { conversationKnowledgeTranslations } from "../conversationKnowledgeTrans
 import { conversationArtifactTranslations } from "../conversationArtifactTranslations";
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
+import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -16,6 +17,7 @@ export const ptBR = {
   ...conversationArtifactTranslations.ptBR,
   ...interruptionTranslations.ptBR,
   ...ulraAuditTranslations.ptBR,
+  ...councilWorkspaceTranslations.ptBR,
   ...dataBackupTranslations.ptBR,
   ...conversationKnowledgeTranslations.ptBR,
   ...imagePromptTranslations.ptBR,
@@ -147,28 +149,28 @@ export const ptBR = {
   useResponseMode: ({ mode }) => `Usar ${mode}`,
   chooseResponseModel: "Escolha um modelo",
   responseModelCount: ({ count }) => `${count} modelos disponíveis`,
-  ulraMode: "Modo Supremo",
-  ulraModeHomeLabel: "Mostrar o modo Supremo na tela inicial",
+  ulraMode: "Conselho de Modelos",
+  ulraModeHomeLabel: "Mostrar o Conselho de Modelos na tela inicial",
   ulraModeSettingsDescription:
     "Permite a deliberação entre vários modelos quando pelo menos dois modelos da tela inicial estão prontos.",
   ulraModeInfo:
-    "O modo Supremo consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, os modelos questionam a posição mais recente de cada participante; as rodadas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza as rodadas concluídas com êxito, mantendo sempre a posição mais recente de cada modelo. A deliberação é compartilhada com todos os provedores envolvidos.",
+    "O Conselho de Modelos consulta separadamente cada modelo pronto na tela inicial. Em cada rodada, os modelos questionam a posição mais recente de cada participante; as rodadas restantes são ignoradas após uma convergência unânime explícita. O modelo selecionado sintetiza as rodadas concluídas com êxito, mantendo sempre a posição mais recente de cada modelo. A deliberação é compartilhada com todos os provedores envolvidos.",
   ulraModeRounds: "Rodadas de revisão",
   ulraModeCallEstimate: ({ count }) =>
     `Até ${count} chamadas de modelo por mensagem com a configuração atual.`,
   ulraModeThresholdWarning:
     "Mais de 4 modelos ou 3 rodadas podem levar muito tempo, consumir muitos tokens e atingir limites de contexto ou taxa dos provedores. Isto é apenas um aviso.",
-  ulraModeFirstUseTitle: "Ativar o modo Supremo?",
+  ulraModeFirstUseTitle: "Ativar o Conselho de Modelos?",
   ulraModeFirstUseMessage: ({ calls, models, rounds }) =>
     `Com ${models} modelos e até ${rounds} rodadas de revisão, uma mensagem pode fazer até ${calls} chamadas de modelo. Pode demorar muito mais, custar bem mais e compartilhar a deliberação com todos os provedores envolvidos.`,
-  ulraModeHighRiskTitle: "Execução extensa do modo Supremo",
+  ulraModeHighRiskTitle: "Execução extensa do Conselho de Modelos",
   ulraModeHighRiskMessage: ({ calls, models, rounds }) =>
     `${models} modelos e ${rounds} rodadas de revisão podem fazer até ${calls} chamadas de modelo. Isso pode levar muito tempo, usar muitos tokens e atingir limites dos provedores. Continuar mesmo assim?`,
   ulraModeEnableAction: "Ativar",
   ulraModeNeedsTwoModels:
-    "O modo Supremo precisa de pelo menos dois modelos prontos na tela inicial.",
+    "O Conselho de Modelos precisa de pelo menos dois modelos prontos na tela inicial.",
   ulraModeAllModelsFailed:
-    "Todos os modelos do modo Supremo falharam antes que uma resposta pudesse ser sintetizada.",
+    "Todos os modelos do Conselho de Modelos falharam antes que uma resposta pudesse ser sintetizada.",
   ulraModePartialFailureNotice: ({ failed, succeeded }) =>
     `${failed} chamadas internas de modelo falharam; a resposta final usou ${succeeded} contribuições bem-sucedidas.`,
   sttTabDescription:

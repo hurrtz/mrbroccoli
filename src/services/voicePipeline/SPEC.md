@@ -110,7 +110,10 @@ the configured review depth.
 
 Each private participant has a ten-minute absolute deadline. Terminally failed
 participants are retired from later rounds; successful participants continue.
-Each batch reports progress when it starts and whenever a participant settles.
+Participants run one after another within each immutable round. Progress names
+the participant currently in flight and reports again whenever it settles, so
+the workspace can truthfully pair its active model with completed and failed
+counts without completion-order races.
 The public progress contract counts the independent contribution batch as round
 one, so `totalRounds` equals that batch plus the configured review rounds. It
 separates models that returned usable responses from failed but settled calls,
@@ -124,8 +127,10 @@ completion has a separate 32,000-character ceiling at the shared streaming
 boundary; this limit is independent of provider token settings and prevents a
 runaway synthesis from overwhelming rendering, leak inspection, or speech.
 
-**Decision:** The round barrier is deliberate. Every reviewer sees the same
-snapshot, preventing completion order from changing the deliberation.
+**Decision:** Both the round barrier and sequential participant order are
+deliberate. Every reviewer sees the same snapshot, while the visible current
+model and the provider-billing arithmetic correspond to exactly one in-flight
+participant call.
 
 ## Response and Speech
 
