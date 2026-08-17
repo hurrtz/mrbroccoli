@@ -46,12 +46,12 @@ the complete Play Store translations are kept in a dedicated file under
   wrap in the transcript so all attachments remain viewable.
 - Functional local speech models remain selectable when their benchmark is
   slower than recommended; only failed benchmarks block selection.
-- The home pager arrows now remain fully active, sit outside the horizontal
-  swipe recognizer so every ordinary tap completes one transition, and always
-  bring the next surface in from the side that was pressed—even across repeated
-  cycles. Revealing the text composer does not focus it or open the keyboard.
-  The workspace also adds breathing room below its headline before the model
-  selector.
+- The home pager arrows now align with the measured voice-orb centre, remain
+  fully active, sit outside the horizontal swipe recognizer so every ordinary
+  tap completes one transition, and always bring the next surface in from the
+  side that was pressed—even across repeated cycles. Revealing the text composer
+  does not focus it or open the keyboard. The workspace also adds breathing room
+  below its headline before the model selector.
 - Long Model Council syntheses no longer freeze the app during streamed
   readback: private-context leak checks now stay incremental, and runaway final
   answers stop at a provider-independent safety ceiling.

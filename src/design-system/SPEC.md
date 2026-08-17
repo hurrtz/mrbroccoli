@@ -96,6 +96,9 @@ framework or hiding platform behavior behind excessive abstraction.
   Stop remains active throughout a turn; Restart, Back, and Forward are enabled
   only during spoken playback. That box must include the complete visible
   label footprint instead of relying on overflow beyond its measured height.
+  Because that footprint is deliberately asymmetric, sibling controls that
+  flank the orb must align to the layout's returned `centreY`, not the box
+  midpoint.
   `OrbSatellite` has no persistent container;
   active toggles use filled accent glyphs plus matching labels, disabled
   controls rest at 38%, and its Image form may replace the glyph with up to

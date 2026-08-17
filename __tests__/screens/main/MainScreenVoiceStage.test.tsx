@@ -288,6 +288,24 @@ describe("MainScreenVoiceStage composer", () => {
     ).toEqual(expect.objectContaining({ height: 120, width: 120 }));
   });
 
+  it("centres the pager chevrons on the measured voice orb", () => {
+    const screen = renderStage(<MainScreenVoiceStage {...createProps()} />);
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("pager-chevron-layer").props.style)
+        .transform,
+    ).toEqual([{ translateY: -23 }]);
+
+    fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+      nativeEvent: { layout: { height: 148, width: 320 } },
+    });
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("pager-chevron-layer").props.style)
+        .transform,
+    ).toEqual([{ translateY: -28.5 }]);
+  });
+
   it("blocks prompt CTAs when the selected voice route is unavailable", () => {
     const onPress = jest.fn();
     const onResolvePromptBlock = jest.fn();

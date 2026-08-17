@@ -253,6 +253,11 @@ enter from the left, including repeated taps around the two-page circle. Arrow
 and swipe navigation change only the visible page; neither focuses the composer
 or opens the keyboard. A direct field action owns keyboard entry, and a layout
 remount restores focus only when that field actually held it.
+The sibling layer translates vertically by
+`transportLayout.centreY - transportLayout.height / 2` for the current measured
+orb. This keeps both 44pt targets centred on the orb instead of on the transport
+box whose translated control labels reserve more space below the orb than above
+it.
 The portrait pager measures one central stage and derives the largest
 orb-transport cluster that fits its height and the width between the two 44pt
 chevrons, clamped from a 120pt orb to the portrait ceiling. `OrbTransport`

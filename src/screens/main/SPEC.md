@@ -46,6 +46,9 @@ receive already-derived state and callbacks.
   a transcript dock or landscape split simply makes it smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
   the voice/text pager discoverable without competing with the voice action.
+  Their target centres follow the orb centre returned by the measured
+  `OrbTransport` layout, not the midpoint of its asymmetric box with the label
+  allowance below the orb.
   **Decision:** the pager is a closed circle — every decisive swipe and every
   chevron leaves the current surface, in either direction, so no navigation
   gesture is ever a dead end. With two pages that circle is a toggle, which is

@@ -3,7 +3,10 @@ import React from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-import { OrbTransport } from "../../../design-system/OrbTransport";
+import {
+  getOrbTransportLayout,
+  OrbTransport,
+} from "../../../design-system/OrbTransport";
 import { Colors } from "../../../theme/colors";
 import { InputMode } from "../../../types";
 import { TranslateFn } from "../shared";
@@ -275,6 +278,12 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
   } = props;
 
   const targetSurface = activeSurface === "voice" ? "text" : "voice";
+  const transportLayout = getOrbTransportLayout(
+    props.stageSize,
+    props.showTransportLabels,
+  );
+  const chevronCentreOffsetY =
+    transportLayout.centreY - transportLayout.height / 2;
 
   return (
     <View style={styles.pagerShell} testID="voice-text-input-pager-shell">
@@ -327,6 +336,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
         pointerEvents={isActive ? "none" : "box-none"}
         style={[
           styles.chevronLayer,
+          { transform: [{ translateY: chevronCentreOffsetY }] },
           isActive ? styles.chevronLayerCovered : null,
         ]}
         testID="pager-chevron-layer"
