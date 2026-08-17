@@ -832,6 +832,12 @@ export function useConversationMutations(params: {
       for (const record of records) {
         const originalId = record.conversation.id;
         const existingMeta = existingMetasById.get(originalId);
+        const importedPinned = record.conversation.archived
+          ? false
+          : record.pinned;
+        const existingPinned = existingMeta?.archived
+          ? false
+          : existingMeta?.pinned;
 
         if (existingMeta) {
           const existingConversation = await readConversation(originalId);
@@ -841,7 +847,7 @@ export function useConversationMutations(params: {
               existingConversation,
               record,
             )) &&
-            existingMeta.pinned === record.pinned
+            existingPinned === importedPinned
           ) {
             conversationsSkipped += 1;
             restoredByOriginalId.set(originalId, existingConversation);
@@ -870,7 +876,7 @@ export function useConversationMutations(params: {
         pendingRestores.push({
           originalId,
           conversation: restoredConversation,
-          pinned: record.pinned,
+          pinned: importedPinned,
         });
         conversationsRestored += 1;
       }

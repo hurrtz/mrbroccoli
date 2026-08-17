@@ -56,6 +56,9 @@ the complete Play Store translations are kept in a dedicated file under
 - Model Council now publishes live structured progress for future workspace
   presentation: the current and maximum round, active models, completed calls,
   successful responses, failures, and final synthesis stage.
+- Encrypted backups now attach reliably in iOS mail clients by using JSON file
+  and share metadata, and restoring an archived backup no longer creates
+  duplicate sessions because of an obsolete pinned-state bit.
 
 ## 4.0.0 - 2026-08-16
 

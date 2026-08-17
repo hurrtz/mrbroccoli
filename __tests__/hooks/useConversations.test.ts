@@ -564,6 +564,51 @@ describe("useConversations", () => {
     );
   });
 
+  it("does not duplicate archived conversations with a stale pinned backup bit", async () => {
+    const { result } = renderHook(() => useConversations());
+
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Archived backup");
+    });
+    const conversationId = result.current.activeConversation!.id;
+    await act(async () => {
+      await result.current.toggleConversationArchived(conversationId);
+    });
+    const archivedConversation = result.current.activeConversation!;
+
+    let restoreResult:
+      | Awaited<ReturnType<typeof result.current.restoreConversationBackup>>
+      | undefined;
+    await act(async () => {
+      restoreResult = await result.current.restoreConversationBackup(
+        [
+          {
+            conversation: archivedConversation,
+            // Archived conversations cannot be pinned. Older or interrupted
+            // exports may nevertheless carry this stale metadata bit.
+            pinned: true,
+          },
+        ],
+        null,
+      );
+    });
+
+    expect(restoreResult).toEqual({
+      conversationsCopied: 0,
+      conversationsRestored: 0,
+      conversationsSkipped: 1,
+    });
+    expect(result.current.conversations).toHaveLength(1);
+    expect(result.current.conversations[0]).toEqual(
+      expect.objectContaining({
+        archived: true,
+        id: conversationId,
+        pinned: false,
+      }),
+    );
+  });
+
   it("remaps branch ancestry when a backup family is restored as copies", async () => {
     const stored = new Map<string, string>();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(

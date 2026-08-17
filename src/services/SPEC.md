@@ -114,7 +114,9 @@ fresh disclosure; prior consent to one provider is not consent to another.
 image bytes and replaces device paths with
 `mrbroccoli-backup://image/<attachment-id>` references. It supports readable
 JSON and passphrase-encrypted AES-256-GCM with bounded input size and a minimum
-passphrase length.
+passphrase length. Both exports are JSON envelopes and use a `.json` terminal
+extension plus matching share metadata so native mail and file targets can
+accept them; the encrypted filename remains visibly marked as encrypted.
 
 Portable settings exclude `apiKeys` and provider-validation diagnostics.
 Backups exclude downloaded models, audio, derived knowledge/index data, debug

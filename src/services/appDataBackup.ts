@@ -541,7 +541,10 @@ export async function createAppDataBackup(params: {
       return {
         ...(attachments.length > 0 ? { attachments } : {}),
         conversation: portableConversation,
-        pinned: meta.pinned,
+        // Archive state owns visibility and archived sessions cannot also be
+        // pinned. Canonicalize the portable metadata so a stale pin bit does
+        // not turn an otherwise-identical restore into a conflict copy.
+        pinned: portableConversation.archived ? false : meta.pinned,
       };
     }),
   );

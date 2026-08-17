@@ -488,14 +488,17 @@ describe("DataPrivacySettingsPage", () => {
       "a long test passphrase",
     );
     const sharedPath = jest.mocked(Sharing.shareAsync).mock.calls[0][0];
-    expect(sharedPath).toMatch(/\.mrbroccoli\.encrypted$/);
+    expect(sharedPath).toMatch(/-encrypted\.mrbroccoli\.json$/);
     expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
       sharedPath,
       encryptedDocument,
     );
     expect(Sharing.shareAsync).toHaveBeenCalledWith(
       sharedPath,
-      expect.objectContaining({ mimeType: "application/octet-stream" }),
+      expect.objectContaining({
+        mimeType: "application/json",
+        UTI: "public.json",
+      }),
     );
     expect(getVisibleModal(screen)).toBeUndefined();
   });

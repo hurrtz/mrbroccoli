@@ -209,6 +209,38 @@ describe("appDataBackup", () => {
     expect(parseAppDataBackup(serialized)).toEqual(backup);
   });
 
+  it("exports archived conversations without stale pin metadata", async () => {
+    const archivedConversation: Conversation = {
+      ...conversation,
+      archived: true,
+    };
+    const { backup } = await createAppDataBackup({
+      activeConversationId: null,
+      appVersion: "4.0.0",
+      conversationMetas: [
+        {
+          id: archivedConversation.id,
+          title: archivedConversation.title,
+          createdAt: archivedConversation.createdAt,
+          updatedAt: archivedConversation.updatedAt,
+          messageCount: 1,
+          providers: [],
+          providerModels: {},
+          lastModel: null,
+          lastProvider: null,
+          archived: true,
+          pinned: true,
+        },
+      ],
+      getConversationById: async () => archivedConversation,
+      settings: DEFAULT_SETTINGS,
+    });
+
+    expect(backup.data.conversations[0]).toEqual(
+      expect.objectContaining({ pinned: false }),
+    );
+  });
+
   it("drops retired private markers while parsing a legacy backup", async () => {
     const legacyBackup = await createBackup();
     (

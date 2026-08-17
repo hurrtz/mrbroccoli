@@ -122,6 +122,8 @@ fail or be rebuilt without losing conversations.
 Backup restore is non-destructive:
 
 - identical records with matching pin state are skipped;
+- archive state implies an unpinned record, so stale pinned metadata in an
+  archived backup cannot create a duplicate of identical conversation data;
 - a conflicting conversation ID is restored under a new UUID;
 - attachment IDs and files are materialized safely;
 - branch root/parent references and knowledge exclusions are remapped across

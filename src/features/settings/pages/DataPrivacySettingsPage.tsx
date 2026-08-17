@@ -163,9 +163,9 @@ function getBackupFileName(encrypted: boolean) {
     .toISOString()
     .replace(/\.\d{3}Z$/, "Z")
     .replace(/:/g, "-");
-  return `mr-broccoli-backup-${timestamp}.mrbroccoli.${
-    encrypted ? "encrypted" : "json"
-  }`;
+  return `mr-broccoli-backup-${timestamp}${
+    encrypted ? "-encrypted" : ""
+  }.mrbroccoli.json`;
 }
 
 export function DataPrivacySettingsPage({
@@ -296,8 +296,12 @@ export function DataPrivacySettingsPage({
       );
       await Sharing.shareAsync(file.path, {
         dialogTitle: t("dataBackup"),
-        mimeType: encrypted ? "application/octet-stream" : "application/json",
-        UTI: encrypted ? "public.data" : "public.json",
+        // Both formats are JSON documents. Keeping `.json`, its MIME type,
+        // and its iOS UTI aligned lets mail clients accept the encrypted
+        // envelope as an attachment instead of treating the custom suffix as
+        // unknown generic data.
+        mimeType: "application/json",
+        UTI: "public.json",
       });
       return file;
     },
