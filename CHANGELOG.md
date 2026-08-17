@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.1.0 - 2026-08-18
+
 - Mr Broccoli is now one paid-upfront BYOK product from first launch. The app
   opens directly into the workspace, all provider features are available after
   their own key is configured, and the former Free/Premium purchase,
