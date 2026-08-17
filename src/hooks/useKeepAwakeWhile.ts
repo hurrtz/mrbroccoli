@@ -6,11 +6,10 @@ import { recordDebugLogEvent } from "../services/debugLogCapture";
 /**
  * Holds the screen wake lock while `active` is true.
  *
- * Two long-running foreground tasks need this: a voice session, and Free
- * on-device setup, whose downloads and benchmarks run far longer than any
+ * Voice sessions and optional speech-model downloads can run longer than the
  * default screen timeout. The release deliberately waits for an in-flight
  * activation to settle, so a fast unmount cannot strand a wake lock; keeping
- * that in one place stops the two callers from drifting apart.
+ * that behavior in one place stops callers from drifting apart.
  */
 export function useKeepAwakeWhile(active: boolean, tag: string) {
   useEffect(() => {

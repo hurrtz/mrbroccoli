@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const pl = {
   ...conversationKnowledgeTranslations.pl,
   ...imagePromptTranslations.pl,
   ...onDeviceTranslations.pl,
-  ...onboardingTranslations.pl,
-  ...introTranslations.pl,
-  ...premiumTranslations.pl,
+  ...localSpeechTranslations.pl,
+  ...settingsTranslations.pl,
   ...transcriptEditTranslations.pl,
   ...workspaceTranslations.pl,
   ...sessionLockTranslations.pl,
-  ...autoSetupTranslations.pl,
   appName: "Pan Brokuł",
   retry: "Spróbuj ponownie",
   dismiss: "Odrzuć",
@@ -40,7 +36,6 @@ export const pl = {
   settings: "Ustawienia",
   settingsReleaseVersion: ({ version }) => `Wersja ${version}`,
   all: "Wszystko",
-  firstRun: "Pierwsze uruchomienie",
   instructions: "Instrukcje",
   providers: "Dostawcy",
   webSearch: "Wyszukiwanie w Internecie",
@@ -211,10 +206,10 @@ export const pl = {
   createApiKey: "Poświadczenia",
   apiKey: "Klucz API",
   aboutThisProvider: "Informacje o tym dostawcy",
-  openRouterOnboardingTitle: "Jeden klucz, wielu dostawców",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Jeden klucz, wielu dostawców",
+  openRouterGatewayDescription:
     "Utwórz dedykowany klucz OpenRouter, wklej go poniżej i korzystaj z modeli opartych na migawkach od kilku dostawców bez konieczności wymiany bezpośredniego połączenia.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Ścieżka żądania: to urządzenie → OpenRouter → wybrany dostawca nadrzędny",
   openRouterKeys: "Klucze OpenRouter",
   providerStatusInvalid: "Nieprawidłowe",

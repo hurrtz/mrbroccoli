@@ -4,7 +4,6 @@ import {
   type LocalModelDefinition,
 } from "../../constants/localModels";
 import type { Settings, SpeechLanguage } from "../../types";
-import { deriveResponseModesForProvider } from "../../utils/responseModes";
 
 export function getLocalLanguageSettingsUpdate(
   settings: Settings,
@@ -64,25 +63,6 @@ export function getLocalLanguageSettingsUpdate(
     nextSettings.ttsMode = "native";
   }
 
-  let responseModes = settings.responseModes.filter(({ route }) => {
-    return (
-      !route.localModelId ||
-      localModelSupportsLanguages(
-        getLocalModel(route.localModelId),
-        nextLanguages,
-      )
-    );
-  });
-  if (responseModes.length !== settings.responseModes.length) {
-    if (responseModes.length === 0) {
-      responseModes = deriveResponseModesForProvider(settings.lastProvider, 1);
-    }
-    nextSettings.responseModes = responseModes;
-    if (!responseModes.some(({ id }) => id === settings.activeResponseMode)) {
-      nextSettings.activeResponseMode = responseModes[0].id;
-    }
-  }
-
   return nextSettings;
 }
 
@@ -104,18 +84,5 @@ export function getLocalModelRemovalSettingsUpdate(
     nextSettings.localTtsModelId = null;
     nextSettings.ttsMode = "native";
   }
-  if (model.capability === "llm") {
-    let responseModes = settings.responseModes.filter(
-      ({ route }) => route.localModelId !== model.id,
-    );
-    if (responseModes.length === 0) {
-      responseModes = deriveResponseModesForProvider(settings.lastProvider, 1);
-    }
-    nextSettings.responseModes = responseModes;
-    if (!responseModes.some(({ id }) => id === settings.activeResponseMode)) {
-      nextSettings.activeResponseMode = responseModes[0].id;
-    }
-  }
-
   return nextSettings;
 }

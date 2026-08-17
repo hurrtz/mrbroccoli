@@ -1,8 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
 
-import { IntroBanner } from "../../components/IntroBanner";
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
+import {
+  AttachmentPopover,
+  type AttachmentPopoverAnchor,
+} from "../../design-system/AttachmentPopover";
 import { ConversationSettingsSummary } from "../../design-system/ConversationSettingsSummary";
 import { IconButton } from "../../design-system/IconButton";
 import { OrbSatellite } from "../../design-system/OrbSatellite";
@@ -11,7 +14,7 @@ import { Modal } from "../../design-system/NativeControls";
 import { SheetHeader } from "../../design-system/SheetHeader";
 import type { Colors } from "../../theme/colors";
 import { fonts } from "../../theme/typography";
-import type { VoiceVisualPhase } from "../../types";
+import type { MessageImageAttachment, VoiceVisualPhase } from "../../types";
 import type { IpadLayout } from "../../utils/ipadLayout";
 import { MainScreenRouteCard } from "./MainScreenRouteCard";
 import { MainScreenTopBar } from "./MainScreenTopBar";
@@ -24,27 +27,19 @@ import { styles } from "./styles";
 const ACCESSIBILITY_COMPACT_FONT_SCALE = 1.8;
 
 interface WorkspaceSatellitesProps {
-  colors: Colors;
+  attachments: MessageImageAttachment[];
   compact?: boolean;
   councilActive: boolean;
   councilAvailable: boolean;
   disabled: boolean;
   imageAvailable: boolean;
   imageDisabled: boolean;
-  driveRunning: boolean;
-  driveSession: boolean;
+  handsFreeActive: boolean;
   onAddImage?: () => void;
-  onDriveResume?: () => void;
-  onDriveStop?: () => void;
-  /** Replays the response from its first word; live only while he speaks. */
-  onRestart?: () => void;
-  /** Moves a paragraph back or forward; live only while he speaks. */
-  onSeekBack?: () => void;
-  onSeekForward?: () => void;
-  onStopPlayback: () => void;
+  onRemoveImage?: (attachmentId: string) => void;
+  onToggleHandsFree: () => void;
   onToggleCouncil?: () => void;
   onToggleWeb?: () => void;
-  speaking: boolean;
   t: TranslateFn;
   turnActive: boolean;
   webActive: boolean;
@@ -52,149 +47,134 @@ interface WorkspaceSatellitesProps {
 }
 
 /**
- * The ring belongs to the phase. At idle it carries the composing controls —
- * image, council, web — the only moment they mean anything. Once a turn runs
- * they give way to the transport verbs, and a drive session shows transport in
- * every phase, idle included, because the loop must be stoppable at rest.
- *
- * Restart, Back and Forward stay disabled until speaking begins; Back and
- * Forward additionally require a reply with more than one paragraph.
+ * The row always belongs to composing. Image, Council and Web dim while a turn
+ * runs; Hands free remains live because it owns the session loop rather than
+ * the current question. Transport verbs live around the orb instead.
  */
 function WorkspaceSatellites({
-  colors,
+  attachments,
   compact = false,
   councilActive,
   councilAvailable,
-  driveRunning,
-  driveSession,
-  onDriveResume,
-  onDriveStop,
-  onRestart,
-  onSeekBack,
-  onSeekForward,
+  handsFreeActive,
   disabled,
   imageAvailable,
   imageDisabled,
   onAddImage,
-  onStopPlayback,
+  onRemoveImage,
+  onToggleHandsFree,
   onToggleCouncil,
   onToggleWeb,
-  speaking,
   t,
   turnActive,
   webActive,
   webAvailable,
 }: WorkspaceSatellitesProps) {
-  const divider = (
-    <View
-      style={[
-        workspaceStyles.satelliteDivider,
-        { backgroundColor: colors.border },
-      ]}
-    />
-  );
+  const imageAnchorRef = React.useRef<View>(null);
+  const previousAttachmentCountRef = React.useRef(attachments.length);
+  const [imagePopoverAnchor, setImagePopoverAnchor] =
+    React.useState<AttachmentPopoverAnchor | null>(null);
+  const [imagePopoverVisible, setImagePopoverVisible] = React.useState(false);
+  const openImagePopover = React.useCallback(() => {
+    imageAnchorRef.current?.measureInWindow((x, y, width, height) => {
+      setImagePopoverAnchor({ height, width, x, y });
+      setImagePopoverVisible(true);
+    });
+  }, []);
 
-  const composing = !turnActive && !driveSession;
+  React.useEffect(() => {
+    const previousCount = previousAttachmentCountRef.current;
+    previousAttachmentCountRef.current = attachments.length;
+    if (attachments.length > previousCount) {
+      setImagePopoverVisible(false);
+    }
+  }, [attachments.length]);
+
+  React.useEffect(() => {
+    if (turnActive) {
+      setImagePopoverVisible(false);
+    }
+  }, [turnActive]);
+
+  const composingDisabled = disabled || turnActive || handsFreeActive;
 
   return (
-    <View
-      style={[
-        workspaceStyles.satellites,
-        compact ? workspaceStyles.satellitesCompact : null,
-      ]}
-      testID="workspace-satellites"
-    >
-      {composing ? (
-        <>
-          {!compact ? (
-            <>
-              <OrbSatellite
-                accessibilityLabel={t("addImage")}
-                compact={compact}
-                disabled={imageDisabled || !imageAvailable}
-                icon="image"
-                label={t("workspaceImageLabel")}
-                onPress={imageAvailable ? onAddImage : undefined}
-                testID="satellite-image"
-              />
-              {divider}
-            </>
-          ) : null}
-          <OrbSatellite
-            accessibilityLabel={t("ulraMode")}
-            active={councilActive}
-            compact={compact}
-            disabled={disabled || !councilAvailable}
-            icon="council"
-            kind="toggle"
-            label={t("workspaceCouncilLabel")}
-            onPress={councilAvailable ? onToggleCouncil : undefined}
-            testID="satellite-council"
-          />
-          <OrbSatellite
-            accessibilityLabel={t("webSearch")}
-            active={webActive}
-            compact={compact}
-            disabled={disabled || !webAvailable}
-            icon="search"
-            kind="toggle"
-            label={t("workspaceWebLabel")}
-            onPress={webAvailable ? onToggleWeb : undefined}
-            testID="satellite-web"
-          />
-        </>
-      ) : (
-        <>
-          <OrbSatellite
-            compact={compact}
-            disabled={!speaking || !onRestart}
-            icon="reload"
-            label={t("transportRestart")}
-            onPress={onRestart}
-            testID="satellite-restart"
-          />
-          <OrbSatellite
-            compact={compact}
-            disabled={!speaking || !onSeekBack}
-            icon="left"
-            label={t("transportBack")}
-            onPress={onSeekBack}
-            testID="satellite-back"
-          />
-          <OrbSatellite
-            compact={compact}
-            disabled={!speaking || !onSeekForward}
-            icon="right"
-            label={t("transportForward")}
-            onPress={onSeekForward}
-            testID="satellite-forward"
-          />
-          {driveSession && !driveRunning ? (
+    <>
+      <View
+        style={[
+          workspaceStyles.satellites,
+          compact ? workspaceStyles.satellitesCompact : null,
+        ]}
+        testID="workspace-satellites"
+      >
+        {!compact ? (
+          <View collapsable={false} ref={imageAnchorRef}>
             <OrbSatellite
-              accessibilityLabel={t("continueDriveSession")}
-              compact={compact}
-              icon="play"
-              label={t("transportResume")}
-              onPress={onDriveResume}
-              testID="satellite-resume"
-              tone="success"
-            />
-          ) : (
-            <OrbSatellite
-              accessibilityLabel={
-                driveSession ? t("stopDriveSession") : t("stop")
+              accessibilityLabel={t("addImage")}
+              disabled={composingDisabled || imageDisabled || !imageAvailable}
+              icon="image"
+              label={
+                attachments.length > 0
+                  ? t("workspaceImageCount", { count: attachments.length })
+                  : t("workspaceImageLabel")
               }
-              compact={compact}
-              icon="stop"
-              label={t("stop")}
-              onPress={driveSession ? onDriveStop : onStopPlayback}
-              testID="satellite-stop"
-              tone="danger"
+              onPress={imageAvailable ? openImagePopover : undefined}
+              testID="satellite-image"
+              thumbnails={attachments.map((attachment) => attachment.uri)}
             />
-          )}
-        </>
-      )}
-    </View>
+          </View>
+        ) : null}
+        <OrbSatellite
+          accessibilityLabel={t("ulraMode")}
+          active={councilActive}
+          compact={compact}
+          disabled={composingDisabled || !councilAvailable}
+          icon="council"
+          kind="toggle"
+          label={t("workspaceCouncilLabel")}
+          onPress={councilAvailable ? onToggleCouncil : undefined}
+          testID="satellite-council"
+        />
+        <OrbSatellite
+          accessibilityLabel={t("webSearch")}
+          active={webActive}
+          compact={compact}
+          disabled={composingDisabled || !webAvailable}
+          icon="search"
+          kind="toggle"
+          label={t("workspaceWebLabel")}
+          onPress={webAvailable ? onToggleWeb : undefined}
+          testID="satellite-web"
+        />
+        <OrbSatellite
+          accessibilityLabel={t("handsFree")}
+          active={handsFreeActive}
+          compact={compact}
+          disabled={!onToggleHandsFree}
+          icon="car"
+          kind="toggle"
+          label={t("handsFree")}
+          onPress={onToggleHandsFree}
+          testID="satellite-hands-free"
+        />
+      </View>
+      {!compact ? (
+        <AttachmentPopover
+          addLabel={t("addImage")}
+          anchor={imagePopoverAnchor}
+          attachments={attachments}
+          emptyLabel={t("workspaceImagesEmpty")}
+          imageLabel={(index, count) =>
+            t("attachedImageLabel", { count, index })
+          }
+          onAdd={() => onAddImage?.()}
+          onClose={() => setImagePopoverVisible(false)}
+          onRemove={(attachmentId) => onRemoveImage?.(attachmentId)}
+          removeLabel={(index) => t("removeAttachedImage", { index })}
+          visible={imagePopoverVisible}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -205,17 +185,13 @@ interface MainScreenWorkspaceProps {
     "style"
   > | null;
   colors: Colors;
-  introBanner: React.ComponentProps<typeof IntroBanner>;
   ipadLayout: IpadLayout;
   isLandscape: boolean;
   routeCard: Omit<React.ComponentProps<typeof MainScreenRouteCard>, "style"> & {
     t: TranslateFn;
   };
   routePicker: Omit<React.ComponentProps<typeof RoutePickerSheet>, "t">;
-  satellites: Omit<
-    WorkspaceSatellitesProps,
-    "colors" | "compact" | "speaking" | "turnActive"
-  >;
+  satellites: Omit<WorkspaceSatellitesProps, "compact" | "turnActive">;
   settingsSummary: {
     accessibilityLabel: string;
     onPress: () => void;
@@ -247,7 +223,6 @@ interface MainScreenWorkspaceProps {
 export function MainScreenWorkspace({
   backgroundTask,
   colors,
-  introBanner,
   ipadLayout,
   isLandscape,
   routeCard,
@@ -280,21 +255,17 @@ export function MainScreenWorkspace({
   } = topBar;
   const { t: routePickerTranslate, ...routeCardProps } = routeCard;
   const {
+    attachments,
     councilActive,
     councilAvailable,
     disabled: satellitesDisabled,
-    driveRunning,
-    driveSession,
+    handsFreeActive,
     imageAvailable,
     imageDisabled,
     onAddImage,
-    onDriveResume,
-    onDriveStop,
-    onRestart,
-    onSeekBack,
-    onSeekForward,
-    onStopPlayback,
+    onRemoveImage,
     onToggleCouncil,
+    onToggleHandsFree,
     onToggleWeb,
     t: translateSatellite,
     webActive,
@@ -303,25 +274,19 @@ export function MainScreenWorkspace({
   const portraitSatellites = React.useMemo(
     () => (
       <WorkspaceSatellites
-        colors={colors}
+        attachments={attachments}
         compact={useAccessibilityCompactLayout}
         councilActive={councilActive}
         councilAvailable={councilAvailable}
         disabled={satellitesDisabled}
-        driveRunning={driveRunning}
-        driveSession={driveSession}
+        handsFreeActive={handsFreeActive}
         imageAvailable={imageAvailable}
         imageDisabled={imageDisabled}
         onAddImage={onAddImage}
-        onDriveResume={onDriveResume}
-        onDriveStop={onDriveStop}
-        onRestart={onRestart}
-        onSeekBack={onSeekBack}
-        onSeekForward={onSeekForward}
-        onStopPlayback={onStopPlayback}
+        onRemoveImage={onRemoveImage}
         onToggleCouncil={onToggleCouncil}
+        onToggleHandsFree={onToggleHandsFree}
         onToggleWeb={onToggleWeb}
-        speaking={visualPhase === "speaking"}
         t={translateSatellite}
         turnActive={visualPhase !== "idle"}
         webActive={webActive}
@@ -329,21 +294,16 @@ export function MainScreenWorkspace({
       />
     ),
     [
-      colors,
+      attachments,
       councilActive,
       councilAvailable,
-      driveRunning,
-      driveSession,
+      handsFreeActive,
       imageAvailable,
       imageDisabled,
       onAddImage,
-      onDriveResume,
-      onDriveStop,
-      onRestart,
-      onSeekBack,
-      onSeekForward,
-      onStopPlayback,
+      onRemoveImage,
       onToggleCouncil,
+      onToggleHandsFree,
       onToggleWeb,
       satellitesDisabled,
       translateSatellite,
@@ -355,13 +315,11 @@ export function MainScreenWorkspace({
   );
 
   if (ipadLayout.isRegularWidth) {
-    const regularOrbCeiling = introBanner.visible
-      ? 168
-      : ipadLayout.transcriptDocked
-        ? 204
-        : isLandscape
-          ? 224
-          : 208;
+    const regularOrbCeiling = ipadLayout.transcriptDocked
+      ? 204
+      : isLandscape
+        ? 224
+        : 208;
 
     return (
       <View style={workspaceStyles.ipadShell} testID="ipad-workspace">
@@ -397,7 +355,6 @@ export function MainScreenWorkspace({
           </View>
 
           <View style={workspaceStyles.ipadBody}>
-            <IntroBanner {...introBanner} compact={introBanner.compact} />
             {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
             <View style={workspaceStyles.ipadStageArea}>
               <MainScreenVoiceStage
@@ -506,15 +463,7 @@ export function MainScreenWorkspace({
             style={styles.heroCardLandscape}
             {...routeCardProps}
           />
-          <View
-            testID="landscape-stage-area"
-            style={[
-              styles.landscapeStageArea,
-              voiceStage.inputMode === "drive-session"
-                ? styles.landscapeStageAreaDrive
-                : null,
-            ]}
-          >
+          <View testID="landscape-stage-area" style={styles.landscapeStageArea}>
             {/* The words cost the orb height this narrow column cannot spare,
                 so the control floats over the stage's top-right corner and the
                 orb owns everything between the byline and the control row. */}
@@ -530,9 +479,7 @@ export function MainScreenWorkspace({
               colors={colors}
               footer={
                 <WorkspaceSatellites
-                  colors={colors}
                   compact
-                  speaking={visualPhase === "speaking"}
                   turnActive={visualPhase !== "idle"}
                   {...satellites}
                 />
@@ -541,7 +488,7 @@ export function MainScreenWorkspace({
               // Short phone windows must retain the complete 44pt transport
               // row above the system gesture area. Regular-width iPads use
               // their larger, separately measured ceilings above.
-              maxOrbSize={104}
+              maxOrbSize={150}
               {...voiceStage}
               // The left pane cannot fit the full notice paragraph above the
               // status line at any font scale, so landscape always takes the
@@ -560,7 +507,6 @@ export function MainScreenWorkspace({
         />
 
         <View testID="landscape-right-pane" style={styles.landscapeRightColumn}>
-          <IntroBanner compact {...introBanner} />
           <TranscriptPreviewCard
             colors={colors}
             layout="landscape"
@@ -578,19 +524,12 @@ export function MainScreenWorkspace({
     <>
       <MainScreenTopBar colors={colors} {...topBar} />
 
-      <View style={styles.workspaceBody}>
-        <IntroBanner
-          {...introBanner}
-          compact={useAccessibilityCompactLayout || introBanner.compact}
-        />
+      <View style={styles.workspaceBody} testID="workspace-body">
         {backgroundTask ? <BackgroundTaskBar {...backgroundTask} /> : null}
-        <MainScreenRouteCard {...routeCardProps} />
-        <ConversationSettingsSummary
-          accessibilityLabel={settingsSummary.accessibilityLabel}
-          compact={useAccessibilityCompactLayout}
-          onPress={settingsSummary.onPress}
-          summary={settingsSummary.summary}
-          testID="conversation-settings-summary"
+        <MainScreenRouteCard
+          {...routeCardProps}
+          presentation="workspace-header"
+          settingsSummary={settingsSummary}
         />
 
         <View
@@ -604,9 +543,7 @@ export function MainScreenWorkspace({
             <MainScreenVoiceStage
               colors={colors}
               footer={portraitSatellites}
-              // The banner row borrows vertical room from the stage; the orb
-              // steps down rather than squeezing the caption or satellites.
-              maxOrbSize={introBanner.visible ? 156 : 196}
+              maxOrbSize={196}
               {...voiceStage}
             />
           </View>
@@ -732,12 +669,6 @@ const workspaceStyles = StyleSheet.create({
   satellitesCompact: {
     alignItems: "center",
     flexShrink: 0,
-  },
-  satelliteDivider: {
-    alignSelf: "stretch",
-    marginHorizontal: 6,
-    maxHeight: 44,
-    width: 1,
   },
   transcriptHandle: {
     marginHorizontal: 0,

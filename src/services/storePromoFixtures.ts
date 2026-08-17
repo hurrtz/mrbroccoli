@@ -11,19 +11,12 @@ import { replaceAllConversationRows } from "./conversationStore";
 import { toPublicSettings } from "../hooks/settings/storage";
 import { STORAGE_KEY } from "../hooks/settings/types";
 import {
-  normalizeFreeSpeechLanguage,
-  type SpeechLanguage,
-} from "../constants/speechLanguages";
-import {
   DEFAULT_SETTINGS,
   type Conversation,
   type Message,
   type Settings,
 } from "../types";
-import {
-  DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
-  getApplicationId,
-} from "./developmentEntitlement";
+import { getApplicationId } from "./debugRuntimeContext";
 import {
   isStorePromoApplicationId,
   STORE_PROMO_ORB_STORAGE_KEY,
@@ -609,16 +602,9 @@ export function buildStorePromoConversations(
   return [root, branch, recent] as const;
 }
 
-function getStorePromoSpeechLanguage(language: AppLanguage): SpeechLanguage {
-  if (language === "pt-BR") {
-    return "pt-BR";
-  }
-  return normalizeFreeSpeechLanguage(language) ?? "en";
-}
-
 export async function seedStorePromoFixture(
   language: AppLanguage,
-  scene: StorePromoScene = "premium",
+  scene: StorePromoScene = "conversation",
   orb: StorePromoOrbPresentation | null = null,
   colorScheme: StorePromoColorScheme = "light",
 ) {
@@ -633,16 +619,11 @@ export async function seedStorePromoFixture(
   const storedSettings = storedSettingsRaw
     ? (JSON.parse(storedSettingsRaw) as Partial<Settings>)
     : {};
-  const speechLanguage = getStorePromoSpeechLanguage(language);
-  const onboarding = scene === "onboarding" || scene === "onboarding-ready";
   const nextSettings: Settings = {
     ...DEFAULT_SETTINGS,
     ...storedSettings,
     apiKeys: DEFAULT_SETTINGS.apiKeys,
     language,
-    freeOnboardingLanguageInitialized: true,
-    freeOfflineSetupCompleted: scene !== "onboarding",
-    localLanguages: [speechLanguage],
     activeResponseMode: "mode-1",
     responseModes: [
       {
@@ -658,18 +639,9 @@ export async function seedStorePromoFixture(
         route: { provider: "gemini", model: "gemini-3.6-flash" },
       },
     ],
-    introDismissed: !onboarding,
-    ...(onboarding
-      ? {
-          introCompleted: false,
-          introOpened: false,
-        }
-      : {}),
     showDebugLogButton: false,
     spokenRepliesEnabled: false,
-    sttLanguage: speechLanguage,
     theme: colorScheme,
-    ttsListenLanguages: [speechLanguage],
     ulraModeActive: true,
     ulraModeEnabled: true,
     ulraModeWarningAcknowledged: true,
@@ -677,7 +649,7 @@ export async function seedStorePromoFixture(
   const conversations = buildStorePromoConversations(
     language,
     STORE_PROMO_FIXTURE_NOW_MS,
-    scene === "premium",
+    true,
   );
   const metas = sortConversationMeta(
     conversations.map((conversation) =>
@@ -697,10 +669,6 @@ export async function seedStorePromoFixture(
     [STORE_PROMO_FIXTURE_MARKER_KEY, language],
     [STORE_PROMO_ORB_STORAGE_KEY, JSON.stringify(orb)],
     [STORE_PROMO_SCENE_STORAGE_KEY, scene],
-    [
-      DEVELOPMENT_ENTITLEMENT_MODE_STORAGE_KEY,
-      scene === "premium" ? "premium" : "free",
-    ],
   ]);
   await replaceAllConversationRows(
     conversations.map((conversation) => ({

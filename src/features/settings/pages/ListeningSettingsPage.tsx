@@ -1,10 +1,7 @@
 import React from "react";
 import { View } from "react-native";
 
-import {
-  SPEECH_LANGUAGE_OPTIONS,
-  type SpeechLanguage,
-} from "../../../constants/speechLanguages";
+import { type SpeechLanguage } from "../../../constants/speechLanguages";
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
 import { useLocalization } from "../../../i18n";
 import type { LocalModelSettingsController } from "../../settings-core/useLocalModelSettings";
@@ -17,20 +14,14 @@ import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsMultiChoiceRow } from "../settings-primitives/SettingsMultiChoiceRow";
 
 export function ListeningSettingsPage({
-  allSttProviders,
-  isPremium,
   localModels,
-  onOpenPremium,
   onUpdate,
   onUpdateProviderSttModel,
   selectableSttProviders,
   selectedSttProviderModelOptions,
   settings,
 }: {
-  allSttProviders: Provider[];
-  isPremium: boolean;
   localModels: LocalModelSettingsController;
-  onOpenPremium: () => void;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
@@ -40,11 +31,7 @@ export function ListeningSettingsPage({
   settings: Settings;
 }) {
   const { t } = useLocalization();
-  const languageOptions = SPEECH_LANGUAGE_OPTIONS.filter(
-    (language) =>
-      isPremium ||
-      localModels.freeLanguageOptions.some((option) => option === language),
-  ).map((value) => ({
+  const languageOptions = localModels.speechLanguageOptions.map((value) => ({
     value,
     label: getTtsListenLanguageLabel(value, settings.language),
   }));
@@ -58,11 +45,6 @@ export function ListeningSettingsPage({
       value: "toggle-to-talk",
       label: t("toggleToTalk"),
       supporting: t("toggleToTalkDescription"),
-    },
-    {
-      value: "drive-session",
-      label: t("driveSession"),
-      supporting: t("driveSessionDescription"),
     },
   ] as const;
 
@@ -95,11 +77,7 @@ export function ListeningSettingsPage({
         capability="stt"
         title={t("whoListens")}
         footer={t("whoListensFooter")}
-        freeProviderRoutes={allSttProviders}
-        isPremium={isPremium}
         localModels={localModels}
-        onOpenPremium={onOpenPremium}
-        premiumCopy={t("premiumDescription")}
         settings={settings}
         providerRoutes={selectableSttProviders.map((provider) => ({
           provider,

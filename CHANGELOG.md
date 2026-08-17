@@ -10,6 +10,46 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Mr Broccoli is now one paid-upfront BYOK product from first launch. The app
+  opens directly into the workspace, all provider features are available after
+  their own key is configured, and the former Free/Premium purchase,
+  entitlement, onboarding, bundled preview-audio, automatic local setup, and
+  on-device response-model paths have been removed. Optional on-device speech
+  recognition and voices remain available as secondary Listening and Speaking
+  choices, and upgrades remove retired local response-model files without
+  touching installed speech models.
+- Answering-model routes are now open-ended instead of stopping at four, and
+  both Settings and the home picker scroll through the complete configured
+  list.
+- The home workspace now matches the latest native design: its portrait model
+  and conversation settings form one two-row header, the orb uses the new phase
+  glyphs plus a close neutral ring, and a permanent orbit carries Restart,
+  Back, Forward, and Stop without moving the orb between phases. The composing
+  row stays stable with borderless Image, Council, Web, and Hands free controls;
+  images live in a fixed thumbnail deck and anchored scrolling popover instead
+  of shifting the stage.
+- Drive Session is now the session-scoped Hands free switch rather than a third
+  saved input mode. It starts off, wraps push-to-talk or toggle-to-talk, starts
+  listening when enabled, keeps its adaptive ambient-level learning and spoken
+  countdown, can be toggled during an answer, and leaves Stop responsible only
+  for the current turn. Legacy Drive selections migrate to toggle-to-talk.
+- The voice orb's single progress ring shows only the full turn from submission
+  to first speech during processing, preserves the read position while speech
+  is paused, and fills red only after the learned estimate is exceeded.
+- Transcript message actions remain visible while content is folded, Copy now
+  confirms success, and compact source, route, duration, and usage information
+  opens in a scrollable receipt modal without repeating the prompt as a search
+  query. Toasts appear above drawers and modals.
+- Pending images no longer push the home controls down, and sent image sets
+  wrap in the transcript so all attachments remain viewable.
+- Functional local speech models remain selectable when their benchmark is
+  slower than recommended; only failed benchmarks block selection.
+- The home pager arrows now remain fully active, sit outside the horizontal
+  swipe recognizer so every ordinary tap completes one transition, and always
+  bring the next surface in from the side that was pressed—even across repeated
+  cycles. Revealing the text composer does not focus it or open the keyboard.
+  The workspace also adds breathing room below its headline before the model
+  selector.
 - Long Model Council syntheses no longer freeze the app during streamed
   readback: private-context leak checks now stay incremental, and runaway final
   answers stop at a provider-independent safety ceiling.

@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: On-device language voice pair
+name: Optional on-device language voice pair
 tags:
   - runtime
   - on-device
@@ -27,6 +27,7 @@ tags:
 - tapOn:
     id: conversation-languages-picker
 - tapOn: ${LANGUAGE_LABEL}
+- tapOn: "English"
 - tapOn: "Done"
 - tapOn:
     id: settings-back-button

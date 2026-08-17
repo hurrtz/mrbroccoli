@@ -1,8 +1,15 @@
 import React from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 
 import { getProviderLabel, getProviderModelName } from "../constants/models";
+import { Modal } from "../design-system/NativeControls";
 import {
   PhosphorIcon,
   type PhosphorIconName,
@@ -27,10 +34,12 @@ interface TranscriptMessageProps extends Pick<
   | "message"
   | "onBranch"
   | "onCopy"
+  | "onEdit"
   | "onOpenBranches"
   | "onOpenBranchSource"
   | "onOpenSpeakingSettings"
   | "onRepeat"
+  | "onReport"
   | "onRetry"
   | "onShare"
   | "selectable"
@@ -215,7 +224,6 @@ function getTranscriptMetrics(
   }
 
   if (search) {
-    rows.push({ label: t("searchQuery"), value: search.query });
     if (search.summary.trim()) {
       rows.push({ label: t("webSearch"), value: search.summary });
     }
@@ -245,10 +253,12 @@ function TranscriptAction({
   icon,
   label,
   onPress,
+  testID,
 }: {
   icon: PhosphorIconName;
   label: string;
   onPress: () => void;
+  testID?: string;
 }) {
   const { colors } = useTheme();
   return (
@@ -258,6 +268,7 @@ function TranscriptAction({
       activeOpacity={0.72}
       accessibilityRole="button"
       accessibilityLabel={label}
+      testID={testID}
     >
       <PhosphorIcon name={icon} size="compact" color={colors.textMuted} />
     </TouchableOpacity>
@@ -272,11 +283,13 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
   message,
   onBranch,
   onCopy,
+  onEdit,
   onOpenBranches,
   onOpenBranchSource,
   onOpenSpeakingSettings,
   onRemove,
   onRepeat,
+  onReport,
   onRetry,
   onShare,
   onToggle,
@@ -287,6 +300,10 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
   const { colors } = useTheme();
   const { locale, t } = useLocalization();
   const [metricsOpen, setMetricsOpen] = React.useState(false);
+  const [copyConfirmed, setCopyConfirmed] = React.useState(false);
+  const copyConfirmationTimerRef = React.useRef<ReturnType<
+    typeof setTimeout
+  > | null>(null);
   const isUser = message.role === "user";
   const paragraphs = message.content
     .split(/\n\s*\n/)
@@ -301,44 +318,85 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
       : message.model;
   const meta = showUsageStats ? getTranscriptMeta(message, t) : null;
   const metrics = showUsageStats ? getTranscriptMetrics(message, t) : [];
-  const actions = expanded
-    ? [
-        onBranch
-          ? {
-              icon: "branch" as const,
-              label: t("branchFromHere"),
-              onPress: () => void onBranch(message),
-            }
-          : null,
-        onCopy
-          ? {
-              icon: "copy" as const,
-              label: t("copy"),
-              onPress: () => void onCopy(message),
-            }
-          : null,
-        onShare
-          ? {
-              icon: "share-alt" as const,
-              label: t("share"),
-              onPress: () => onShare(message),
-            }
-          : null,
-        onRepeat
-          ? {
-              icon: (repeatState === "speaking"
-                ? "stop"
-                : repeatState === "preparing"
-                  ? "loading"
-                  : "sound") as PhosphorIconName,
-              label: repeatState === "speaking" ? t("stop") : t("repeatReply"),
-              onPress: () => onRepeat(message),
-            }
-          : null,
-      ].filter((action): action is NonNullable<typeof action> =>
-        Boolean(action),
-      )
-    : [];
+  React.useEffect(() => {
+    setCopyConfirmed(false);
+    if (copyConfirmationTimerRef.current) {
+      clearTimeout(copyConfirmationTimerRef.current);
+      copyConfirmationTimerRef.current = null;
+    }
+    return () => {
+      if (copyConfirmationTimerRef.current) {
+        clearTimeout(copyConfirmationTimerRef.current);
+      }
+    };
+  }, [message.id]);
+
+  const handleCopy = async () => {
+    try {
+      if (!(await onCopy?.(message))) {
+        return;
+      }
+      setCopyConfirmed(true);
+      if (copyConfirmationTimerRef.current) {
+        clearTimeout(copyConfirmationTimerRef.current);
+      }
+      copyConfirmationTimerRef.current = setTimeout(() => {
+        copyConfirmationTimerRef.current = null;
+        setCopyConfirmed(false);
+      }, 3_000);
+    } catch {
+      // The owning action reports clipboard failures through the global toast.
+    }
+  };
+  const actions = [
+    onEdit
+      ? {
+          icon: "edit" as const,
+          label: t("correctTranscript"),
+          onPress: () => onEdit(message),
+        }
+      : null,
+    onBranch
+      ? {
+          icon: "branch" as const,
+          label: t("branchFromHere"),
+          onPress: () => void onBranch(message),
+        }
+      : null,
+    onCopy
+      ? {
+          icon: (copyConfirmed ? "check" : "copy") as PhosphorIconName,
+          label: copyConfirmed ? t("messageCopied") : t("copy"),
+          onPress: () => void handleCopy(),
+          testID: `transcript-copy-${message.id}`,
+        }
+      : null,
+    onShare
+      ? {
+          icon: "share-alt" as const,
+          label: t("share"),
+          onPress: () => onShare(message),
+        }
+      : null,
+    onRepeat
+      ? {
+          icon: (repeatState === "speaking"
+            ? "stop"
+            : repeatState === "preparing"
+              ? "loading"
+              : "sound") as PhosphorIconName,
+          label: repeatState === "speaking" ? t("stop") : t("repeatReply"),
+          onPress: () => onRepeat(message),
+        }
+      : null,
+    onReport
+      ? {
+          icon: "warning" as const,
+          label: t("reportResponse"),
+          onPress: () => onReport(message),
+        }
+      : null,
+  ].filter((action): action is NonNullable<typeof action> => Boolean(action));
 
   const renderRightActions = onRemove
     ? () => (
@@ -453,6 +511,7 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
             <MessageImageAttachments
               attachments={message.attachments ?? []}
               colors={colors}
+              layout="grid"
               t={t}
             />
             {expanded ? (
@@ -489,6 +548,31 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
             )}
           </TouchableOpacity>
 
+          {meta && (expanded || !canFold) ? (
+            <TouchableOpacity
+              testID={`transcript-meta-${message.id}`}
+              disabled={metrics.length === 0}
+              onPress={() => setMetricsOpen(true)}
+              activeOpacity={0.72}
+              style={styles.metaDisclosure}
+              accessibilityRole={metrics.length > 0 ? "button" : undefined}
+              accessibilityState={
+                metrics.length > 0 ? { expanded: metricsOpen } : undefined
+              }
+            >
+              <Text style={[styles.metaText, { color: colors.textMuted }]}>
+                {meta}
+              </Text>
+              {metrics.length > 0 ? (
+                <PhosphorIcon
+                  name="info-circle"
+                  size="inline"
+                  color={colors.textMuted}
+                />
+              ) : null}
+            </TouchableOpacity>
+          ) : null}
+
           <MessageBranchIndicator
             messageId={message.id}
             branchChildren={branchChildren}
@@ -503,41 +587,22 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
             </View>
           ) : null}
 
-          {meta ? (
-            <TouchableOpacity
-              testID={`transcript-meta-${message.id}`}
-              disabled={metrics.length === 0}
-              onPress={() => setMetricsOpen((current) => !current)}
-              activeOpacity={0.72}
-              style={styles.metaDisclosure}
-              accessibilityRole={metrics.length > 0 ? "button" : undefined}
-              accessibilityState={
-                metrics.length > 0 ? { expanded: metricsOpen } : undefined
-              }
-            >
-              <Text style={[styles.metaText, { color: colors.textMuted }]}>
-                {meta}
-              </Text>
-              {metrics.length > 0 ? (
-                <PhosphorIcon
-                  name={metricsOpen ? "up" : "down"}
-                  size="inline"
-                  color={colors.textMuted}
-                />
-              ) : null}
-            </TouchableOpacity>
-          ) : null}
-
-          {metricsOpen && metrics.length > 0 ? (
-            <View
+          <Modal
+            cardStyle={styles.metricsModal}
+            footer={[
+              {
+                text: t("done"),
+                onPress: () => setMetricsOpen(false),
+              },
+            ]}
+            onClose={() => setMetricsOpen(false)}
+            title={t("turnReceipt")}
+            visible={metricsOpen && metrics.length > 0}
+          >
+            <ScrollView
+              contentContainerStyle={styles.metrics}
+              showsVerticalScrollIndicator
               testID={`transcript-metrics-${message.id}`}
-              style={[
-                styles.metrics,
-                {
-                  backgroundColor: colors.surface,
-                  borderColor: colors.border,
-                },
-              ]}
             >
               {metrics.map((metric, index) => (
                 <View key={`${metric.label}-${index}`} style={styles.metricRow}>
@@ -557,8 +622,8 @@ export const TranscriptMessage = React.memo(function TranscriptMessage({
                   </Text>
                 </View>
               ))}
-            </View>
-          ) : null}
+            </ScrollView>
+          </Modal>
 
           <ReplyFailureCard message={message} onRetry={onRetry} />
           <PipelineNotices
@@ -660,6 +725,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
+    marginBottom: -5,
   },
   metaText: {
     fontFamily: fonts.mono,
@@ -668,13 +734,11 @@ const styles = StyleSheet.create({
     letterSpacing: 0.4,
   },
   metrics: {
-    marginTop: 2,
-    marginBottom: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
-    borderRadius: 12,
-    borderWidth: 1,
     gap: 6,
+    paddingBottom: 8,
+  },
+  metricsModal: {
+    maxHeight: "72%",
   },
   metricRow: {
     flexDirection: "row",

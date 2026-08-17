@@ -26,7 +26,6 @@ type EventAdapterParams = Pick<
   | "model"
   | "modelEffort"
   | "onAttachmentsAccepted"
-  | "localLlmModelId"
   | "player"
   | "provider"
   | "replyPlayback"
@@ -88,7 +87,6 @@ export function createVoicePipelineEventAdapter({
   model,
   modelEffort,
   onAttachmentsAccepted,
-  localLlmModelId,
   onError,
   player,
   playbackStartedRef,
@@ -279,14 +277,14 @@ export function createVoicePipelineEventAdapter({
           runConversationId = createConversation(
             text,
             model,
-            localLlmModelId ? null : provider,
+            provider,
             initialConversationSettings,
           );
         } else {
           runConversationId = createConversation(
             text,
             model,
-            localLlmModelId ? null : provider,
+            provider,
           );
         }
       }
@@ -321,7 +319,7 @@ export function createVoicePipelineEventAdapter({
         summarizedCount,
         usage,
         model,
-        localLlmModelId ? null : provider,
+        provider,
       );
     },
     onWebSearchStart: () => {
@@ -437,7 +435,7 @@ export function createVoicePipelineEventAdapter({
         role: "assistant",
         content: fullText,
         model: actualModel,
-        provider: localLlmModelId ? null : provider,
+        provider,
         usage,
         metadata: messageState.consumeAssistantMetadata(metadata),
       });

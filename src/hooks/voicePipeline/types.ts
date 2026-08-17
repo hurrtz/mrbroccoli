@@ -27,7 +27,6 @@ import type {
 import type { useAudioPlayer } from "../useAudioPlayer";
 import type { UlraModeConfig } from "../../services/ulraMode";
 import type {
-  LocalLlmModelId,
   LocalSttModelId,
   LocalTtsModelId,
 } from "../../constants/localModels";
@@ -53,9 +52,16 @@ export interface VoiceCaptureRequest {
   turnId?: string;
 }
 
-export type AudioPlayer = Omit<
+export type AudioPlayer = Pick<
   ReturnType<typeof useAudioPlayer>,
-  "sealPlaybackReel"
+  | "enqueueAudio"
+  | "enqueueSpeechPause"
+  | "hasPendingPlaybackNow"
+  | "isPlaying"
+  | "resetCancellation"
+  | "speakText"
+  | "stopPlayback"
+  | "waitForDrain"
 > & {
   /** Present on the production player; optional for focused controller fakes. */
   sealPlaybackReel?: () => void;
@@ -89,7 +95,6 @@ export interface UseVoicePipelineParams {
   providerApiKey: string;
   model: string;
   modelEffort?: string;
-  localLlmModelId?: LocalLlmModelId;
   sttMode: SttBackendMode;
   sttLanguage: SttLanguage;
   sttProvider: Provider | null;

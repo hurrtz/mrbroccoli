@@ -1,0 +1,69 @@
+appId: ${APP_ID}
+name: Google Play organization and BYOK settings screenshots
+tags:
+  - store-promos
+  - android
+---
+- assertVisible:
+    id: store-promo-fixture-ready-conversation
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: voice-stage-thinking
+- tapOn:
+    id: main-conversations-button
+- assertVisible:
+    id: conversation-drawer-item-promo-root
+- assertVisible:
+    id: conversation-drawer-item-promo-branch
+- takeScreenshot:
+    path: 03-conversation-branches
+- tapOn:
+    id: conversation-drawer-close
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: conversation-drawer-close
+- tapOn:
+    id: main-settings-button
+- assertVisible:
+    id: settings-page-overview
+- takeScreenshot:
+    path: 04-byok-settings
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-thinking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-thinking
+- assertVisible:
+    id: settings-page-thinking
+- takeScreenshot:
+    path: 05-choose-exact-model
+- tapOn:
+    id: settings-back-button
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-speaking
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-speaking
+- assertVisible:
+    id: settings-page-speaking
+- takeScreenshot:
+    path: 06-choose-your-voice
+- tapOn:
+    id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
+- assertVisible:
+    id: conversation-settings-summary-control
+- tapOn:
+    id: conversation-settings-summary-control
+- assertVisible:
+    id: conversation-settings-drawer
+- takeScreenshot:
+    path: 07-conversation-settings

@@ -73,7 +73,7 @@ describe("RuntimeReadiness", () => {
 
     const listen = dotStyle(screen, "listen");
     expect(listen.backgroundColor).toBe("transparent");
-    expect(listen.borderColor).toBe(lightColors.premium);
+    expect(listen.borderColor).toBe(lightColors.attention);
 
     const speak = dotStyle(screen, "speak");
     expect(speak.backgroundColor).toBe(lightColors.danger);

@@ -74,11 +74,6 @@ const NATIVE_LICENSES = [
     source:
       "node_modules/react-native-sherpa-onnx/THIRD_PARTY_LICENSES/zstd.txt",
   },
-  {
-    name: "llama.cpp",
-    license: "MIT",
-    source: "node_modules/llama.rn/cpp/LICENSE",
-  },
 ];
 
 const REVIEWED_SHERPA_MODEL_LICENSE_ROWS = [

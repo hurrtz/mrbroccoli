@@ -123,7 +123,7 @@ export function runOrbMatrix({ argv = process.argv.slice(2), cwd = process.cwd()
 
   for (const [name, phase, phaseProgress, turnProgress, overtime] of ORB_MATRIX) {
     const url =
-      `mrbroccoli://store-promos?locale=en&scene=premium&phase=${phase}` +
+      `mrbroccoli://store-promos?locale=en&scene=conversation&phase=${phase}` +
       `&phaseProgress=${phaseProgress}&turnProgress=${turnProgress}&overtime=${overtime}`;
     const commandInput = {
       appId: options.appId,

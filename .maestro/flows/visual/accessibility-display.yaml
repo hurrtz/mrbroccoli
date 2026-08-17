@@ -12,10 +12,6 @@ tags:
 - setOrientation: PORTRAIT
 - assertVisible:
     id: main-screen
-- assertVisible:
-    id: intro-banner
-- takeScreenshot:
-    path: ${PLATFORM}/accessibility/intro-banner-home
 - takeScreenshot:
     path: ${PLATFORM}/accessibility/home
 - tapOn:

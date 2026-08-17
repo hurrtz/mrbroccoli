@@ -44,10 +44,8 @@ import {
 import {
   createResponseModeId,
   DEFAULT_RESPONSE_MODE_COUNT,
-  MAX_RESPONSE_MODES,
 } from "../../constants/providers/defaults";
 import { normalizeResponseModeRouteEffort } from "../../utils/modelEffort";
-import { getLocalModel, isLocalModelId } from "../../constants/localModels";
 import {
   LEGACY_MODEL_FIELD_KEYS,
   type LegacyStoredSettings,
@@ -68,6 +66,12 @@ const LEGACY_SETTINGS_FIELD_NAMES = [
   "ttsPlayback",
   "ttsVoice",
   "localTtsVoices",
+  "introDismissed",
+  "introOpened",
+  "introCompleted",
+  "freeOnboardingLanguageInitialized",
+  "freeOfflineSetupCompleted",
+  "freeOfflineProfileOverrides",
   "openaiModel",
   "anthropicModel",
   "geminiModel",
@@ -369,23 +373,6 @@ function extractStoredResponseModeRoute(
   }
 
   const candidate = entry as Partial<ResponseModeRoute>;
-  if (
-    candidate.runtime === "local" &&
-    isLocalModelId(candidate.localModelId) &&
-    getLocalModel(candidate.localModelId).capability === "llm"
-  ) {
-    const fallbackProvider = isProvider(candidate.provider)
-      ? candidate.provider
-      : DEFAULT_SETTINGS.lastProvider;
-    const localModel = getLocalModel(candidate.localModelId);
-
-    return {
-      runtime: "local",
-      localModelId: candidate.localModelId,
-      provider: fallbackProvider,
-      model: localModel.name,
-    };
-  }
   const provider = isProvider(candidate.provider)
     ? candidate.provider
     : undefined;
@@ -432,7 +419,6 @@ function extractStoredResponseModes(
 
   if (Array.isArray(storedResponseModes)) {
     return storedResponseModes
-      .slice(0, MAX_RESPONSE_MODES)
       .reduce((accumulator, entry, index) => {
         const candidate = entry as Partial<ResponseModeConfig> | undefined;
         const route = extractStoredResponseModeRoute(

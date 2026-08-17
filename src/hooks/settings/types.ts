@@ -16,8 +16,10 @@ export type SettingsUpdate = Partial<
 
 export type LegacyStoredSettings = Omit<
   Partial<Settings>,
-  "ttsMode" | "webSearchMode"
+  "inputMode" | "ttsMode" | "webSearchMode"
 > & {
+  /** Drive Session was retired as a persisted mode in favor of session-only Hands free. */
+  inputMode?: Settings["inputMode"] | "drive-session";
   webSearchEnabled?: boolean;
   /** Legacy "auto" mode is migrated to "on". */
   webSearchMode?: Settings["webSearchMode"] | "auto";
@@ -25,6 +27,12 @@ export type LegacyStoredSettings = Omit<
   ttsVoice?: string;
   ttsMode?: Settings["ttsMode"];
   localTtsVoices?: unknown;
+  introDismissed?: boolean;
+  introOpened?: boolean;
+  introCompleted?: boolean;
+  freeOnboardingLanguageInitialized?: boolean;
+  freeOfflineSetupCompleted?: boolean;
+  freeOfflineProfileOverrides?: unknown;
   openaiModel?: string;
   anthropicModel?: string;
   geminiModel?: string;

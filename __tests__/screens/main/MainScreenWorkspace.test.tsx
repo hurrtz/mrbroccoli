@@ -3,6 +3,7 @@ import { fireEvent, render, within } from "@testing-library/react-native";
 import { StyleSheet, useWindowDimensions } from "react-native";
 
 import { MainScreenWorkspace } from "../../../src/screens/main/MainScreenWorkspace";
+import { LocalizationProvider } from "../../../src/i18n";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
 import { lightColors } from "../../../src/theme/colors";
 import { resolveIpadLayout } from "../../../src/utils/ipadLayout";
@@ -102,13 +103,6 @@ function createWorkspaceProps(t: jest.Mock) {
   return {
     backgroundTask: null,
     colors: lightColors,
-    introBanner: {
-      onDismiss: jest.fn(),
-      onOpen: jest.fn(),
-      showDismiss: true,
-      t: ((key: string) => key) as never,
-      visible: false,
-    },
     ipadLayout: resolveIpadLayout({
       height: 932,
       isPad: false,
@@ -132,21 +126,17 @@ function createWorkspaceProps(t: jest.Mock) {
       visible: false,
     },
     satellites: {
+      attachments: [],
       councilActive: false,
       councilAvailable: true,
       disabled: false,
+      handsFreeActive: false,
       imageAvailable: true,
       imageDisabled: false,
-      driveRunning: true,
-      driveSession: false,
-      onRestart: jest.fn(),
-      onSeekBack: jest.fn(),
-      onSeekForward: jest.fn(),
       onAddImage: jest.fn(),
-      onDriveResume: jest.fn(),
-      onDriveStop: jest.fn(),
-      onStopPlayback: jest.fn(),
+      onRemoveImage: jest.fn(),
       onToggleCouncil: jest.fn(),
+      onToggleHandsFree: jest.fn(),
       onToggleWeb: jest.fn(),
       t,
       webActive: true,
@@ -193,16 +183,20 @@ function createWorkspaceProps(t: jest.Mock) {
 }
 
 function renderWorkspace(ui: React.ReactElement) {
-  const screen = render(<ThemeProvider mode="light">{ui}</ThemeProvider>);
+  const wrap = (content: React.ReactElement) => (
+    <LocalizationProvider language="en">
+      <ThemeProvider mode="light">{content}</ThemeProvider>
+    </LocalizationProvider>
+  );
+  const screen = render(wrap(ui));
   return {
     ...screen,
-    rerender: (next: React.ReactElement) =>
-      screen.rerender(<ThemeProvider mode="light">{next}</ThemeProvider>),
+    rerender: (next: React.ReactElement) => screen.rerender(wrap(next)),
   };
 }
 
 describe("MainScreenWorkspace streaming isolation", () => {
-  it("gives the satellite ring to the phase and to a drive session", () => {
+  it("keeps the composing row stable while a turn runs", () => {
     const t = jest.fn((key: string) => key);
     const base = createWorkspaceProps(t);
     const transcript = {
@@ -227,10 +221,14 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
     expect(idle.getByTestId("satellite-council")).toBeTruthy();
-    expect(idle.queryByTestId("satellite-stop")).toBeNull();
+    expect(idle.getByTestId("satellite-hands-free")).toBeTruthy();
+    expect(
+      StyleSheet.flatten(idle.getByTestId("workspace-body").props.style)
+        .paddingTop,
+    ).toBe(14);
     idle.unmount();
 
-    // A running turn hands the ring to transport; only Stop is live.
+    // Per-question controls stay in place but dim; Hands free stays live.
     const turn = renderWorkspace(
       <MainScreenWorkspace
         {...base}
@@ -238,33 +236,29 @@ describe("MainScreenWorkspace streaming isolation", () => {
         visualPhase="speaking"
       />,
     );
-    expect(turn.queryByTestId("satellite-council")).toBeNull();
-    expect(turn.getByTestId("satellite-stop")).toBeTruthy();
-    // All four transport verbs come alive in the speaking phase.
-    for (const verb of ["restart", "back", "forward", "stop"]) {
-      expect(
-        turn.getByTestId(`satellite-${verb}`).props.accessibilityState,
-      ).toEqual(expect.objectContaining({ disabled: false }));
-    }
-    turn.unmount();
+    expect(
+      turn.getByTestId("satellite-council").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: true }));
+    expect(
+      turn.getByTestId("satellite-hands-free").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ checked: false, disabled: false }));
+    fireEvent.press(turn.getByTestId("satellite-hands-free"));
+    expect(base.satellites.onToggleHandsFree).toHaveBeenCalledTimes(1);
 
-    // A paused drive session shows transport at idle, ending in Resume.
-    const onDriveResume = jest.fn();
-    const drive = renderWorkspace(
+    turn.rerender(
       <MainScreenWorkspace
         {...base}
-        satellites={{
-          ...base.satellites,
-          driveRunning: false,
-          driveSession: true,
-          onDriveResume,
-        }}
+        satellites={{ ...base.satellites, handsFreeActive: true }}
         transcript={transcript}
         visualPhase="idle"
       />,
     );
-    fireEvent.press(drive.getByTestId("satellite-resume"));
-    expect(onDriveResume).toHaveBeenCalledTimes(1);
+    expect(
+      turn.getByTestId("satellite-council").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ disabled: true }));
+    expect(
+      turn.getByTestId("satellite-hands-free").props.accessibilityState,
+    ).toEqual(expect.objectContaining({ checked: true, disabled: false }));
   });
 
   beforeEach(() => {
@@ -290,7 +284,6 @@ describe("MainScreenWorkspace streaming isolation", () => {
     const screen = renderWorkspace(
       <MainScreenWorkspace
         {...workspaceProps}
-        introBanner={{ ...workspaceProps.introBanner, visible: true }}
         transcript={{
           activeConversationId: null,
           activeReplayMessageId: null,
@@ -317,12 +310,9 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(screen.getByTestId("intro-banner")).toBeTruthy();
-    expect(screen.queryByTestId("intro-banner-open")).toBeNull();
-    expect(screen.queryByText("Balanced · Brief")).toBeNull();
+    expect(screen.getByText("Balanced · Brief")).toBeTruthy();
     expect(
-      screen.getByTestId("conversation-settings-summary-control").props
-        .accessibilityLabel,
+      screen.getByTestId("workspace-header-settings").props.accessibilityLabel,
     ).toBe("Conversation settings");
     expect(
       within(screen.getByTestId("workspace-satellites")).queryByText(
@@ -378,45 +368,6 @@ describe("MainScreenWorkspace streaming isolation", () => {
     ).toEqual({ text: "compact" });
     expect(screen.queryByTestId("workspace-status-line")).toBeNull();
     expect(screen.getByTestId("landscape-right-pane")).toBeTruthy();
-  });
-
-  it("steps the orb ceiling down while the intro banner is visible", () => {
-    const t = jest.fn((key: string) => key);
-    const workspaceProps = createWorkspaceProps(t);
-    const transcript = {
-      activeConversationId: null,
-      activeReplayMessageId: null,
-      messages: [],
-      onCopyMessage: jest.fn(async () => true),
-      onRetryMessage: jest.fn(),
-      replayPhase: "idle" as const,
-      scrollEnabled: true,
-      showUsageStats: false,
-      showWhenEmpty: true,
-      t,
-    };
-    const screen = renderWorkspace(
-      <MainScreenWorkspace
-        {...workspaceProps}
-        introBanner={{ ...workspaceProps.introBanner, visible: true }}
-        transcript={transcript}
-      />,
-    );
-
-    expect(
-      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
-    ).toBe("156");
-
-    screen.rerender(
-      <MainScreenWorkspace
-        {...workspaceProps}
-        introBanner={{ ...workspaceProps.introBanner, visible: false }}
-        transcript={transcript}
-      />,
-    );
-    expect(
-      screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
-    ).toBe("196");
   });
 
   it("compacts the blocked-route notice in landscape at normal text size", () => {
@@ -506,7 +457,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteBylineRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(0);
     expect(mockVoicePagerRenderCount).toBe(1);
     // The satellites belong to the measured voice-stage cluster. Keeping them
     // inside it prevents tall screens from donating all spare height between
@@ -528,7 +479,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
       />,
     );
 
-    expect(mockRouteBylineRenderCount).toBe(1);
+    expect(mockRouteBylineRenderCount).toBe(0);
     expect(mockVoicePagerRenderCount).toBe(1);
     // Transcript updates do not leak reply or route metadata into the stable
     // design-system handle.
@@ -536,17 +487,13 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(screen.queryByText("Hello there")).toBeNull();
   });
 
-  it("top-aligns the complete Drive control stack in constrained landscape", () => {
+  it("keeps the compact composing row and 150pt orb ceiling in landscape", () => {
     const t = jest.fn((key: string) => key);
     const workspaceProps = createWorkspaceProps(t);
     const screen = renderWorkspace(
       <MainScreenWorkspace
         {...workspaceProps}
         isLandscape
-        satellites={{
-          ...workspaceProps.satellites,
-          driveSession: true,
-        }}
         transcript={{
           activeConversationId: null,
           activeReplayMessageId: null,
@@ -562,9 +509,8 @@ describe("MainScreenWorkspace streaming isolation", () => {
         visualPhase="idle"
         voiceStage={{
           ...workspaceProps.voiceStage,
-          inputMode: "drive-session",
           isActive: false,
-          statusTitle: "Drive",
+          statusTitle: "Ready",
           visualPhase: "idle",
         }}
       />,
@@ -573,7 +519,7 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(
       StyleSheet.flatten(screen.getByTestId("landscape-stage-area").props.style)
         .justifyContent,
-    ).toBe("flex-start");
+    ).toBe("flex-end");
     // Landscape keeps the settings control, floated over the stage's
     // top-right corner as an icon so the words cost the orb no height.
     expect(
@@ -584,15 +530,11 @@ describe("MainScreenWorkspace streaming isolation", () => {
       expect.objectContaining({ position: "absolute", right: 0, top: 0 }),
     );
     expect(screen.queryByText("Balanced · Brief")).toBeNull();
-    expect(screen.queryByTestId("satellite-council")).toBeNull();
+    expect(screen.getByTestId("satellite-council")).toBeTruthy();
+    expect(screen.getByTestId("satellite-hands-free")).toBeTruthy();
     expect(
       screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
-    ).toBe("104");
-    expect(
-      within(screen.getByTestId("voice-stage-idle")).getByTestId(
-        "satellite-stop",
-      ),
-    ).toBeTruthy();
+    ).toBe("150");
   });
 
   it("uses the regular portrait iPad shell with a persistent-handle content pane", () => {
@@ -643,58 +585,6 @@ describe("MainScreenWorkspace streaming isolation", () => {
     expect(
       screen.getByTestId("voice-text-input-pager").props.accessibilityHint,
     ).toBe("208");
-  });
-
-  it("keeps the full introduction invitation across regular iPad orientations", () => {
-    const t = jest.fn((key: string) => key);
-    const workspaceProps = createWorkspaceProps(t);
-    const transcript = {
-      activeConversationId: null,
-      activeReplayMessageId: null,
-      messages: [],
-      onCopyMessage: jest.fn(async () => true),
-      onRetryMessage: jest.fn(),
-      replayPhase: "idle" as const,
-      scrollEnabled: true,
-      showUsageStats: false,
-      showWhenEmpty: true,
-      t,
-    };
-    const renderRegularWorkspace = (width: number, height: number) => (
-      <MainScreenWorkspace
-        {...workspaceProps}
-        introBanner={{ ...workspaceProps.introBanner, visible: true }}
-        ipadLayout={resolveIpadLayout({
-          height,
-          isPad: true,
-          platform: "ios",
-          width,
-        })}
-        isLandscape={width > height}
-        transcript={transcript}
-        visualPhase="idle"
-      />
-    );
-
-    mockUseWindowDimensions.mockReturnValue({
-      fontScale: 1,
-      height: 1180,
-      scale: 2,
-      width: 820,
-    });
-    const screen = renderWorkspace(renderRegularWorkspace(820, 1180));
-
-    expect(screen.getByTestId("intro-banner-play-ring")).toBeTruthy();
-
-    mockUseWindowDimensions.mockReturnValue({
-      fontScale: 1,
-      height: 820,
-      scale: 2,
-      width: 1180,
-    });
-    screen.rerender(renderRegularWorkspace(1180, 820));
-
-    expect(screen.getByTestId("intro-banner-play-ring")).toBeTruthy();
   });
 
   it("docks exactly one transcript and removes the handle in wide iPad landscape", () => {

@@ -259,29 +259,13 @@ const performanceTranslations = {
 
 const en = {
   ...performanceTranslations.en,
-  settingsOnDevice: "On-device AI",
-  settingsOnDeviceSummary:
-    "Private local models, device checks, downloads, and tests.",
-  onDeviceIntro:
-    "Choose languages once, then Mr Broccoli only offers local listening, thinking, and speaking models that fit this phone.",
   onDeviceLanguages: "Conversation languages",
   onDeviceLanguagesHint:
     "Every selected local model must support all of these languages. This choice also updates listening and spoken-reply languages.",
-  onDeviceTestDevice: "Test this device again",
   onDeviceTestingDevice: "Testing this device…",
   onDeviceDownloadCancelled: "Download cancelled.",
   onDeviceDownloadServiceTitle: "Downloading a model",
   onDeviceDownloadServiceBody: "Keep this running until it finishes.",
-  onDeviceDeviceReady: "Device check complete",
-  onDeviceDeviceSummary: ({ memory, storage }: TranslationParams) =>
-    `${memory} RAM · ${storage} free`,
-  onDeviceNoCompatibleModels:
-    "No local model in the curated catalogue supports every selected language and fits this device.",
-  onDeviceThinkingModels: "Local responses",
-  onDeviceListeningModels: "Local speech recognition",
-  onDeviceSpeakingModels: "Local voices",
-  onDeviceUse: "Use",
-  onDeviceInUse: "In use",
   onDeviceViable: "Test passed",
   onDeviceBelowTarget: "Works, but slower than recommended",
   onDeviceTestFailed: "Test failed",
@@ -298,29 +282,13 @@ export const onDeviceTranslations = {
   en,
   de: define({
     ...performanceTranslations.de,
-    settingsOnDevice: "KI auf dem Gerät",
-    settingsOnDeviceSummary:
-      "Private lokale Modelle, Geräteprüfung, Downloads und Tests.",
-    onDeviceIntro:
-      "Wähle Sprachen einmal aus. Mr Broccoli bietet danach nur lokale Modelle zum Hören, Denken und Sprechen an, die zu diesem Smartphone passen.",
     onDeviceLanguages: "Gesprächssprachen",
     onDeviceLanguagesHint:
       "Jedes lokale Modell muss alle ausgewählten Sprachen unterstützen. Die Auswahl aktualisiert auch Erkennung und Sprachausgabe.",
-    onDeviceTestDevice: "Gerät erneut testen",
     onDeviceTestingDevice: "Gerät wird getestet…",
-    onDeviceDownloadCancelled: "تم إلغاء التنزيل.",
-    onDeviceDownloadServiceTitle: "تنزيل نموذج",
-    onDeviceDownloadServiceBody: "أبقِ هذا يعمل حتى ينتهي.",
-    onDeviceDeviceReady: "Geräteprüfung abgeschlossen",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} frei`,
-    onDeviceNoCompatibleModels:
-      "Kein lokales Modell im geprüften Katalog unterstützt alle ausgewählten Sprachen und passt zu diesem Gerät.",
-    onDeviceThinkingModels: "Lokale Antworten",
-    onDeviceListeningModels: "Lokale Spracherkennung",
-    onDeviceSpeakingModels: "Lokale Stimmen",
-    onDeviceUse: "Verwenden",
-    onDeviceInUse: "Wird verwendet",
+    onDeviceDownloadCancelled: "Download abgebrochen.",
+    onDeviceDownloadServiceTitle: "Modell wird heruntergeladen",
+    onDeviceDownloadServiceBody: "Lass diesen Vorgang laufen, bis er abgeschlossen ist.",
     onDeviceViable: "Test bestanden",
     onDeviceBelowTarget: "Funktioniert, aber langsamer als empfohlen",
     onDeviceTestFailed: "Test fehlgeschlagen",
@@ -332,29 +300,13 @@ export const onDeviceTranslations = {
   }),
   uk: define({
     ...performanceTranslations.uk,
-    settingsOnDevice: "ШІ на пристрої",
-    settingsOnDeviceSummary:
-      "Приватні локальні моделі, перевірка пристрою, завантаження й тести.",
-    onDeviceIntro:
-      "Виберіть мови один раз, і Mr Broccoli запропонує лише локальні моделі для слухання, мислення та мовлення, які підходять цьому телефону.",
     onDeviceLanguages: "Мови розмови",
     onDeviceLanguagesHint:
       "Кожна локальна модель має підтримувати всі вибрані мови. Вибір також оновлює мови розпізнавання та озвучення.",
-    onDeviceTestDevice: "Перевірити пристрій знову",
     onDeviceTestingDevice: "Перевірка пристрою…",
-    onDeviceDownloadCancelled: "Stahování zrušeno.",
-    onDeviceDownloadServiceTitle: "Stahování modelu",
-    onDeviceDownloadServiceBody: "Nech to běžet, dokud neskončí.",
-    onDeviceDeviceReady: "Перевірку пристрою завершено",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} ОЗП · ${storage} вільно`,
-    onDeviceNoCompatibleModels:
-      "У перевіреному каталозі немає локальної моделі, яка підтримує всі вибрані мови й підходить цьому пристрою.",
-    onDeviceThinkingModels: "Локальні відповіді",
-    onDeviceListeningModels: "Локальне розпізнавання мовлення",
-    onDeviceSpeakingModels: "Локальні голоси",
-    onDeviceUse: "Використовувати",
-    onDeviceInUse: "Використовується",
+    onDeviceDownloadCancelled: "Завантаження скасовано.",
+    onDeviceDownloadServiceTitle: "Завантаження моделі",
+    onDeviceDownloadServiceBody: "Не закривайте цей процес, доки він не завершиться.",
     onDeviceViable: "Тест пройдено",
     onDeviceBelowTarget: "Працює, але повільніше за рекомендоване",
     onDeviceTestFailed: "Тест не пройдено",
@@ -366,29 +318,13 @@ export const onDeviceTranslations = {
   }),
   hi: define({
     ...performanceTranslations.hi,
-    settingsOnDevice: "डिवाइस पर AI",
-    settingsOnDeviceSummary:
-      "निजी स्थानीय मॉडल, डिवाइस जाँच, डाउनलोड और परीक्षण।",
-    onDeviceIntro:
-      "भाषाएँ एक बार चुनें। फिर Mr Broccoli केवल इसी फ़ोन पर चल सकने वाले स्थानीय सुनने, सोचने और बोलने के मॉडल दिखाएगा।",
     onDeviceLanguages: "बातचीत की भाषाएँ",
     onDeviceLanguagesHint:
       "हर स्थानीय मॉडल को चुनी हुई सभी भाषाओं का समर्थन करना होगा। यह चयन सुनने और बोले गए उत्तरों की भाषाएँ भी बदलता है।",
-    onDeviceTestDevice: "इस डिवाइस को फिर जाँचें",
     onDeviceTestingDevice: "डिवाइस की जाँच हो रही है…",
-    onDeviceDownloadCancelled: "Download abgebrochen.",
-    onDeviceDownloadServiceTitle: "Modell wird geladen",
-    onDeviceDownloadServiceBody: "Lass das laufen, bis es fertig ist.",
-    onDeviceDeviceReady: "डिवाइस जाँच पूरी हुई",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} खाली`,
-    onDeviceNoCompatibleModels:
-      "चुनी हुई सभी भाषाओं और इस डिवाइस के लिए कोई उपयुक्त स्थानीय मॉडल नहीं है।",
-    onDeviceThinkingModels: "स्थानीय उत्तर",
-    onDeviceListeningModels: "स्थानीय वाक् पहचान",
-    onDeviceSpeakingModels: "स्थानीय आवाज़ें",
-    onDeviceUse: "उपयोग करें",
-    onDeviceInUse: "उपयोग में",
+    onDeviceDownloadCancelled: "डाउनलोड रद्द किया गया।",
+    onDeviceDownloadServiceTitle: "मॉडल डाउनलोड हो रहा है",
+    onDeviceDownloadServiceBody: "इसे पूरा होने तक चलने दें।",
     onDeviceViable: "परीक्षण सफल",
     onDeviceBelowTarget: "चलता है, लेकिन सुझाई गति से धीमा",
     onDeviceTestFailed: "परीक्षण विफल",
@@ -399,29 +335,13 @@ export const onDeviceTranslations = {
   }),
   es: define({
     ...performanceTranslations.es,
-    settingsOnDevice: "IA en el dispositivo",
-    settingsOnDeviceSummary:
-      "Modelos locales privados, comprobación del dispositivo, descargas y pruebas.",
-    onDeviceIntro:
-      "Elige los idiomas una vez y Mr Broccoli solo ofrecerá modelos locales de escucha, razonamiento y voz que funcionen en este teléfono.",
     onDeviceLanguages: "Idiomas de conversación",
     onDeviceLanguagesHint:
       "Cada modelo local debe admitir todos estos idiomas. La selección también actualiza los idiomas de reconocimiento y respuesta hablada.",
-    onDeviceTestDevice: "Volver a probar el dispositivo",
     onDeviceTestingDevice: "Probando el dispositivo…",
     onDeviceDownloadCancelled: "Descarga cancelada.",
     onDeviceDownloadServiceTitle: "Descargando un modelo",
-    onDeviceDownloadServiceBody: "Déjalo en marcha hasta que termine.",
-    onDeviceDeviceReady: "Comprobación completada",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} libres`,
-    onDeviceNoCompatibleModels:
-      "Ningún modelo local del catálogo verificado admite todos los idiomas elegidos y funciona en este dispositivo.",
-    onDeviceThinkingModels: "Respuestas locales",
-    onDeviceListeningModels: "Reconocimiento de voz local",
-    onDeviceSpeakingModels: "Voces locales",
-    onDeviceUse: "Usar",
-    onDeviceInUse: "En uso",
+    onDeviceDownloadServiceBody: "Déjalo en ejecución hasta que termine.",
     onDeviceViable: "Prueba superada",
     onDeviceBelowTarget: "Funciona, pero más lento de lo recomendado",
     onDeviceTestFailed: "Prueba fallida",
@@ -433,29 +353,13 @@ export const onDeviceTranslations = {
   }),
   fr: define({
     ...performanceTranslations.fr,
-    settingsOnDevice: "IA sur l’appareil",
-    settingsOnDeviceSummary:
-      "Modèles locaux privés, contrôle de l’appareil, téléchargements et tests.",
-    onDeviceIntro:
-      "Choisissez les langues une fois. Mr Broccoli ne proposera ensuite que les modèles locaux d’écoute, de réflexion et de voix adaptés à ce téléphone.",
     onDeviceLanguages: "Langues de conversation",
     onDeviceLanguagesHint:
       "Chaque modèle local doit prendre en charge toutes ces langues. Ce choix met aussi à jour les langues d’écoute et des réponses vocales.",
-    onDeviceTestDevice: "Retester cet appareil",
     onDeviceTestingDevice: "Test de l’appareil…",
     onDeviceDownloadCancelled: "Téléchargement annulé.",
-    onDeviceDownloadServiceTitle: "Téléchargement d'un modèle",
-    onDeviceDownloadServiceBody: "Laisse-le tourner jusqu'à la fin.",
-    onDeviceDeviceReady: "Contrôle de l’appareil terminé",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} disponibles`,
-    onDeviceNoCompatibleModels:
-      "Aucun modèle local du catalogue vérifié ne prend en charge toutes les langues choisies tout en étant adapté à cet appareil.",
-    onDeviceThinkingModels: "Réponses locales",
-    onDeviceListeningModels: "Reconnaissance vocale locale",
-    onDeviceSpeakingModels: "Voix locales",
-    onDeviceUse: "Utiliser",
-    onDeviceInUse: "Utilisé",
+    onDeviceDownloadServiceTitle: "Téléchargement d’un modèle",
+    onDeviceDownloadServiceBody: "Laissez cette opération se poursuivre jusqu’à la fin.",
     onDeviceViable: "Test réussi",
     onDeviceBelowTarget: "Fonctionne, mais plus lentement que recommandé",
     onDeviceTestFailed: "Échec du test",
@@ -467,29 +371,13 @@ export const onDeviceTranslations = {
   }),
   it: define({
     ...performanceTranslations.it,
-    settingsOnDevice: "IA sul dispositivo",
-    settingsOnDeviceSummary:
-      "Modelli locali privati, verifica del dispositivo, download e test.",
-    onDeviceIntro:
-      "Scegli le lingue una volta: Mr Broccoli offrirà solo modelli locali di ascolto, ragionamento e voce adatti a questo telefono.",
     onDeviceLanguages: "Lingue della conversazione",
     onDeviceLanguagesHint:
       "Ogni modello locale deve supportare tutte le lingue selezionate. La scelta aggiorna anche le lingue di ascolto e risposta vocale.",
-    onDeviceTestDevice: "Verifica di nuovo il dispositivo",
     onDeviceTestingDevice: "Verifica del dispositivo…",
-    onDeviceDownloadCancelled: "डाउनलोड रद्द किया गया।",
-    onDeviceDownloadServiceTitle: "मॉडल डाउनलोड हो रहा है",
-    onDeviceDownloadServiceBody: "इसे पूरा होने तक चलने दें।",
-    onDeviceDeviceReady: "Verifica del dispositivo completata",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} liberi`,
-    onDeviceNoCompatibleModels:
-      "Nessun modello locale del catalogo curato supporta tutte le lingue selezionate ed è adatto a questo dispositivo.",
-    onDeviceThinkingModels: "Risposte locali",
-    onDeviceListeningModels: "Riconoscimento vocale locale",
-    onDeviceSpeakingModels: "Voci locali",
-    onDeviceUse: "Usa",
-    onDeviceInUse: "In uso",
+    onDeviceDownloadCancelled: "Download annullato.",
+    onDeviceDownloadServiceTitle: "Download di un modello",
+    onDeviceDownloadServiceBody: "Lascialo in esecuzione fino al termine.",
     onDeviceViable: "Test superato",
     onDeviceBelowTarget: "Funziona, ma più lentamente del consigliato",
     onDeviceTestFailed: "Test non riuscito",
@@ -501,29 +389,13 @@ export const onDeviceTranslations = {
   }),
   pt: define({
     ...performanceTranslations.pt,
-    settingsOnDevice: "IA no dispositivo",
-    settingsOnDeviceSummary:
-      "Modelos locais privados, verificação do dispositivo, transferências e testes.",
-    onDeviceIntro:
-      "Escolha os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este telemóvel.",
     onDeviceLanguages: "Idiomas da conversa",
     onDeviceLanguagesHint:
       "Cada modelo local tem de suportar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
-    onDeviceTestDevice: "Testar novamente este dispositivo",
     onDeviceTestingDevice: "A testar o dispositivo…",
-    onDeviceDownloadCancelled: "A letöltés megszakítva.",
-    onDeviceDownloadServiceTitle: "Modell letöltése",
-    onDeviceDownloadServiceBody: "Hagyd futni, amíg be nem fejeződik.",
-    onDeviceDeviceReady: "Verificação do dispositivo concluída",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} livres`,
-    onDeviceNoCompatibleModels:
-      "Nenhum modelo local do catálogo verificado suporta todos os idiomas escolhidos e cabe neste dispositivo.",
-    onDeviceThinkingModels: "Respostas locais",
-    onDeviceListeningModels: "Reconhecimento de voz local",
-    onDeviceSpeakingModels: "Vozes locais",
-    onDeviceUse: "Usar",
-    onDeviceInUse: "Em uso",
+    onDeviceDownloadCancelled: "Transferência cancelada.",
+    onDeviceDownloadServiceTitle: "A transferir um modelo",
+    onDeviceDownloadServiceBody: "Mantém este processo em execução até terminar.",
     onDeviceViable: "Teste aprovado",
     onDeviceBelowTarget: "Funciona, mas é mais lento do que o recomendado",
     onDeviceTestFailed: "Teste falhou",
@@ -535,29 +407,13 @@ export const onDeviceTranslations = {
   }),
   ptBR: define({
     ...performanceTranslations.ptBR,
-    settingsOnDevice: "IA no dispositivo",
-    settingsOnDeviceSummary:
-      "Modelos locais privados, verificação do dispositivo, downloads e testes.",
-    onDeviceIntro:
-      "Escolha os idiomas uma vez. O Mr Broccoli só mostrará modelos locais de escuta, raciocínio e voz adequados a este celular.",
     onDeviceLanguages: "Idiomas da conversa",
     onDeviceLanguagesHint:
       "Cada modelo local deve aceitar todos os idiomas escolhidos. A seleção também atualiza os idiomas de escuta e resposta falada.",
-    onDeviceTestDevice: "Testar este dispositivo novamente",
     onDeviceTestingDevice: "Testando o dispositivo…",
-    onDeviceDownloadCancelled: "Download annullato.",
-    onDeviceDownloadServiceTitle: "Download di un modello",
-    onDeviceDownloadServiceBody: "Lascialo in esecuzione fino al termine.",
-    onDeviceDeviceReady: "Verificação do dispositivo concluída",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} livres`,
-    onDeviceNoCompatibleModels:
-      "Nenhum modelo local do catálogo verificado aceita todos os idiomas escolhidos e cabe neste dispositivo.",
-    onDeviceThinkingModels: "Respostas locais",
-    onDeviceListeningModels: "Reconhecimento de voz local",
-    onDeviceSpeakingModels: "Vozes locais",
-    onDeviceUse: "Usar",
-    onDeviceInUse: "Em uso",
+    onDeviceDownloadCancelled: "Download cancelado.",
+    onDeviceDownloadServiceTitle: "Baixando um modelo",
+    onDeviceDownloadServiceBody: "Mantenha isto em execução até terminar.",
     onDeviceViable: "Teste aprovado",
     onDeviceBelowTarget: "Funciona, mas é mais lento que o recomendado",
     onDeviceTestFailed: "Teste falhou",
@@ -569,29 +425,13 @@ export const onDeviceTranslations = {
   }),
   ru: define({
     ...performanceTranslations.ru,
-    settingsOnDevice: "ИИ на устройстве",
-    settingsOnDeviceSummary:
-      "Приватные локальные модели, проверка устройства, загрузки и тесты.",
-    onDeviceIntro:
-      "Выберите языки один раз, и Mr Broccoli предложит только подходящие этому телефону локальные модели для распознавания, ответов и озвучивания.",
     onDeviceLanguages: "Языки разговора",
     onDeviceLanguagesHint:
       "Каждая локальная модель должна поддерживать все выбранные языки. Выбор также обновляет языки распознавания и голосовых ответов.",
-    onDeviceTestDevice: "Проверить устройство снова",
     onDeviceTestingDevice: "Проверка устройства…",
-    onDeviceDownloadCancelled: "ダウンロードを取り消しました。",
-    onDeviceDownloadServiceTitle: "モデルをダウンロード中",
-    onDeviceDownloadServiceBody: "完了するまでそのままにしてください。",
-    onDeviceDeviceReady: "Проверка устройства завершена",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} ОЗУ · ${storage} свободно`,
-    onDeviceNoCompatibleModels:
-      "В проверенном каталоге нет локальной модели, которая поддерживает все выбранные языки и подходит этому устройству.",
-    onDeviceThinkingModels: "Локальные ответы",
-    onDeviceListeningModels: "Локальное распознавание речи",
-    onDeviceSpeakingModels: "Локальные голоса",
-    onDeviceUse: "Использовать",
-    onDeviceInUse: "Используется",
+    onDeviceDownloadCancelled: "Загрузка отменена.",
+    onDeviceDownloadServiceTitle: "Загрузка модели",
+    onDeviceDownloadServiceBody: "Не закрывайте этот процесс до завершения.",
     onDeviceViable: "Тест пройден",
     onDeviceBelowTarget: "Работает, но медленнее рекомендованного",
     onDeviceTestFailed: "Тест не пройден",
@@ -603,28 +443,13 @@ export const onDeviceTranslations = {
   }),
   "zh-CN": define({
     ...performanceTranslations["zh-CN"],
-    settingsOnDevice: "设备端 AI",
-    settingsOnDeviceSummary: "私密本地模型、设备检测、下载与测试。",
-    onDeviceIntro:
-      "只需选择一次语言，Mr Broccoli就只会提供适合此手机的本地听写、推理和语音模型。",
     onDeviceLanguages: "对话语言",
     onDeviceLanguagesHint:
       "每个本地模型都必须支持所有所选语言。此选择也会更新听写和语音回复语言。",
-    onDeviceTestDevice: "重新测试此设备",
     onDeviceTestingDevice: "正在测试设备…",
-    onDeviceDownloadCancelled: "Pobieranie anulowane.",
-    onDeviceDownloadServiceTitle: "Pobieranie modelu",
-    onDeviceDownloadServiceBody: "Zostaw to, aż się zakończy.",
-    onDeviceDeviceReady: "设备检测完成",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} 内存 · ${storage} 可用`,
-    onDeviceNoCompatibleModels:
-      "经审核的目录中没有同时支持所有所选语言且适合此设备的本地模型。",
-    onDeviceThinkingModels: "本地回复",
-    onDeviceListeningModels: "本地语音识别",
-    onDeviceSpeakingModels: "本地语音",
-    onDeviceUse: "使用",
-    onDeviceInUse: "使用中",
+    onDeviceDownloadCancelled: "下载已取消。",
+    onDeviceDownloadServiceTitle: "正在下载模型",
+    onDeviceDownloadServiceBody: "请保持运行直到完成。",
     onDeviceViable: "测试通过",
     onDeviceBelowTarget: "可以运行，但速度低于建议值",
     onDeviceTestFailed: "测试失败",
@@ -634,29 +459,13 @@ export const onDeviceTranslations = {
   }),
   ar: define({
     ...performanceTranslations.ar,
-    settingsOnDevice: "ذكاء اصطناعي على الجهاز",
-    settingsOnDeviceSummary:
-      "نماذج محلية خاصة وفحص الجهاز والتنزيلات والاختبارات.",
-    onDeviceIntro:
-      "اختر اللغات مرة واحدة، وسيعرض Mr Broccoli فقط نماذج الاستماع والتفكير والصوت المحلية المناسبة لهذا الهاتف.",
     onDeviceLanguages: "لغات المحادثة",
     onDeviceLanguagesHint:
       "يجب أن يدعم كل نموذج محلي جميع اللغات المحددة. يحدّث هذا الاختيار أيضًا لغات الاستماع والردود المنطوقة.",
-    onDeviceTestDevice: "اختبار هذا الجهاز مجددًا",
     onDeviceTestingDevice: "جارٍ اختبار الجهاز…",
-    onDeviceDownloadCancelled: "Transferência cancelada.",
-    onDeviceDownloadServiceTitle: "A transferir um modelo",
-    onDeviceDownloadServiceBody: "Deixa a decorrer até terminar.",
-    onDeviceDeviceReady: "اكتمل فحص الجهاز",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} ذاكرة · ${storage} متاحة`,
-    onDeviceNoCompatibleModels:
-      "لا يوجد نموذج محلي في الكتالوج المراجع يدعم كل اللغات المحددة ويناسب هذا الجهاز.",
-    onDeviceThinkingModels: "ردود محلية",
-    onDeviceListeningModels: "تعرّف محلي على الكلام",
-    onDeviceSpeakingModels: "أصوات محلية",
-    onDeviceUse: "استخدام",
-    onDeviceInUse: "قيد الاستخدام",
+    onDeviceDownloadCancelled: "تم إلغاء التنزيل.",
+    onDeviceDownloadServiceTitle: "جارٍ تنزيل نموذج",
+    onDeviceDownloadServiceBody: "اترك هذه العملية قيد التشغيل حتى تكتمل.",
     onDeviceViable: "نجح الاختبار",
     onDeviceBelowTarget: "يعمل، لكنه أبطأ من الموصى به",
     onDeviceTestFailed: "فشل الاختبار",
@@ -667,29 +476,13 @@ export const onDeviceTranslations = {
   }),
   ja: define({
     ...performanceTranslations.ja,
-    settingsOnDevice: "オンデバイス AI",
-    settingsOnDeviceSummary:
-      "プライベートなローカルモデル、端末チェック、ダウンロード、テスト。",
-    onDeviceIntro:
-      "言語を一度選ぶと、Mr Broccoliはこの端末に適したローカルの音声認識・推論・音声モデルだけを表示します。",
     onDeviceLanguages: "会話の言語",
     onDeviceLanguagesHint:
       "各ローカルモデルは選択したすべての言語に対応する必要があります。この選択は音声認識と読み上げの言語にも反映されます。",
-    onDeviceTestDevice: "この端末を再テスト",
     onDeviceTestingDevice: "端末をテスト中…",
-    onDeviceDownloadCancelled: "Download cancelado.",
-    onDeviceDownloadServiceTitle: "Baixando um modelo",
-    onDeviceDownloadServiceBody: "Deixe rodando até terminar.",
-    onDeviceDeviceReady: "端末チェック完了",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM・空き ${storage}`,
-    onDeviceNoCompatibleModels:
-      "選択したすべての言語に対応し、この端末で動作するローカルモデルは審査済みカタログにありません。",
-    onDeviceThinkingModels: "ローカル応答",
-    onDeviceListeningModels: "ローカル音声認識",
-    onDeviceSpeakingModels: "ローカル音声",
-    onDeviceUse: "使用",
-    onDeviceInUse: "使用中",
+    onDeviceDownloadCancelled: "ダウンロードをキャンセルしました。",
+    onDeviceDownloadServiceTitle: "モデルをダウンロード中",
+    onDeviceDownloadServiceBody: "完了するまでこのまま実行してください。",
     onDeviceViable: "テスト合格",
     onDeviceBelowTarget: "動作しますが、推奨速度を下回ります",
     onDeviceTestFailed: "テスト失敗",
@@ -700,29 +493,13 @@ export const onDeviceTranslations = {
   }),
   hu: define({
     ...performanceTranslations.hu,
-    settingsOnDevice: "Eszközön futó MI",
-    settingsOnDeviceSummary:
-      "Privát helyi modellek, eszközellenőrzés, letöltések és tesztek.",
-    onDeviceIntro:
-      "Válaszd ki egyszer a nyelveket, és Mr Broccoli csak az ezen a telefonon futó helyi hallási, gondolkodási és beszédmodelleket kínálja fel.",
     onDeviceLanguages: "Beszélgetési nyelvek",
     onDeviceLanguagesHint:
       "Minden helyi modellnek támogatnia kell az összes kiválasztott nyelvet. Ez a felismerés és a felolvasás nyelveit is frissíti.",
-    onDeviceTestDevice: "Eszköz újbóli tesztelése",
     onDeviceTestingDevice: "Eszköz tesztelése…",
-    onDeviceDownloadCancelled: "Загрузка отменена.",
-    onDeviceDownloadServiceTitle: "Загрузка модели",
-    onDeviceDownloadServiceBody: "Не закрывайте, пока не завершится.",
-    onDeviceDeviceReady: "Eszközellenőrzés kész",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} szabad`,
-    onDeviceNoCompatibleModels:
-      "Az ellenőrzött katalógusban nincs minden kiválasztott nyelvet támogató, ezen az eszközön futó helyi modell.",
-    onDeviceThinkingModels: "Helyi válaszok",
-    onDeviceListeningModels: "Helyi beszédfelismerés",
-    onDeviceSpeakingModels: "Helyi hangok",
-    onDeviceUse: "Használat",
-    onDeviceInUse: "Használatban",
+    onDeviceDownloadCancelled: "Letöltés megszakítva.",
+    onDeviceDownloadServiceTitle: "Modell letöltése",
+    onDeviceDownloadServiceBody: "Hagyd futni, amíg befejeződik.",
     onDeviceViable: "Teszt sikeres",
     onDeviceBelowTarget: "Működik, de az ajánlottnál lassabb",
     onDeviceTestFailed: "Teszt sikertelen",
@@ -734,29 +511,13 @@ export const onDeviceTranslations = {
   }),
   cs: define({
     ...performanceTranslations.cs,
-    settingsOnDevice: "AI v zařízení",
-    settingsOnDeviceSummary:
-      "Soukromé místní modely, kontrola zařízení, stahování a testy.",
-    onDeviceIntro:
-      "Vyberte jazyky jednou a Mr Broccoli nabídne jen místní modely poslechu, uvažování a hlasu vhodné pro tento telefon.",
     onDeviceLanguages: "Jazyky konverzace",
     onDeviceLanguagesHint:
       "Každý místní model musí podporovat všechny vybrané jazyky. Volba upraví také jazyky rozpoznávání a mluvených odpovědí.",
-    onDeviceTestDevice: "Otestovat zařízení znovu",
     onDeviceTestingDevice: "Testování zařízení…",
-    onDeviceDownloadCancelled: "Nedladdningen avbröts.",
-    onDeviceDownloadServiceTitle: "Laddar ner en modell",
-    onDeviceDownloadServiceBody: "Låt det vara igång tills det är klart.",
-    onDeviceDeviceReady: "Kontrola zařízení dokončena",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} volné`,
-    onDeviceNoCompatibleModels:
-      "V prověřeném katalogu není místní model, který podporuje všechny vybrané jazyky a hodí se pro toto zařízení.",
-    onDeviceThinkingModels: "Místní odpovědi",
-    onDeviceListeningModels: "Místní rozpoznávání řeči",
-    onDeviceSpeakingModels: "Místní hlasy",
-    onDeviceUse: "Použít",
-    onDeviceInUse: "Používá se",
+    onDeviceDownloadCancelled: "Stahování zrušeno.",
+    onDeviceDownloadServiceTitle: "Stahování modelu",
+    onDeviceDownloadServiceBody: "Nechte proces běžet, dokud se nedokončí.",
     onDeviceViable: "Test úspěšný",
     onDeviceBelowTarget: "Funguje, ale pomaleji než doporučeno",
     onDeviceTestFailed: "Test selhal",
@@ -767,29 +528,13 @@ export const onDeviceTranslations = {
   }),
   pl: define({
     ...performanceTranslations.pl,
-    settingsOnDevice: "AI na urządzeniu",
-    settingsOnDeviceSummary:
-      "Prywatne modele lokalne, kontrola urządzenia, pobieranie i testy.",
-    onDeviceIntro:
-      "Wybierz języki raz, a Mr Broccoli pokaże tylko lokalne modele słuchania, rozumowania i głosu odpowiednie dla tego telefonu.",
     onDeviceLanguages: "Języki rozmowy",
     onDeviceLanguagesHint:
       "Każdy model lokalny musi obsługiwać wszystkie wybrane języki. Wybór aktualizuje też języki rozpoznawania i odpowiedzi głosowych.",
-    onDeviceTestDevice: "Przetestuj urządzenie ponownie",
     onDeviceTestingDevice: "Testowanie urządzenia…",
-    onDeviceDownloadCancelled: "İndirme iptal edildi.",
-    onDeviceDownloadServiceTitle: "Model indiriliyor",
-    onDeviceDownloadServiceBody: "Bitene kadar çalışır durumda bırak.",
-    onDeviceDeviceReady: "Kontrola urządzenia zakończona",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} wolne`,
-    onDeviceNoCompatibleModels:
-      "W sprawdzonym katalogu nie ma lokalnego modelu obsługującego wszystkie wybrane języki i pasującego do tego urządzenia.",
-    onDeviceThinkingModels: "Odpowiedzi lokalne",
-    onDeviceListeningModels: "Lokalne rozpoznawanie mowy",
-    onDeviceSpeakingModels: "Lokalne głosy",
-    onDeviceUse: "Użyj",
-    onDeviceInUse: "W użyciu",
+    onDeviceDownloadCancelled: "Pobieranie anulowane.",
+    onDeviceDownloadServiceTitle: "Pobieranie modelu",
+    onDeviceDownloadServiceBody: "Pozostaw ten proces uruchomiony do zakończenia.",
     onDeviceViable: "Test zaliczony",
     onDeviceBelowTarget: "Działa, ale wolniej niż zalecane",
     onDeviceTestFailed: "Test nieudany",
@@ -800,29 +545,13 @@ export const onDeviceTranslations = {
   }),
   tr: define({
     ...performanceTranslations.tr,
-    settingsOnDevice: "Cihaz içi yapay zekâ",
-    settingsOnDeviceSummary:
-      "Özel yerel modeller, cihaz kontrolü, indirmeler ve testler.",
-    onDeviceIntro:
-      "Dilleri bir kez seçin; Mr Broccoli yalnızca bu telefona uygun yerel dinleme, düşünme ve ses modellerini sunar.",
     onDeviceLanguages: "Konuşma dilleri",
     onDeviceLanguagesHint:
       "Her yerel model seçilen tüm dilleri desteklemelidir. Bu seçim dinleme ve sesli yanıt dillerini de günceller.",
-    onDeviceTestDevice: "Bu cihazı yeniden test et",
     onDeviceTestingDevice: "Cihaz test ediliyor…",
-    onDeviceDownloadCancelled: "Завантаження скасовано.",
-    onDeviceDownloadServiceTitle: "Завантаження моделі",
-    onDeviceDownloadServiceBody: "Залиште це, доки не завершиться.",
-    onDeviceDeviceReady: "Cihaz kontrolü tamamlandı",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} boş`,
-    onDeviceNoCompatibleModels:
-      "İncelenmiş katalogda seçilen tüm dilleri destekleyen ve bu cihaza uygun yerel model yok.",
-    onDeviceThinkingModels: "Yerel yanıtlar",
-    onDeviceListeningModels: "Yerel konuşma tanıma",
-    onDeviceSpeakingModels: "Yerel sesler",
-    onDeviceUse: "Kullan",
-    onDeviceInUse: "Kullanımda",
+    onDeviceDownloadCancelled: "İndirme iptal edildi.",
+    onDeviceDownloadServiceTitle: "Model indiriliyor",
+    onDeviceDownloadServiceBody: "Tamamlanana kadar çalışır durumda bırakın.",
     onDeviceViable: "Test başarılı",
     onDeviceBelowTarget: "Çalışıyor, ancak önerilenden yavaş",
     onDeviceTestFailed: "Test başarısız",
@@ -833,29 +562,13 @@ export const onDeviceTranslations = {
   }),
   sv: define({
     ...performanceTranslations.sv,
-    settingsOnDevice: "AI på enheten",
-    settingsOnDeviceSummary:
-      "Privata lokala modeller, enhetskontroll, hämtningar och tester.",
-    onDeviceIntro:
-      "Välj språk en gång. Mr Broccoli visar sedan bara lokala modeller för lyssning, resonemang och tal som passar den här telefonen.",
     onDeviceLanguages: "Samtalsspråk",
     onDeviceLanguagesHint:
       "Varje lokal modell måste stödja alla valda språk. Valet uppdaterar även språk för igenkänning och talade svar.",
-    onDeviceTestDevice: "Testa enheten igen",
     onDeviceTestingDevice: "Testar enheten…",
-    onDeviceDownloadCancelled: "ڈاؤن لوڈ منسوخ کر دیا گیا۔",
-    onDeviceDownloadServiceTitle: "ماڈل ڈاؤن لوڈ ہو رہا ہے",
-    onDeviceDownloadServiceBody: "اسے مکمل ہونے تک چلنے دیں۔",
-    onDeviceDeviceReady: "Enhetskontrollen är klar",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} RAM · ${storage} ledigt`,
-    onDeviceNoCompatibleModels:
-      "Ingen lokal modell i den granskade katalogen stöder alla valda språk och passar den här enheten.",
-    onDeviceThinkingModels: "Lokala svar",
-    onDeviceListeningModels: "Lokal taligenkänning",
-    onDeviceSpeakingModels: "Lokala röster",
-    onDeviceUse: "Använd",
-    onDeviceInUse: "Används",
+    onDeviceDownloadCancelled: "Hämtningen avbröts.",
+    onDeviceDownloadServiceTitle: "Hämtar en modell",
+    onDeviceDownloadServiceBody: "Låt detta köras tills det är klart.",
     onDeviceViable: "Test godkänt",
     onDeviceBelowTarget: "Fungerar, men långsammare än rekommenderat",
     onDeviceTestFailed: "Testet misslyckades",
@@ -866,28 +579,13 @@ export const onDeviceTranslations = {
   }),
   ur: define({
     ...performanceTranslations.ur,
-    settingsOnDevice: "ڈیوائس پر AI",
-    settingsOnDeviceSummary: "نجی مقامی ماڈلز، ڈیوائس جانچ، ڈاؤن لوڈ اور ٹیسٹ۔",
-    onDeviceIntro:
-      "زبانیں ایک بار منتخب کریں، پھر Mr Broccoli صرف اسی فون کے لیے موزوں مقامی سننے، سوچنے اور بولنے کے ماڈلز دکھائے گا۔",
     onDeviceLanguages: "گفتگو کی زبانیں",
     onDeviceLanguagesHint:
       "ہر مقامی ماڈل کو منتخب تمام زبانوں کی معاونت کرنی ہوگی۔ یہ انتخاب سننے اور بولے گئے جواب کی زبانیں بھی بدلتا ہے۔",
-    onDeviceTestDevice: "اس ڈیوائس کو دوبارہ جانچیں",
     onDeviceTestingDevice: "ڈیوائس کی جانچ جاری ہے…",
-    onDeviceDownloadCancelled: "下载已取消。",
-    onDeviceDownloadServiceTitle: "正在下载模型",
-    onDeviceDownloadServiceBody: "请保持运行直到完成。",
-    onDeviceDeviceReady: "ڈیوائس کی جانچ مکمل",
-    onDeviceDeviceSummary: ({ memory, storage }) =>
-      `${memory} ریم · ${storage} خالی`,
-    onDeviceNoCompatibleModels:
-      "جائزہ شدہ فہرست میں کوئی مقامی ماڈل تمام منتخب زبانوں کی معاونت اور اس ڈیوائس پر چلنے کی صلاحیت نہیں رکھتا۔",
-    onDeviceThinkingModels: "مقامی جوابات",
-    onDeviceListeningModels: "مقامی آواز شناخت",
-    onDeviceSpeakingModels: "مقامی آوازیں",
-    onDeviceUse: "استعمال کریں",
-    onDeviceInUse: "استعمال میں",
+    onDeviceDownloadCancelled: "ڈاؤن لوڈ منسوخ کر دیا گیا۔",
+    onDeviceDownloadServiceTitle: "ماڈل ڈاؤن لوڈ ہو رہا ہے",
+    onDeviceDownloadServiceBody: "اسے مکمل ہونے تک چلنے دیں۔",
     onDeviceViable: "ٹیسٹ کامیاب",
     onDeviceBelowTarget: "چلتا ہے، مگر تجویز سے سست",
     onDeviceTestFailed: "ٹیسٹ ناکام",

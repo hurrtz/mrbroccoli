@@ -416,6 +416,7 @@ export function useAudioPlayer(
 
   // The reply's paragraphs, remembered so playback can move between them.
   const {
+    canRestartReply,
     canSeekParagraph,
     isSeeking: isSeekingParagraph,
     markDrained: markPlaybackReelDrained,
@@ -423,6 +424,7 @@ export function useAudioPlayer(
     readingProgressTiming,
     recordAudio,
     recordSpeech,
+    restartReply,
     seal: sealPlaybackReelState,
     seekParagraph,
   } = usePlaybackReel({
@@ -462,8 +464,10 @@ export function useAudioPlayer(
     enqueueSpeechPause,
     speakText: recordSpeech,
     canSeekParagraph,
+    canRestartReply,
     readingProgress,
     readingProgressTiming,
+    restartReply,
     sealPlaybackReel,
     seekParagraph,
     pausePlayback,

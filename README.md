@@ -1,6 +1,8 @@
 # Mr Broccoli
 
-Mr Broccoli is a voice-first mobile chat app built with Expo and React Native. It supports push-to-talk, toggle-to-talk, and an opt-in Drive Session that re-arms voice capture after each completed reply.
+Mr Broccoli is a paid-upfront, voice-first BYOK chat app built with Expo and
+React Native. It supports push-to-talk, toggle-to-talk, and an opt-in Drive
+Session that re-arms voice capture after each completed reply.
 
 The app is intentionally user-key driven. No provider API keys are shipped in the app bundle. Each user adds their own keys in Settings, and providers stay disabled until configured.
 
@@ -17,12 +19,12 @@ before changing code, and update the affected spec chain with the implementation
 - Voice-first interaction with live recording and playback states
 - Adaptive iPhone and iPad interface: compact windows reuse the phone layout,
   while regular iPad adds persistent conversations, optional transcript
-  docking, master-detail Settings, and a focused Intro card
-- Guided on-device catalogue with device checks, verified downloads, benchmarks,
-  and local Qwen, Whisper, Kokoro, and Piper routes
+  docking and master-detail Settings
+- Optional local speech catalogue with device checks, verified downloads,
+  benchmarks, and Whisper, Kokoro, and Piper routes
 - User-managed API keys stored securely on device with `expo-secure-store`
 - Multi-provider support with branded provider selection
-- Optional OpenRouter gateway onboarding alongside direct provider keys
+- Optional guided OpenRouter gateway setup alongside direct provider keys
 - Per-provider model selection in Settings
 - Per-capability connection checks for thinking, listening, speaking, search, and voice discovery
 - Expandable turn receipts showing the requested and actual routes, effort mapping, context handling, search, speech route, fallbacks, and timings
@@ -31,7 +33,7 @@ before changing code, and update the affected spec chain with the implementation
 - Rolling conversation compaction for long sessions to reduce token cost
 - Optional on-device retrieval from eligible earlier conversations, with
   visible source sessions and locked-session exclusion
-- Premium, animated mobile UI tuned for spoken conversation
+- Polished, animated mobile UI tuned for spoken conversation
 
 ## Supported Providers
 
@@ -58,8 +60,6 @@ Voice input and spoken replies are not tied to any single provider:
 - Text-to-speech uses the device's native voices by default. Downloadable Kokoro
   and language-specific Piper voices run locally, while OpenAI, Gemini, xAI,
   Qwen, Mistral, and ElevenLabs remain available as provider alternatives.
-- Downloadable Qwen3 0.6B and 1.7B models are normal response modes. Their turns
-  do not use provider credentials, conversation summarization, or web search.
 - Mistral, xAI, and ElevenLabs account voices are discovered automatically and can be refreshed from Speaking settings. ElevenLabs falls back to a built-in premade voice when a restricted key cannot read account voices.
 
 Every interface locale is also an official speech language: English, German,
@@ -224,8 +224,8 @@ __tests__/              Focused hook and service tests
 ## Notes
 
 - Home screen icons and launcher assets require a new native build. OTA updates alone will not change them.
-- Sherpa/ONNX and llama.rn runtime changes require a native rebuild; adding only
-  an OTA update is not sufficient.
+- Sherpa/ONNX runtime changes require a native rebuild; adding only an OTA
+  update is not sufficient.
 - Release builds use `com.tobiaswinkler.app.mrbroccoli` as the iOS bundle
   identifier and Android application ID. Debug builds append `.dev` so local
   installs can coexist with the App Store or Play Store app.
@@ -245,8 +245,8 @@ the generated notices are collected in
 terms and distribution boundaries are documented in
 [docs/licensing-and-provider-terms.md](docs/licensing-and-provider-terms.md).
 
-Optional model licenses are displayed in the on-device catalogue; licenses and
-sources are recorded in the provider-terms review. The llama.rn and Sherpa
-wrappers are MIT licensed; their native dependencies retain their respective
+Optional speech-model licenses are displayed in the on-device catalogue;
+licenses and sources are recorded in the provider-terms review. The Sherpa
+wrapper is MIT licensed; its native dependencies retain their respective
 third-party licenses. Sherpa's unused FFmpeg runtime is excluded from Android
 and iOS builds.

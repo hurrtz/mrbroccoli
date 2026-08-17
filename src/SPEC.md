@@ -31,7 +31,7 @@ and presentation so changes can be validated at the closest reliable layer.
 | `catalog/`       | Typed access to imported provider research data                                   |
 | `components/`    | Reusable product components and focused subcomponents                             |
 | `constants/`     | Curated runtime manifests, defaults, model catalogues, and static policies        |
-| `context/`       | Root settings and Premium React contexts                                          |
+| `context/`       | Root settings React context                                                       |
 | `design-system/` | Dependency-light native controls, typography, and icon semantics                  |
 | `features/`      | Complete secondary surfaces, currently Settings and its shared core               |
 | `hooks/`         | React lifecycle controllers plus settings/conversation persistence adapters       |

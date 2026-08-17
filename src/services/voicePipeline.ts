@@ -27,7 +27,6 @@ export async function runVoicePipeline(
     attachments,
     messages,
     model,
-    localLlmModelId,
     provider,
     providerApiKey,
     sttMode,
@@ -104,7 +103,6 @@ export async function runVoicePipeline(
     provider,
     model,
     modelEffort,
-    localLlmModelId,
     language,
     spokenRepliesEnabled,
     ttsMode,
@@ -196,7 +194,7 @@ export async function runVoicePipeline(
       model,
       provider,
       providerApiKey,
-      skipSummaryUpdate: Boolean(localLlmModelId),
+      skipSummaryUpdate: false,
       summarizedMessageCount,
     });
     turnReceipt.timing.contextMs = Date.now() - contextStartedAtMs;
@@ -458,7 +456,6 @@ export async function runVoicePipeline(
       llmAlreadyStarted: Boolean(ulraMode),
       messages: allMessages,
       model: synthesisModel,
-      localLlmModelId,
       modelStartedAtMs,
       modelEffort: synthesisModelEffort,
       provider: synthesisProvider,

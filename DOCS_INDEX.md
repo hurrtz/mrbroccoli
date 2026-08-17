@@ -21,15 +21,15 @@ authoritative documents.
 - `README.md` and `docs/` — operational setup and focused reference material.
 - `CHANGELOG.md` — user-visible release history, not architecture authority.
 
-## Active Cross-Cutting Goal
+## Historical Design Evidence
 
-- [`docs/specs/design-system-reconciliation/requirements.md`](./docs/specs/design-system-reconciliation/requirements.md)
-  defines the current design-system and native-runtime reconciliation goal;
-  its sibling `design.md`, `tasks.md`, and `matrix.md` hold the execution model
-  and live evidence status.
 - [`gaplist.md`](./gaplist.md) records the screenshot-to-design-system audit
-  that preceded the current reconciliation work. It is implementation evidence,
-  not a replacement for the living specs.
+  that preceded the paid-upfront BYOK product boundary. It is historical
+  implementation evidence, not a current parity checklist or a replacement for
+  the living specs.
+- The vendored design mirror may retain Intro, automatic-setup, Premium, and
+  local-response specimens until the next upstream re-import. The root living
+  specs explicitly retire those surfaces; they are not implementation targets.
 
 ## Stable Boundaries
 
@@ -41,7 +41,7 @@ authoritative documents.
 | Settings persistence | `src/hooks/settings/` | [`src/hooks/settings/SPEC.md`](./src/hooks/settings/SPEC.md) | root persistence design |
 | Conversations | `src/hooks/conversations/` | [`src/hooks/conversations/SPEC.md`](./src/hooks/conversations/SPEC.md) | root conversation design |
 | Main workspace | `src/screens/main/` | [`src/screens/main/SPEC.md`](./src/screens/main/SPEC.md) | [`src/screens/main/DESIGN.md`](./src/screens/main/DESIGN.md) |
-| Settings UI | `src/features/settings/` | [`src/features/settings/SPEC.md`](./src/features/settings/SPEC.md) | root edition design |
+| Settings UI | `src/features/settings/` | [`src/features/settings/SPEC.md`](./src/features/settings/SPEC.md) | root product design |
 | Provider manifest | `src/constants/providers/` | [`src/constants/providers/SPEC.md`](./src/constants/providers/SPEC.md) | service routing specs |
 | Service layer | `src/services/` | [`src/services/SPEC.md`](./src/services/SPEC.md) | service child specs |
 | Voice pipeline | `src/services/voicePipeline/` | [`src/services/voicePipeline/SPEC.md`](./src/services/voicePipeline/SPEC.md) | [`src/services/voicePipeline/DESIGN.md`](./src/services/voicePipeline/DESIGN.md) |
@@ -102,14 +102,31 @@ authoritative documents.
 5. [`src/services/llm/SPEC.md`](./src/services/llm/SPEC.md) for LLM behavior.
 6. Voice-pipeline specs when STT/TTS/search execution changes.
 
-### Changing Free/Premium behavior
+### Changing paid-app or BYOK behavior
 
 1. Root spec and design.
 2. [`src/context/SPEC.md`](./src/context/SPEC.md)
 3. [`src/screens/main/SPEC.md`](./src/screens/main/SPEC.md)
 4. [`src/features/settings/SPEC.md`](./src/features/settings/SPEC.md)
-5. [`src/services/SPEC.md`](./src/services/SPEC.md) when offline-profile
-   selection or store integration changes.
+5. [`src/services/SPEC.md`](./src/services/SPEC.md) when provider routing or
+   local speech-model handling changes.
+
+### Changing store listing copy or gallery images
+
+1. [`docs/google-play-listing-translations.md`](./docs/google-play-listing-translations.md)
+   and [`docs/app-store-listing-translations.md`](./docs/app-store-listing-translations.md)
+   for the listing text. Both carry the same positioning and editing rules;
+   keep the locale set and its order identical between them.
+2. [`src/i18n/locales/`](./src/i18n/locales/) and
+   [`src/i18n/workspaceTranslations.ts`](./src/i18n/workspaceTranslations.ts) to
+   confirm a feature's name in that language before writing copy for it.
+3. `npm run listing:verify` for store character limits and forbidden claims.
+4. [`docs/store-promo-screenshots.md`](./docs/store-promo-screenshots.md) for
+   the screenshot captures, the gallery panels rendered from them, and the
+   fastlane upload path for both stores.
+5. `npm run listing:export` then the `fastlane` lanes to publish. The exporter
+   writes nothing unless every managed field exists for every locale, because
+   `deliver` clears a live field whose file is missing.
 
 ### Changing a native module
 

@@ -86,7 +86,7 @@ describe("Phosphor icon system", () => {
     expect(StyleSheet.flatten(icon.props.style).height).toBe(24);
   });
 
-  it("keeps every application glyph regular and on the shared wrapper", () => {
+  it("keeps application glyphs on the shared wrapper and reserves fill for active satellites", () => {
     const packageJson = JSON.parse(
       fs.readFileSync(path.join(root, "package.json"), "utf8"),
     ) as { dependencies?: Record<string, string> };
@@ -109,6 +109,15 @@ describe("Phosphor icon system", () => {
         errors.push(`${relative}: bypasses the shared Phosphor icon wrapper`);
       }
       if (
+        ![
+          "src/design-system/OrbSatellite.tsx",
+          "src/design-system/PhosphorIcon.tsx",
+        ].includes(relative) &&
+        source.includes("weight=")
+      ) {
+        errors.push(`${relative}: assigns a non-standard glyph weight`);
+      }
+      if (
         source.includes("@ant-design/react-native") ||
         source.includes("@ant-design/icons-react-native") ||
         /\bAntIcon(?:Button|Name|Size)?\b/.test(source) ||
@@ -122,7 +131,8 @@ describe("Phosphor icon system", () => {
       return errors;
     });
 
-    expect(wrapper).toContain('weight="regular"');
+    expect(wrapper).toContain('weight = "regular"');
+    expect(wrapper).toContain("weight={weight}");
     expect(violations).toEqual([]);
     expect(packageJson.dependencies?.["phosphor-react-native"]).toBeDefined();
     expect(

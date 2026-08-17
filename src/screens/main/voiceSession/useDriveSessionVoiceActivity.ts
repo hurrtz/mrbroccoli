@@ -4,7 +4,6 @@ import { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { playNativeRecordingCue } from "../../../services/nativeWaveform";
 import { getDriveCountdownCueAudioUri } from "../../../services/playbackCues";
-import { Settings } from "../../../types";
 import { ShowToastFn, TranslateFn } from "../shared";
 import {
   createDriveAcousticProfile,
@@ -31,7 +30,6 @@ interface UseDriveSessionVoiceActivityParams {
   engaged: boolean;
   inputMetering: number | null;
   inputMeteringSampleId: number;
-  inputMode: Settings["inputMode"];
   isBusy: boolean;
   isRecording: boolean;
   mainSurfaceVisible: boolean;
@@ -54,7 +52,6 @@ export function useDriveSessionVoiceActivity({
   engaged,
   inputMetering,
   inputMeteringSampleId,
-  inputMode,
   isBusy,
   isRecording,
   mainSurfaceVisible,
@@ -86,10 +83,10 @@ export function useDriveSessionVoiceActivity({
   }, []);
 
   useEffect(() => {
-    if (inputMode !== "drive-session") {
+    if (!autoContinueEnabled) {
       resetAcousticProfile();
     }
-  }, [inputMode, resetAcousticProfile]);
+  }, [autoContinueEnabled, resetAcousticProfile]);
 
   useEffect(() => {
     const updated = updateDriveAcousticProfileRoute(
@@ -103,11 +100,7 @@ export function useDriveSessionVoiceActivity({
     }
 
     const shouldRestartVoiceActivity =
-      inputMode === "drive-session" &&
-      autoContinueEnabled &&
-      engaged &&
-      isRecording &&
-      mainSurfaceVisible;
+      autoContinueEnabled && engaged && isRecording && mainSurfaceVisible;
     voiceActivityRef.current = shouldRestartVoiceActivity
       ? createDriveVoiceActivityState(Date.now(), {
           noiseFloorDb: updated.profile.noiseFloorDb,
@@ -127,18 +120,13 @@ export function useDriveSessionVoiceActivity({
     audioRoute,
     autoContinueEnabled,
     engaged,
-    inputMode,
     isRecording,
     mainSurfaceVisible,
   ]);
 
   useEffect(() => {
     const active =
-      inputMode === "drive-session" &&
-      autoContinueEnabled &&
-      engaged &&
-      isRecording &&
-      mainSurfaceVisible;
+      autoContinueEnabled && engaged && isRecording && mainSurfaceVisible;
 
     if (!active) {
       voiceActivityRef.current = null;
@@ -166,13 +154,7 @@ export function useDriveSessionVoiceActivity({
         },
       });
     }
-  }, [
-    autoContinueEnabled,
-    engaged,
-    inputMode,
-    isRecording,
-    mainSurfaceVisible,
-  ]);
+  }, [autoContinueEnabled, engaged, isRecording, mainSurfaceVisible]);
 
   useEffect(() => {
     const current = voiceActivityRef.current;
@@ -236,7 +218,6 @@ export function useDriveSessionVoiceActivity({
 
   useEffect(() => {
     const shouldMonitorAmbient =
-      inputMode === "drive-session" &&
       autoContinueEnabled &&
       engaged &&
       mainSurfaceVisible &&
@@ -267,7 +248,6 @@ export function useDriveSessionVoiceActivity({
   }, [
     autoContinueEnabled,
     engaged,
-    inputMode,
     isBusy,
     isRecording,
     mainSurfaceVisible,
@@ -282,7 +262,6 @@ export function useDriveSessionVoiceActivity({
     if (
       !ambientMonitoring ||
       typeof ambientInputMetering !== "number" ||
-      inputMode !== "drive-session" ||
       !autoContinueEnabled ||
       !engaged ||
       isRecording ||
@@ -328,7 +307,6 @@ export function useDriveSessionVoiceActivity({
     ambientMonitoring,
     autoContinueEnabled,
     engaged,
-    inputMode,
     isRecording,
     playerIsPlaybackPaused,
     playerIsPlaying,
@@ -336,7 +314,6 @@ export function useDriveSessionVoiceActivity({
 
   useEffect(() => {
     if (
-      inputMode !== "drive-session" ||
       !autoContinueEnabled ||
       !engaged ||
       !isRecording ||
@@ -420,7 +397,6 @@ export function useDriveSessionVoiceActivity({
   }, [
     autoContinueEnabled,
     engaged,
-    inputMode,
     isRecording,
     mainSurfaceVisible,
     showToast,

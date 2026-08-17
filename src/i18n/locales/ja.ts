@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const ja = {
   ...conversationKnowledgeTranslations.ja,
   ...imagePromptTranslations.ja,
   ...onDeviceTranslations.ja,
-  ...onboardingTranslations.ja,
-  ...introTranslations.ja,
-  ...premiumTranslations.ja,
+  ...localSpeechTranslations.ja,
+  ...settingsTranslations.ja,
   ...transcriptEditTranslations.ja,
   ...workspaceTranslations.ja,
   ...sessionLockTranslations.ja,
-  ...autoSetupTranslations.ja,
   appName: "ミスター・ブロッコリー",
   retry: "再試行",
   dismiss: "閉じる",
@@ -41,7 +37,6 @@ export const ja = {
   settings: "設定",
   settingsReleaseVersion: ({ version }) => `バージョン ${version}`,
   all: "すべて",
-  firstRun: "初回起動",
   instructions: "指示",
   providers: "プロバイダー",
   webSearch: "ウェブ検索",
@@ -210,10 +205,10 @@ export const ja = {
   createApiKey: "資格情報",
   apiKey: "API キー",
   aboutThisProvider: "このプロバイダーについて",
-  openRouterOnboardingTitle: "1 つのキー、複数のプロバイダー",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "1 つのキー、複数のプロバイダー",
+  openRouterGatewayDescription:
     "専用の OpenRouter キーを作成して下に貼り付け、直接接続を置き換えることなく、いくつかのプロバイダーのスナップショットに基づくモデルを使用します。",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "リクエスト パス: このデバイス → OpenRouter → 選択した上流プロバイダー",
   openRouterKeys: "OpenRouter キー",
   providerStatusInvalid: "無効",

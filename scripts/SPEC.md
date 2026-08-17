@@ -59,41 +59,30 @@ flowchart LR
 Maestro device work must never be hidden in the Git hook.
 
 The cross-platform Maestro suite starts from cleared app state and verifies
-the current first-run contract: the app opens directly into the workspace with
-the optional introduction banner. It must not wait for a retired blocking
-setup wizard before exercising settings, locales, layout, or accessibility.
+the current first-run contract: the paid BYOK app opens directly into the
+workspace. It must not wait for onboarding, edition selection, or local-model
+setup before exercising settings, locales, layout, or accessibility.
 The screen-reader hierarchy gate follows the current home-screen contract: it
-checks the setup banner, blocked voice orb, circular voice/text pager controls,
+checks the blocked voice orb, circular voice/text pager controls,
 conversation controls, transcript peek, and all three satellite actions by
 stable IDs and exact English accessible names before accepting TalkBack or
 VoiceOver evidence. Removed design-system controls must be dropped from that
 contract in the same change that removes them from the workspace.
-The smoke flow covers the Welcome audio control and the Setup offer/manual
-states, waits for the language-independent playing-control marker, then
-restarts and dismisses the introduction banner before continuing into
-Settings. It does not claim the Try step without a configured route and
-deterministic test turn.
+The smoke flow covers the empty provider-first workspace, Settings overview,
+App & diagnostics, and landscape without any first-run detour.
 Flows that edit nested Settings sheets dismiss the software keyboard and, on
 platforms where that action leaves the modal open, the owning sheet before
 navigating the parent frame, so system input overlays cannot consume the next
 app control.
 The checked-in runtime flows also hold every voice-orb phase and ring boundary
-deterministically under the isolated fixture identity, and prove honest
-low-memory automatic-setup failure and retry on Android without downloading a
-model. A separate physical-device flow accepts a real proposal, waits through
-download, checksum verification, and benchmarks, then restarts out of the
-first-run flow and verifies the selected Thinking route and Data & privacy
-storage inventory; it is never part of an emulator or Git-hook run. Local-model
-catalogue flows follow the product's
-stage ownership: Thinking for response models, Listening for recognition, and
-Speaking for voices. Verified models expose a stable viable-state selector so
-device tests wait for the real benchmark result rather than translated copy.
+deterministically under the isolated fixture identity. Local speech-model
+catalogue flows follow the product's stage ownership: Listening for recognition
+and Speaking for voices. Verified models expose a stable viable-state selector
+so device tests wait for the real benchmark result rather than translated copy.
 The verifier parses every checked-in Maestro file as YAML before inspecting its
 actions, then rejects selectors from the retired standalone Device page, the
-removed playing caption, and step dots outside the current three-step
-introduction. It also rejects controls, screenshots, and titles owned by the
-retired seven-step walkthrough. Android automatic-setup runtime flows select
-the Setup dot and start the setup scan before waiting for its result card.
+removed playing caption, and every retired introduction, automatic-setup,
+edition, and local-response selector.
 Localized coverage captures exactly fourteen non-redundant frames per language
 in both light and dark schemes:
 the language picker, both genuinely distinct App and overview positions, all
@@ -101,18 +90,12 @@ six Settings detail pages, the empty home and sessions drawer, and landscape.
 It navigates to stable bottom selectors instead of blindly repeating swipes,
 because a page that already fits on a tall phone must not produce duplicate
 frames that imply missing content.
-Store-promo onboarding stops after the seeded Free conversation, reseeds the
-identity-guarded onboarding scene in the same locale, relaunches into its real
-first-run banner, and captures both the welcome and deterministic proposal
-selected from the fixed device snapshot. A second guarded offline-ready scene
-unlocks the final live-test screen without starting a microphone, download,
-benchmark, or provider request. Every later fixture scene stops the app before
-reseeding; the flow never clears the seeded locale or leaves the Intro modal
-open before the next fixture deep link. Before onboarding, the Free scene also
-captures the real purchase sheet with the deterministic development price; the
-automation identity never contacts a platform store. The supported capture
-matrix includes the five requested iPhone display classes, a regular-width
-iPad, and Android phone and tablet profiles.
+Store promos use one identity-guarded `conversation` scene and capture a
+seven-image BYOK story: voice conversation, transcript, branches, provider
+settings, exact response route, voice selection, and per-conversation settings.
+The automation identity never contacts a platform store or provider. The
+supported capture matrix includes the five requested iPhone display classes, a
+regular-width iPad, and Android phone and tablet profiles.
 
 ## Living-Spec Review
 

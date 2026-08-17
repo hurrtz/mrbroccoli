@@ -46,7 +46,7 @@ describe("local model catalogue", () => {
     ).toBe(true);
   });
 
-  it("covers every Free language with a compact local voice", () => {
+  it("covers every supported speech language with a compact local voice", () => {
     expect(
       getLocalModelsForLanguages("tts", ["it"]).map(({ id }) => id),
     ).toContain("piper-it-it-paola");
@@ -79,21 +79,6 @@ describe("local model catalogue", () => {
     ]);
   });
 
-  it("keeps strong reasoning choices for Russian without offering unsupported models", () => {
-    const modelIds = getLocalModelsForLanguages("llm", ["ru"]).map(
-      ({ id }) => id,
-    );
-
-    expect(modelIds).toEqual([
-      "qwen3-0.6b-q8",
-      "qwen3.5-0.8b-q8",
-      "qwen3-1.7b-q8",
-      "qwen3-4b-q4",
-    ]);
-    expect(modelIds).not.toContain("granite-4.0-1b-q4");
-    expect(modelIds).not.toContain("ministral-3-3b-reasoning-q4");
-  });
-
   it.each(["en", "de", "es", "fr", "it", "pt-BR", "ru"] as const)(
     "offers at least two downloadable voices for %s",
     (language) => {
@@ -112,16 +97,9 @@ describe("local model catalogue", () => {
   it.each([...FREE_SPEECH_LANGUAGE_OPTIONS, "pt-BR"] as const)(
     "provides a recommended route and advanced range for %s",
     (language) => {
-      const llms = getLocalModelsForLanguages("llm", [language]);
       const stt = getLocalModelsForLanguages("stt", [language]);
       const tts = getLocalModelsForLanguages("tts", [language]);
 
-      expect(
-        llms.some(({ catalogTier }) => catalogTier === "recommended"),
-      ).toBe(true);
-      expect(llms.some(({ catalogTier }) => catalogTier === "advanced")).toBe(
-        true,
-      );
       expect(stt.some(({ catalogTier }) => catalogTier === "recommended")).toBe(
         true,
       );

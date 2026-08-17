@@ -10,6 +10,4 @@ tags:
       all: allow
 - assertVisible:
     id: main-screen
-- assertVisible:
-    id: intro-banner
 - setOrientation: PORTRAIT

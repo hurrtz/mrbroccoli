@@ -32,7 +32,7 @@ export function useProviderAvailabilityGuards({
 }: UseProviderAvailabilityGuardsParams) {
   useEffect(() => {
     const activeRoute = getResponseModeRoute(settings, activeResponseMode);
-    if (!loaded || providerApiKey || activeRoute?.runtime === "local") {
+    if (!loaded || providerApiKey || !activeRoute) {
       return;
     }
 

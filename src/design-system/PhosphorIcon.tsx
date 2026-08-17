@@ -9,6 +9,7 @@ import {
   ArrowUpIcon,
   BrainIcon,
   BugIcon,
+  CarIcon,
   CaretDownIcon,
   CaretLeftIcon,
   CaretRightIcon,
@@ -19,6 +20,7 @@ import {
   CheckCircleIcon,
   CheckIcon,
   CircleIcon,
+  CircuitryIcon,
   CopyIcon,
   CpuIcon,
   DownloadSimpleIcon,
@@ -59,9 +61,12 @@ import {
   SpinnerGapIcon,
   SquareIcon,
   StopIcon,
+  TextAlignLeftIcon,
+  TextAlignRightIcon,
   TrashIcon,
   TrayIcon,
   UsersThreeIcon,
+  UserSoundIcon,
   WarningCircleIcon,
   WarningIcon,
   WaveformIcon,
@@ -117,6 +122,8 @@ const PHOSPHOR_ICONS = {
   // fork is a path splitting, not a developer's git operation.
   branch: ArrowsSplitIcon,
   bug: BugIcon,
+  car: CarIcon,
+  circuitry: CircuitryIcon,
   // Model Council. The key is the meaning, not the glyph name — matches the
   // design system's icon map, which also keys UsersThree as "council".
   council: UsersThreeIcon,
@@ -151,8 +158,11 @@ const PHOSPHOR_ICONS = {
   sliders: SlidersHorizontalIcon,
   sound: SpeakerHighIcon,
   stop: StopIcon,
+  "text-align-left": TextAlignLeftIcon,
+  "text-align-right": TextAlignRightIcon,
   thunderbolt: LightningIcon,
   up: CaretUpIcon,
+  "user-sound": UserSoundIcon,
   warning: WarningIcon,
   cpu: CpuIcon,
 } satisfies Record<string, Icon>;
@@ -175,6 +185,7 @@ export function PhosphorIcon({
   color,
   name,
   size = "control",
+  weight = "regular",
   visualSize,
   style,
   testID,
@@ -182,6 +193,8 @@ export function PhosphorIcon({
   color: string;
   name: PhosphorIconName;
   size?: IconSize;
+  /** Filled glyphs are reserved for active toggle state. */
+  weight?: "regular" | "fill";
   /**
    * The voice orb's deliberate exception to the semantic scale: its glyph is
    * a fixed proportion of a measured diameter, so no static token can name
@@ -206,7 +219,7 @@ export function PhosphorIcon({
       size={resolvedSize}
       style={[{ color, width: resolvedSize, height: resolvedSize }, style]}
       testID={testID ?? `phosphor-icon-${name}`}
-      weight="regular"
+      weight={weight}
     />
   );
 }

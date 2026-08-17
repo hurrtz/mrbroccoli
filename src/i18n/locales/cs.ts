@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const cs = {
   ...conversationKnowledgeTranslations.cs,
   ...imagePromptTranslations.cs,
   ...onDeviceTranslations.cs,
-  ...onboardingTranslations.cs,
-  ...introTranslations.cs,
-  ...premiumTranslations.cs,
+  ...localSpeechTranslations.cs,
+  ...settingsTranslations.cs,
   ...transcriptEditTranslations.cs,
   ...workspaceTranslations.cs,
   ...sessionLockTranslations.cs,
-  ...autoSetupTranslations.cs,
   appName: "Pan Brokolice",
   retry: "Zkus to znovu",
   dismiss: "Zavřít",
@@ -40,7 +36,6 @@ export const cs = {
   settings: "Nastavení",
   settingsReleaseVersion: ({ version }) => `Verze ${version}`,
   all: "Vše",
-  firstRun: "První spuštění",
   instructions: "Instrukce",
   providers: "Poskytovatelé",
   webSearch: "Vyhledávání na webu",
@@ -212,10 +207,10 @@ export const cs = {
   createApiKey: "Pověření",
   apiKey: "API klíč",
   aboutThisProvider: "O tomto poskytovateli",
-  openRouterOnboardingTitle: "Jeden klíč, více poskytovatelů",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Jeden klíč, více poskytovatelů",
+  openRouterGatewayDescription:
     "Vytvoř vyhrazený klíč OpenRouter, vlož jej níže a používej modely se zálohou snímků od několika poskytovatelů, aniž byste nahradili jakékoli přímé připojení.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Cesta požadavku: toto zařízení → OpenRouter → vybraný upstream poskytovatel",
   openRouterKeys: "Klíče OpenRouter",
   providerStatusInvalid: "Neplatné",

@@ -4,13 +4,8 @@ import {
 } from "../../../src/screens/main/voiceSession/driveSessionStateMachine";
 
 describe("driveSessionStateMachine", () => {
-  it("starts enabled only when Drive Session is selected", () => {
-    expect(createDriveSessionState("drive-session")).toEqual({
-      armRequested: false,
-      autoContinueEnabled: true,
-      engaged: false,
-    });
-    expect(createDriveSessionState("tap-to-record")).toEqual({
+  it("starts disabled for every new app session", () => {
+    expect(createDriveSessionState()).toEqual({
       armRequested: false,
       autoContinueEnabled: false,
       engaged: false,
@@ -18,9 +13,10 @@ describe("driveSessionStateMachine", () => {
   });
 
   it("models the engage, arm, and consume lifecycle explicitly", () => {
-    let state = createDriveSessionState("drive-session");
+    let state = transitionDriveSessionState(createDriveSessionState(), {
+      type: "resume",
+    });
 
-    state = transitionDriveSessionState(state, { type: "engage" });
     state = transitionDriveSessionState(state, { type: "arm-requested" });
     expect(state).toEqual({
       armRequested: true,
@@ -32,17 +28,16 @@ describe("driveSessionStateMachine", () => {
     expect(state.armRequested).toBe(false);
   });
 
-  it("pauses without discarding engagement and resumes in an armed state", () => {
-    const engaged = transitionDriveSessionState(
-      createDriveSessionState("drive-session"),
-      { type: "engage" },
-    );
+  it("turns the switch fully off and resumes in an armed state", () => {
+    const engaged = transitionDriveSessionState(createDriveSessionState(), {
+      type: "resume",
+    });
     const paused = transitionDriveSessionState(engaged, { type: "pause" });
 
     expect(paused).toEqual({
       armRequested: false,
       autoContinueEnabled: false,
-      engaged: true,
+      engaged: false,
     });
     expect(transitionDriveSessionState(paused, { type: "resume" })).toEqual({
       armRequested: true,
@@ -52,14 +47,15 @@ describe("driveSessionStateMachine", () => {
   });
 
   it("separates temporary disengagement from a full suspension", () => {
-    const armed = transitionDriveSessionState(
-      createDriveSessionState("drive-session"),
-      { type: "resume" },
-    );
+    const armed = transitionDriveSessionState(createDriveSessionState(), {
+      type: "resume",
+    });
 
-    expect(
-      transitionDriveSessionState(armed, { type: "disengage" }),
-    ).toEqual({ ...armed, engaged: false });
+    expect(transitionDriveSessionState(armed, { type: "disengage" })).toEqual({
+      armRequested: false,
+      autoContinueEnabled: false,
+      engaged: false,
+    });
     expect(transitionDriveSessionState(armed, { type: "suspend" })).toEqual({
       ...armed,
       armRequested: false,
@@ -67,20 +63,17 @@ describe("driveSessionStateMachine", () => {
     });
   });
 
-  it("resets stale state when Drive Session mode is entered", () => {
-    expect(
-      transitionDriveSessionState(
-        {
-          armRequested: true,
-          autoContinueEnabled: false,
-          engaged: true,
-        },
-        { type: "mode-entered" },
-      ),
-    ).toEqual({
-      armRequested: false,
+  it("re-engages an enabled switch after a temporary suspension", () => {
+    const suspended = transitionDriveSessionState(
+      transitionDriveSessionState(createDriveSessionState(), {
+        type: "resume",
+      }),
+      { type: "suspend" },
+    );
+    expect(transitionDriveSessionState(suspended, { type: "engage" })).toEqual({
+      armRequested: true,
       autoContinueEnabled: true,
-      engaged: false,
+      engaged: true,
     });
   });
 });

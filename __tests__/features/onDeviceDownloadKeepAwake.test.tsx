@@ -2,10 +2,8 @@ import React from "react";
 import { fireEvent, waitFor } from "@testing-library/react-native";
 
 /**
- * The wake lock used to live on the Free setup wizard. Removing the wizard
- * moved downloading into the stage pages and silently left the lock behind,
- * so a sleeping phone aborted multi-gigabyte downloads again. These tests pin
- * the lock to the shared lifecycle controller those pages mount.
+ * Speech-model downloads keep the phone awake and continue through the native
+ * foreground service while their Settings pages are mounted.
  */
 
 const mockBeginDownload = jest.fn(() => Promise.resolve(true));
@@ -17,15 +15,6 @@ const mockGetLocalCatalogInstallStatuses = jest.fn(
   (_options?: { phonemeLanguages?: string[] }) => Promise.resolve({}),
 );
 const mockGetLocalModelBenchmarkResults = jest.fn(() => Promise.resolve({}));
-const mockSelectOfflineProfile = jest.fn((_params?: unknown) => ({
-  status: "unavailable",
-}));
-const mockGetAppliedOfflineProfileSettingsUpdate = jest.fn(
-  (_settings?: unknown, _profile?: unknown, _overrides?: unknown) => ({}),
-);
-const mockEvaluateOfflineProfileReadiness = jest.fn((_params?: unknown) => ({
-  ready: false,
-}));
 
 jest.mock("expo-keep-awake", () => ({
   activateKeepAwakeAsync: (...args: unknown[]) =>
@@ -79,21 +68,9 @@ jest.mock("../../src/services/localDeviceCapabilities", () => ({
   ),
 }));
 
-jest.mock("../../src/services/offlineProfileManager", () => ({
-  evaluateOfflineProfileReadiness: (params: unknown) =>
-    mockEvaluateOfflineProfileReadiness(params),
+jest.mock("../../src/services/localSpeechModelManager", () => ({
   getLocalCatalogInstallStatuses: (options?: { phonemeLanguages?: string[] }) =>
     mockGetLocalCatalogInstallStatuses(options),
-}));
-
-jest.mock("../../src/services/offlineProfile", () => ({
-  getAppliedOfflineProfileSettingsUpdate: (
-    settings: unknown,
-    profile: unknown,
-    overrides?: unknown,
-  ) =>
-    mockGetAppliedOfflineProfileSettingsUpdate(settings, profile, overrides),
-  selectOfflineProfile: (params: unknown) => mockSelectOfflineProfile(params),
 }));
 
 jest.mock("../../src/services/nativeSpeechCapabilities", () => ({
@@ -107,10 +84,6 @@ jest.mock("../../src/services/nativeSpeechCapabilities", () => ({
   ),
 }));
 
-jest.mock("../../src/services/localLlm", () => ({
-  benchmarkLocalLlm: jest.fn(() => Promise.resolve({ status: "viable" })),
-}));
-
 jest.mock("../../src/services/localSpeechModels", () => ({
   getLocalTtsBenchmarkText: jest.requireActual(
     "../../src/services/localSpeechModels",
@@ -121,12 +94,6 @@ jest.mock("../../src/services/localSpeechModels", () => ({
 
 jest.mock("../../src/services/kokoroTts", () => ({
   benchmarkKokoroModel: jest.fn(() => Promise.resolve({ status: "viable" })),
-}));
-
-// Not under test here, and it needs a fuller device snapshot than this suite
-// builds.
-jest.mock("../../src/components/LocalModelPerformanceSummary", () => ({
-  LocalModelPerformanceSummary: () => null,
 }));
 
 jest.mock("../../src/features/settings-core/useNativeVoiceOptions", () => ({
@@ -172,7 +139,7 @@ function renderPage(params?: {
   settings?: typeof DEFAULT_SETTINGS;
 }) {
   const model = LOCAL_MODEL_CATALOG.find(
-    (candidate) => candidate.id === (params?.modelId ?? "qwen3-0.6b-q8"),
+    (candidate) => candidate.id === (params?.modelId ?? "whisper-tiny"),
   );
   if (!model) {
     throw new Error("Missing local-model test fixture.");
@@ -180,7 +147,6 @@ function renderPage(params?: {
   function LifecycleHarness() {
     const localModels = useLocalModelSettings({
       active: true,
-      isPremium: false,
       kokoroModel,
       onPreviewVoice:
         params?.onPreviewVoice ?? jest.fn(() => Promise.resolve()),
@@ -203,7 +169,7 @@ function renderPage(params?: {
   return renderWithProviders(<LifecycleHarness />);
 }
 
-async function getLlmDownloadButton(
+async function getDownloadButton(
   screen: ReturnType<typeof renderPage>,
   modelId: string,
 ) {
@@ -217,31 +183,34 @@ beforeEach(() => {
   mockDownloadSignal = undefined;
   mockGetLocalCatalogInstallStatuses.mockResolvedValue({});
   mockGetLocalModelBenchmarkResults.mockResolvedValue({});
-  mockSelectOfflineProfile.mockReturnValue({ status: "unavailable" });
-  mockEvaluateOfflineProfileReadiness.mockReturnValue({ ready: false });
-  mockGetAppliedOfflineProfileSettingsUpdate.mockReturnValue({});
 });
 
 describe("on-device model downloads", () => {
   it("offers acquisition through the stage-owned lifecycle action", async () => {
-    const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm",
+    const firstSpeechModel = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "stt",
     );
-    expect(firstLlm).toBeTruthy();
+    expect(firstSpeechModel).toBeTruthy();
 
     const screen = renderPage();
-    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
+    const downloadButton = await getDownloadButton(
+      screen,
+      firstSpeechModel!.id,
+    );
     expect(downloadButton).toBeTruthy();
   });
 
   it("holds the wake lock for as long as a download runs", async () => {
-    const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm",
+    const firstSpeechModel = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "stt",
     );
-    expect(firstLlm).toBeTruthy();
+    expect(firstSpeechModel).toBeTruthy();
 
     const screen = renderPage();
-    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
+    const downloadButton = await getDownloadButton(
+      screen,
+      firstSpeechModel!.id,
+    );
 
     expect(mockActivateKeepAwake).not.toHaveBeenCalled();
 
@@ -268,11 +237,14 @@ describe("on-device model downloads", () => {
   it("runs the transfer under a foreground service so leaving the app cannot kill it", async () => {
     // A wake lock only answers a sleeping screen while the app is in front.
     // Switching away killed the transfer instantly.
-    const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm",
+    const firstSpeechModel = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "stt",
     );
     const screen = renderPage();
-    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
+    const downloadButton = await getDownloadButton(
+      screen,
+      firstSpeechModel!.id,
+    );
 
     fireEvent.press(downloadButton);
 
@@ -287,16 +259,19 @@ describe("on-device model downloads", () => {
   it("turns the running download into a way out of it", async () => {
     // A multi-gigabyte transfer with no way to stop it is its own trap, and
     // the service has accepted an abort signal all along.
-    const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm",
+    const firstSpeechModel = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "stt",
     );
     const screen = renderPage();
-    const downloadButton = await getLlmDownloadButton(screen, firstLlm!.id);
+    const downloadButton = await getDownloadButton(
+      screen,
+      firstSpeechModel!.id,
+    );
 
     fireEvent.press(downloadButton);
 
     const cancelButton = await waitFor(() =>
-      screen.getByTestId(`local-model-cancel-${firstLlm?.id}`),
+      screen.getByTestId(`local-model-cancel-${firstSpeechModel?.id}`),
     );
     expect(mockDownloadSignal?.aborted).toBe(false);
 
@@ -307,7 +282,7 @@ describe("on-device model downloads", () => {
     // user made deliberately.
     await waitFor(() =>
       expect(
-        screen.getByTestId(`local-model-download-${firstLlm?.id}`),
+        screen.getByTestId(`local-model-download-${firstSpeechModel?.id}`),
       ).toBeTruthy(),
     );
     await waitFor(() =>
@@ -318,11 +293,11 @@ describe("on-device model downloads", () => {
   });
 
   it("keeps a download failure on the model instead of opening an alert", async () => {
-    const firstLlm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.capability === "llm",
+    const firstSpeechModel = LOCAL_MODEL_CATALOG.find(
+      (model) => model.capability === "stt",
     )!;
     const screen = renderPage();
-    fireEvent.press(await getLlmDownloadButton(screen, firstLlm.id));
+    fireEvent.press(await getDownloadButton(screen, firstSpeechModel.id));
     await waitFor(() => expect(mockRejectDownload).toBeDefined());
 
     mockRejectDownload?.(new Error("Archive verification failed"));
@@ -333,7 +308,7 @@ describe("on-device model downloads", () => {
       ),
     );
     expect(
-      screen.getByTestId(`local-model-download-${firstLlm.id}`),
+      screen.getByTestId(`local-model-download-${firstSpeechModel.id}`),
     ).toBeTruthy();
   });
 
@@ -371,66 +346,4 @@ describe("on-device model downloads", () => {
     );
   });
 
-  it("persists a Free local selection only through a complete ready profile", async () => {
-    const onUpdate = jest.fn();
-    const llm = LOCAL_MODEL_CATALOG.find(
-      (model) => model.id === "qwen3-0.6b-q8",
-    )!;
-    const stt = LOCAL_MODEL_CATALOG.find(
-      (model) => model.id === "whisper-tiny",
-    )!;
-    const profile = {
-      languages: ["en"],
-      llm,
-      thoroughLlm: null,
-      stt,
-      tts: null,
-    };
-    mockGetLocalCatalogInstallStatuses.mockResolvedValue({
-      [llm.id]: { installed: true, path: "/models/llm", verified: true },
-      [stt.id]: { installed: true, path: "/models/stt", verified: true },
-    });
-    mockGetLocalModelBenchmarkResults.mockResolvedValue({
-      [llm.id]: { status: "viable" },
-      [stt.id]: { status: "viable" },
-    });
-    (mockSelectOfflineProfile as jest.Mock).mockReturnValue({
-      status: "ready",
-      profile,
-    });
-    mockEvaluateOfflineProfileReadiness.mockReturnValue({ ready: true });
-    (mockGetAppliedOfflineProfileSettingsUpdate as jest.Mock).mockReturnValue({
-      activeResponseMode: "free-offline",
-      freeOfflineSetupCompleted: true,
-      responseModes: [
-        {
-          id: "free-offline",
-          route: {
-            runtime: "local",
-            localModelId: llm.id,
-            provider: "openai",
-            model: llm.name,
-          },
-        },
-      ],
-    });
-
-    const screen = renderPage({ modelId: llm.id, onUpdate });
-    await waitFor(() =>
-      expect(mockGetLocalCatalogInstallStatuses).toHaveBeenCalled(),
-    );
-    fireEvent.press(screen.getByTestId("select-local-model"));
-
-    expect(mockGetAppliedOfflineProfileSettingsUpdate).toHaveBeenCalledWith(
-      DEFAULT_SETTINGS,
-      profile,
-      { quickLlmModelId: llm.id },
-    );
-    expect(onUpdate).toHaveBeenCalledWith(
-      expect.objectContaining({
-        activeResponseMode: "free-offline",
-        freeOfflineSetupCompleted: true,
-      }),
-    );
-  });
 });

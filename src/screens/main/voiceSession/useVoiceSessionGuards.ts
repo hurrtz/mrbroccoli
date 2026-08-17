@@ -45,10 +45,7 @@ export function useVoiceSessionGuards({
   ttsProvider,
 }: UseVoiceSessionGuardsParams) {
   return useCallback(() => {
-    const responseRoute = settings.responseModes?.find(
-      (route) => route.id === settings.activeResponseMode,
-    );
-    if (responseRoute?.route.runtime !== "local" && !providerApiKey) {
+    if (!providerApiKey) {
       showToast(
         t("addProviderKeyToUseProvider", { provider: providerLabel }),
         undefined,

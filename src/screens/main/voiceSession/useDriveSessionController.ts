@@ -9,7 +9,6 @@ import {
 import { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { getDriveReadyCueAudioUri } from "../../../services/playbackCues";
-import { Settings } from "../../../types";
 import { ShowToastFn, TranslateFn } from "../shared";
 import {
   createDriveSessionState,
@@ -38,7 +37,6 @@ interface UseDriveSessionControllerParams {
   playReplyText: (text: string) => Promise<void>;
   player: AudioPlayerController;
   replayPhase: ReplayPhase;
-  settings: Pick<Settings, "inputMode">;
   showToast: ShowToastFn;
   startAmbientMonitoring?: () => Promise<boolean>;
   startVoiceCapture: () => Promise<void>;
@@ -67,7 +65,6 @@ export function useDriveSessionController({
   playReplyText,
   player,
   replayPhase,
-  settings,
   showToast,
   startAmbientMonitoring,
   startVoiceCapture,
@@ -77,15 +74,13 @@ export function useDriveSessionController({
   t,
 }: UseDriveSessionControllerParams) {
   const [driveSessionState, setDriveSessionState] = useState(() =>
-    createDriveSessionState(settings.inputMode),
+    createDriveSessionState(),
   );
-  const { armRequested, autoContinueEnabled, engaged } =
-    driveSessionState;
+  const { armRequested, autoContinueEnabled, engaged } = driveSessionState;
   const driveSessionStateRef = useRef(driveSessionState);
   const pendingAutoRearmCueRef = useRef(false);
   const completedReplyVersionRef = useRef(completedReplyVersion);
   const previousIsBusyRef = useRef(isBusy);
-  const previousInputModeRef = useRef(settings.inputMode);
   const generationRef = useRef(0);
   const armInFlightRef = useRef(false);
   const isBusyRef = useRef(isBusy);
@@ -110,36 +105,31 @@ export function useDriveSessionController({
     driveSessionStateRef.current = nextState;
     setDriveSessionState(nextState);
   }, []);
-  const {
-    resetAcousticProfile,
-    silenceCountdownSeconds,
-    voiceActive,
-  } = useDriveSessionVoiceActivity({
-    ambientInputMetering,
-    ambientInputMeteringSampleId,
-    ambientMonitoring,
-    audioRoute,
-    autoContinueEnabled,
-    engaged,
-    inputMetering,
-    inputMeteringSampleId,
-    inputMode: settings.inputMode,
-    isBusy,
-    isRecording,
-    mainSurfaceVisible,
-    playerIsPlaybackPaused: player.isPlaybackPaused,
-    playerIsPlaying: player.isPlaying,
-    replayPhase,
-    showToast,
-    startAmbientMonitoring,
-    stopAmbientMonitoring,
-    stopVoiceCapture,
-    t,
-  });
+  const { resetAcousticProfile, silenceCountdownSeconds, voiceActive } =
+    useDriveSessionVoiceActivity({
+      ambientInputMetering,
+      ambientInputMeteringSampleId,
+      ambientMonitoring,
+      audioRoute,
+      autoContinueEnabled,
+      engaged,
+      inputMetering,
+      inputMeteringSampleId,
+      isBusy,
+      isRecording,
+      mainSurfaceVisible,
+      playerIsPlaybackPaused: player.isPlaybackPaused,
+      playerIsPlaying: player.isPlaying,
+      replayPhase,
+      showToast,
+      startAmbientMonitoring,
+      stopAmbientMonitoring,
+      stopVoiceCapture,
+      t,
+    });
 
   const arm = useCallback(async () => {
     if (
-      settings.inputMode !== "drive-session" ||
       !driveSessionStateRef.current.autoContinueEnabled ||
       !driveSessionStateRef.current.engaged ||
       !driveSessionStateRef.current.armRequested ||
@@ -241,26 +231,26 @@ export function useDriveSessionController({
     ensureVoiceSessionReady,
     hasActiveVoiceCaptureNow,
     player,
-    settings.inputMode,
     showToast,
     startVoiceCapture,
     t,
     transition,
   ]);
 
-  const engage = useCallback(() => {
-    if (
-      settings.inputMode !== "drive-session" ||
-      driveSessionStateRef.current.engaged
-    ) {
+  const enable = useCallback(() => {
+    if (driveSessionStateRef.current.autoContinueEnabled) {
+      return;
+    }
+
+    if (!ensureVoiceSessionReady()) {
       return;
     }
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    transition({ type: "engage" });
-    recordDebugLogEvent({ event: "drive-session-engaged" });
-  }, [settings.inputMode, transition]);
+    transition({ type: "resume" });
+    recordDebugLogEvent({ event: "hands-free-enabled" });
+  }, [ensureVoiceSessionReady, transition]);
 
   const suspend = useCallback(() => {
     if (!driveSessionStateRef.current.engaged) {
@@ -274,31 +264,18 @@ export function useDriveSessionController({
   }, [transition]);
 
   useEffect(() => {
-    const previousInputMode = previousInputModeRef.current;
-    previousInputModeRef.current = settings.inputMode;
-
-    if (settings.inputMode !== "drive-session") {
+    if (!mainSurfaceVisible) {
       suspend();
       return;
     }
 
-    if (previousInputMode !== "drive-session") {
-      generationRef.current += 1;
-      transition({ type: "mode-entered" });
-      recordDebugLogEvent({ event: "drive-session-mode-entered" });
+    if (
+      driveSessionStateRef.current.autoContinueEnabled &&
+      !driveSessionStateRef.current.engaged
+    ) {
+      transition({ type: "engage" });
     }
-  }, [
-    settings.inputMode,
-    suspend,
-    transition,
-  ]);
-
-  useEffect(() => {
-    if (mainSurfaceVisible) {
-      return;
-    }
-    suspend();
-  }, [mainSurfaceVisible, suspend]);
+  }, [mainSurfaceVisible, suspend, transition]);
 
   useEffect(() => {
     const previousReplyVersion = completedReplyVersionRef.current;
@@ -306,7 +283,6 @@ export function useDriveSessionController({
 
     if (
       completedReplyVersion === previousReplyVersion ||
-      settings.inputMode !== "drive-session" ||
       !driveSessionStateRef.current.autoContinueEnabled ||
       !driveSessionStateRef.current.engaged
     ) {
@@ -319,11 +295,7 @@ export function useDriveSessionController({
       event: "drive-session-reply-completed",
       payload: { completedReplyVersion },
     });
-  }, [
-    completedReplyVersion,
-    settings.inputMode,
-    transition,
-  ]);
+  }, [completedReplyVersion, transition]);
 
   useEffect(() => {
     const wasBusy = previousIsBusyRef.current;
@@ -332,7 +304,6 @@ export function useDriveSessionController({
     if (
       !wasBusy ||
       isBusy ||
-      settings.inputMode !== "drive-session" ||
       !driveSessionStateRef.current.autoContinueEnabled ||
       !driveSessionStateRef.current.engaged
     ) {
@@ -347,16 +318,10 @@ export function useDriveSessionController({
         completedReplyVersion,
       },
     });
-  }, [
-    completedReplyVersion,
-    isBusy,
-    settings.inputMode,
-    transition,
-  ]);
+  }, [completedReplyVersion, isBusy, transition]);
 
   useEffect(() => {
     if (
-      settings.inputMode !== "drive-session" ||
       !autoContinueEnabled ||
       !engaged ||
       !armRequested ||
@@ -381,10 +346,9 @@ export function useDriveSessionController({
     player.isPlaybackPaused,
     player.isPlaying,
     replayPhase,
-    settings.inputMode,
   ]);
 
-  const handleStop = useCallback(() => {
+  const disable = useCallback(() => {
     if (!driveSessionStateRef.current.autoContinueEnabled) {
       return;
     }
@@ -392,22 +356,29 @@ export function useDriveSessionController({
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
     transition({ type: "pause" });
-    recordDebugLogEvent({ event: "drive-session-auto-paused" });
-  }, [transition]);
+    resetAcousticProfile();
+    void stopAmbientMonitoring?.();
+    recordDebugLogEvent({ event: "hands-free-disabled" });
+  }, [resetAcousticProfile, stopAmbientMonitoring, transition]);
 
-  const handleContinue = useCallback(() => {
-    if (!ensureVoiceSessionReady()) {
+  const toggle = useCallback(() => {
+    if (driveSessionStateRef.current.autoContinueEnabled) {
+      disable();
+    } else {
+      enable();
+    }
+  }, [disable, enable]);
+
+  const requestNextTurn = useCallback(() => {
+    if (
+      !driveSessionStateRef.current.autoContinueEnabled ||
+      !driveSessionStateRef.current.engaged
+    ) {
       return;
     }
-
-    generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    transition({ type: "resume" });
-    recordDebugLogEvent({ event: "drive-session-auto-resumed" });
-  }, [
-    ensureVoiceSessionReady,
-    transition,
-  ]);
+    transition({ type: "arm-requested" });
+  }, [transition]);
 
   const handleRepeat = useCallback(async () => {
     const reply = lastCompletedReplyRef.current.trim();
@@ -418,7 +389,6 @@ export function useDriveSessionController({
 
     const shouldResume =
       driveSessionStateRef.current.autoContinueEnabled &&
-      settings.inputMode === "drive-session" &&
       mainSurfaceVisibleRef.current;
 
     generationRef.current += 1;
@@ -439,7 +409,6 @@ export function useDriveSessionController({
       if (
         shouldResume &&
         driveSessionStateRef.current.autoContinueEnabled &&
-        settings.inputMode === "drive-session" &&
         mainSurfaceVisibleRef.current
       ) {
         generationRef.current += 1;
@@ -452,7 +421,6 @@ export function useDriveSessionController({
     cancelVoiceCapture,
     lastCompletedReplyRef,
     playReplyText,
-    settings.inputMode,
     showToast,
     stopReplay,
     t,
@@ -462,14 +430,10 @@ export function useDriveSessionController({
   const reset = useCallback(() => {
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    transition({ type: "suspend" });
+    transition({ type: "pause" });
     resetAcousticProfile();
     void stopAmbientMonitoring?.();
-  }, [
-    resetAcousticProfile,
-    stopAmbientMonitoring,
-    transition,
-  ]);
+  }, [resetAcousticProfile, stopAmbientMonitoring, transition]);
 
   return {
     autoContinueEnabled,
@@ -477,11 +441,12 @@ export function useDriveSessionController({
     engaged,
     silenceCountdownSeconds,
     voiceActive,
-    engage,
-    handleContinue,
+    disable,
+    enable,
     handleRepeat,
-    handleStop,
     reset,
+    requestNextTurn,
     suspend,
+    toggle,
   };
 }

@@ -7,7 +7,7 @@ tags:
 # The runner package-targets the fixture URL before Maestro starts. This avoids
 # Android's chooser when production and development builds are also installed.
 - assertVisible:
-    id: store-promo-fixture-ready-premium
+    id: store-promo-fixture-ready-conversation
 - stopApp
 - launchApp
 - setOrientation: PORTRAIT

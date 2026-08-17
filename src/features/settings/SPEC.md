@@ -23,10 +23,9 @@ last_validated_sha: 7db5c94
 Settings exposes deep control without placing provider machinery on the main
 conversation surface. Its overview has seven primary pages: Connections,
 Thinking, Search, Listening, Speaking, Data & privacy, and App & diagnostics.
-There is no standalone device page. On-device acquisition and selection belong
-to the stage that uses each model, bulk setup belongs to App & diagnostics and
-the introduction, languages belong to Listening, and model cleanup belongs to
-Data & privacy.
+There is no standalone device page. Optional on-device speech acquisition and
+selection belong to Listening and Speaking, languages belong to Listening, and
+model cleanup belongs to Data & privacy.
 
 The historical `Ant` filename prefix remains for import stability. The app does
 not depend on Ant Design; controls are React Native-owned and come from the
@@ -37,7 +36,7 @@ shared design system and settings primitives.
 - `AntSettingsModal.tsx` owns modal lifecycle and page navigation.
 - `AntSettingsFrame.tsx` owns the accessible frame, title, back/close actions,
   keyboard behavior, and focus containment.
-- `AntSettingsPageContent.tsx` routes pages, enforces edition access, and owns
+- `AntSettingsPageContent.tsx` routes pages and owns
   the modal-scoped local-model controller.
 - `AntSettingsOverview.tsx` groups the seven primary pages into Conversation,
   Voice, and Privacy & app, with a live summary on every row.
@@ -47,7 +46,7 @@ shared design system and settings primitives.
   `SettingsGroup`, `SettingsRow`, `SettingsChoiceRow`,
   `SettingsMultiChoiceRow`, `RouteOptionRow`, `LocalModelRouteGroup`,
   `VoicePickerSheet`, `SettingsSheet`,
-  `SettingsPillAction`, `IconAction`, and `PremiumBand`.
+  `SettingsPillAction`, and `IconAction`.
 - `settings-core/` owns reusable non-visual normalization, readiness,
   validation, voice-preview, local-model lifecycle, and controller behavior.
 
@@ -74,15 +73,11 @@ vertical Settings scrolling and controls away from that edge keep ownership of
 their touches. Android keeps its system-back behavior and regular iPad keeps
 the persistent category rail instead of a back gesture.
 
-## Edition Boundary
+## Product Boundary
 
-Free and Premium users see the same seven-page overview and the same structure
-inside every page. Free sees cloud provider routes and Premium-only controls as
-locked rows followed by a Premium band, while system and on-device routes stay
-fully usable. Premium unlocks those controls in place.
-
-**Decision:** Edition checks live in page routing or within a route group;
-overview visibility is never an authorization boundary.
+All seven pages belong to the paid app. There is no edition gate, upsell row,
+purchase surface, or entitlement-dependent route. Provider features are ready
+only when their own credentials and capability checks are ready.
 
 Callers may name any of the seven landing pages directly. The target is
 recomputed each time the modal opens, and a closed modal clears it so the next
@@ -93,7 +88,7 @@ plain open cannot inherit the preceding deep link.
 Settings readiness is capability-specific. One provider key may validly support
 speech while lacking voice-directory permission or a working LLM route.
 
-The Premium overview surfaces derived readiness as `RuntimeReadiness`: the four
+The overview surfaces derived readiness as `RuntimeReadiness`: the four
 capabilities (think, listen, speak, search) on one quiet line, each a 44pt
 target opening the page that configures it. It is deliberately not a stepper —
 the four are independent, so there are no connectors, no card, and no heading.
@@ -117,26 +112,28 @@ capability healthy. The UI shows the capability that was actually tested.
 ## Page Ownership
 
 - Connections: one manifest-ordered provider list with capability and health
-  summaries. Premium opens credentials, provider information, and
-  capability-specific connection tests in a modal sheet; Free keeps every
-  provider visible as a locked route. Its footer states the security boundary:
+  summaries. Each provider opens credentials, provider information, and
+  capability-specific connection tests in a modal sheet. Its footer states the security boundary:
   keys remain in the device keychain and are sent only to their own provider.
-- Thinking: the `Answering models` group owns up to four numbered coexisting
-  answering-model slots. Each opens a focused sheet for provider/local route,
+- Thinking: the `Answering models` group owns an open-ended ordered list of
+  numbered coexisting answering-model slots. Each opens a focused sheet for provider route,
   exact model, and that model's effort ladder. Its Conversation defaults group
   owns the length and tone inherited by sessions without overrides. Local
   acquisition, benchmark, selection, and swipe-removal happen in the model
-  chooser; Model Council and the system prompt live in quiet sheets.
-- Listening: input mode, conversation languages, and one `Who listens`
+  chooser; Model Council and the system prompt live in quiet sheets. Local
+  response models are not offered.
+- Listening: the persisted manual input mode (`push-to-talk` or
+  `toggle-to-talk`), conversation languages, and one `Who listens`
   system, local, or provider recognition route group. Downloaded local models
   cannot be selected until a successful device benchmark marks them viable.
-- **Decision:** a below-target benchmark is non-viable everywhere a local
-  model can be picked (Listening, Speaking, Thinking): the radio stays
-  locked and the row's detail line states the result. Rejected alternative:
-  selectable-with-warning — voice-pipeline latency is the product's core
-  promise, and a knowingly slow route would degrade the primary experience
-  behind a warning most users would not reread. `isLocalModelViable` encodes
-  the rule once for every route group.
+  Hands free is deliberately not a third persisted input mode: it is the
+  session-scoped home-screen loop layered over either manual capture mode.
+- **Decision:** a below-target but functional speech benchmark remains
+  selectable in Listening and Speaking, and the row's detail line keeps the
+  performance warning visible. A failed benchmark remains locked. This keeps
+  optional local speech under the user's control without presenting a broken
+  route as usable. `isLocalModelViable` encodes the rule once for both route
+  groups.
 - Speaking: playback timing and provider-supported delivery instructions,
   followed by one native/local/provider route group. A selected route exposes
   its model and voice as inset subrows; voice selection opens one searchable,
@@ -147,14 +144,13 @@ capability healthy. The UI shows the capability that was actually tested.
 - Search: one `Who searches` group with a Nobody route plus search-provider
   routes, with result count, depth, and provider-specific search mode shown
   only for the active route. Nobody
-  remains usable in both editions; Free keeps provider routes visibly locked.
+  remains usable without configuring a search provider.
 - Data & privacy: the knowledge opt-in, archived-conversation entry point,
   portable archive management, encrypted/readable backup and restore, and a
   storage janitor that may remove or cancel local models without duplicating
   their download and selection controls.
-- App & diagnostics: the shared automatic-setup job, appearance, intro and
-  transcript-usage visibility, debug capture access, speech diagnostics,
-  runtime overrides, and isolated entitlement simulation.
+- App & diagnostics: appearance, transcript-usage visibility, debug capture
+  access, speech diagnostics, and runtime overrides.
 
 ## Interaction Rules
 
@@ -191,11 +187,11 @@ capability healthy. The UI shows the capability that was actually tested.
   page interactive and avoids overlapping keyboard and modal teardown.
 - Every page uses semantic colors, centralized typography, and shared icon
   tokens.
-- Free local-model changes are applied as one ready profile. A stage may record
-  a pending preference while a required artifact is absent or untested, but it
-  must not display or persist that choice as the active Free runtime until the
-  complete LLM/STT/TTS profile is installed and viable. Hosted slots survive
-  Free mode for entitlement restoration, within the same four-slot limit.
+- Local speech-model choices become active only after the required artifact is
+  installed, verified, and functionally benchmarked on the current device.
+  Below-target results remain explicit warnings; failed results block use.
+  Local speech never creates a response route or alters the provider-only
+  answering slots.
 - Settings groups use one bordered inset surface with row dividers rather than
   nesting a separate card around every row. Route choices expose native radio
   semantics; local-model removal remains an explicit swipe action. Removing a
@@ -203,9 +199,6 @@ capability healthy. The UI shows the capability that was actually tested.
 - Provider connection rows expose capability and aggregate health at a glance;
   credential inputs and detailed validation belong to the selected provider's
   focus-isolated sheet rather than expanding the overview list in place.
-- `PremiumBand` is the one deliberately decorative Settings primitive. Its
-  gradients and sheen use theme tokens, its upgrade action remains at least 44
-  points, and Reduce Motion disables the recurring sheen animation.
 
 ## Change Contract
 

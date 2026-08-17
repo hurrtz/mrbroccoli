@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const ur = {
   ...conversationKnowledgeTranslations.ur,
   ...imagePromptTranslations.ur,
   ...onDeviceTranslations.ur,
-  ...onboardingTranslations.ur,
-  ...introTranslations.ur,
-  ...premiumTranslations.ur,
+  ...localSpeechTranslations.ur,
+  ...settingsTranslations.ur,
   ...transcriptEditTranslations.ur,
   ...workspaceTranslations.ur,
   ...sessionLockTranslations.ur,
-  ...autoSetupTranslations.ur,
   appName: "مسٹر بروکلی",
   retry: "دوبارہ کوشش کریں۔",
   dismiss: "بند کریں",
@@ -40,7 +36,6 @@ export const ur = {
   settings: "ترتیبات",
   settingsReleaseVersion: ({ version }) => `ورژن ${version}`,
   all: "تمام",
-  firstRun: "پہلا رن",
   instructions: "ہدایات",
   providers: "فراہم کرنے والے",
   webSearch: "ویب تلاش",
@@ -209,10 +204,10 @@ export const ur = {
   createApiKey: "اسناد",
   apiKey: "API کلید",
   aboutThisProvider: "اس فراہم کنندہ کے بارے میں",
-  openRouterOnboardingTitle: "ایک کلید، متعدد فراہم کنندگان",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "ایک کلید، متعدد فراہم کنندگان",
+  openRouterGatewayDescription:
     "ایک وقف شدہ OpenRouter کلید بنائیں، اسے نیچے چسپاں کریں، اور کسی بھی براہ راست کنکشن کو تبدیل کیے بغیر کئی فراہم کنندگان کے اسنیپ شاٹ سے حمایت یافتہ ماڈل استعمال کریں۔",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "درخواست کا راستہ: یہ آلہ → OpenRouter → منتخب کردہ اپ اسٹریم فراہم کنندہ",
   openRouterKeys: "OpenRouter کلیدیں",
   providerStatusInvalid: "غلط",

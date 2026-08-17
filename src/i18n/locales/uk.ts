@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const uk = {
   ...conversationKnowledgeTranslations.uk,
   ...imagePromptTranslations.uk,
   ...onDeviceTranslations.uk,
-  ...onboardingTranslations.uk,
-  ...introTranslations.uk,
-  ...premiumTranslations.uk,
+  ...localSpeechTranslations.uk,
+  ...settingsTranslations.uk,
   ...transcriptEditTranslations.uk,
   ...workspaceTranslations.uk,
   ...sessionLockTranslations.uk,
-  ...autoSetupTranslations.uk,
   appName: "Пан Броколі",
   retry: "Повторити",
   dismiss: "Закрити",
@@ -40,7 +36,6 @@ export const uk = {
   settings: "Налаштування",
   settingsReleaseVersion: ({ version }) => `Версія ${version}`,
   all: "Усі",
-  firstRun: "Перший запуск",
   instructions: "Інструкції",
   providers: "Провайдери",
   webSearch: "Вебпошук",
@@ -219,10 +214,10 @@ export const uk = {
   createApiKey: "Облікові дані",
   apiKey: "Ключ API",
   aboutThisProvider: "Про цього провайдера",
-  openRouterOnboardingTitle: "Один ключ, кілька провайдерів",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Один ключ, кілька провайдерів",
+  openRouterGatewayDescription:
     "Створи окремий ключ OpenRouter, вставте його нижче та користуйтеся моделями зі стабільними версіями від кількох провайдерів, не замінюючи прямі підключення.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Шлях запиту: цей пристрій → OpenRouter → вибраний кінцевий провайдер",
   openRouterKeys: "Ключі OpenRouter",
   providerStatusInvalid: "Недійсні дані",

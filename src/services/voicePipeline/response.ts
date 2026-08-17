@@ -12,7 +12,6 @@ import {
   type InternalContextLeakReason,
 } from "../llm/contextLeakGuard";
 import { streamChat } from "../llm";
-import { streamLocalChat } from "../localLlm";
 import type { createVoicePipelineTtsQueue } from "./ttsQueue";
 import type { RunVoicePipelineParams } from "./types";
 
@@ -30,7 +29,6 @@ interface RunPipelineResponseParams {
   llmAlreadyStarted?: boolean;
   messages: Message[];
   model: RunVoicePipelineParams["model"];
-  localLlmModelId?: RunVoicePipelineParams["localLlmModelId"];
   modelStartedAtMs?: number;
   modelEffort?: RunVoicePipelineParams["modelEffort"];
   provider: RunVoicePipelineParams["provider"];
@@ -59,7 +57,6 @@ export async function runPipelineResponse({
   llmAlreadyStarted = false,
   messages,
   model,
-  localLlmModelId,
   modelStartedAtMs,
   modelEffort,
   provider,
@@ -79,7 +76,6 @@ export async function runPipelineResponse({
     event: "voice-pipeline-llm-requested",
     payload: {
       model,
-      localLlmModelId: localLlmModelId ?? null,
       modelEffort: modelEffort ?? null,
       provider,
       hasWebSearchContext: !!webSearchContext,
@@ -191,69 +187,30 @@ export async function runPipelineResponse({
     completed = true;
   };
 
-  if (localLlmModelId) {
-    try {
-      const result = await streamLocalChat({
-        messages,
-        modelId: localLlmModelId,
-        assistantInstructions,
-        responseLength,
-        responseTone,
-        language,
-        conversationSummary,
-        pastConversationKnowledge,
-        spokenParagraphStreaming:
-          spokenRepliesEnabled && replyPlayback === "stream",
-        webSearchContext,
-        abortSignal,
-        onChunk,
-      });
-      recordDebugLogEvent({
-        event: "voice-pipeline-local-llm-finished",
-        payload: {
-          completionTokenLimit: result.termination.completionTokenLimit,
-          completionTokens: result.usage.completionTokens,
-          contextFull: result.termination.contextFull,
-          limitReached: result.termination.limitReached,
-          stoppedEos: result.termination.stoppedEos,
-          stoppedWord: result.termination.stoppedWord,
-          turnId,
-        },
-      });
-      await onDone(result.fullText, result.usage);
-    } catch (error) {
-      if (!abortSignal?.aborted) {
-        await callbacks.onError(
-          error instanceof Error ? error : new Error(String(error)),
-        );
-      }
-    }
-  } else {
-    await streamChat({
-      messages,
-      model,
-      modelEffort,
-      provider,
-      apiKey: providerApiKey,
-      assistantInstructions,
-      responseLength,
-      responseTone,
-      language,
-      conversationSummary,
-      pastConversationKnowledge,
-      spokenParagraphStreaming:
-        spokenRepliesEnabled && replyPlayback === "stream",
-      synthesisContext,
-      webSearchContext,
-      maxOutputCharacters: synthesisContext
-        ? MODEL_COUNCIL_MAX_COMPLETION_CHARACTERS
-        : undefined,
-      abortSignal,
-      onChunk,
-      onDone,
-      onError: callbacks.onError,
-    });
-  }
+  await streamChat({
+    messages,
+    model,
+    modelEffort,
+    provider,
+    apiKey: providerApiKey,
+    assistantInstructions,
+    responseLength,
+    responseTone,
+    language,
+    conversationSummary,
+    pastConversationKnowledge,
+    spokenParagraphStreaming:
+      spokenRepliesEnabled && replyPlayback === "stream",
+    synthesisContext,
+    webSearchContext,
+    maxOutputCharacters: synthesisContext
+      ? MODEL_COUNCIL_MAX_COMPLETION_CHARACTERS
+      : undefined,
+    abortSignal,
+    onChunk,
+    onDone,
+    onError: callbacks.onError,
+  });
 
   return completed;
 }

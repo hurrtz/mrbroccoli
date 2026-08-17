@@ -14,23 +14,16 @@ import {
 import { useLocalization } from "../../../i18n";
 import type { Settings } from "../../../types";
 
-import { PremiumBand } from "../settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { styles } from "../styles";
 
 export function SearchSettingsPage({
-  allSearchProviders,
-  isPremium,
-  onOpenPremium,
   onUpdate,
   searchProviders,
   settings,
 }: {
-  allSearchProviders: readonly WebSearchProvider[];
-  isPremium: boolean;
-  onOpenPremium: () => void;
   settings: Settings;
   searchProviders: WebSearchProvider[];
   onUpdate: (
@@ -38,7 +31,6 @@ export function SearchSettingsPage({
   ) => void;
 }) {
   const { t } = useLocalization();
-  const visibleProviders = isPremium ? searchProviders : allSearchProviders;
   const selectedWebSearchProvider =
     settings.webSearchMode === "on" ? settings.webSearchProvider : null;
   const selectedProviderSettings = selectedWebSearchProvider
@@ -83,18 +75,17 @@ export function SearchSettingsPage({
         <RouteOptionRow
           testID="settings-search-route-nobody"
           label={t("webSearchNobody")}
-          last={visibleProviders.length === 0 && isPremium}
+          last={searchProviders.length === 0}
           description={t("webSearchNobodyDescription")}
           selected={settings.webSearchMode === "off"}
           onSelect={() => onUpdate({ webSearchMode: "off" })}
         />
-        {visibleProviders.map((provider, index) => (
+        {searchProviders.map((provider, index) => (
           <RouteOptionRow
             key={provider}
             testID={`settings-search-route-provider-${provider}`}
             label={PROVIDER_LABELS[provider]}
-            locked={!isPremium}
-            last={index === visibleProviders.length - 1 && isPremium}
+            last={index === searchProviders.length - 1}
             meta={`${t("provider")} · ${t("apiKey")}`}
             selected={selectedWebSearchProvider === provider}
             onSelect={() =>
@@ -105,14 +96,6 @@ export function SearchSettingsPage({
             }
           />
         ))}
-        {!isPremium ? (
-          <PremiumBand
-            actionLabel={t("upgradeToPremium")}
-            copy={t("premiumBenefitTools")}
-            onPress={onOpenPremium}
-            premiumLabel={t("premium")}
-          />
-        ) : null}
       </SettingsGroup>
 
       {selectedWebSearchProvider && selectedProviderSettings ? (

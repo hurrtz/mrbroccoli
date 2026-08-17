@@ -73,14 +73,8 @@ Gradle's files under `android/app/build/outputs/` are overwritten by later
 builds. Use the versioned archive when retaining or uploading diagnostics for a
 published release.
 
-The 2.8.0 on-device catalogue adds the `llama.rn` and Expo SQLite native
-runtimes. Its release AAB measures 177,567,513 bytes, up 18,721,401 bytes
-(11.8%) from the 2.7.0 release AAB at 158,846,112 bytes. The uncompressed arm64
-native payload is 68,237,400 bytes, up from 56,174,400 bytes; x86_64 grows from
-57,961,904 to 71,489,408 bytes. This reviewed increase raises the AAB upload
-ceiling from 160 MiB to 180 MiB while retaining the 70 MiB arm64 ceiling and
-128 KiB bundled-ONNX ceiling. Reasoning, speech-recognition, and
-speech-generation models remain download-only.
+Optional speech-recognition and speech-generation models remain download-only.
+The app contains no local response-model runtime or bundled model weights.
 
 ## Useful Checks
 

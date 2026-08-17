@@ -22,13 +22,9 @@ function getArchiveErrorKey(error: ConversationArchiveController["error"]) {
 }
 
 export function ConversationKnowledgeGroup({
-  isPremium,
-  onOpenPremium,
   onUpdate,
   settings,
 }: {
-  isPremium: boolean;
-  onOpenPremium: () => void;
   onUpdate: (partial: Partial<Settings>) => void;
   settings: Settings;
 }) {
@@ -44,19 +40,15 @@ export function ConversationKnowledgeGroup({
         icon="brain"
         label={t("usePastConversationKnowledge")}
         last
-        value={isPremium ? undefined : t("premium")}
-        onPress={isPremium ? undefined : onOpenPremium}
         control={
-          isPremium ? (
-            <Switch
-              testID="past-conversation-knowledge-switch"
-              label={t("usePastConversationKnowledge")}
-              value={settings.pastConversationKnowledgeEnabled}
-              onChange={(pastConversationKnowledgeEnabled) =>
-                onUpdate({ pastConversationKnowledgeEnabled })
-              }
-            />
-          ) : undefined
+          <Switch
+            testID="past-conversation-knowledge-switch"
+            label={t("usePastConversationKnowledge")}
+            value={settings.pastConversationKnowledgeEnabled}
+            onChange={(pastConversationKnowledgeEnabled) =>
+              onUpdate({ pastConversationKnowledgeEnabled })
+            }
+          />
         }
       />
     </SettingsGroup>
@@ -66,23 +58,19 @@ export function ConversationKnowledgeGroup({
 export function ArchiveSettingsSheet({
   archivedConversationCount,
   conversationArchive,
-  isPremium,
   onClose,
   onOpenArchivedConversations,
-  onOpenPremium,
   visible,
 }: {
   archivedConversationCount: number;
   conversationArchive: ConversationArchiveController;
-  isPremium: boolean;
   onClose: () => void;
   onOpenArchivedConversations: () => void;
-  onOpenPremium: () => void;
   visible: boolean;
 }) {
   const { t } = useLocalization();
   const { colors } = useTheme();
-  const pendingActionRef = React.useRef<"archived" | "premium" | null>(null);
+  const pendingActionRef = React.useRef<"archived" | null>(null);
   const archiveBusy =
     !conversationArchive.loaded || conversationArchive.syncing;
   const archiveError = conversationArchive.error
@@ -93,10 +81,8 @@ export function ArchiveSettingsSheet({
     pendingActionRef.current = null;
     if (pendingAction === "archived") {
       onOpenArchivedConversations();
-    } else if (pendingAction === "premium") {
-      onOpenPremium();
     }
-  }, [onOpenArchivedConversations, onOpenPremium]);
+  }, [onOpenArchivedConversations]);
 
   React.useEffect(() => {
     if (visible || !pendingActionRef.current) {
@@ -151,28 +137,24 @@ export function ArchiveSettingsSheet({
               }
               control={null}
             />
-            {isPremium ? (
-              <>
-                <SettingsRow
-                  testID="sync-conversation-archive"
-                  disabled={archiveBusy}
-                  icon="reload"
-                  label={
-                    conversationArchive.syncing
-                      ? t("conversationArchiveSyncing")
-                      : t("conversationArchiveSyncNow")
-                  }
-                  onPress={() => void conversationArchive.syncNow()}
-                />
-                <SettingsRow
-                  testID="change-conversation-archive-folder"
-                  disabled={archiveBusy}
-                  icon="folder-open"
-                  label={t("conversationArchiveChangeFolder")}
-                  onPress={() => void conversationArchive.chooseDirectory()}
-                />
-              </>
-            ) : null}
+            <SettingsRow
+              testID="sync-conversation-archive"
+              disabled={archiveBusy}
+              icon="reload"
+              label={
+                conversationArchive.syncing
+                  ? t("conversationArchiveSyncing")
+                  : t("conversationArchiveSyncNow")
+              }
+              onPress={() => void conversationArchive.syncNow()}
+            />
+            <SettingsRow
+              testID="change-conversation-archive-folder"
+              disabled={archiveBusy}
+              icon="folder-open"
+              label={t("conversationArchiveChangeFolder")}
+              onPress={() => void conversationArchive.chooseDirectory()}
+            />
             <SettingsRow
               testID="disconnect-conversation-archive"
               danger
@@ -183,7 +165,7 @@ export function ArchiveSettingsSheet({
               onPress={() => void conversationArchive.disconnect()}
             />
           </>
-        ) : isPremium ? (
+        ) : (
           <SettingsRow
             testID="choose-conversation-archive-folder"
             disabled={archiveBusy}
@@ -191,18 +173,6 @@ export function ArchiveSettingsSheet({
             label={t("conversationArchiveChooseFolder")}
             last
             onPress={() => void conversationArchive.chooseDirectory()}
-          />
-        ) : (
-          <SettingsRow
-            icon="lock"
-            label={t("conversationArchive")}
-            last
-            testID="unlock-conversation-archive"
-            value={t("premium")}
-            onPress={() => {
-              pendingActionRef.current = "premium";
-              onClose();
-            }}
           />
         )}
       </SettingsGroup>

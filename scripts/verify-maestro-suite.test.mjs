@@ -9,7 +9,6 @@ import {
   findMaestroYamlErrors,
   findRetiredMaestroSelectors,
   findUnsettledNativeModalDismissals,
-  MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW,
   MAESTRO_LOCALIZED_SCREENSHOTS,
   MAESTRO_SMOKE_FLOW,
   readAppLanguages,
@@ -289,138 +288,23 @@ test("rejects retired intro selectors, screenshots, and titles", () => {
   );
 });
 
-test("smoke covers Welcome and Setup, then restarts without claiming Try", () => {
+test("smoke opens directly into the BYOK workspace and Settings", () => {
   const smokeFlow = fs.readFileSync(
     path.join(process.cwd(), MAESTRO_SMOKE_FLOW),
     "utf8",
   );
 
   for (const selector of [
-    "intro-welcome-play",
-    "intro-welcome-stop",
-    "intro-stepper-dot-1",
-    "intro-setup-step",
-    "intro-auto-start",
-    "intro-manual-switch",
-    "intro-manual-catalogue",
-    "stopApp",
-    "launchApp",
-    "intro-banner-dismiss",
+    "main-screen",
+    "main-settings-button",
+    "settings-page-overview",
+    "settings-page-app",
+    "landscape-left-pane",
+    "landscape-right-pane",
   ]) {
     assert.match(smokeFlow, new RegExp(selector));
   }
-  assert.doesNotMatch(smokeFlow, /intro-stepper-dot-2|intro-try-step/);
-  const stopApp = smokeFlow.indexOf("stopApp");
-  const relaunch = smokeFlow.indexOf("launchApp", stopApp);
-  assert.ok(stopApp < relaunch);
-  assert.ok(relaunch < smokeFlow.indexOf("intro-banner-dismiss"));
-  assert.ok(
-    smokeFlow.indexOf("intro-banner-dismiss") <
-      smokeFlow.indexOf("main-settings-button"),
-  );
-});
-
-test("eligible setup restarts after Ready without claiming a stale completion action", () => {
-  const eligibleFlow = fs.readFileSync(
-    path.join(process.cwd(), MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW),
-    "utf8",
-  );
-  const proposal = eligibleFlow.indexOf("auto-setup-proposal");
-  const proposalLabel = eligibleFlow.indexOf(
-    '"Recommended for this phone"',
-    proposal,
-  );
-  const scrollToInstall = eligibleFlow.indexOf("scrollUntilVisible", proposal);
-  const installLabel = eligibleFlow.indexOf(
-    '"Download and install"',
-    scrollToInstall,
-  );
-  const installSelector = eligibleFlow.indexOf(
-    "auto-setup-install",
-    scrollToInstall,
-  );
-  const installTap = eligibleFlow.indexOf(
-    "auto-setup-install",
-    installSelector + 1,
-  );
-  const installingScreenshot = eligibleFlow.indexOf(
-    "auto-setup-installing",
-    installTap,
-  );
-  const readyScreenshot = eligibleFlow.indexOf("auto-setup-ready");
-  const doneState = eligibleFlow.indexOf("auto-setup-done-state", installTap);
-  const scrollToDone = eligibleFlow.indexOf("scrollUntilVisible", doneState);
-  const doneScrollTarget = eligibleFlow.indexOf(
-    "auto-setup-done",
-    scrollToDone,
-  );
-  const stopApp = eligibleFlow.indexOf("stopApp", readyScreenshot);
-  const launchApp = eligibleFlow.indexOf("launchApp", stopApp);
-  const dismissBanner = eligibleFlow.indexOf("intro-banner-dismiss", launchApp);
-  const settings = eligibleFlow.indexOf("main-settings-button", dismissBanner);
-
-  assert.ok(proposal < proposalLabel);
-  assert.ok(proposalLabel < scrollToInstall);
-  assert.doesNotMatch(
-    eligibleFlow.slice(proposal, scrollToInstall),
-    /"Download and install"/,
-  );
-  assert.ok(scrollToInstall < installSelector);
-  assert.ok(installSelector < installLabel);
-  assert.ok(installLabel < installTap);
-  assert.ok(installSelector < installTap);
-  assert.ok(installTap < installingScreenshot);
-  assert.ok(installTap < doneState);
-  assert.ok(doneState < scrollToDone);
-  assert.ok(scrollToDone < doneScrollTarget);
-  assert.ok(doneScrollTarget < readyScreenshot);
-  assert.ok(readyScreenshot < stopApp);
-  assert.ok(stopApp < launchApp);
-  assert.ok(launchApp < dismissBanner);
-  assert.ok(dismissBanner < settings);
-  assert.doesNotMatch(eligibleFlow, /tapOn: "Done"|intro-close|intro-try-step/);
-});
-
-test("low-memory setup reaches Thinking through the current Intro manual catalogue", () => {
-  const lowMemoryFlow = fs.readFileSync(
-    path.join(
-      process.cwd(),
-      ".maestro/flows/runtime/android-low-memory-auto-setup.yaml",
-    ),
-    "utf8",
-  );
-  const retry = lowMemoryFlow.lastIndexOf(
-    'visible: "No suitable set for this phone"',
-  );
-  const manualSwitch = lowMemoryFlow.indexOf("intro-manual-switch", retry);
-  const manualCatalogue = lowMemoryFlow.indexOf(
-    "intro-manual-catalogue",
-    manualSwitch,
-  );
-  const scrollToManualLlm = lowMemoryFlow.indexOf(
-    "scrollUntilVisible",
-    manualCatalogue,
-  );
-  const manualLlmScroll = lowMemoryFlow.indexOf(
-    "intro-manual-llm",
-    scrollToManualLlm,
-  );
-  const manualLlmTap = lowMemoryFlow.indexOf(
-    "intro-manual-llm",
-    manualLlmScroll + 1,
-  );
-  const thinkingPage = lowMemoryFlow.indexOf(
-    "settings-page-thinking",
-    manualLlmTap,
-  );
-
-  assert.ok(retry < manualSwitch);
-  assert.ok(manualSwitch < manualCatalogue);
-  assert.ok(manualCatalogue < scrollToManualLlm);
-  assert.ok(scrollToManualLlm < manualLlmScroll);
-  assert.ok(manualLlmScroll < manualLlmTap);
-  assert.ok(manualLlmTap < thinkingPage);
-  assert.doesNotMatch(lowMemoryFlow, /auto-setup-manual/);
+  assert.doesNotMatch(smokeFlow, /intro-|auto-setup|premium|entitlement/);
 });
 
 test("defines the complete deterministic orb boundary matrix", () => {

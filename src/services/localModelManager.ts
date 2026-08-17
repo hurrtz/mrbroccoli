@@ -1,7 +1,5 @@
 import {
-  LOCAL_MODEL_CATALOG_VERSION,
   getLocalModel,
-  type LocalLlmModelDefinition,
   type LocalModelDefinition,
   type LocalModelId,
   type LocalTtsModelDefinition,
@@ -20,7 +18,7 @@ export type LocalModelInstallStatus = {
   verified: boolean;
 };
 
-const LLM_DIRECTORY_NAME = "local-models/llm";
+const RETIRED_LLM_DIRECTORY_NAME = "local-models/llm";
 
 function getFsModule() {
   // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps Jest and unsupported builds import-safe
@@ -68,18 +66,6 @@ async function installRequiredPhonemePacks(
   });
 }
 
-function llmPaths(model: LocalLlmModelDefinition) {
-  const { DocumentDirectoryPath } = getFsModule();
-  const directory = `${DocumentDirectoryPath}/${LLM_DIRECTORY_NAME}`;
-  const path = `${directory}/${model.fileName}`;
-  return {
-    directory,
-    path,
-    partialPath: `${path}.partial`,
-    markerPath: `${path}.verified-${LOCAL_MODEL_CATALOG_VERSION}`,
-  };
-}
-
 function normalizeProgress(value: number) {
   return Math.max(0, Math.min(1, value));
 }
@@ -124,7 +110,7 @@ async function assertPinnedSherpaMetadata(
 }
 
 async function getVerifiedSherpaArtifactPath(
-  model: Exclude<LocalModelDefinition, LocalLlmModelDefinition>,
+  model: LocalModelDefinition,
 ) {
   const {
     getLocalModelPathByCategory,
@@ -155,7 +141,7 @@ async function getVerifiedSherpaArtifactPath(
 }
 
 async function downloadSherpaModelInForeground(
-  model: Exclude<LocalModelDefinition, LocalLlmModelDefinition>,
+  model: LocalModelDefinition,
   archiveExt: "tar.bz2" | "onnx",
   options?: {
     abortSignal?: AbortSignal;
@@ -303,20 +289,6 @@ export async function getLocalModelInstallStatus(
 ): Promise<LocalModelInstallStatus> {
   const model = getLocalModel(modelId);
 
-  if (model.runtime === "llama-rn") {
-    const { exists, readFile } = getFsModule();
-    const paths = llmPaths(model);
-    const installed = await exists(paths.path);
-    const marker = (await exists(paths.markerPath))
-      ? await readFile(paths.markerPath, "utf8").catch(() => "")
-      : "";
-    return {
-      installed,
-      path: installed ? paths.path : null,
-      verified: installed && marker.trim() === model.sha256,
-    };
-  }
-
   const artifact = await getVerifiedSherpaArtifactPath(model);
   const artifactPath = artifact.path;
   const verified =
@@ -329,83 +301,6 @@ export async function getLocalModelInstallStatus(
   return { installed: artifact.installed, path, verified };
 }
 
-async function downloadLlmModel(
-  model: LocalLlmModelDefinition,
-  options?: {
-    abortSignal?: AbortSignal;
-    onProgress?: (progress: LocalModelDownloadProgress) => void;
-  },
-) {
-  const {
-    downloadFile,
-    exists,
-    hash,
-    mkdir,
-    moveFile,
-    stopDownload,
-    unlink,
-    writeFile,
-  } = getFsModule();
-  const paths = llmPaths(model);
-  await mkdir(paths.directory, { NSURLIsExcludedFromBackupKey: true });
-  for (const path of [paths.partialPath, paths.markerPath]) {
-    if (await exists(path)) {
-      await unlink(path);
-    }
-  }
-
-  const task = downloadFile({
-    fromUrl: model.downloadUrl,
-    toFile: paths.partialPath,
-    background: true,
-    progressDivider: 1,
-    progressInterval: 300,
-    readTimeout: 120_000,
-    progress: ({ bytesWritten, contentLength }) => {
-      const total = contentLength > 0 ? contentLength : model.downloadBytes;
-      options?.onProgress?.({
-        phase: "downloading",
-        progress: total > 0 ? normalizeProgress(bytesWritten / total) : 0,
-      });
-    },
-  });
-  const abort = () => stopDownload(task.jobId);
-  options?.abortSignal?.addEventListener("abort", abort, { once: true });
-
-  try {
-    const response = await task.promise;
-    if (options?.abortSignal?.aborted) {
-      const error = new Error("Download aborted");
-      error.name = "AbortError";
-      throw error;
-    }
-    if (response.statusCode < 200 || response.statusCode >= 300) {
-      throw new Error(
-        `${model.name} download failed with HTTP ${response.statusCode}.`,
-      );
-    }
-    options?.onProgress?.({ phase: "verifying", progress: 0 });
-    const digest = (await hash(paths.partialPath, "sha256")).toLowerCase();
-    if (digest !== model.sha256.toLowerCase()) {
-      throw new Error(`${model.name} failed its SHA-256 integrity check.`);
-    }
-    if (await exists(paths.path)) {
-      await unlink(paths.path);
-    }
-    await moveFile(paths.partialPath, paths.path);
-    await writeFile(paths.markerPath, model.sha256, "utf8");
-    options?.onProgress?.({ phase: "verifying", progress: 1 });
-    return paths.path;
-  } catch (error) {
-    if (await exists(paths.partialPath)) {
-      await unlink(paths.partialPath).catch(() => undefined);
-    }
-    throw error;
-  } finally {
-    options?.abortSignal?.removeEventListener("abort", abort);
-  }
-}
-
 export async function downloadLocalModel(
   modelId: LocalModelId,
   options?: {
@@ -414,10 +309,6 @@ export async function downloadLocalModel(
   },
 ) {
   const model = getLocalModel(modelId);
-
-  if (model.runtime === "llama-rn") {
-    return downloadLlmModel(model, options);
-  }
 
   const remote = await assertPinnedSherpaMetadata(model);
   let artifact = await getVerifiedSherpaArtifactPath(model);
@@ -489,18 +380,20 @@ export async function downloadLocalModel(
 
 export async function removeLocalModel(modelId: LocalModelId) {
   const model = getLocalModel(modelId);
-
-  if (model.runtime === "llama-rn") {
-    const { exists, unlink } = getFsModule();
-    const paths = llmPaths(model);
-    for (const path of [paths.path, paths.partialPath, paths.markerPath]) {
-      if (await exists(path)) {
-        await unlink(path);
-      }
-    }
-    return;
-  }
-
   const { deleteModelByCategory } = getDownloadModule();
   await deleteModelByCategory(getSherpaCategory(model), model.runtimeModelId);
+}
+
+/**
+ * Remove response-generation models downloaded by releases that offered a
+ * local LLM route. Those artifacts are no longer addressable by the product
+ * and can occupy several gigabytes, so upgrades clean the retired directory
+ * without touching retained on-device speech models.
+ */
+export async function removeRetiredLocalLlmArtifacts() {
+  const { DocumentDirectoryPath, exists, unlink } = getFsModule();
+  const directory = `${DocumentDirectoryPath}/${RETIRED_LLM_DIRECTORY_NAME}`;
+  if (await exists(directory)) {
+    await unlink(directory);
+  }
 }

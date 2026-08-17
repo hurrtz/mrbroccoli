@@ -17,8 +17,4 @@
 # rewrite that anonymous callback class or the Release app aborts in ART.
 -keep class com.sherpaonnx.SherpaOnnxTtsHelper$* { *; }
 
-# llama.rn installs its JSI bindings and resolves optimized native variants
-# through these Java entry points.
--keep class com.rnllama.** { *; }
-
 # Add any project-specific keep options here.

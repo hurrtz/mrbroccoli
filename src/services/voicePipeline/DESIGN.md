@@ -38,7 +38,7 @@ flowchart TD
     SearchCall --> Deliberation{Model Council?}
     Deliberation -->|yes| Uber[Contributions and review rounds]
     Deliberation -->|no| Response
-    Uber --> Response[Local or hosted final stream]
+    Uber --> Response[Provider final stream]
     Response --> Guard[Internal-context leak guard]
     Guard --> Persist[onResponseDone and turn receipt]
     Guard --> Queue[TTS paragraph queue]
@@ -77,11 +77,9 @@ flowchart LR
     Summary[Provenance-marked summary] --> Plan
     Plan --> Recent[Bounded recent messages]
     Plan --> Update{Needs summary update?}
-    Update -->|hosted route| Summarizer[Internal provider task]
-    Update -->|local route| Skip[Keep current summary only]
+    Update -->|provider route| Summarizer[Internal provider task]
     Summarizer -->|success| Effective[Updated summary plus recent]
     Summarizer -->|failure| Fallback[Bounded recent fallback]
-    Skip --> Effective
 ```
 
 Only summaries carrying the current provenance marker are reused as generated
@@ -126,7 +124,7 @@ The TTS queue separates synthesis scheduling from ordered output:
 
 1. stream chunks accumulate until a complete paragraph;
 2. speech rendering removes visual-only formatting;
-3. provider/local paragraphs split into engine-sized chunks;
+3. provider or downloaded-speech paragraphs split into engine-sized chunks;
 4. up to two synthesis slots prefetch conversation playback;
 5. a single output promise chain preserves source order;
 6. explicit pause cues separate paragraphs; and
@@ -151,18 +149,18 @@ their timers and release listeners or abort-linking functions in their own
 
 ## Failure Degradation
 
-| Failure | Result |
-| --- | --- |
-| STT fails or returns empty | no model request; preserve non-aborted audio |
-| Summary update fails | continue with bounded recent messages |
-| Knowledge retrieval fails | continue without cross-session excerpts |
-| Web search fails | continue without search and persist an inline assistant notice |
-| Some Uber participants fail | continue with successful routes; report degraded/retired outcome |
-| All Uber participants fail | final synthesis cannot proceed normally |
-| Final synthesis exceeds its output ceiling | abort the provider stream and report an incomplete reply |
-| Primary LLM route fails | bounded candidate fallback or user-visible error |
-| TTS route fails | follow explicit fallback order or keep readable text reply, with an inline assistant notice |
-| Abort occurs | stop downstream publication and clean up |
+| Failure                                    | Result                                                                                      |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| STT fails or returns empty                 | no model request; preserve non-aborted audio                                                |
+| Summary update fails                       | continue with bounded recent messages                                                       |
+| Knowledge retrieval fails                  | continue without cross-session excerpts                                                     |
+| Web search fails                           | continue without search and persist an inline assistant notice                              |
+| Some Uber participants fail                | continue with successful routes; report degraded/retired outcome                            |
+| All Uber participants fail                 | final synthesis cannot proceed normally                                                     |
+| Final synthesis exceeds its output ceiling | abort the provider stream and report an incomplete reply                                    |
+| Primary LLM route fails                    | bounded candidate fallback or user-visible error                                            |
+| TTS route fails                            | follow explicit fallback order or keep readable text reply, with an inline assistant notice |
+| Abort occurs                               | stop downstream publication and clean up                                                    |
 
 No degradation path may fabricate success metadata or hide the actual route.
 Assistant-owned degradation notices are durable transcript metadata rather than

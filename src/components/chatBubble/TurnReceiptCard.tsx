@@ -21,7 +21,6 @@ function formatDuration(durationMs?: number) {
 function formatRoute(
   provider: Provider | null,
   model: string,
-  t: ReturnType<typeof useLocalization>["t"],
   gateway?: string,
   upstreamProvider?: string,
   strategy?: string,
@@ -29,7 +28,7 @@ function formatRoute(
 ) {
   if (!provider) {
     return [
-      `${t("settingsOnDevice")} · ${model}`,
+      model,
       strategy,
       attempts && attempts > 1 ? `×${attempts}` : undefined,
     ]
@@ -98,7 +97,7 @@ function formatInput(
     return `${source} · ${t("turnReceiptSystemSpeech")}`;
   }
   if (receipt.input.mode === "local") {
-    return [source, t("settingsOnDevice"), receipt.input.model]
+    return [source, t("onDeviceSpeech"), receipt.input.model]
       .filter(Boolean)
       .join(" · ");
   }
@@ -154,7 +153,7 @@ function formatSpeech(
     return ["Kokoro", speech.voice].filter(Boolean).join(" · ");
   }
   if (speech.actualMode === "local") {
-    return [t("settingsOnDevice"), speech.model].filter(Boolean).join(" · ");
+    return [t("onDeviceSpeech"), speech.model].filter(Boolean).join(" · ");
   }
 
   return [
@@ -244,7 +243,6 @@ export function TurnReceiptCard({ message }: { message: Message }) {
   const requestedRoute = formatRoute(
     receipt.requestedRoute.provider,
     receipt.requestedRoute.model,
-    t,
     receipt.requestedRoute.gateway,
     receipt.requestedRoute.upstreamProvider,
     receipt.requestedRoute.strategy,
@@ -253,7 +251,6 @@ export function TurnReceiptCard({ message }: { message: Message }) {
   const actualRoute = formatRoute(
     receipt.actualRoute.provider,
     receipt.actualRoute.model,
-    t,
     receipt.actualRoute.gateway,
     receipt.actualRoute.upstreamProvider,
     receipt.actualRoute.strategy,

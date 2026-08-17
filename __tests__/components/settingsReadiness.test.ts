@@ -42,20 +42,12 @@ describe("settings readiness", () => {
     expectStatus(readiness.think, "broken");
   });
 
-  it("marks selected local thinking, listening, and compatible speech ready", () => {
+  it("marks provider thinking plus local listening and compatible speech ready", () => {
     const settings = withSettings({
-      responseModes: [
-        {
-          id: "mode-1",
-          route: {
-            runtime: "local",
-            localModelId: "qwen3-0.6b-q8",
-            provider: "openai",
-            model: "Qwen3 0.6B",
-          },
-        },
-      ],
-      activeResponseMode: "mode-1",
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "openai-test-key",
+      },
       sttMode: "local",
       localSttModelId: "whisper-tiny",
       ttsMode: "local",
@@ -64,7 +56,7 @@ describe("settings readiness", () => {
     });
 
     const readiness = getSettingsReadiness(settings, {
-      llmProviders: [],
+      llmProviders: ["openai"],
       sttProviders: [],
       ttsProviders: [],
       searchProviders: [],

@@ -126,10 +126,13 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     const combinedFlow = platformFlows.join("\n");
     errors.push(...findStorePromoSceneBoundaryErrors(platform, platformFlows));
     errors.push(...findStorePromoDrawerBoundaryErrors(platform, platformFlows));
-    const expectedScenes = STORE_PROMO_ANDROID_FLOW_SCENES;
+    const expectedScenes =
+      platform === "android"
+        ? STORE_PROMO_ANDROID_FLOW_SCENES
+        : ["conversation"];
     const sceneReadiness = [
       ...combinedFlow.matchAll(
-        /store-promo-fixture-ready-(premium|free|onboarding-ready|onboarding)/g,
+        /store-promo-fixture-ready-(conversation)/g,
       ),
     ];
     const actualScenes = sceneReadiness.map((match) => match[1]);
@@ -205,22 +208,10 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     }
     for (const selector of [
       "voice-stage-thinking",
-      "voice-stage-idle",
-      "intro-banner",
-      "intro-welcome-step",
-      "intro-stepper-dot-1",
-      "intro-stepper-dot-2",
-      "intro-setup-step",
-      "intro-try-step",
-      "auto-setup-card",
-      "auto-setup-proposal",
-      "store-promo-fixture-ready-onboarding",
-      "store-promo-fixture-ready-onboarding-ready",
+      "store-promo-fixture-ready-conversation",
       "transcript-handle",
       "conversation-drawer-item-promo-branch",
       "settings-page-thinking",
-      "settings-page-app",
-      "automatic-setup-group",
       "settings-modal-title",
       "settings-close-button",
       "conversation-settings-summary-control",
@@ -233,19 +224,11 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       }
     }
     if (
-      platform === "ios" &&
-      (!combinedFlow.includes("chat-transcript-list") ||
-        !combinedFlow.includes("transcript-message-promo-assistant-2") ||
-        !combinedFlow.includes("settings-page-speaking"))
+      !combinedFlow.includes("chat-transcript-list") ||
+      !combinedFlow.includes("transcript-message-promo-assistant-2") ||
+      !combinedFlow.includes("settings-page-speaking")
     ) {
-      errors.push(
-        "iOS store screenshot flow is missing its Premium-only surfaces",
-      );
-    }
-    if (combinedFlow.includes("intro-close")) {
-      errors.push(
-        `${platform} store screenshot flow must reseed directly instead of closing onboarding`,
-      );
+      errors.push(`${platform} store screenshot flow is missing a BYOK story surface`);
     }
     if (
       platform === "ios" &&
@@ -254,11 +237,6 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     ) {
       errors.push(
         "iOS store screenshot flow must open the transcript before using message actions",
-      );
-    }
-    if (!/id:\s*\^app-settings-page-\$\{LOCALE\}\$/.test(combinedFlow)) {
-      errors.push(
-        `${platform} automatic-setup capture does not prove its localized Settings page`,
       );
     }
   }
@@ -277,14 +255,8 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
   if (!fixture.includes("Record<AppLanguage, StorePromoCopy>")) {
     errors.push("Store screenshot fixture copy is not exhaustive by locale");
   }
-  if (
-    !presentation.includes("applyStorePromoAutoSetupJob") ||
-    !presentation.includes('scene !== "onboarding"') ||
-    !presentation.includes('scene !== "onboarding-ready"')
-  ) {
-    errors.push(
-      "Store screenshot presentation does not own a guarded onboarding proposal",
-    );
+  if (!presentation.includes('STORE_PROMO_SCENES = ["conversation"]')) {
+    errors.push("Store screenshot presentation is not guarded to the BYOK scene");
   }
   if (
     !runner.includes('artifacts", "store-promos", platform') ||
@@ -310,13 +282,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     STORE_PROMO_ANDROID_FLOW_SCENES.length !==
       STORE_PROMO_FLOWS.android.length ||
     JSON.stringify(STORE_PROMO_ANDROID_FLOW_SCENES) !==
-      JSON.stringify([
-        "premium",
-        "free",
-        "onboarding",
-        "onboarding-ready",
-        "premium",
-      ])
+      JSON.stringify(["conversation", "conversation"])
   ) {
     errors.push(
       "Android store screenshot flows do not have deterministic scenes",

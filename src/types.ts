@@ -17,12 +17,7 @@ import {
   type WebSearchProviderSettings,
 } from "./constants/webSearch";
 import type { RuntimeAppProviderId } from "./constants/providers/runtimeManifest";
-import type {
-  LocalLlmModelId,
-  LocalSttModelId,
-  LocalTtsCatalogModelId,
-  LocalTtsModelId,
-} from "./constants/localModels";
+import type { LocalSttModelId, LocalTtsModelId } from "./constants/localModels";
 import type { SpeechLanguage, SttLanguage } from "./constants/speechLanguages";
 import { DEFAULT_KOKORO_VOICES } from "./constants/kokoro";
 import { DEFAULT_TTS_FALLBACK_POLICY } from "./constants/ttsFallback";
@@ -37,7 +32,7 @@ export type { AppLanguage } from "./i18n/localeRegistry";
 export type { SpeechLanguage, SttLanguage } from "./constants/speechLanguages";
 
 export type Provider = RuntimeAppProviderId;
-export type InputMode = "push-to-talk" | "toggle-to-talk" | "drive-session";
+export type InputMode = "push-to-talk" | "toggle-to-talk";
 export type ReplyPlayback = "stream" | "wait";
 export type TtsPlayback = ReplyPlayback;
 export type ThemeMode = "light" | "dark" | "system";
@@ -58,12 +53,6 @@ export interface TtsFallbackPolicy {
 }
 export type KokoroLanguage = "en" | "zh";
 export type KokoroVoiceSelections = Record<KokoroLanguage, string>;
-export interface FreeOfflineProfileOverrides {
-  quickLlmModelId?: LocalLlmModelId;
-  thoroughLlmModelId?: LocalLlmModelId | null;
-  sttModelId?: LocalSttModelId | null;
-  ttsModelId?: LocalTtsCatalogModelId | null;
-}
 export type ProviderCapability = "llm" | "stt" | "tts" | "search" | "voices";
 export type AssistantResponseLength = "brief" | "normal" | "thorough";
 export type AssistantResponseTone =
@@ -72,8 +61,6 @@ export interface ResponseModeRoute {
   provider: Provider;
   model: string;
   effort?: string;
-  runtime?: "provider" | "local";
-  localModelId?: LocalLlmModelId;
 }
 export interface ResponseModeConfig {
   id: ResponseMode;
@@ -171,18 +158,6 @@ export interface Settings {
   providerValidationResults: ProviderValidationResults;
   language: AppLanguage;
   theme: ThemeMode;
-  introDismissed: boolean;
-  /** Whether the introduction has ever been opened from the banner. */
-  introOpened: boolean;
-  /**
-   * Whether the introduction has been walked to its Done action once. Until
-   * then the flow keeps its first-run integrity: no close control, and the
-   * setup and test gates stay armed.
-   */
-  introCompleted: boolean;
-  freeOnboardingLanguageInitialized: boolean;
-  freeOfflineSetupCompleted: boolean;
-  freeOfflineProfileOverrides: FreeOfflineProfileOverrides;
   lastProvider: Provider;
   sttMode: SttBackendMode;
   nativeSttRequiresOnDevice: boolean;
@@ -323,6 +298,7 @@ export interface MessageReplyFailureMetadata {
 export interface MessageTurnReceiptRoute {
   provider: Provider | null;
   model: string;
+  /** `local` is read-only compatibility for receipts created before local response generation was retired. */
   runtime?: "provider" | "local";
   gateway?: string;
   upstreamProvider?: string;
@@ -479,12 +455,6 @@ export const DEFAULT_SETTINGS: Settings = {
   providerValidationResults: {},
   language: "en",
   theme: "system",
-  introDismissed: false,
-  introOpened: false,
-  introCompleted: false,
-  freeOnboardingLanguageInitialized: false,
-  freeOfflineSetupCompleted: false,
-  freeOfflineProfileOverrides: {},
   lastProvider: DEFAULT_RUNTIME_PROVIDER_ID,
   sttMode: "native",
   nativeSttRequiresOnDevice: false,

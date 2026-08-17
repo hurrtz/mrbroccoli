@@ -2,7 +2,6 @@ import React from "react";
 import {
   Pressable,
   StyleSheet,
-  Text,
   View,
   type StyleProp,
   type ViewStyle,
@@ -55,6 +54,7 @@ function getPhaseInk(phase: VoiceVisualPhase, colors: Colors): string {
 function getPhaseIcon(
   phase: VoiceVisualPhase,
   paused: boolean,
+  rtl: boolean,
 ): PhosphorIconName {
   if (phase === "speaking") {
     return paused ? "play" : "pause";
@@ -64,15 +64,15 @@ function getPhaseIcon(
     case "recording":
       return "stop";
     case "transcribing":
-      return "file-text";
+      return rtl ? "text-align-right" : "text-align-left";
     case "thinking-briefly":
-      return "thunderbolt";
+      return "brain";
     case "searching":
       return "global";
     case "thinking":
-      return "brain";
+      return "circuitry";
     case "synthesizing":
-      return "customer-service";
+      return "user-sound";
     default:
       return "mic";
   }
@@ -80,7 +80,6 @@ function getPhaseIcon(
 
 const BAND = 6;
 const CORE_GAP = 3;
-const TINT_ALPHA = 0.16;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 /** A UI-thread clock that continues between semantic pipeline updates. */
@@ -100,20 +99,6 @@ function clamp01(value: number | undefined): number {
   return Math.max(0, Math.min(1, value));
 }
 
-/** The design's 16% colour-mix tint, as an rgba of the phase ink. */
-function tintOf(hexColor: string): string {
-  const channels = hexColor
-    .slice(1)
-    .match(/.{2}/g)
-    ?.map((channel) => Number.parseInt(channel, 16));
-
-  if (!channels || channels.length < 3) {
-    return hexColor;
-  }
-
-  return `rgba(${channels[0]}, ${channels[1]}, ${channels[2]}, ${TINT_ALPHA})`;
-}
-
 function ProgressRing({
   centre,
   radius,
@@ -125,6 +110,7 @@ function ProgressRing({
   tailColor,
   tail,
   tailTiming,
+  paused = false,
 }: {
   centre: number;
   radius: number;
@@ -137,9 +123,10 @@ function ProgressRing({
   tailColor?: string;
   tail?: number;
   tailTiming?: VoiceOrbRingTiming;
+  paused?: boolean;
 }) {
   const circumference = 2 * Math.PI * radius;
-  const progressClock = useRingClock(progress, progressTiming);
+  const progressClock = useRingClock(progress, progressTiming, paused);
   const tailClock = useRingClock(tail, tailTiming);
   const progressVisibility = useRingVisibility(
     Boolean(tailColor && (tail || tailTiming)),
@@ -198,28 +185,48 @@ function ProgressRing({
 function useRingClock(
   value: number | undefined,
   timing: VoiceOrbRingTiming | undefined,
+  paused = false,
 ) {
   const clock = useSharedValue(clamp01(value));
+  const wasPausedRef = React.useRef(paused);
   const durationMs = timing?.durationMs;
   const delayMs = timing?.delayMs;
   const target = clamp01(timing?.target ?? 1);
 
   React.useEffect(() => {
     cancelAnimation(clock);
-    clock.value = clamp01(value);
-    if (durationMs === undefined || clock.value >= target) {
+    if (paused) {
+      wasPausedRef.current = true;
       return () => cancelAnimation(clock);
     }
 
+    const base = clamp01(value);
+    const resumed = wasPausedRef.current;
+    wasPausedRef.current = false;
+    if (!resumed) {
+      clock.value = base;
+    }
+    const current = clamp01(clock.value);
+    if (durationMs === undefined || current >= target) {
+      return () => cancelAnimation(clock);
+    }
+
+    const fullDistance = Math.max(0, target - base);
+    const remainingDistance = Math.max(0, target - current);
+    const remainingDurationMs =
+      resumed && fullDistance > 0
+        ? durationMs * (remainingDistance / fullDistance)
+        : durationMs;
+
     const animation = withTiming(target, {
-      duration: Math.max(0, Math.round(durationMs)),
+      duration: Math.max(0, Math.round(remainingDurationMs)),
       easing: Easing.linear,
     });
     clock.value = delayMs
       ? withDelay(Math.max(0, Math.round(delayMs)), animation)
       : animation;
     return () => cancelAnimation(clock);
-  }, [clock, delayMs, durationMs, target, value]);
+  }, [clock, delayMs, durationMs, paused, target, value]);
 
   return clock;
 }
@@ -251,14 +258,11 @@ function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
 }
 
 /**
- * The workspace's one loud element. Two concentric rings carry two different
- * clocks: the outer one is the whole turn against its estimate, the inner one
- * is the current phase against itself. Past the estimate both rings fill with
- * red as they run, so a late turn is legible without reading anything.
- *
- * Whenever both bands would carry exactly the same information, the orb draws
- * one continuous double-width band. That avoids a raster seam between two
- * adjacent strokes while preserving the same outer and inner boundaries.
+ * The workspace's one loud element. One continuous double-width ring carries
+ * the only progress estimate that matters: submission to first speech, then
+ * how much of the spoken reply has been read. Past the estimate it fills with
+ * red, so a late turn is legible without reading anything. A single stroke
+ * also avoids a raster seam between adjacent bands.
  */
 export function VoiceOrb({
   paused = false,
@@ -266,13 +270,11 @@ export function VoiceOrb({
   phaseProgress = 0,
   phaseProgressTiming,
   turnProgress = 0,
-  turnProgressTiming,
   overtime = 0,
   overtimeTiming,
   size = 196,
+  rtl = false,
   label,
-  coreLabel,
-  coreLabelColor,
   onPress,
   onPressIn,
   onPressOut,
@@ -284,28 +286,24 @@ export function VoiceOrb({
   paused?: boolean;
   /** Which pipeline phase the orb is showing. Defaults to idle. */
   phase?: VoiceVisualPhase;
-  /** 0–1 through the current phase. Drives the inner ring. */
+  /** 0–1 through the one active progress clock. */
   phaseProgress?: number;
-  /** UI-thread interpolation for the current phase ring. */
+  /** UI-thread interpolation for the one active progress clock. */
   phaseProgressTiming?: VoiceOrbRingTiming;
-  /** 0–1 through the whole turn against its estimate. Drives the outer ring. */
+  /** Legacy whole-turn value retained while callers move to phaseProgress. */
   turnProgress?: number;
-  /** UI-thread interpolation for the whole-turn ring. */
+  /** Legacy timing retained for caller compatibility. */
   turnProgressTiming?: VoiceOrbRingTiming;
-  /** 0–1 past the estimate. Above 0 both rings fill with red as the turn runs. */
+  /** 0–1 past the estimate. Above 0 the ring fills with red as the turn runs. */
   overtime?: number;
   /** UI-thread interpolation for the late-turn tail. */
   overtimeTiming?: VoiceOrbRingTiming;
   /** Diameter in points. The screen measures its space and passes it down. */
   size?: number;
+  /** Mirrors the transcribing glyph for right-to-left interface locales. */
+  rtl?: boolean;
   /** Accessible name, translated by the caller. */
   label: string;
-  /**
-   * Replaces the glyph in the core — the Drive Session silence countdown.
-   * Everything else shows the phase glyph.
-   */
-  coreLabel?: string;
-  coreLabelColor?: string;
   onPress?: () => void;
   onPressIn?: () => void;
   onPressOut?: () => void;
@@ -316,12 +314,8 @@ export function VoiceOrb({
   const { colors } = useTheme();
 
   const ink = getPhaseInk(phase, colors);
-  const tint = tintOf(ink);
   const foreground = getAccessibleForeground(ink);
   const late = clamp01(overtime);
-  // Recording and speaking read as one indicator; the middle phases keep two
-  // clocks (whole turn against its estimate, current phase against itself).
-  const combined = phase === "recording" || phase === "speaking";
   const quiet =
     phase === "idle" &&
     !clamp01(turnProgress) &&
@@ -329,16 +323,16 @@ export function VoiceOrb({
     !late;
 
   // The ring footprint keeps one screen-colour gap around the proportional
-  // core. Distinct clocks split it into two flush bands; a shared clock uses
-  // one double-width stroke over the exact same inner and outer boundaries.
+  // core. One double-width stroke covers the former inner and outer bounds
+  // without a raster seam between adjacent circles.
   const inner = size - BAND * 2;
   const innerHole = inner - BAND * 2;
-  const disc = Math.min(innerHole - CORE_GAP * 2, Math.floor(size * 0.79));
+  const disc = Math.min(innerHole - CORE_GAP * 2, Math.floor(size * 0.86));
   const iconSide = Math.round(size * 0.3);
   const centre = size / 2;
-  const turnRadius = (size - BAND) / 2;
-  const phaseRadius = (inner - BAND) / 2;
-  const combinedRadius = (turnRadius + phaseRadius) / 2;
+  const outerRadius = (size - BAND) / 2;
+  const innerRadius = (inner - BAND) / 2;
+  const combinedRadius = (outerRadius + innerRadius) / 2;
 
   return (
     <Pressable
@@ -365,51 +359,24 @@ export function VoiceOrb({
             cx={centre}
             cy={centre}
             r={combinedRadius}
-            stroke={tint}
+            stroke={colors.turnTrack}
             strokeWidth={BAND * 2}
             fill="none"
           />
-        ) : combined ? (
-          // Recording and speaking have one thing to say — how much of the
-          // window is used, how much of the response has been read — so both
-          // rings carry the same arc rather than two competing clocks.
+        ) : (
           <ProgressRing
             centre={centre}
             radius={combinedRadius}
             strokeWidth={BAND * 2}
-            trackColor={tint}
-            progressColor={ink}
+            trackColor={colors.turnTrack}
+            progressColor={colors.turnInk}
             progress={phaseProgress}
             progressTiming={phaseProgressTiming}
             tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
             tail={late}
             tailTiming={overtimeTiming}
+            paused={phase === "speaking" && paused}
           />
-        ) : (
-          <>
-            <ProgressRing
-              centre={centre}
-              radius={turnRadius}
-              trackColor={colors.turnTrack}
-              progressColor={colors.turnInk}
-              progress={turnProgress}
-              progressTiming={turnProgressTiming}
-              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
-              tail={late}
-              tailTiming={overtimeTiming}
-            />
-            <ProgressRing
-              centre={centre}
-              radius={phaseRadius}
-              trackColor={tint}
-              progressColor={ink}
-              progress={phaseProgress}
-              progressTiming={phaseProgressTiming}
-              tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
-              tail={late}
-              tailTiming={overtimeTiming}
-            />
-          </>
         )}
       </Svg>
       <View
@@ -436,26 +403,11 @@ export function VoiceOrb({
           ]}
           testID="voice-orb-core"
         >
-          {coreLabel ? (
-            <Text
-              style={[
-                styles.coreLabel,
-                {
-                  color: coreLabelColor ?? foreground,
-                  fontSize: Math.max(20, Math.round(iconSide * 0.6)),
-                },
-              ]}
-              testID="voice-orb-core-label"
-            >
-              {coreLabel}
-            </Text>
-          ) : (
-            <PhosphorIcon
-              color={foreground}
-              name={getPhaseIcon(phase, paused)}
-              visualSize={iconSide}
-            />
-          )}
+          <PhosphorIcon
+            color={foreground}
+            name={getPhaseIcon(phase, paused, rtl)}
+            visualSize={iconSide}
+          />
         </View>
       </View>
     </Pressable>
@@ -466,10 +418,5 @@ const styles = StyleSheet.create({
   centre: {
     alignItems: "center",
     justifyContent: "center",
-  },
-  coreLabel: {
-    fontVariant: ["tabular-nums"],
-    fontWeight: "600",
-    textAlign: "center",
   },
 });

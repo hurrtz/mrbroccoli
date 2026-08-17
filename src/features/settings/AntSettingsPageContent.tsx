@@ -68,23 +68,16 @@ export function AntSettingsPageContent({
     providerVoiceDirectories,
     settings,
   } = props;
-  const handleOpenPremium = React.useCallback(
-    () => props.onOpenPremium(activePage),
-    [activePage, props],
-  );
   const localModels = useLocalModelSettings({
     active:
       props.visible &&
-      (activePage === "thinking" ||
-        activePage === "listening" ||
+      (activePage === "listening" ||
         activePage === "speaking" ||
         activePage === "data"),
-    isPremium: props.isPremium,
     kokoroModel,
     onPreviewVoice: props.onPreviewVoice,
     onUpdate,
     settings,
-    storePromoPreview: props.storePromoLocalDevicePreview,
   });
 
   switch (activePage) {
@@ -92,9 +85,7 @@ export function AntSettingsPageContent({
       return (
         <AntSettingsOverview
           getProviderHealthState={validation.getHealthState}
-          isPremium={props.isPremium}
           onOpenPage={onOpenPage}
-          onOpenPremium={handleOpenPremium}
           readiness={getSettingsReadiness(settings, {
             llmProviders: PROVIDER_ORDER.filter(
               (provider) => PROVIDER_LLM_SUPPORT[provider] === "provider",
@@ -118,8 +109,6 @@ export function AntSettingsPageContent({
             settings={settings}
             focusProvider={focusProvider}
             focusCatalogProviderId={focusCatalogProviderId}
-            isPremium={props.isPremium}
-            onOpenPremium={handleOpenPremium}
             getProviderHealthState={validation.getHealthState}
             getProviderCapabilityHealthState={
               validation.getCapabilityHealthState
@@ -147,21 +136,11 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="thinking">
           <ThinkingSettingsPage
-            allLlmProviders={PROVIDER_ORDER.filter(
-              (provider) => PROVIDER_LLM_SUPPORT[provider] === "provider",
-            )}
-            isPremium={props.isPremium}
-            localModels={localModels}
             settings={settings}
-            llmProviders={
-              props.storePromoLocalDevicePreview
-                ? ["openai", "anthropic", "gemini"]
-                : validation.selectableLlmProviders
-            }
+            llmProviders={validation.selectableLlmProviders}
             onUpdate={onUpdate}
             onUpdateResponseModeRoute={onUpdateResponseModeRoute}
             onAddResponseMode={onAddResponseMode}
-            onOpenPremium={handleOpenPremium}
             onRemoveResponseMode={onRemoveResponseMode}
             onTextInputFocus={controller.handleTextInputFocus}
           />
@@ -171,12 +150,7 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="listening">
           <ListeningSettingsPage
-            allSttProviders={PROVIDER_ORDER.filter(
-              (provider) => PROVIDER_STT_SUPPORT[provider] === "provider",
-            )}
-            isPremium={props.isPremium}
             localModels={localModels}
-            onOpenPremium={handleOpenPremium}
             settings={settings}
             selectableSttProviders={validation.selectableSttProviders}
             selectedSttProviderModelOptions={
@@ -192,12 +166,7 @@ export function AntSettingsPageContent({
         <DrillInPage page="speaking">
           <SpeakingSettingsPage
             activePreview={controller.activePreview}
-            allTtsProviders={PROVIDER_ORDER.filter(
-              (provider) => PROVIDER_TTS_SUPPORT[provider] === "provider",
-            )}
-            isPremium={props.isPremium}
             localModels={localModels}
-            onOpenPremium={handleOpenPremium}
             settings={settings}
             selectableTtsProviders={validation.selectableTtsProviders}
             onUpdate={onUpdate}
@@ -215,9 +184,6 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="search">
           <SearchSettingsPage
-            allSearchProviders={WEB_SEARCH_PROVIDER_IDS}
-            isPremium={props.isPremium}
-            onOpenPremium={handleOpenPremium}
             settings={settings}
             searchProviders={validation.selectableSearchProviders}
             onUpdate={onUpdate}
@@ -228,13 +194,8 @@ export function AntSettingsPageContent({
       return (
         <DrillInPage page="app">
           <AppSettingsPage
-            autoSetup={props.autoSetup}
-            developmentEntitlementMode={props.developmentEntitlementMode}
             settings={settings}
             speechDiagnostics={controller.speechDiagnostics}
-            onSetDevelopmentEntitlementMode={
-              props.onSetDevelopmentEntitlementMode
-            }
             onUpdate={onUpdate}
           />
         </DrillInPage>
@@ -244,11 +205,9 @@ export function AntSettingsPageContent({
         <DrillInPage page="data">
           <DataPrivacySettingsPage
             archivedConversationCount={props.archivedConversationCount}
-            isPremium={props.isPremium}
             localModels={localModels}
             settings={settings}
             onUpdate={onUpdate}
-            onOpenPremium={handleOpenPremium}
             onOpenArchivedConversations={props.onOpenArchivedConversations}
             conversationArchive={props.conversationArchive}
             onCreateAppDataBackup={props.onCreateAppDataBackup}

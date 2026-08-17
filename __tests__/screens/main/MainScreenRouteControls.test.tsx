@@ -120,7 +120,7 @@ describe("MainScreenRouteControls", () => {
     expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
-  it("omits premium route controls when the caller hides Web Search", () => {
+  it("omits Web Search when the caller hides that route control", () => {
     const screen = render(
       <MainScreenRouteControls
         colors={lightColors}

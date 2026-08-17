@@ -8,11 +8,7 @@ import {
   PROVIDER_LABELS,
   PROVIDER_ORDER,
 } from "../../constants/models";
-import { IconButton } from "../../design-system/IconButton";
-import {
-  PhosphorIcon,
-  type PhosphorIconName,
-} from "../../design-system/PhosphorIcon";
+import type { PhosphorIconName } from "../../design-system/PhosphorIcon";
 import { useLocalization } from "../../i18n";
 import { APP_LANGUAGE_OPTIONS } from "../../i18n/localeRegistry";
 import { useTheme } from "../../theme/ThemeContext";
@@ -21,7 +17,6 @@ import type { Settings } from "../../types";
 import type { SettingsReadiness } from "../settings-core/readiness";
 import type { ProviderHealthState, SettingsPage } from "../settings-core/types";
 
-import { PremiumBand } from "./settings-primitives/PremiumBand";
 import {
   RuntimeReadiness,
   type ReadinessStep,
@@ -134,8 +129,6 @@ function getInputModeLabel(
       return t("pushToTalk");
     case "toggle-to-talk":
       return t("toggleToTalk");
-    case "drive-session":
-      return t("driveSession");
   }
 }
 
@@ -161,16 +154,9 @@ function displayVoiceName(voice: string | undefined) {
   return voice ? voice.charAt(0).toLocaleUpperCase() + voice.slice(1) : voice;
 }
 
-function getResponseModeLabel(settings: Settings, isPremium: boolean) {
-  const modes = isPremium
-    ? settings.responseModes
-    : settings.responseModes.filter((mode) => mode.route.runtime === "local");
-  return modes
-    .map(({ route }) =>
-      route.runtime === "local" && route.localModelId
-        ? getLocalModel(route.localModelId).name
-        : getProviderModelName(route.provider, route.model),
-    )
+function getResponseModeLabel(settings: Settings) {
+  return settings.responseModes
+    .map(({ route }) => getProviderModelName(route.provider, route.model))
     .filter(Boolean)
     .slice(0, 3)
     .join(" · ");
@@ -220,7 +206,6 @@ function getSpeakingRouteLabel(
 
 function getOverviewState({
   getProviderHealthState,
-  isPremium,
   page,
   settings,
   t,
@@ -228,16 +213,12 @@ function getOverviewState({
   getProviderHealthState: (
     provider: keyof Settings["apiKeys"],
   ) => ProviderHealthState;
-  isPremium: boolean;
   page: SettingsDetailPage;
   settings: Settings;
   t: ReturnType<typeof useLocalization>["t"];
 }) {
   switch (page) {
     case "connections": {
-      if (!isPremium) {
-        return t("premium");
-      }
       const configured = PROVIDER_ORDER.filter(
         (provider) => settings.apiKeys[provider]?.trim().length > 0,
       );
@@ -259,13 +240,8 @@ function getOverviewState({
       return [...named, ...(overflow > 0 ? [`+${overflow}`] : [])].join(" · ");
     }
     case "thinking":
-      return (
-        getResponseModeLabel(settings, isPremium) || t("providerStatusNotSetup")
-      );
+      return getResponseModeLabel(settings) || t("providerStatusNotSetup");
     case "search":
-      if (!isPremium) {
-        return t("premium");
-      }
       return settings.webSearchMode === "on" && settings.webSearchProvider
         ? `${PROVIDER_LABELS[settings.webSearchProvider]} · ${
             settings.webSearchProviderSettings[settings.webSearchProvider]
@@ -298,64 +274,22 @@ function getOverviewState({
 
 export function AntSettingsOverview({
   getProviderHealthState,
-  isPremium,
   onOpenPage,
-  onOpenPremium,
   readiness,
   settings,
 }: {
   getProviderHealthState: (
     provider: keyof Settings["apiKeys"],
   ) => ProviderHealthState;
-  isPremium: boolean;
   onOpenPage: (page: SettingsDetailPage) => void;
-  onOpenPremium: () => void;
   readiness: SettingsReadiness;
   settings: Settings;
 }) {
   const { colors } = useTheme();
   const { t } = useLocalization();
-  const [showPremiumCard, setShowPremiumCard] = React.useState(true);
 
   return (
     <View testID="settings-page-overview" style={localStyles.overview}>
-      {isPremium && showPremiumCard ? (
-        <View
-          testID="settings-edition-card"
-          style={[
-            localStyles.premiumCard,
-            {
-              backgroundColor: colors.premiumSoft,
-              borderColor: colors.premiumBorder,
-            },
-          ]}
-        >
-          <PhosphorIcon
-            name="check-circle"
-            size="prominent"
-            color={colors.premium}
-          />
-          <View style={localStyles.premiumCopy}>
-            <Text style={[localStyles.premiumTitle, { color: colors.text }]}>
-              {t("premiumUnlocked")}
-            </Text>
-            <Text
-              style={[
-                localStyles.premiumSupporting,
-                { color: colors.textSecondary },
-              ]}
-            >
-              {t("premiumDescription")}
-            </Text>
-          </View>
-          <IconButton
-            icon="close"
-            accessibilityLabel={t("dismiss")}
-            onPress={() => setShowPremiumCard(false)}
-          />
-        </View>
-      ) : null}
-
       <RuntimeReadiness
         onSelect={(step) => onOpenPage(READINESS_PAGE[step])}
         readiness={readiness}
@@ -376,7 +310,6 @@ export function AntSettingsOverview({
                 label={t(row.titleKey)}
                 supporting={getOverviewState({
                   getProviderHealthState,
-                  isPremium,
                   page,
                   settings,
                   t,
@@ -388,21 +321,6 @@ export function AntSettingsOverview({
           })}
         </SettingsGroup>
       ))}
-
-      {!isPremium ? (
-        <View
-          testID="settings-premium-upgrade"
-          style={[localStyles.bandClip, { borderColor: colors.premiumBorder }]}
-        >
-          <PremiumBand
-            actionLabel={t("upgradeToPremium")}
-            copy={t("premiumDescription")}
-            onPress={onOpenPremium}
-            premiumLabel={t("premium")}
-            testID="settings-premium-upgrade-band"
-          />
-        </View>
-      ) : null}
 
       <Text
         testID="settings-release-version"
@@ -419,36 +337,6 @@ export function AntSettingsOverview({
 const localStyles = StyleSheet.create({
   overview: {
     gap: 14,
-  },
-  premiumCard: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-  },
-  premiumCopy: {
-    flex: 1,
-    minWidth: 0,
-    paddingTop: 2,
-  },
-  premiumTitle: {
-    fontFamily: fonts.display,
-    fontSize: 16,
-    lineHeight: 22,
-  },
-  premiumSupporting: {
-    marginTop: 3,
-    fontFamily: fonts.body,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  bandClip: {
-    borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
-    overflow: "hidden",
   },
   releaseVersion: {
     paddingBottom: 4,

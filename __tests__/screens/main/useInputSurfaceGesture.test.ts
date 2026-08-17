@@ -1,4 +1,5 @@
 import {
+  resolveChevronTarget,
   resolveSwipeSurface,
   resolveSwipeTarget,
 } from "../../../src/screens/main/voiceTextInputPager/useInputSurfaceGesture";
@@ -68,5 +69,38 @@ describe("input surface swipe landing", () => {
     expect(target("voice", -10)).toBeCloseTo(0);
     expect(target("text", 10)).toBe(-PAGE_STRIDE);
     expect(target("text", -10)).toBe(-PAGE_STRIDE);
+  });
+});
+
+describe("input surface chevron landing", () => {
+  it("always lands from the side of the pressed chevron", () => {
+    expect(
+      resolveChevronTarget({
+        activeSurface: "voice",
+        direction: "right",
+        pageStride: PAGE_STRIDE,
+      }),
+    ).toBe(-PAGE_STRIDE);
+    expect(
+      resolveChevronTarget({
+        activeSurface: "text",
+        direction: "right",
+        pageStride: PAGE_STRIDE,
+      }),
+    ).toBe(-PAGE_STRIDE * 2);
+    expect(
+      resolveChevronTarget({
+        activeSurface: "voice",
+        direction: "left",
+        pageStride: PAGE_STRIDE,
+      }),
+    ).toBe(PAGE_STRIDE);
+    expect(
+      resolveChevronTarget({
+        activeSurface: "text",
+        direction: "left",
+        pageStride: PAGE_STRIDE,
+      }),
+    ).toBe(0);
   });
 });

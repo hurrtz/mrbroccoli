@@ -1,6 +1,6 @@
 /**
- * Copy for the orb-centred workspace: the route picker sheet, the status line,
- * the transcript handle, and the satellite labels under the orb. Shared here
+ * Copy for the orb-centred workspace: the route picker sheet, transcript
+ * handle, attachment popover, and satellite labels under the orb. Shared here
  * and spread into every locale so the nineteen dictionaries cannot drift.
  * Satellite labels sit under a 44pt control in a 64pt column — one or two
  * short words, never a sentence.
@@ -9,8 +9,12 @@ const en = {
   workspaceRoutePickerTitle: "Answer the next turn with",
   workspaceNoMessagesYet: "No messages yet",
   workspaceImageLabel: "Image",
+  workspaceImageCount: ({ count }: { count?: string | number }) =>
+    `${count} ${Number(count) === 1 ? "image" : "images"}`,
+  workspaceImagesEmpty: "No images in this conversation yet.",
   workspaceCouncilLabel: "Council",
   workspaceWebLabel: "Web",
+  handsFree: "Hands free",
   transportRestart: "Restart",
   transportBack: "Back",
   transportForward: "Forward",
@@ -18,14 +22,21 @@ const en = {
   workspaceHideTranscript: "Hide transcript",
   workspaceTranscriptTitle: "Transcript",
   conversationSettingsSummary: ({
+    handsFree,
     length,
     tone,
     voice,
   }: {
+    handsFree?: string | number;
     length?: string | number;
     tone?: string | number;
     voice?: string | number;
-  }) => `Length: ${length} · Tone: ${tone} · Voice: ${voice}`,
+  }) =>
+    withHandsFree(
+      handsFree,
+      `Hands free: ${handsFree}`,
+      `Length: ${length} · Tone: ${tone} · Voice: ${voice}`,
+    ),
   conversationDefaultsTitle: "Conversation defaults",
   conversationDefaultsDescription:
     "Used by new sessions and any session without its own overrides.",
@@ -45,22 +56,37 @@ const en = {
 type WorkspaceTranslations = typeof en;
 const define = (value: WorkspaceTranslations) => value;
 
+function withHandsFree(
+  handsFree: string | number | undefined,
+  enabledSummary: string,
+  settingsSummary: string,
+) {
+  return handsFree ? `${enabledSummary} · ${settingsSummary}` : settingsSummary;
+}
+
 export const workspaceTranslations = {
   en,
   ar: define({
     workspaceRoutePickerTitle: "الإجابة على الدور التالي بواسطة",
     workspaceNoMessagesYet: "لا رسائل بعد",
     workspaceImageLabel: "صورة",
+    workspaceImageCount: ({ count }) => `${count} صور`,
+    workspaceImagesEmpty: "لم تتم إضافة صور",
     workspaceCouncilLabel: "المجلس",
     workspaceWebLabel: "ويب",
+    handsFree: "بدون استخدام اليدين",
     transportRestart: "إعادة",
     transportBack: "رجوع",
     transportForward: "تقدّم",
     transportResume: "استئناف",
     workspaceHideTranscript: "إخفاء النص",
     workspaceTranscriptTitle: "النص",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `الطول: ${length} · النبرة: ${tone} · الصوت: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `بدون استخدام اليدين: ${handsFree}`,
+        `الطول: ${length} · النبرة: ${tone} · الصوت: ${voice}`,
+      ),
     conversationDefaultsTitle: "الإعدادات الافتراضية للمحادثة",
     conversationDefaultsDescription:
       "تُستخدم للجلسات الجديدة وأي جلسة بلا إعدادات خاصة بها.",
@@ -79,16 +105,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Na další tah odpoví",
     workspaceNoMessagesYet: "Zatím žádné zprávy",
     workspaceImageLabel: "Obrázek",
+    workspaceImageCount: ({ count }) => `${count} obrázky`,
+    workspaceImagesEmpty: "Nebyly přidány žádné obrázky",
     workspaceCouncilLabel: "Rada",
     workspaceWebLabel: "Web",
+    handsFree: "Bez rukou",
     transportRestart: "Znovu",
     transportBack: "Zpět",
     transportForward: "Vpřed",
     transportResume: "Pokračovat",
     workspaceHideTranscript: "Skrýt přepis",
     workspaceTranscriptTitle: "Přepis",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Délka: ${length} · Tón: ${tone} · Hlas: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Bez rukou: ${handsFree}`,
+        `Délka: ${length} · Tón: ${tone} · Hlas: ${voice}`,
+      ),
     conversationDefaultsTitle: "Výchozí nastavení konverzace",
     conversationDefaultsDescription:
       "Použije se pro nové relace a relace bez vlastních nastavení.",
@@ -107,16 +140,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Die nächste Runde beantwortet",
     workspaceNoMessagesYet: "Noch keine Nachrichten",
     workspaceImageLabel: "Bild",
+    workspaceImageCount: ({ count }) => `${count} Bilder`,
+    workspaceImagesEmpty: "Keine Bilder hinzugefügt",
     workspaceCouncilLabel: "Rat",
     workspaceWebLabel: "Web",
+    handsFree: "Freihändig",
     transportRestart: "Neu",
     transportBack: "Zurück",
     transportForward: "Vor",
     transportResume: "Weiter",
     workspaceHideTranscript: "Transkript ausblenden",
     workspaceTranscriptTitle: "Transkript",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Länge: ${length} · Ton: ${tone} · Stimme: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Freihändig: ${handsFree}`,
+        `Länge: ${length} · Ton: ${tone} · Stimme: ${voice}`,
+      ),
     conversationDefaultsTitle: "Standardeinstellungen für Gespräche",
     conversationDefaultsDescription:
       "Werden für neue Sitzungen und Sitzungen ohne eigene Anpassungen verwendet.",
@@ -135,16 +175,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Responder el próximo turno con",
     workspaceNoMessagesYet: "Aún no hay mensajes",
     workspaceImageLabel: "Imagen",
+    workspaceImageCount: ({ count }) => `${count} imágenes`,
+    workspaceImagesEmpty: "No se añadieron imágenes",
     workspaceCouncilLabel: "Consejo",
     workspaceWebLabel: "Web",
+    handsFree: "Manos libres",
     transportRestart: "Reiniciar",
     transportBack: "Atrás",
     transportForward: "Adelante",
     transportResume: "Reanudar",
     workspaceHideTranscript: "Ocultar transcripción",
     workspaceTranscriptTitle: "Transcripción",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Longitud: ${length} · Tono: ${tone} · Voz: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Manos libres: ${handsFree}`,
+        `Longitud: ${length} · Tono: ${tone} · Voz: ${voice}`,
+      ),
     conversationDefaultsTitle: "Ajustes predeterminados de conversación",
     conversationDefaultsDescription:
       "Se usan en sesiones nuevas y en sesiones sin ajustes propios.",
@@ -163,16 +210,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Répondre au prochain tour avec",
     workspaceNoMessagesYet: "Pas encore de messages",
     workspaceImageLabel: "Image",
+    workspaceImageCount: ({ count }) => `${count} images`,
+    workspaceImagesEmpty: "Aucune image ajoutée",
     workspaceCouncilLabel: "Conseil",
     workspaceWebLabel: "Web",
+    handsFree: "Mains libres",
     transportRestart: "Reprendre",
     transportBack: "Retour",
     transportForward: "Avancer",
     transportResume: "Continuer",
     workspaceHideTranscript: "Masquer la transcription",
     workspaceTranscriptTitle: "Transcription",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Longueur: ${length} · Ton: ${tone} · Voix: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Mains libres : ${handsFree}`,
+        `Longueur : ${length} · Ton : ${tone} · Voix : ${voice}`,
+      ),
     conversationDefaultsTitle: "Réglages de conversation par défaut",
     conversationDefaultsDescription:
       "Utilisés pour les nouvelles sessions et celles sans réglages spécifiques.",
@@ -191,16 +245,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "अगली बारी का जवाब देगा",
     workspaceNoMessagesYet: "अभी कोई संदेश नहीं",
     workspaceImageLabel: "छवि",
+    workspaceImageCount: ({ count }) => `${count} चित्र`,
+    workspaceImagesEmpty: "कोई चित्र नहीं जोड़ा गया",
     workspaceCouncilLabel: "परिषद",
     workspaceWebLabel: "वेब",
+    handsFree: "हैंड्स-फ़्री",
     transportRestart: "फिर से",
     transportBack: "पीछे",
     transportForward: "आगे",
     transportResume: "जारी",
     workspaceHideTranscript: "प्रतिलेख छिपाएँ",
     workspaceTranscriptTitle: "प्रतिलेख",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `लंबाई: ${length} · लहजा: ${tone} · आवाज़: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `हैंड्स-फ़्री: ${handsFree}`,
+        `लंबाई: ${length} · लहजा: ${tone} · आवाज़: ${voice}`,
+      ),
     conversationDefaultsTitle: "बातचीत की डिफ़ॉल्ट सेटिंग",
     conversationDefaultsDescription:
       "नए सत्रों और बिना अलग सेटिंग वाले सत्रों में इस्तेमाल होती हैं।",
@@ -219,16 +280,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "A következő kört válaszolja",
     workspaceNoMessagesYet: "Még nincs üzenet",
     workspaceImageLabel: "Kép",
+    workspaceImageCount: ({ count }) => `${count} kép`,
+    workspaceImagesEmpty: "Nincs hozzáadott kép",
     workspaceCouncilLabel: "Tanács",
     workspaceWebLabel: "Web",
+    handsFree: "Kihangosítás",
     transportRestart: "Újra",
     transportBack: "Vissza",
     transportForward: "Előre",
     transportResume: "Folytatás",
     workspaceHideTranscript: "Átirat elrejtése",
     workspaceTranscriptTitle: "Átirat",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Hossz: ${length} · Hangnem: ${tone} · Hang: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Kihangosítás: ${handsFree}`,
+        `Hossz: ${length} · Hangnem: ${tone} · Hang: ${voice}`,
+      ),
     conversationDefaultsTitle: "Alapértelmezett beszélgetési beállítások",
     conversationDefaultsDescription:
       "Új munkamenetekhez és saját beállítás nélküli munkamenetekhez használjuk.",
@@ -247,16 +315,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Risponde al prossimo turno",
     workspaceNoMessagesYet: "Ancora nessun messaggio",
     workspaceImageLabel: "Immagine",
+    workspaceImageCount: ({ count }) => `${count} immagini`,
+    workspaceImagesEmpty: "Nessuna immagine aggiunta",
     workspaceCouncilLabel: "Consiglio",
     workspaceWebLabel: "Web",
+    handsFree: "Vivavoce",
     transportRestart: "Riavvia",
     transportBack: "Indietro",
     transportForward: "Avanti",
     transportResume: "Riprendi",
     workspaceHideTranscript: "Nascondi trascrizione",
     workspaceTranscriptTitle: "Trascrizione",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Lunghezza: ${length} · Tono: ${tone} · Voce: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Vivavoce: ${handsFree}`,
+        `Lunghezza: ${length} · Tono: ${tone} · Voce: ${voice}`,
+      ),
     conversationDefaultsTitle: "Impostazioni predefinite della conversazione",
     conversationDefaultsDescription:
       "Usate per le nuove sessioni e per quelle senza personalizzazioni.",
@@ -275,16 +350,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "次のターンに答えるのは",
     workspaceNoMessagesYet: "まだメッセージはありません",
     workspaceImageLabel: "画像",
+    workspaceImageCount: ({ count }) => `画像${count}枚`,
+    workspaceImagesEmpty: "画像は追加されていません",
     workspaceCouncilLabel: "評議会",
     workspaceWebLabel: "ウェブ",
+    handsFree: "ハンズフリー",
     transportRestart: "最初から",
     transportBack: "戻る",
     transportForward: "進む",
     transportResume: "再開",
     workspaceHideTranscript: "トランスクリプトを隠す",
     workspaceTranscriptTitle: "トランスクリプト",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `長さ: ${length} · トーン: ${tone} · 音声: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `ハンズフリー: ${handsFree}`,
+        `長さ: ${length} · トーン: ${tone} · 音声: ${voice}`,
+      ),
     conversationDefaultsTitle: "会話のデフォルト設定",
     conversationDefaultsDescription:
       "新しいセッションと個別設定のないセッションで使用されます。",
@@ -303,16 +385,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Na następną turę odpowie",
     workspaceNoMessagesYet: "Brak wiadomości",
     workspaceImageLabel: "Obraz",
+    workspaceImageCount: ({ count }) => `${count} obrazy`,
+    workspaceImagesEmpty: "Nie dodano obrazów",
     workspaceCouncilLabel: "Rada",
     workspaceWebLabel: "Sieć",
+    handsFree: "Bez użycia rąk",
     transportRestart: "Od nowa",
     transportBack: "Wstecz",
     transportForward: "Dalej",
     transportResume: "Wznów",
     workspaceHideTranscript: "Ukryj transkrypcję",
     workspaceTranscriptTitle: "Transkrypcja",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Długość: ${length} · Ton: ${tone} · Głos: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Bez użycia rąk: ${handsFree}`,
+        `Długość: ${length} · Ton: ${tone} · Głos: ${voice}`,
+      ),
     conversationDefaultsTitle: "Domyślne ustawienia rozmowy",
     conversationDefaultsDescription:
       "Używane w nowych sesjach i sesjach bez własnych ustawień.",
@@ -331,16 +420,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Responder ao próximo turno com",
     workspaceNoMessagesYet: "Ainda sem mensagens",
     workspaceImageLabel: "Imagem",
+    workspaceImageCount: ({ count }) => `${count} imagens`,
+    workspaceImagesEmpty: "Nenhuma imagem adicionada",
     workspaceCouncilLabel: "Conselho",
     workspaceWebLabel: "Web",
+    handsFree: "Mãos livres",
     transportRestart: "Reiniciar",
     transportBack: "Voltar",
     transportForward: "Avançar",
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
     workspaceTranscriptTitle: "Transcrição",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Mãos livres: ${handsFree}`,
+        `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+      ),
     conversationDefaultsTitle: "Predefinições da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -359,16 +455,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Responder o próximo turno com",
     workspaceNoMessagesYet: "Ainda sem mensagens",
     workspaceImageLabel: "Imagem",
+    workspaceImageCount: ({ count }) => `${count} imagens`,
+    workspaceImagesEmpty: "Nenhuma imagem adicionada",
     workspaceCouncilLabel: "Conselho",
     workspaceWebLabel: "Web",
+    handsFree: "Mãos livres",
     transportRestart: "Reiniciar",
     transportBack: "Voltar",
     transportForward: "Avançar",
     transportResume: "Retomar",
     workspaceHideTranscript: "Ocultar transcrição",
     workspaceTranscriptTitle: "Transcrição",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Mãos livres: ${handsFree}`,
+        `Comprimento: ${length} · Tom: ${tone} · Voz: ${voice}`,
+      ),
     conversationDefaultsTitle: "Configurações padrão da conversa",
     conversationDefaultsDescription:
       "Usadas em novas sessões e em sessões sem ajustes próprios.",
@@ -387,16 +490,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "На следующий ход ответит",
     workspaceNoMessagesYet: "Сообщений пока нет",
     workspaceImageLabel: "Фото",
+    workspaceImageCount: ({ count }) => `${count} фото`,
+    workspaceImagesEmpty: "Изображения не добавлены",
     workspaceCouncilLabel: "Совет",
     workspaceWebLabel: "Веб",
+    handsFree: "Без рук",
     transportRestart: "Сначала",
     transportBack: "Назад",
     transportForward: "Вперёд",
     transportResume: "Продолжить",
     workspaceHideTranscript: "Скрыть расшифровку",
     workspaceTranscriptTitle: "Стенограмма",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Длина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Без рук: ${handsFree}`,
+        `Длина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+      ),
     conversationDefaultsTitle: "Настройки разговора по умолчанию",
     conversationDefaultsDescription:
       "Используются для новых сеансов и сеансов без собственных настроек.",
@@ -415,16 +525,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Nästa tur besvaras av",
     workspaceNoMessagesYet: "Inga meddelanden än",
     workspaceImageLabel: "Bild",
+    workspaceImageCount: ({ count }) => `${count} bilder`,
+    workspaceImagesEmpty: "Inga bilder tillagda",
     workspaceCouncilLabel: "Råd",
     workspaceWebLabel: "Webb",
+    handsFree: "Handsfree",
     transportRestart: "Börja om",
     transportBack: "Bakåt",
     transportForward: "Framåt",
     transportResume: "Fortsätt",
     workspaceHideTranscript: "Dölj transkription",
     workspaceTranscriptTitle: "Transkription",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Längd: ${length} · Ton: ${tone} · Röst: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Handsfree: ${handsFree}`,
+        `Längd: ${length} · Ton: ${tone} · Röst: ${voice}`,
+      ),
     conversationDefaultsTitle: "Standardinställningar för samtal",
     conversationDefaultsDescription:
       "Används för nya sessioner och sessioner utan egna inställningar.",
@@ -443,16 +560,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "Bir sonraki turu yanıtlayacak",
     workspaceNoMessagesYet: "Henüz mesaj yok",
     workspaceImageLabel: "Görsel",
+    workspaceImageCount: ({ count }) => `${count} görsel`,
+    workspaceImagesEmpty: "Görsel eklenmedi",
     workspaceCouncilLabel: "Konsey",
     workspaceWebLabel: "Web",
+    handsFree: "Eller serbest",
     transportRestart: "Baştan",
     transportBack: "Geri",
     transportForward: "İleri",
     transportResume: "Sürdür",
     workspaceHideTranscript: "Dökümü gizle",
     workspaceTranscriptTitle: "Döküm",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Uzunluk: ${length} · Ton: ${tone} · Ses: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Eller serbest: ${handsFree}`,
+        `Uzunluk: ${length} · Ton: ${tone} · Ses: ${voice}`,
+      ),
     conversationDefaultsTitle: "Varsayılan konuşma ayarları",
     conversationDefaultsDescription:
       "Yeni oturumlarda ve kendi ayarları olmayan oturumlarda kullanılır.",
@@ -471,16 +595,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "На наступний хід відповість",
     workspaceNoMessagesYet: "Повідомлень ще немає",
     workspaceImageLabel: "Фото",
+    workspaceImageCount: ({ count }) => `${count} фото`,
+    workspaceImagesEmpty: "Зображення не додано",
     workspaceCouncilLabel: "Рада",
     workspaceWebLabel: "Веб",
+    handsFree: "Без рук",
     transportRestart: "Спочатку",
     transportBack: "Назад",
     transportForward: "Вперед",
     transportResume: "Далі",
     workspaceHideTranscript: "Сховати розшифровку",
     workspaceTranscriptTitle: "Стенограма",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `Довжина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `Без рук: ${handsFree}`,
+        `Довжина: ${length} · Тон: ${tone} · Голос: ${voice}`,
+      ),
     conversationDefaultsTitle: "Стандартні налаштування розмови",
     conversationDefaultsDescription:
       "Використовуються для нових сеансів і сеансів без власних налаштувань.",
@@ -499,16 +630,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "اگلی باری کا جواب دے گا",
     workspaceNoMessagesYet: "ابھی کوئی پیغام نہیں",
     workspaceImageLabel: "تصویر",
+    workspaceImageCount: ({ count }) => `${count} تصاویر`,
+    workspaceImagesEmpty: "کوئی تصویر شامل نہیں کی گئی",
     workspaceCouncilLabel: "کونسل",
     workspaceWebLabel: "ویب",
+    handsFree: "ہینڈز فری",
     transportRestart: "دوبارہ",
     transportBack: "پیچھے",
     transportForward: "آگے",
     transportResume: "جاری",
     workspaceHideTranscript: "نقل چھپائیں",
     workspaceTranscriptTitle: "نقل",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `لمبائی: ${length} · لہجہ: ${tone} · آواز: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `ہینڈز فری: ${handsFree}`,
+        `لمبائی: ${length} · لہجہ: ${tone} · آواز: ${voice}`,
+      ),
     conversationDefaultsTitle: "گفتگو کی طے شدہ ترتیبات",
     conversationDefaultsDescription:
       "نئے سیشنز اور اپنی الگ ترتیبات کے بغیر سیشنز میں استعمال ہوتی ہیں۔",
@@ -527,16 +665,23 @@ export const workspaceTranslations = {
     workspaceRoutePickerTitle: "下一轮由谁来回答",
     workspaceNoMessagesYet: "暂无消息",
     workspaceImageLabel: "图片",
+    workspaceImageCount: ({ count }) => `${count} 张图片`,
+    workspaceImagesEmpty: "尚未添加图片",
     workspaceCouncilLabel: "评议会",
     workspaceWebLabel: "网络",
+    handsFree: "免提",
     transportRestart: "重新播放",
     transportBack: "后退",
     transportForward: "前进",
     transportResume: "继续",
     workspaceHideTranscript: "隐藏文字记录",
     workspaceTranscriptTitle: "文字记录",
-    conversationSettingsSummary: ({ length, tone, voice }) =>
-      `长度: ${length} · 语气: ${tone} · 语音: ${voice}`,
+    conversationSettingsSummary: ({ handsFree, length, tone, voice }) =>
+      withHandsFree(
+        handsFree,
+        `免提: ${handsFree}`,
+        `长度: ${length} · 语气: ${tone} · 语音: ${voice}`,
+      ),
     conversationDefaultsTitle: "对话默认设置",
     conversationDefaultsDescription: "用于新会话以及没有单独设置的会话。",
     useConversationDefaults: "使用对话默认设置",

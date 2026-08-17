@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { PROVIDER_DEFAULT_STT_MODELS } from "../../constants/models";
 import { setBackgroundVoiceTurnActive } from "../../services/backgroundVoiceTurn";
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
@@ -43,6 +43,7 @@ export function useVoiceSessionController({
   ttsProvider,
   stopReplay,
 }: UseVoiceSessionControllerParams) {
+  const handsFreeEnabledRef = useRef(false);
   const playbackCanPause =
     Boolean(player.isActivelyPlaying) || player.isPlaying;
   const { cancelCurrentInteraction, resetPipelineState } =
@@ -85,9 +86,8 @@ export function useVoiceSessionController({
     startVoiceCapture,
     stopVoiceCapture,
   } = useVoiceCaptureLifecycle({
-    allowBackgroundStart:
-      settings.inputMode === "drive-session" &&
-      settings.sttMode === "provider",
+    allowBackgroundStart: () =>
+      handsFreeEnabledRef.current && settings.sttMode === "provider",
     isRecording,
     maxRecordingMs,
     nativeStt,
@@ -136,8 +136,7 @@ export function useVoiceSessionController({
     isBusy,
     isRecording,
     ambientInputMetering: recorder.ambientInputMetering,
-    ambientInputMeteringSampleId:
-      recorder.ambientInputMeteringSampleId,
+    ambientInputMeteringSampleId: recorder.ambientInputMeteringSampleId,
     ambientMonitoring: recorder.ambientMonitoring ?? false,
     audioRoute: recorder.audioRoute,
     inputMetering:
@@ -153,7 +152,6 @@ export function useVoiceSessionController({
     playReplyText,
     player,
     replayPhase,
-    settings,
     showToast,
     startAmbientMonitoring: recorder.startAmbientMonitoring,
     startVoiceCapture: startVoiceCaptureAfterAmbientStop,
@@ -163,36 +161,31 @@ export function useVoiceSessionController({
     t,
   });
   const {
-    engage: engageDriveSession,
-    handleStop: stopDriveSession,
+    requestNextTurn,
     reset: resetDriveSession,
-    suspend: suspendDriveSession,
+    toggle: toggleHandsFree,
   } = driveSession;
+  handsFreeEnabledRef.current =
+    driveSession.autoContinueEnabled && driveSession.engaged;
   const { handleTogglePress: handleStandardTogglePress } =
     standardPressHandlers;
   const stopAmbientMonitoring = recorder.stopAmbientMonitoring;
   const stopPlayback = player.stopPlayback;
   useVoiceRemoteControls({
     canRepeat: driveSession.canRepeat,
-    driveActive:
-      driveSession.autoContinueEnabled && driveSession.engaged,
-    driveEnabled:
-      driveSession.autoContinueEnabled && driveSession.engaged,
+    handsFreeEnabled: driveSession.autoContinueEnabled,
     isRecording,
-    onContinueDrive: driveSession.handleContinue,
-    onPauseDrive: driveSession.handleStop,
     onRepeat: driveSession.handleRepeat,
     onStopRecording: stopVoiceCapture,
+    onToggleHandsFree: toggleHandsFree,
     player,
     t,
   });
   useVoiceSessionKeepAwake(
-    isRecording ||
-      (driveSession.autoContinueEnabled && driveSession.engaged),
+    isRecording || (driveSession.autoContinueEnabled && driveSession.engaged),
   );
 
   const allowBackgroundDriveSession =
-    settings.inputMode === "drive-session" &&
     settings.sttMode === "provider" &&
     driveSession.autoContinueEnabled &&
     driveSession.engaged;
@@ -247,35 +240,7 @@ export function useVoiceSessionController({
     recorder.clearLastError();
   }, [recorder, showToast]);
 
-  const handleTogglePress = useCallback(
-    async () => {
-      if (settings.inputMode === "drive-session") {
-        const playbackActive =
-          playbackCanPause ||
-          player.isPlaybackPaused ||
-          player.isPlaying;
-
-        if (!isRecording && isBusy && !playbackActive) {
-          suspendDriveSession();
-        } else if (!isRecording && !isBusy && !playbackActive) {
-          engageDriveSession();
-        }
-      }
-
-      await handleStandardTogglePress();
-    },
-    [
-      engageDriveSession,
-      handleStandardTogglePress,
-      isBusy,
-      isRecording,
-      playbackCanPause,
-      player.isPlaybackPaused,
-      player.isPlaying,
-      settings.inputMode,
-      suspendDriveSession,
-    ],
-  );
+  const handleTogglePress = handleStandardTogglePress;
 
   const handleStopPlayback = useCallback(async () => {
     recordDebugLogEvent({
@@ -287,19 +252,21 @@ export function useVoiceSessionController({
       },
     });
 
-    if (settings.inputMode === "drive-session") {
-      stopDriveSession();
-    }
+    await stopAmbientMonitoring?.().catch(() => undefined);
+    await cancelVoiceCapture().catch(() => undefined);
     if (replayPhase !== "idle") {
       await stopReplay().catch(() => undefined);
     }
     await cancelCurrentInteraction();
+    requestNextTurn();
   }, [
+    cancelVoiceCapture,
     cancelCurrentInteraction,
     player.isPlaybackPaused,
     replayPhase,
+    requestNextTurn,
     settings.inputMode,
-    stopDriveSession,
+    stopAmbientMonitoring,
     stopReplay,
   ]);
 
@@ -372,18 +339,14 @@ export function useVoiceSessionController({
   ]);
 
   return {
-    driveAutoContinueEnabled: driveSession.autoContinueEnabled,
-    driveSessionCanRepeat: driveSession.canRepeat,
-    driveSilenceCountdownSeconds:
-      driveSession.silenceCountdownSeconds,
-    driveVoiceActive: driveSession.voiceActive,
-    handleContinueDriveSession: driveSession.handleContinue,
+    handsFreeEnabled: driveSession.autoContinueEnabled,
+    handsFreeSilenceCountdownSeconds: driveSession.silenceCountdownSeconds,
+    handsFreeVoiceActive: driveSession.voiceActive,
     handlePressIn: standardPressHandlers.handlePressIn,
     handlePressOut: standardPressHandlers.handlePressOut,
-    handleRepeatDriveReply: driveSession.handleRepeat,
     handleStopPlayback,
     handleInterruptPlayback,
-    handleStopDriveSession: driveSession.handleStop,
+    handleToggleHandsFree: toggleHandsFree,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,

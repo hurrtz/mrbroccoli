@@ -49,6 +49,10 @@ initial default, but must not permanently couple those settings.
 - Large shared features may define a typed translation module and spread it
   into every locale. This keeps a feature's copy reviewable without weakening
   dictionary completeness.
+- `workspaceTranslations.ts` owns the route header, orb satellite and
+  transport labels, attachment-popover copy, and the conversation-settings
+  sentence. That sentence prefixes the localized Hands free state only while
+  the session loop is enabled; otherwise it remains Length / Tone / Voice.
 - Interpolation placeholders and plural/select shapes must remain consistent
   across locales.
 - Product spelling remains “Mr Broccoli” in every locale unless a deliberate
@@ -58,13 +62,8 @@ initial default, but must not permanently couple those settings.
   script-specific punctuation over a literal rendering of English structure.
 - Provider and model brand names are not translated unless the brand supplies
   a localized name.
-- Copy that names an app store must name only the current platform's store
-  (App Store on iOS, Play Store on Android) via a literal
-  `Platform.select({ ios, default })` in the dictionary, never a helper
-  wrapper. App Review guideline 2.3.10 rejects iOS binaries containing Google
-  Play references, and platform shaking only strips the other platform's
-  string from the release bundle when the call is literal. Guarded by
-  `__tests__/i18n/premiumRestoreHint.test.ts`.
+- Runtime copy does not describe store purchasing. Paid-app pricing and
+  ownership belong to App Store and Google Play metadata, not in-app strings.
 
 ## Direction and Layout
 

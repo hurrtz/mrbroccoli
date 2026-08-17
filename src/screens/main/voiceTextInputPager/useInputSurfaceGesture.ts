@@ -61,6 +61,24 @@ export function resolveSwipeTarget({
   return base + (projectedTranslation > 0 ? pageStride : -pageStride);
 }
 
+/**
+ * A chevron owns the side the next surface enters from. The target may sit one
+ * cycle beyond that surface's canonical position; the page-wrap transforms
+ * already draw the incoming surface on that side of the viewport.
+ */
+export function resolveChevronTarget({
+  activeSurface,
+  direction,
+  pageStride,
+}: {
+  activeSurface: InputSurface;
+  direction: "left" | "right";
+  pageStride: number;
+}): number {
+  const base = -SURFACE_INDEX[activeSurface] * pageStride;
+  return base + (direction === "left" ? pageStride : -pageStride);
+}
+
 interface UseInputSurfaceGestureParams {
   activeSurface: InputSurface;
   applySurface: (surface: InputSurface, focusText: boolean) => void;
@@ -83,11 +101,16 @@ export function useInputSurfaceGesture({
   );
 
   const selectSurface = React.useCallback(
-    (surface: InputSurface) => {
-      const targetX = -SURFACE_INDEX[surface] * pageStride;
+    (direction: "left" | "right") => {
+      const surface = activeSurface === "voice" ? "text" : "voice";
+      const targetX = resolveChevronTarget({
+        activeSurface,
+        direction,
+        pageStride,
+      });
       if (reducedMotion) {
         trackTranslateX.value = targetX;
-        applySurface(surface, surface === "text");
+        applySurface(surface, false);
         return;
       }
 
@@ -96,12 +119,18 @@ export function useInputSurfaceGesture({
         { duration: 220 },
         (finished) => {
           if (finished) {
-            runOnJS(applySurface)(surface, surface === "text");
+            runOnJS(applySurface)(surface, false);
           }
         },
       );
     },
-    [applySurface, pageStride, reducedMotion, trackTranslateX],
+    [
+      activeSurface,
+      applySurface,
+      pageStride,
+      reducedMotion,
+      trackTranslateX,
+    ],
   );
 
   React.useEffect(() => {

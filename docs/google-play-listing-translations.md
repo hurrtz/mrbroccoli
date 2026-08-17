@@ -1,69 +1,105 @@
 # Google Play listing translations
 
-The product name remains **Mr Broccoli** in every store locale. Each field is
-inside its own plain-text block for clean copy and paste into Google Play
-Console.
+Store listing copy for every registered locale. Paired with
+`app-store-listing-translations.md`, which carries the same descriptions plus
+the Apple-only fields.
+
+The heading tag is the Google Play listing language code.
+
+> **Positioning.** Mr Broccoli is a bring-your-own-key app for people who
+> already hold provider accounts. Optional local speech recognition and voices
+> are real secondary routes, but response generation is BYOK-only. Lead with
+> the keys and never imply that the app includes AI usage.
+>
+> **Rules for editing this file.**
+>
+> - Never state a price. The stores render it themselves and it goes stale;
+>   Google Play also restricts price and promotional text in listing assets.
+> - Never claim a ranking, award or superiority, and never present AI output as
+>   medical, legal or financial advice.
+> - Say plainly that the purchase does not include AI usage. This is what stops
+>   one-star reviews from buyers who expected included inference.
+> - Feature names must match the shipped UI for that language, not the English.
+>   `Drive Session`, `Council` and `API key` are translated in
+>   `src/i18n/locales/` and `src/i18n/workspaceTranslations.ts`; look them up
+>   before writing copy for a language rather than translating from English.
+> - Keep the locale set and its order identical to the preceding file.
+> - The heading tag is the folder name the export step uses. Correcting a store
+>   locale code is an edit here, not a code change.
+> - Run `npm run listing:verify` after editing.
+> - Non-English copy has not been reviewed by native speakers.
+
+| Field | Limit |
+| --- | --- |
+| Short description | 80 characters |
+| Full description | 4000 characters |
 
 ## English (`en-US`)
 
 ### Short description
 
 ```text
-Quality-first AI by voice or text, with the models and providers you choose.
+Voice-first AI for your own API keys. Choose the model. Hear the answer.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli is a voice-first AI client for people who care more about the quality of an answer than how quickly it arrives.
+Mr Broccoli is a voice-first AI app for people who already have their own provider accounts. Add your keys, choose exactly which model answers, and listen to the reply. Nothing routes through a server of ours, because there isn't one.
 
-QUALITY OVER SPEED — EVEN BY VOICE
+BEFORE YOU BUY
+Mr Broccoli is built around your own API keys from OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter or Alibaba Qwen. Your purchase gives you the app. It does not include AI usage — your provider bills you directly for what you use.
 
-Many voice experiences prioritize instant replies. Mr Broccoli takes the opposite approach: it lets you use the capable models and reasoning levels you choose for spoken conversations, too. If a stronger answer takes longer, the app gives the model that time and makes the wait visible instead of silently replacing quality with speed.
+TALK, DON'T TYPE
+• Speak, type or attach an image
+• Answers are read aloud, starting as soon as the first paragraph is ready
+• Skip by paragraph, pause, resume or restart playback
+• Drive Session for hands-free turns: it waits until you finish, counts down, sends, speaks the answer and listens again
+• Speech recognition using the system, an on-device model or your provider
 
-Speak naturally or type whenever it suits you. Both input methods are first-class controls: begin with the large microphone button or swipe to the full text field. Mr Broccoli sends your request through your chosen response mode and can read the answer aloud in natural, paragraph-based chunks.
+CHOOSE WHO ANSWERS
+• Save up to four routes — provider, exact model and reasoning effort
+• Switch between them mid-conversation without losing context
+• The home screen says who answers next and at what effort
+• Every answer records the route that actually produced it, including any fallback
 
-CHOOSE HOW MR BROCCOLI THINKS
+TUNE EACH CONVERSATION
+• Length: brief, normal or thorough
+• Tone: professional, casual, nerdy, concise, Socratic or ELI5
+• Your own model and speech-delivery instructions
+• A specific voice per conversation
+Set defaults globally, override them per conversation.
 
-• Connect supported AI providers and models
-• Create response modes that combine a provider, model, and effort level
-• Switch between response modes directly from the home screen
-• Use Model Council to let several selected models answer independently, review one another over configurable rounds, and synthesize a final response
-• Enable grounded web search for questions that need current information
-• Keep, revisit, and manage your conversation transcripts
+YOUR CONVERSATIONS
+• Kept in a local database on your device
+• Search, pin, archive, rename, share or delete
+• Fold and expand entries in one continuous transcript
+• Branch from any message to try another direction without losing the original
+• Lock individual conversations behind a password or biometrics
 
-BUILD YOUR OWN VOICE PIPELINE
+MORE WHEN YOU WANT IT
+• Web search grounding, with sources attached to the answer
+• Council: several models answer, review each other, then one synthesises
+• Image prompts to compatible models
+• Optional recall from your past conversations, entirely on the device
 
-• Choose between device and provider speech recognition
-• Select native, on-device Kokoro, or provider voices for spoken replies
-• Configure intentional speech fallbacks and their order
-• Choose interface, recognition, and spoken-reply languages independently
-• Hear long answers paragraph by paragraph while the following audio is prepared
-• Use Drive Session for a hands-free, continuing voice conversation
-• Preview voices and test individual provider capabilities
+PRIVACY
+• No Mr Broccoli account and no Mr Broccoli server
+• Requests go straight from your device to the provider you chose
+• API keys stay in the operating system's secure storage — never in backups, logs or exports
+• A hosted provider still receives the request you send it
 
-BRING YOUR OWN PROVIDER ACCESS
+YOURS TO KEEP
+• Full backups as readable JSON or passphrase-encrypted AES-256-GCM
+• Markdown archives to read anywhere or hand to another AI
+• Importing never overwrites what is already there
 
-Mr Broccoli connects to supported third-party AI services using credentials you provide. This gives you control over the providers, models, reasoning levels, and speech services you use.
+19 languages, including Arabic and Urdu right-to-left. Interface, dictation and answer language are set independently. Screen reader, large text, contrast and reduced-motion support throughout.
 
-Credentials are stored securely on your device and used only to access the corresponding service. Provider availability, usage limits, terms, and possible charges are determined by the respective providers.
+WHAT IT DOESN'T DO
+No cloud account, no cross-device sync, no hosted inference, no included credits, no silent switching of your chosen model or voice, and no autonomous actions on your behalf. AI output is not medical, legal or financial advice.
 
-DESIGNED FOR CLARITY
-
-Guided setup helps you configure thinking, listening, speaking, and web search. Individual connection tests and built-in diagnostics make configuration problems easier to identify.
-
-The focused interface supports:
-
-• Voice and text conversations
-• 19 interface languages
-• Light and dark appearances
-• Portrait and landscape layouts
-• Configurable model effort and response styles
-• Conversation history and transcripts
-• Spoken responses with pause and replay controls
-• Optional grounded web search
-
-Mr Broccoli does not pretend every answer must be instant. It is built for people willing to wait for an answer worth hearing.
+No subscription. Because there is no account system, a purchase on one store does not unlock the app on the other.
 ```
 
 ## German (`de-DE`)
@@ -71,123 +107,135 @@ Mr Broccoli does not pretend every answer must be instant. It is built for peopl
 ### Short description
 
 ```text
-Qualität vor Tempo: KI per Sprache oder Text mit Modellen deiner Wahl.
+Sprach-KI mit deinen API-Schlüsseln. Modell wählen. Antwort anhören.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli ist ein sprachzentrierter KI-Client für Menschen, denen die Qualität einer Antwort wichtiger ist als die Geschwindigkeit, mit der sie eintrifft.
+Mr Broccoli ist eine sprachgesteuerte KI-App für Menschen, die bereits eigene Provider-Konten nutzen. Hinterlege deine API-Schlüssel, wähle genau das Modell aus, das antworten soll, und hör dir die Antwort an. Nichts läuft über einen Server von uns — es gibt keinen.
 
-QUALITÄT VOR TEMPO — AUCH PER SPRACHE
+VOR DEM KAUF
+Mr Broccoli ist für deine eigenen API-Schlüssel gebaut: OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter oder Alibaba Qwen. Mit dem Kauf erhältst du die App. Die KI-Nutzung ist nicht enthalten — dein Provider rechnet direkt mit dir ab.
 
-Viele Sprachfunktionen sind auf sofortige Antworten optimiert. Mr Broccoli geht bewusst den umgekehrten Weg: Auch in gesprochenen Unterhaltungen kannst du die leistungsfähigen Modelle und Denkstufen verwenden, die du selbst auswählst. Wenn eine bessere Antwort länger dauert, gibt die App dem Modell diese Zeit und macht das Warten sichtbar, statt Qualität stillschweigend gegen Tempo einzutauschen.
+SPRECHEN STATT TIPPEN
+• Sprechen, tippen oder ein Bild anhängen
+• Antworten werden vorgelesen, sobald der erste Absatz fertig ist
+• Absatzweise springen, pausieren, fortsetzen oder neu starten
+• Fahrmodus für freihändige Gespräche: wartet, bis du fertig bist, zählt herunter, sendet, spricht die Antwort und hört wieder zu
+• Spracherkennung über das System, ein Modell auf dem Gerät oder deinen Provider
 
-Sprich ganz natürlich oder tippe, wann immer es besser passt. Beide Eingabearten sind gleichwertige Bedienelemente: Starte mit der großen Mikrofontaste oder wische zum vollständigen Textfeld. Mr Broccoli leitet deine Anfrage über den gewählten Antwortmodus weiter und kann die Antwort in natürlichen, absatzweisen Abschnitten vorlesen.
+WER ANTWORTET
+• Bis zu vier Routen speichern — Provider, exaktes Modell und Denktiefe
+• Mitten im Gespräch wechseln, ohne den Kontext zu verlieren
+• Der Startbildschirm zeigt, wer als Nächstes antwortet und mit welcher Denktiefe
+• Jede Antwort hält fest, welche Route sie wirklich erzeugt hat, inklusive Fallback
 
-BESTIMME, WIE MR BROCCOLI DENKT
+JEDES GESPRÄCH EINSTELLEN
+• Länge: kurz, normal oder ausführlich
+• Ton: professionell, locker, nerdig, knapp, sokratisch oder ELI5
+• Eigene Modell- und Sprechanweisungen
+• Eine eigene Stimme pro Gespräch
+Global vorgeben, pro Gespräch überschreiben.
 
-• Verbinde unterstützte KI-Anbieter und Modelle
-• Erstelle Antwortmodi aus Anbieter, Modell und Denkaufwand
-• Wechsle direkt auf dem Startbildschirm zwischen Antwortmodi
-• Nutze den Übermodus, damit mehrere ausgewählte Modelle unabhängig antworten, ihre Antworten über frei wählbare Runden prüfen und gemeinsam eine finale Antwort erstellen
-• Aktiviere fundierte Websuche für Fragen, die aktuelle Informationen benötigen
-• Bewahre Gesprächsprotokolle auf, rufe sie erneut auf und verwalte sie
+DEINE GESPRÄCHE
+• Liegen in einer lokalen Datenbank auf deinem Gerät
+• Suchen, anpinnen, archivieren, umbenennen, teilen oder löschen
+• Einträge im fortlaufenden Transkript ein- und ausklappen
+• Ab jeder Nachricht verzweigen und eine andere Richtung ausprobieren, ohne das Original zu verlieren
+• Einzelne Gespräche mit Passwort oder Biometrie sperren
 
-BAUE DEINE EIGENE SPRACHPIPELINE
+WENN DU MEHR WILLST
+• Websuche mit Quellenangaben an der Antwort
+• Rat: mehrere Modelle antworten, prüfen sich gegenseitig, eines fasst zusammen
+• Bildanfragen an kompatible Modelle
+• Optionaler Rückgriff auf frühere Gespräche, komplett auf dem Gerät
 
-• Wähle zwischen Geräte- und Anbieter-Spracherkennung
-• Nutze native Stimmen, Kokoro auf dem Gerät oder Stimmen eines Anbieters
-• Lege bewusste Sprach-Fallbacks und ihre Reihenfolge fest
-• Wähle Oberflächen-, Erkennungs- und Ausgabesprache unabhängig voneinander
-• Höre lange Antworten Absatz für Absatz, während die nächsten Audiodaten vorbereitet werden
-• Nutze den Fahrmodus für fortlaufende, freihändige Sprachunterhaltungen
-• Höre Stimmen vorab an und teste einzelne Anbieterfunktionen
+PRIVATSPHÄRE
+• Kein Mr-Broccoli-Konto und kein Mr-Broccoli-Server
+• Anfragen gehen direkt von deinem Gerät zum gewählten Provider
+• API-Schlüssel bleiben im sicheren Speicher des Betriebssystems — nie in Backups, Logs oder Exporten
+• Ein gehosteter Provider erhält die Anfrage, die du ihm schickst
 
-NUTZE DEINE EIGENEN ANBIETERZUGÄNGE
+DEINE DATEN BLEIBEN DEINE
+• Vollständige Backups als lesbares JSON oder mit Passphrase verschlüsselt (AES-256-GCM)
+• Markdown-Archive zum Lesen oder zur Übergabe an eine andere KI
+• Ein Import überschreibt nie, was schon da ist
 
-Mr Broccoli verbindet sich mit unterstützten KI-Diensten von Drittanbietern über Zugangsdaten, die du bereitstellst. So behältst du die Kontrolle über Anbieter, Modelle, Denkstufen und Sprachdienste.
+19 Sprachen, darunter Arabisch und Urdu von rechts nach links. Oberfläche, Diktat und Antwortsprache lassen sich unabhängig einstellen. Screenreader, große Schrift, Kontrast und reduzierte Bewegung werden durchgehend unterstützt.
 
-Die Zugangsdaten werden sicher auf deinem Gerät gespeichert und ausschließlich für den jeweiligen Dienst verwendet. Verfügbarkeit, Nutzungslimits, Bedingungen und mögliche Kosten werden vom jeweiligen Anbieter festgelegt.
+WAS DIE APP NICHT MACHT
+Kein Cloud-Konto, keine Geräte-Synchronisierung, keine gehostete KI, kein Guthaben inklusive, kein stiller Wechsel von Modell oder Stimme und keine selbstständigen Aktionen in deinem Namen. KI-Antworten sind keine medizinische, rechtliche oder finanzielle Beratung.
 
-AUF KLARHEIT AUSGELEGT
-
-Die geführte Einrichtung hilft dir beim Konfigurieren von Denken, Zuhören, Sprechen und Websuche. Einzelne Verbindungstests und integrierte Diagnosen erleichtern das Erkennen von Konfigurationsproblemen.
-
-Die fokussierte Oberfläche unterstützt:
-
-• Unterhaltungen per Sprache und Text
-• 19 Oberflächensprachen
-• Helles und dunkles Erscheinungsbild
-• Hoch- und Querformat
-• Einstellbaren Denkaufwand und Antwortstile
-• Gesprächsverlauf und Transkripte
-• Gesprochene Antworten mit Pause und Wiederholung
-• Optionale, fundierte Websuche
-
-Mr Broccoli behauptet nicht, jede Antwort müsse sofort da sein. Die App ist für Menschen gemacht, die auf eine hörenswerte Antwort warten können.
+Kein Abo. Da es kein Konto-System gibt, schaltet ein Kauf in einem Store die App im anderen nicht frei.
 ```
 
-## Ukrainian (`uk-UA`)
+## Ukrainian (`uk`)
 
 ### Short description
 
 ```text
-Якість понад швидкість: ШІ голосом або текстом із вибраними моделями.
+Голосовий ШІ з вашими ключами API. Оберіть модель. Слухайте відповідь.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli — це орієнтований на голос ШІ-клієнт для людей, яким якість відповіді важливіша за швидкість її отримання.
+Mr Broccoli — голосовий застосунок зі ШІ для тих, хто вже має власні акаунти в провайдерів. Додайте свої ключі, оберіть, яка саме модель відповість, і послухайте відповідь. Нічого не проходить через наш сервер, бо його просто немає.
 
-ЯКІСТЬ ПОНАД ШВИДКІСТЬ — НАВІТЬ У ГОЛОСОВОМУ СПІЛКУВАННІ
+ПЕРЕД ПОКУПКОЮ
+Mr Broccoli побудований навколо ваших власних ключів API від OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter або Alibaba Qwen. Купівля надає вам доступ до застосунку. Використання ШІ до неї не входить — провайдер виставляє рахунок безпосередньо вам за те, що ви витратили.
 
-Багато голосових сервісів віддають перевагу миттєвим відповідям. Mr Broccoli діє навпаки: у голосових розмовах ви також можете використовувати потужні моделі й рівні міркування, які обираєте самі. Якщо краща відповідь потребує більше часу, застосунок дає моделі цей час і показує процес очікування, а не непомітно жертвує якістю заради швидкості.
+ГОВОРІТЬ, А НЕ ДРУКУЙТЕ
+• Говоріть, друкуйте або додайте зображення
+• Відповіді читаються вголос, щойно готовий перший абзац
+• Переходьте абзацами, ставте на паузу, продовжуйте або починайте заново
+• Режим водіння для розмов без рук: чекає, поки ви договорите, відлічує, надсилає, промовляє відповідь і знову слухає
+• Розпізнавання мовлення системою, моделлю на пристрої або вашим провайдером
 
-Говоріть природно або вводьте текст, коли це зручніше. Обидва способи введення є повноцінними елементами керування: почніть із великої кнопки мікрофона або проведіть пальцем до повного текстового поля. Mr Broccoli надсилає запит через вибраний режим відповіді й може озвучувати результат природними фрагментами по абзацах.
+ХТО ВІДПОВІДАЄ
+• Збережіть до чотирьох маршрутів — провайдер, точна модель і глибина міркування
+• Перемикайтеся посеред розмови, не втрачаючи контексту
+• Головний екран показує, хто відповість наступним і з якою глибиною
+• Кожна відповідь фіксує маршрут, який її справді створив, разом із запасним
 
-ОБЕРІТЬ, ЯК МІРКУЄ MR BROCCOLI
+НАЛАШТУЙТЕ КОЖНУ РОЗМОВУ
+• Довжина: стисло, звичайно або докладно
+• Тон: професійний, невимушений, нердовий, лаконічний, сократівський або ELI5
+• Власні вказівки для моделі та для озвучення
+• Окремий голос для кожної розмови
+Задайте загальні значення й перевизначайте їх у конкретних розмовах.
 
-• Підключайте підтримуваних постачальників ШІ та моделі
-• Створюйте режими відповіді з постачальника, моделі й рівня зусиль
-• Перемикайте режими відповіді безпосередньо на головному екрані
-• Використовуйте Суперрежим, щоб кілька вибраних моделей незалежно відповідали, переглядали відповіді одна одної протягом заданої кількості раундів і створювали фінальний висновок
-• Вмикайте пошук в інтернеті з перевіреними джерелами для актуальних запитань
-• Зберігайте, переглядайте й упорядковуйте стенограми розмов
+ВАШІ РОЗМОВИ
+• Зберігаються в локальній базі даних на вашому пристрої
+• Шукайте, закріплюйте, архівуйте, перейменовуйте, діліться або видаляйте
+• Згортайте й розгортайте записи в суцільній розшифровці
+• Розгалужуйтеся від будь-якого повідомлення, щоб спробувати інший напрям, не втративши початковий
+• Блокуйте окремі розмови паролем або біометрією
 
-СТВОРІТЬ ВЛАСНИЙ ГОЛОСОВИЙ КОНВЕЄР
+КОЛИ ПОТРІБНО БІЛЬШЕ
+• Пошук у вебі з джерелами, доданими до відповіді
+• Рада: кілька моделей відповідають, перевіряють одна одну, а одна підсумовує
+• Запити із зображенням до сумісних моделей
+• Необов'язкове звернення до попередніх розмов, повністю на пристрої
 
-• Обирайте розпізнавання мовлення на пристрої або через постачальника
-• Використовуйте системні голоси, Kokoro на пристрої або голоси постачальника
-• Налаштовуйте резервні голосові маршрути та їхню черговість
-• Незалежно обирайте мови інтерфейсу, розпізнавання й озвучення
-• Слухайте довгі відповіді абзац за абзацом, поки готується наступне аудіо
-• Використовуйте режим водіння для безперервної розмови без рук
-• Прослуховуйте голоси й тестуйте окремі можливості постачальників
+ПРИВАТНІСТЬ
+• Немає акаунта Mr Broccoli і немає сервера Mr Broccoli
+• Запити йдуть прямо з вашого пристрою до обраного провайдера
+• Ключі API лишаються в захищеному сховищі системи — ніколи в резервних копіях, журналах чи експортах
+• Хмарний провайдер, звісно, отримує надісланий йому запит
 
-ВИКОРИСТОВУЙТЕ ВЛАСНІ ДОСТУПИ ДО СЕРВІСІВ
+ЩО ЛИШАЄТЬСЯ ВАШИМ
+• Повні резервні копії в читабельному JSON або зашифровані парольною фразою (AES-256-GCM)
+• Архіви в Markdown — читати будь-де або передати іншому ШІ
+• Імпорт ніколи не перезаписує те, що вже є
 
-Mr Broccoli підключається до підтримуваних сторонніх ШІ-сервісів за допомогою наданих вами облікових даних. Ви самі контролюєте постачальників, моделі, рівні міркування й голосові сервіси.
+19 мов, зокрема арабська й урду справа наліво. Мова інтерфейсу, диктування й відповіді налаштовуються окремо. Підтримка зчитувача екрана, великого тексту, контрасту та зменшеного руху.
 
-Облікові дані безпечно зберігаються на вашому пристрої та використовуються лише для доступу до відповідного сервісу. Доступність, ліміти, умови й можливі витрати визначає кожен постачальник.
+ЧОГО ЗАСТОСУНОК НЕ РОБИТЬ
+Немає хмарного акаунта, немає синхронізації між пристроями, немає розміщеного нами ШІ, немає включених кредитів, немає тихої підміни обраної моделі чи голосу і немає самостійних дій від вашого імені. Відповіді ШІ не є медичною, юридичною чи фінансовою консультацією.
 
-СТВОРЕНО ДЛЯ ЯСНОСТІ
-
-Покрокове налаштування допомагає підготувати мислення, слухання, озвучення й вебпошук. Окремі тести з’єднання та вбудована діагностика полегшують пошук проблем.
-
-Зосереджений інтерфейс підтримує:
-
-• Голосові й текстові розмови
-• 19 мов інтерфейсу
-• Світлу й темну теми
-• Книжкову й альбомну орієнтації
-• Налаштовувані зусилля моделі та стилі відповіді
-• Історію розмов і стенограми
-• Озвучені відповіді з паузою та повтором
-• Необов’язковий вебпошук із перевіреними джерелами
-
-Mr Broccoli не вдає, що кожна відповідь має бути миттєвою. Його створено для людей, готових зачекати на відповідь, яку справді варто почути.
+Без підписки. Оскільки системи акаунтів немає, покупка в одному магазині не відкриває застосунок в іншому.
 ```
 
 ## Hindi (`hi-IN`)
@@ -195,61 +243,67 @@ Mr Broccoli не вдає, що кожна відповідь має бути м
 ### Short description
 
 ```text
-गति से पहले गुणवत्ता: आवाज़ या टेक्स्ट में, आपके चुने AI मॉडल।
+अपनी API कुंजियों से आवाज़-आधारित AI। मॉडल चुनें, जवाब सुनें।
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli उन लोगों के लिए आवाज़-केंद्रित AI क्लाइंट है जिन्हें जवाब मिलने की गति से अधिक उसकी गुणवत्ता की परवाह है।
+Mr Broccoli आवाज़-आधारित AI ऐप है, उन लोगों के लिए जिनके पास पहले से अपने प्रोवाइडर खाते हैं। अपनी कुंजियाँ जोड़ें, ठीक वही मॉडल चुनें जो जवाब दे, और जवाब सुनें। कुछ भी हमारे सर्वर से होकर नहीं जाता, क्योंकि ऐसा कोई सर्वर है ही नहीं।
 
-गति से पहले गुणवत्ता — आवाज़ में भी
+खरीदने से पहले
+Mr Broccoli आपकी अपनी API कुंजियों के इर्द-गिर्द बना है — OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter या Alibaba Qwen। आपकी खरीद से आपको ऐप मिलता है। इसमें AI का उपयोग शामिल नहीं है — जितना आप इस्तेमाल करेंगे, उसका बिल आपका प्रोवाइडर सीधे आपको भेजेगा।
 
-कई वॉइस अनुभव तुरंत जवाब देने को प्राथमिकता देते हैं। Mr Broccoli इसका उलटा रास्ता अपनाता है: बोलकर बातचीत करते समय भी आप वही सक्षम मॉडल और रीजनिंग स्तर चुन सकते हैं जो आपको चाहिए। बेहतर जवाब में अधिक समय लगे तो ऐप मॉडल को वह समय देता है और प्रतीक्षा को साफ़ दिखाता है—गति के लिए गुणवत्ता को चुपचाप कम नहीं करता।
+टाइप नहीं, बोलिए
+• बोलें, टाइप करें या तस्वीर जोड़ें
+• पहला पैराग्राफ़ तैयार होते ही जवाब पढ़कर सुनाया जाता है
+• पैराग्राफ़ दर पैराग्राफ़ आगे-पीछे जाएँ, रोकें, फिर से शुरू करें
+• हाथ खाली रखकर बात करने के लिए ड्राइव सत्र: आपके बोलना खत्म करने का इंतज़ार करता है, गिनती करता है, भेजता है, जवाब बोलता है और फिर सुनने लगता है
+• वाक् पहचान सिस्टम से, डिवाइस पर मौजूद मॉडल से या आपके प्रोवाइडर से
 
-स्वाभाविक रूप से बोलें या जब सुविधाजनक हो तब टाइप करें। दोनों इनपुट तरीके समान रूप से महत्वपूर्ण हैं: बड़े माइक्रोफ़ोन बटन से शुरू करें या पूरे टेक्स्ट फ़ील्ड पर स्वाइप करें। Mr Broccoli आपकी चुनी प्रतिक्रिया विधि से अनुरोध भेजता है और जवाब को स्वाभाविक, अनुच्छेद-आधारित हिस्सों में पढ़कर सुना सकता है।
+कौन जवाब देगा
+• चार रास्ते तक सहेजें — प्रोवाइडर, सटीक मॉडल और सोचने की गहराई
+• बातचीत के बीच में बदलें, संदर्भ खोए बिना
+• होम स्क्रीन बताती है कि अगला जवाब कौन और किस गहराई से देगा
+• हर जवाब उस रास्ते को दर्ज करता है जिसने उसे सचमुच बनाया, फ़ॉलबैक समेत
 
-चुनें कि MR BROCCOLI कैसे सोचे
+हर बातचीत अपने हिसाब से
+• लंबाई: संक्षिप्त, सामान्य या विस्तृत
+• लहज़ा: पेशेवर, अनौपचारिक, नर्डी, कसा हुआ, सुकराती या ELI5
+• मॉडल और बोलने के अपने निर्देश
+• हर बातचीत के लिए अलग आवाज़
+वैश्विक डिफ़ॉल्ट तय करें और बातचीत के हिसाब से बदलें।
 
-• समर्थित AI प्रदाताओं और मॉडलों को जोड़ें
-• प्रदाता, मॉडल और प्रयास स्तर को मिलाकर प्रतिक्रिया विधियाँ बनाएँ
-• होम स्क्रीन से सीधे प्रतिक्रिया विधियाँ बदलें
-• सर्वोच्च मोड में कई चुने मॉडल स्वतंत्र जवाब देते हैं, तय राउंड में एक-दूसरे के जवाबों की समीक्षा करते हैं और अंतिम जवाब तैयार करते हैं
-• ताज़ा जानकारी के लिए स्रोत-आधारित वेब खोज चालू करें
-• बातचीत के ट्रांसक्रिप्ट सहेजें, दोबारा खोलें और प्रबंधित करें
+आपकी बातचीत
+• आपके डिवाइस पर लोकल डेटाबेस में रहती है
+• खोजें, पिन करें, संग्रह करें, नाम बदलें, साझा करें या मिटाएँ
+• लगातार चलने वाले ट्रांसक्रिप्ट में प्रविष्टियाँ समेटें और खोलें
+• किसी भी संदेश से शाखा बनाकर दूसरी दिशा आज़माएँ, मूल खोए बिना
+• अलग-अलग बातचीत को पासवर्ड या बायोमेट्रिक से लॉक करें
 
-अपनी वॉइस पाइपलाइन बनाएँ
+जब और चाहिए
+• वेब खोज, स्रोत जवाब के साथ जुड़े हुए
+• परिषद: कई मॉडल जवाब देते हैं, एक-दूसरे को परखते हैं, फिर एक सार तैयार करता है
+• संगत मॉडलों को तस्वीर के साथ सवाल
+• पुरानी बातचीत से वैकल्पिक संदर्भ, पूरी तरह डिवाइस पर
 
-• डिवाइस या प्रदाता आधारित वाक् पहचान चुनें
-• सिस्टम, डिवाइस पर Kokoro या प्रदाता की आवाज़ें चुनें
-• जानबूझकर चुने गए वॉइस फ़ॉलबैक और उनका क्रम तय करें
-• इंटरफ़ेस, पहचान और बोले गए जवाब की भाषाएँ अलग-अलग चुनें
-• अगला ऑडियो तैयार होते समय लंबे जवाब अनुच्छेद-दर-अनुच्छेद सुनें
-• बिना हाथ लगाए लगातार वॉइस बातचीत के लिए ड्राइव मोड इस्तेमाल करें
-• आवाज़ों का पूर्वावलोकन करें और प्रदाता की अलग-अलग क्षमताएँ जाँचें
+निजता
+• न Mr Broccoli खाता, न Mr Broccoli सर्वर
+• अनुरोध आपके डिवाइस से सीधे आपके चुने प्रोवाइडर को जाते हैं
+• API कुंजियाँ सिस्टम के सुरक्षित भंडारण में रहती हैं — बैकअप, लॉग या निर्यात में कभी नहीं
+• होस्टेड प्रोवाइडर को वह अनुरोध ज़रूर मिलता है जो आप उसे भेजते हैं
 
-अपनी प्रदाता पहुँच का उपयोग करें
+जो आपका रहता है
+• पूरा बैकअप — पढ़ने योग्य JSON या पासफ़्रेज़ से एन्क्रिप्टेड (AES-256-GCM)
+• Markdown संग्रह, कहीं भी पढ़ें या किसी दूसरे AI को सौंपें
+• आयात पहले से मौजूद चीज़ों को कभी नहीं मिटाता
 
-Mr Broccoli आपके दिए क्रेडेंशियल से समर्थित तृतीय-पक्ष AI सेवाओं से जुड़ता है। इससे प्रदाता, मॉडल, रीजनिंग स्तर और स्पीच सेवाओं पर नियंत्रण आपके पास रहता है।
+19 भाषाएँ, जिनमें दाएँ से बाएँ लिखी जाने वाली अरबी और उर्दू शामिल हैं। इंटरफ़ेस, डिक्टेशन और जवाब की भाषा अलग-अलग सेट होती है। स्क्रीन रीडर, बड़े अक्षर, कंट्रास्ट और कम एनिमेशन का पूरा समर्थन।
 
-क्रेडेंशियल आपके डिवाइस पर सुरक्षित रूप से संग्रहीत होते हैं और केवल संबंधित सेवा तक पहुँचने के लिए उपयोग किए जाते हैं। उपलब्धता, उपयोग सीमाएँ, शर्तें और संभावित शुल्क संबंधित प्रदाता तय करते हैं।
+यह क्या नहीं करता
+कोई क्लाउड खाता नहीं, डिवाइसों के बीच सिंक नहीं, हमारी होस्ट की गई AI नहीं, कोई क्रेडिट शामिल नहीं, आपके चुने मॉडल या आवाज़ की चुपचाप अदला-बदली नहीं, और आपकी ओर से अपने आप कोई काम नहीं। AI के जवाब चिकित्सा, कानूनी या वित्तीय सलाह नहीं हैं।
 
-स्पष्टता के लिए बनाया गया
-
-निर्देशित सेटअप सोचने, सुनने, बोलने और वेब खोज को कॉन्फ़िगर करने में मदद करता है। अलग-अलग कनेक्शन टेस्ट और अंतर्निहित डायग्नोस्टिक्स समस्याएँ पहचानना आसान बनाते हैं।
-
-केंद्रित इंटरफ़ेस में शामिल हैं:
-
-• आवाज़ और टेक्स्ट बातचीत
-• 19 इंटरफ़ेस भाषाएँ
-• हल्की और गहरी थीम
-• पोर्ट्रेट और लैंडस्केप लेआउट
-• कॉन्फ़िगर योग्य मॉडल प्रयास और प्रतिक्रिया शैलियाँ
-• बातचीत का इतिहास और ट्रांसक्रिप्ट
-• रोकने और दोबारा सुनने के नियंत्रण वाली बोली गई प्रतिक्रियाएँ
-• वैकल्पिक स्रोत-आधारित वेब खोज
-
-Mr Broccoli यह दिखावा नहीं करता कि हर जवाब तुरंत मिलना चाहिए। यह उन लोगों के लिए बना है जो सुनने लायक जवाब के लिए प्रतीक्षा कर सकते हैं।
+कोई सदस्यता नहीं। खाता व्यवस्था न होने के कारण, एक स्टोर पर की गई खरीद दूसरे स्टोर पर ऐप नहीं खोलती।
 ```
 
 ## Spanish (`es-ES`)
@@ -257,61 +311,67 @@ Mr Broccoli यह दिखावा नहीं करता कि हर �
 ### Short description
 
 ```text
-Calidad antes que rapidez: IA por voz o texto con los modelos que elijas.
+IA por voz con tus propias claves API. Elige el modelo. Escucha.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli es un cliente de IA centrado en la voz para quienes valoran más la calidad de una respuesta que la rapidez con la que llega.
+Mr Broccoli es una app de IA por voz para quienes ya tienen sus propias cuentas de proveedor. Añade tus claves, elige exactamente qué modelo responde y escucha la respuesta. Nada pasa por un servidor nuestro, porque no existe.
 
-CALIDAD ANTES QUE RAPIDEZ, TAMBIÉN POR VOZ
+ANTES DE COMPRAR
+Mr Broccoli está construida en torno a tus propias claves API de OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter o Alibaba Qwen. Con la compra obtienes la app. No incluye el uso de IA: tu proveedor te factura directamente lo que consumes.
 
-Muchas experiencias de voz priorizan las respuestas instantáneas. Mr Broccoli adopta el enfoque contrario: también te permite usar en conversaciones habladas los modelos potentes y niveles de razonamiento que tú elijas. Si una respuesta mejor necesita más tiempo, la aplicación se lo concede al modelo y hace visible la espera, en lugar de cambiar calidad por velocidad sin avisar.
+HABLA, NO ESCRIBAS
+• Habla, escribe o adjunta una imagen
+• Las respuestas se leen en voz alta en cuanto está listo el primer párrafo
+• Salta por párrafos, pausa, reanuda o reinicia la reproducción
+• Sesión de conducción para turnos con manos libres: espera a que termines, hace la cuenta atrás, envía, dice la respuesta y vuelve a escuchar
+• Reconocimiento de voz del sistema, de un modelo en el dispositivo o de tu proveedor
 
-Habla con naturalidad o escribe cuando te resulte más cómodo. Ambos métodos de entrada son controles de primera clase: empieza con el gran botón del micrófono o desliza hasta el campo de texto completo. Mr Broccoli envía tu petición mediante el modo de respuesta elegido y puede leer la respuesta en fragmentos naturales organizados por párrafos.
+QUIÉN RESPONDE
+• Guarda hasta cuatro rutas: proveedor, modelo exacto y nivel de razonamiento
+• Cambia a mitad de conversación sin perder el contexto
+• La pantalla de inicio indica quién responde y con qué nivel
+• Cada respuesta registra la ruta que realmente la produjo, incluidos los reintentos
 
-ELIGE CÓMO PIENSA MR BROCCOLI
+AJUSTA CADA CONVERSACIÓN
+• Longitud: breve, normal o exhaustiva
+• Tono: profesional, informal, friki, conciso, socrático o ELI5
+• Tus propias instrucciones de modelo y de locución
+• Una voz concreta por conversación
+Define valores globales y sobrescríbelos en cada conversación.
 
-• Conecta proveedores y modelos de IA compatibles
-• Crea modos de respuesta que combinan proveedor, modelo y nivel de esfuerzo
-• Cambia de modo directamente desde la pantalla de inicio
-• Usa el Modo supremo para que varios modelos seleccionados respondan por separado, revisen sus aportaciones durante las rondas que configures y sinteticen una respuesta final
-• Activa la búsqueda web fundamentada para preguntas que requieran información actual
-• Guarda, consulta y gestiona las transcripciones de tus conversaciones
+TUS CONVERSACIONES
+• Guardadas en una base de datos local en tu dispositivo
+• Busca, fija, archiva, renombra, comparte o elimina
+• Pliega y despliega entradas en una transcripción continua
+• Ramifica desde cualquier mensaje para probar otro camino sin perder el original
+• Bloquea conversaciones concretas con contraseña o biometría
 
-CREA TU PROPIA CADENA DE VOZ
+CUANDO QUIERAS MÁS
+• Búsqueda web, con las fuentes adjuntas a la respuesta
+• Consejo: varios modelos responden, se revisan entre sí y uno sintetiza
+• Peticiones con imagen a modelos compatibles
+• Recuerdo opcional de conversaciones anteriores, todo en el dispositivo
 
-• Elige entre reconocimiento de voz del dispositivo o de un proveedor
-• Selecciona voces nativas, Kokoro en el dispositivo o voces de proveedores
-• Configura alternativas de voz deliberadas y su orden
-• Elige por separado los idiomas de interfaz, reconocimiento y respuesta hablada
-• Escucha respuestas largas párrafo a párrafo mientras se prepara el audio siguiente
-• Usa el modo de conducción para mantener conversaciones de voz continuas y sin manos
-• Previsualiza voces y prueba capacidades concretas de cada proveedor
+PRIVACIDAD
+• Sin cuenta de Mr Broccoli y sin servidor de Mr Broccoli
+• Las peticiones van directas de tu dispositivo al proveedor que elijas
+• Las claves API se quedan en el almacenamiento seguro del sistema: nunca en copias, registros ni exportaciones
+• Un proveedor alojado sí recibe la petición que le envías
 
-USA TU PROPIO ACCESO A PROVEEDORES
+LO QUE SIGUE SIENDO TUYO
+• Copias completas en JSON legible o cifradas con contraseña (AES-256-GCM)
+• Archivos Markdown para leer donde quieras o pasar a otra IA
+• Importar nunca sobrescribe lo que ya está
 
-Mr Broccoli se conecta a servicios de IA de terceros compatibles mediante las credenciales que tú proporcionas. Así controlas los proveedores, modelos, niveles de razonamiento y servicios de voz que utilizas.
+19 idiomas, con árabe y urdu de derecha a izquierda. El idioma de la interfaz, el dictado y la respuesta se configuran por separado. Compatible con lector de pantalla, texto grande, contraste y movimiento reducido.
 
-Las credenciales se guardan de forma segura en tu dispositivo y solo se usan para acceder al servicio correspondiente. La disponibilidad, los límites de uso, las condiciones y los posibles cargos dependen de cada proveedor.
+LO QUE NO HACE
+Sin cuenta en la nube, sin sincronización entre dispositivos, sin IA alojada por nosotros, sin créditos incluidos, sin cambios silenciosos de tu modelo o tu voz y sin acciones autónomas en tu nombre. Las respuestas de la IA no son asesoramiento médico, legal ni financiero.
 
-DISEÑADO PARA SER CLARO
-
-La configuración guiada te ayuda a preparar el razonamiento, la escucha, la voz y la búsqueda web. Las pruebas de conexión individuales y los diagnósticos integrados facilitan la identificación de problemas.
-
-La interfaz enfocada admite:
-
-• Conversaciones por voz y texto
-• 19 idiomas de interfaz
-• Temas claro y oscuro
-• Diseños vertical y horizontal
-• Esfuerzo del modelo y estilos de respuesta configurables
-• Historial y transcripciones de conversaciones
-• Respuestas habladas con pausa y repetición
-• Búsqueda web fundamentada opcional
-
-Mr Broccoli no finge que todas las respuestas deban ser instantáneas. Está hecho para quienes prefieren esperar por una respuesta que merezca la pena escuchar.
+Sin suscripción. Como no hay sistema de cuentas, comprar en una tienda no desbloquea la app en la otra.
 ```
 
 ## French (`fr-FR`)
@@ -319,61 +379,67 @@ Mr Broccoli no finge que todas las respuestas deban ser instantáneas. Está hec
 ### Short description
 
 ```text
-La qualité avant la vitesse : une IA vocale ou écrite avec vos modèles.
+IA vocale avec vos propres clés API. Choisissez le modèle. Écoutez.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli est un client d’IA axé sur la voix, destiné à celles et ceux qui privilégient la qualité d’une réponse plutôt que sa rapidité.
+Mr Broccoli est une application d'IA vocale pour celles et ceux qui possèdent déjà leurs propres comptes fournisseurs. Ajoutez vos clés, choisissez exactement quel modèle répond, et écoutez la réponse. Rien ne transite par un serveur à nous, parce qu'il n'y en a aucun.
 
-LA QUALITÉ AVANT LA VITESSE, MÊME À L’ORAL
+AVANT D'ACHETER
+Mr Broccoli est conçue autour de vos propres clés API : OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter ou Alibaba Qwen. Votre achat vous donne accès à l'app. Il n'inclut pas l'usage de l'IA — votre fournisseur vous facture directement ce que vous consommez.
 
-De nombreuses expériences vocales privilégient les réponses instantanées. Mr Broccoli fait le choix inverse : les conversations parlées peuvent elles aussi utiliser les modèles performants et les niveaux de raisonnement que vous choisissez. Si une meilleure réponse demande plus de temps, l’application l’accorde au modèle et rend l’attente visible, au lieu de sacrifier discrètement la qualité au profit de la vitesse.
+PARLEZ, N'ÉCRIVEZ PLUS
+• Parlez, écrivez ou joignez une image
+• Les réponses sont lues à voix haute dès que le premier paragraphe est prêt
+• Avancez paragraphe par paragraphe, mettez en pause, reprenez ou recommencez
+• Séance de conduite pour les échanges mains libres : elle attend que vous ayez fini, décompte, envoie, énonce la réponse et se remet à écouter
+• Reconnaissance vocale via le système, un modèle sur l'appareil ou votre fournisseur
 
-Parlez naturellement ou saisissez du texte quand cela vous convient. Les deux modes de saisie sont traités comme des commandes à part entière : commencez avec le grand bouton du microphone ou balayez vers le champ de texte complet. Mr Broccoli transmet votre demande selon le mode de réponse choisi et peut lire la réponse par segments naturels, organisés en paragraphes.
+QUI RÉPOND
+• Enregistrez jusqu'à quatre routes — fournisseur, modèle exact et effort de raisonnement
+• Changez en pleine conversation sans perdre le contexte
+• L'écran d'accueil indique qui répond ensuite et avec quel effort
+• Chaque réponse conserve la route qui l'a réellement produite, y compris les replis
 
-CHOISISSEZ COMMENT MR BROCCOLI RÉFLÉCHIT
+RÉGLEZ CHAQUE CONVERSATION
+• Longueur : brève, normale ou approfondie
+• Ton : professionnel, décontracté, geek, concis, socratique ou ELI5
+• Vos propres instructions de modèle et de diction
+• Une voix spécifique par conversation
+Définissez des valeurs par défaut, remplacez-les conversation par conversation.
 
-• Connectez des fournisseurs et modèles d’IA compatibles
-• Créez des modes de réponse associant fournisseur, modèle et niveau d’effort
-• Changez de mode directement depuis l’écran d’accueil
-• Utilisez le Mode suprême pour que plusieurs modèles sélectionnés répondent séparément, examinent leurs réponses pendant un nombre de tours configurable et synthétisent une réponse finale
-• Activez une recherche web fondée sur des sources pour les questions nécessitant des informations actuelles
-• Conservez, consultez et gérez les transcriptions de vos conversations
+VOS CONVERSATIONS
+• Conservées dans une base de données locale sur votre appareil
+• Recherchez, épinglez, archivez, renommez, partagez ou supprimez
+• Repliez et dépliez les entrées d'une transcription continue
+• Bifurquez depuis n'importe quel message pour explorer une autre piste sans perdre l'original
+• Verrouillez certaines conversations par mot de passe ou biométrie
 
-CRÉEZ VOTRE PROPRE CHAÎNE VOCALE
+QUAND VOUS EN VOULEZ PLUS
+• Recherche web, avec les sources jointes à la réponse
+• Conseil : plusieurs modèles répondent, se relisent, puis un seul fait la synthèse
+• Requêtes avec image vers les modèles compatibles
+• Rappel facultatif de vos conversations passées, entièrement sur l'appareil
 
-• Choisissez la reconnaissance vocale de l’appareil ou d’un fournisseur
-• Sélectionnez des voix natives, Kokoro sur l’appareil ou des voix de fournisseurs
-• Configurez volontairement les solutions vocales de repli et leur ordre
-• Choisissez séparément les langues de l’interface, de la reconnaissance et des réponses parlées
-• Écoutez les longues réponses paragraphe par paragraphe pendant la préparation de la suite
-• Utilisez le mode conduite pour une conversation vocale continue et mains libres
-• Préécoutez les voix et testez séparément les capacités des fournisseurs
+CONFIDENTIALITÉ
+• Aucun compte Mr Broccoli et aucun serveur Mr Broccoli
+• Les requêtes partent directement de votre appareil vers le fournisseur choisi
+• Les clés API restent dans le stockage sécurisé du système — jamais dans les sauvegardes, journaux ou exports
+• Un fournisseur hébergé reçoit bien la requête que vous lui envoyez
 
-UTILISEZ VOS PROPRES ACCÈS FOURNISSEURS
+CE QUI RESTE À VOUS
+• Sauvegardes complètes en JSON lisible ou chiffrées par phrase secrète (AES-256-GCM)
+• Archives Markdown à lire partout ou à confier à une autre IA
+• Un import n'écrase jamais ce qui existe déjà
 
-Mr Broccoli se connecte aux services d’IA tiers compatibles à l’aide des identifiants que vous fournissez. Vous gardez ainsi le contrôle des fournisseurs, modèles, niveaux de raisonnement et services vocaux utilisés.
+19 langues, dont l'arabe et l'ourdou de droite à gauche. Langue de l'interface, de la dictée et de la réponse se règlent séparément. Lecteur d'écran, grands caractères, contraste et animations réduites pris en charge partout.
 
-Les identifiants sont stockés de façon sécurisée sur votre appareil et servent uniquement à accéder au service correspondant. La disponibilité, les limites d’utilisation, les conditions et les frais éventuels dépendent de chaque fournisseur.
+CE QU'ELLE NE FAIT PAS
+Pas de compte cloud, pas de synchronisation entre appareils, pas d'IA hébergée par nous, pas de crédits inclus, aucun changement silencieux de votre modèle ou de votre voix, et aucune action autonome en votre nom. Les réponses de l'IA ne constituent pas un avis médical, juridique ou financier.
 
-CONÇU POUR ÊTRE CLAIR
-
-La configuration guidée vous aide à régler la réflexion, l’écoute, la parole et la recherche web. Les tests de connexion individuels et les diagnostics intégrés facilitent l’identification des problèmes.
-
-L’interface épurée prend en charge :
-
-• Les conversations vocales et écrites
-• 19 langues d’interface
-• Les thèmes clair et sombre
-• Les formats portrait et paysage
-• L’effort du modèle et les styles de réponse configurables
-• L’historique et les transcriptions des conversations
-• Les réponses parlées avec pause et répétition
-• La recherche web fondée sur des sources, en option
-
-Mr Broccoli ne prétend pas que chaque réponse doit être instantanée. Il s’adresse aux personnes prêtes à attendre une réponse qui mérite d’être entendue.
+Sans abonnement. Faute de système de comptes, un achat sur une boutique ne débloque pas l'application sur l'autre.
 ```
 
 ## Italian (`it-IT`)
@@ -381,61 +447,67 @@ Mr Broccoli ne prétend pas que chaque réponse doit être instantanée. Il s’
 ### Short description
 
 ```text
-Qualità prima della velocità: IA vocale o testuale con i modelli che scegli.
+IA vocale con le tue chiavi API. Scegli il modello. Ascolta la risposta.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli è un client IA incentrato sulla voce per chi considera la qualità di una risposta più importante della velocità con cui arriva.
+Mr Broccoli è un'app di IA vocale per chi ha già i propri account presso i provider. Aggiungi le tue chiavi, scegli esattamente quale modello risponde e ascolta la risposta. Niente passa da un nostro server, perché non ne esiste uno.
 
-QUALITÀ PRIMA DELLA VELOCITÀ, ANCHE A VOCE
+PRIMA DI ACQUISTARE
+Mr Broccoli è costruita attorno alle tue chiavi API di OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter o Alibaba Qwen. Con l'acquisto ottieni l'app. Non include l'uso dell'IA: è il tuo provider a fatturarti direttamente quello che consumi.
 
-Molte esperienze vocali privilegiano risposte immediate. Mr Broccoli sceglie l’approccio opposto: anche nelle conversazioni parlate puoi usare i modelli più capaci e i livelli di ragionamento che preferisci. Se una risposta migliore richiede più tempo, l’app lo concede al modello e rende visibile l’attesa, invece di sacrificare silenziosamente la qualità alla velocità.
+PARLA, NON SCRIVERE
+• Parla, scrivi o allega un'immagine
+• Le risposte vengono lette ad alta voce appena il primo paragrafo è pronto
+• Salta di paragrafo, metti in pausa, riprendi o ricomincia
+• Sessione di guida per turni a mani libere: aspetta che tu finisca, fa il conto alla rovescia, invia, pronuncia la risposta e torna in ascolto
+• Riconoscimento vocale di sistema, con un modello sul dispositivo o tramite il tuo provider
 
-Parla in modo naturale oppure scrivi quando ti è più comodo. Entrambi i metodi di input sono controlli di pari livello: inizia con il grande pulsante del microfono oppure scorri fino al campo di testo completo. Mr Broccoli invia la richiesta tramite la modalità di risposta scelta e può leggere la risposta in segmenti naturali organizzati per paragrafo.
+CHI RISPONDE
+• Salva fino a quattro rotte: provider, modello esatto e livello di ragionamento
+• Cambia a metà conversazione senza perdere il contesto
+• La schermata iniziale dice chi risponde e con quale livello
+• Ogni risposta registra la rotta che l'ha davvero prodotta, ripieghi compresi
 
-SCEGLI COME PENSA MR BROCCOLI
+REGOLA OGNI CONVERSAZIONE
+• Lunghezza: breve, normale o approfondita
+• Tono: professionale, informale, nerd, conciso, socratico o ELI5
+• Istruzioni tue per il modello e per la lettura
+• Una voce specifica per conversazione
+Imposta i valori globali e sovrascrivili per singola conversazione.
 
-• Collega provider e modelli IA supportati
-• Crea modalità di risposta combinando provider, modello e livello di impegno
-• Passa da una modalità all’altra direttamente dalla schermata iniziale
-• Usa la Modalità suprema per far rispondere più modelli selezionati in modo indipendente, farli confrontare per il numero di turni configurato e sintetizzare una risposta finale
-• Attiva la ricerca web basata su fonti per le domande che richiedono informazioni aggiornate
-• Conserva, consulta e gestisci le trascrizioni delle conversazioni
+LE TUE CONVERSAZIONI
+• Conservate in un database locale sul dispositivo
+• Cerca, fissa, archivia, rinomina, condividi o elimina
+• Comprimi ed espandi le voci di una trascrizione continua
+• Dirama da qualsiasi messaggio per provare un'altra strada senza perdere l'originale
+• Blocca singole conversazioni con password o biometria
 
-CREA LA TUA PIPELINE VOCALE
+QUANDO VUOI DI PIÙ
+• Ricerca sul web, con le fonti allegate alla risposta
+• Consiglio: più modelli rispondono, si rileggono a vicenda, poi uno sintetizza
+• Richieste con immagine ai modelli compatibili
+• Richiamo facoltativo delle conversazioni passate, interamente sul dispositivo
 
-• Scegli il riconoscimento vocale del dispositivo o di un provider
-• Seleziona voci native, Kokoro sul dispositivo o voci dei provider
-• Configura fallback vocali intenzionali e il relativo ordine
-• Scegli separatamente le lingue dell’interfaccia, del riconoscimento e delle risposte parlate
-• Ascolta le risposte lunghe paragrafo per paragrafo mentre viene preparato l’audio successivo
-• Usa la modalità Guida per conversazioni vocali continue e senza mani
-• Ascolta le anteprime delle voci e testa le singole capacità dei provider
+PRIVACY
+• Nessun account Mr Broccoli e nessun server Mr Broccoli
+• Le richieste vanno dal tuo dispositivo direttamente al provider scelto
+• Le chiavi API restano nell'archivio sicuro del sistema: mai in backup, log o esportazioni
+• Un provider ospitato riceve comunque la richiesta che gli invii
 
-USA I TUOI ACCESSI AI PROVIDER
+QUELLO CHE RESTA TUO
+• Backup completi in JSON leggibile o cifrati con passphrase (AES-256-GCM)
+• Archivi Markdown da leggere ovunque o da passare a un'altra IA
+• L'importazione non sovrascrive mai quello che c'è già
 
-Mr Broccoli si collega ai servizi IA di terze parti supportati tramite le credenziali che fornisci. In questo modo mantieni il controllo su provider, modelli, livelli di ragionamento e servizi vocali.
+19 lingue, con arabo e urdu da destra a sinistra. Lingua dell'interfaccia, della dettatura e della risposta si impostano separatamente. Supporto per screen reader, testo grande, contrasto e movimento ridotto.
 
-Le credenziali vengono archiviate in modo sicuro sul dispositivo e utilizzate soltanto per accedere al servizio corrispondente. Disponibilità, limiti d’uso, condizioni ed eventuali costi dipendono dai rispettivi provider.
+QUELLO CHE NON FA
+Nessun account cloud, nessuna sincronizzazione tra dispositivi, nessuna IA ospitata da noi, nessun credito incluso, nessun cambio silenzioso del modello o della voce e nessuna azione autonoma per tuo conto. Le risposte dell'IA non sono consulenza medica, legale o finanziaria.
 
-PROGETTATO PER LA CHIAREZZA
-
-La configurazione guidata ti aiuta a impostare ragionamento, ascolto, voce e ricerca web. I test di connessione individuali e la diagnostica integrata rendono più semplice individuare i problemi.
-
-L’interfaccia essenziale supporta:
-
-• Conversazioni vocali e testuali
-• 19 lingue dell’interfaccia
-• Temi chiaro e scuro
-• Layout verticale e orizzontale
-• Impegno del modello e stili di risposta configurabili
-• Cronologia e trascrizioni delle conversazioni
-• Risposte parlate con pausa e ripetizione
-• Ricerca web basata su fonti facoltativa
-
-Mr Broccoli non finge che ogni risposta debba essere immediata. È pensato per chi è disposto ad aspettare una risposta che valga la pena ascoltare.
+Nessun abbonamento. Non esistendo un sistema di account, un acquisto su uno store non sblocca l'app sull'altro.
 ```
 
 ## Portuguese (`pt-PT`)
@@ -443,61 +515,67 @@ Mr Broccoli non finge che ogni risposta debba essere immediata. È pensato per c
 ### Short description
 
 ```text
-Qualidade acima da rapidez: IA por voz ou texto com os modelos que escolher.
+IA por voz com as suas chaves API. Escolha o modelo. Ouça a resposta.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli é um cliente de IA centrado na voz para quem valoriza mais a qualidade de uma resposta do que a rapidez com que ela chega.
+O Mr Broccoli é uma app de IA por voz para quem já tem contas próprias nos fornecedores. Adicione as suas chaves, escolha exactamente que modelo responde e oiça a resposta. Nada passa por um servidor nosso, porque não existe nenhum.
 
-QUALIDADE ACIMA DA RAPIDEZ, TAMBÉM POR VOZ
+ANTES DE COMPRAR
+O Mr Broccoli foi feito à volta das suas próprias chaves API da OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter ou Alibaba Qwen. A compra dá-lhe acesso à aplicação. Não inclui a utilização de IA — o seu fornecedor cobra-lhe directamente o que consumir.
 
-Muitas experiências de voz dão prioridade a respostas instantâneas. Mr Broccoli segue a abordagem oposta: também permite utilizar, em conversas faladas, os modelos mais capazes e os níveis de raciocínio que escolher. Se uma resposta melhor demorar mais tempo, a aplicação dá esse tempo ao modelo e torna a espera visível, em vez de trocar silenciosamente qualidade por rapidez.
+FALE, EM VEZ DE ESCREVER
+• Fale, escreva ou anexe uma imagem
+• As respostas são lidas em voz alta assim que o primeiro parágrafo estiver pronto
+• Salte por parágrafos, faça pausa, retome ou recomece
+• Sessão Drive para turnos em mãos-livres: espera que termine, faz a contagem decrescente, envia, diz a resposta e volta a ouvir
+• Reconhecimento de voz do sistema, de um modelo no dispositivo ou do seu fornecedor
 
-Fale naturalmente ou escreva quando for mais conveniente. Ambos os métodos de introdução são controlos de primeira classe: comece com o grande botão do microfone ou deslize para o campo de texto completo. Mr Broccoli envia o pedido através do modo de resposta escolhido e pode ler a resposta em segmentos naturais organizados por parágrafo.
+QUEM RESPONDE
+• Guarde até quatro rotas: fornecedor, modelo exacto e nível de raciocínio
+• Mude a meio da conversa sem perder o contexto
+• O ecrã inicial indica quem responde a seguir e com que nível
+• Cada resposta regista a rota que realmente a produziu, incluindo recursos alternativos
 
-ESCOLHA COMO MR BROCCOLI PENSA
+AFINE CADA CONVERSA
+• Extensão: breve, normal ou aprofundada
+• Tom: profissional, descontraído, nerd, conciso, socrático ou ELI5
+• Instruções suas para o modelo e para a locução
+• Uma voz específica por conversa
+Defina valores globais e substitua-os conversa a conversa.
 
-• Ligue fornecedores e modelos de IA compatíveis
-• Crie modos de resposta que combinam fornecedor, modelo e nível de esforço
-• Alterne entre modos diretamente no ecrã inicial
-• Use o Modo Supremo para que vários modelos selecionados respondam de forma independente, analisem as respostas uns dos outros ao longo das rondas configuradas e sintetizem uma resposta final
-• Ative pesquisa na Web fundamentada para perguntas que exigem informação atual
-• Guarde, consulte e gira as transcrições das suas conversas
+AS SUAS CONVERSAS
+• Guardadas numa base de dados local no seu dispositivo
+• Pesquise, fixe, arquive, mude o nome, partilhe ou elimine
+• Recolha e expanda entradas numa transcrição contínua
+• Ramifique a partir de qualquer mensagem para tentar outro caminho sem perder o original
+• Bloqueie conversas específicas com palavra-passe ou biometria
 
-CRIE O SEU PRÓPRIO FLUXO DE VOZ
+QUANDO QUISER MAIS
+• Pesquisa web, com as fontes anexadas à resposta
+• Conselho: vários modelos respondem, revêem-se entre si e um faz a síntese
+• Pedidos com imagem para modelos compatíveis
+• Recurso opcional a conversas anteriores, inteiramente no dispositivo
 
-• Escolha entre reconhecimento de voz do dispositivo ou de um fornecedor
-• Selecione vozes nativas, Kokoro no dispositivo ou vozes de fornecedores
-• Configure alternativas de voz intencionais e a respetiva ordem
-• Escolha separadamente os idiomas da interface, do reconhecimento e das respostas faladas
-• Ouça respostas longas parágrafo a parágrafo enquanto o áudio seguinte é preparado
-• Use o modo de condução para manter uma conversa de voz contínua e mãos-livres
-• Pré-escute vozes e teste capacidades individuais dos fornecedores
+PRIVACIDADE
+• Sem conta Mr Broccoli e sem servidor Mr Broccoli
+• Os pedidos vão do seu dispositivo directamente para o fornecedor escolhido
+• As chaves API ficam no armazenamento seguro do sistema — nunca em cópias, registos ou exportações
+• Um fornecedor alojado recebe de facto o pedido que lhe envia
 
-USE OS SEUS PRÓPRIOS ACESSOS
+O QUE CONTINUA A SER SEU
+• Cópias completas em JSON legível ou cifradas com frase-passe (AES-256-GCM)
+• Arquivos Markdown para ler onde quiser ou entregar a outra IA
+• Importar nunca substitui o que já lá está
 
-Mr Broccoli liga-se a serviços de IA de terceiros compatíveis através das credenciais que fornecer. Assim, mantém o controlo dos fornecedores, modelos, níveis de raciocínio e serviços de voz que utiliza.
+19 idiomas, com árabe e urdu da direita para a esquerda. O idioma da interface, do ditado e da resposta definem-se em separado. Suporte para leitor de ecrã, texto grande, contraste e movimento reduzido.
 
-As credenciais são guardadas de forma segura no seu dispositivo e utilizadas apenas para aceder ao serviço correspondente. A disponibilidade, os limites de utilização, os termos e os possíveis custos são definidos por cada fornecedor.
+O QUE NÃO FAZ
+Sem conta na nuvem, sem sincronização entre dispositivos, sem IA alojada por nós, sem créditos incluídos, sem trocas silenciosas do seu modelo ou da sua voz e sem acções autónomas em seu nome. As respostas da IA não são aconselhamento médico, jurídico ou financeiro.
 
-CRIADO PARA SER CLARO
-
-A configuração guiada ajuda a preparar o raciocínio, a escuta, a voz e a pesquisa na Web. Os testes de ligação individuais e os diagnósticos integrados facilitam a identificação de problemas.
-
-A interface focada suporta:
-
-• Conversas por voz e texto
-• 19 idiomas de interface
-• Temas claro e escuro
-• Orientações vertical e horizontal
-• Esforço do modelo e estilos de resposta configuráveis
-• Histórico e transcrições de conversas
-• Respostas faladas com pausa e repetição
-• Pesquisa na Web fundamentada opcional
-
-Mr Broccoli não finge que todas as respostas têm de ser instantâneas. Foi criado para quem aceita esperar por uma resposta que valha a pena ouvir.
+Sem subscrição. Como não há sistema de contas, comprar numa loja não desbloqueia a app na outra.
 ```
 
 ## Brazilian Portuguese (`pt-BR`)
@@ -505,61 +583,67 @@ Mr Broccoli não finge que todas as respostas têm de ser instantâneas. Foi cri
 ### Short description
 
 ```text
-Qualidade acima da rapidez: IA por voz ou texto com modelos que você escolher.
+IA por voz com suas chaves API. Escolha o modelo. Ouça a resposta.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli é um cliente de IA voltado à voz para quem se importa mais com a qualidade da resposta do que com a velocidade em que ela chega.
+O Mr Broccoli é um app de IA por voz para quem já tem as próprias contas nos provedores. Adicione suas chaves, escolha exatamente qual modelo responde e ouça a resposta. Nada passa por um servidor nosso, porque não existe nenhum.
 
-QUALIDADE ACIMA DA RAPIDEZ, TAMBÉM POR VOZ
+ANTES DE COMPRAR
+O Mr Broccoli foi feito em torno das suas próprias chaves API da OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter ou Alibaba Qwen. A compra dá a você o app. Ela não inclui o uso de IA — seu provedor cobra diretamente de você o que consumir.
 
-Muitas experiências por voz priorizam respostas instantâneas. Mr Broccoli segue o caminho oposto: nas conversas faladas, você também pode usar os modelos mais capazes e os níveis de raciocínio que escolher. Se uma resposta melhor levar mais tempo, o app dá esse tempo ao modelo e mostra a espera, em vez de trocar qualidade por velocidade sem avisar.
+FALE, EM VEZ DE DIGITAR
+• Fale, digite ou anexe uma imagem
+• As respostas são lidas em voz alta assim que o primeiro parágrafo fica pronto
+• Pule por parágrafos, pause, retome ou recomece
+• Sessão do Drive para turnos com as mãos livres: espera você terminar, faz a contagem regressiva, envia, fala a resposta e volta a ouvir
+• Reconhecimento de voz do sistema, de um modelo no aparelho ou do seu provedor
 
-Fale naturalmente ou digite quando for mais conveniente. As duas formas de entrada são controles de primeira classe: comece pelo grande botão do microfone ou deslize até o campo de texto completo. Mr Broccoli envia sua solicitação pelo modo de resposta escolhido e pode ler o resultado em trechos naturais organizados por parágrafo.
+QUEM RESPONDE
+• Salve até quatro rotas: provedor, modelo exato e nível de raciocínio
+• Troque no meio da conversa sem perder o contexto
+• A tela inicial mostra quem responde e com qual nível
+• Cada resposta registra a rota que realmente a produziu, inclusive as alternativas
 
-ESCOLHA COMO MR BROCCOLI PENSA
+AJUSTE CADA CONVERSA
+• Tamanho: breve, normal ou detalhado
+• Tom: profissional, descontraído, nerd, conciso, socrático ou ELI5
+• Suas próprias instruções de modelo e de locução
+• Uma voz específica por conversa
+Defina padrões globais e substitua conversa a conversa.
 
-• Conecte provedores e modelos de IA compatíveis
-• Crie modos de resposta combinando provedor, modelo e nível de esforço
-• Alterne entre os modos diretamente na tela inicial
-• Use o Modo Supremo para que vários modelos selecionados respondam de forma independente, revisem uns aos outros nas rodadas configuradas e sintetizem uma resposta final
-• Ative a pesquisa fundamentada na web para perguntas que exigem informações atuais
-• Salve, reveja e gerencie as transcrições das suas conversas
+SUAS CONVERSAS
+• Guardadas em um banco de dados local no seu aparelho
+• Busque, fixe, arquive, renomeie, compartilhe ou exclua
+• Recolha e expanda entradas em uma transcrição contínua
+• Ramifique a partir de qualquer mensagem para tentar outro caminho sem perder o original
+• Bloqueie conversas específicas com senha ou biometria
 
-MONTE SEU PRÓPRIO FLUXO DE VOZ
+QUANDO QUISER MAIS
+• Busca na web, com as fontes anexadas à resposta
+• Conselho: vários modelos respondem, revisam uns aos outros e um faz a síntese
+• Pedidos com imagem para modelos compatíveis
+• Retomada opcional de conversas anteriores, inteiramente no aparelho
 
-• Escolha o reconhecimento de voz do dispositivo ou de um provedor
-• Selecione vozes nativas, Kokoro no dispositivo ou vozes de provedores
-• Configure alternativas de voz intencionais e a ordem delas
-• Escolha separadamente os idiomas da interface, do reconhecimento e das respostas faladas
-• Ouça respostas longas parágrafo por parágrafo enquanto o próximo áudio é preparado
-• Use o modo de direção para uma conversa por voz contínua e sem usar as mãos
-• Ouça prévias de vozes e teste recursos individuais dos provedores
+PRIVACIDADE
+• Sem conta Mr Broccoli e sem servidor Mr Broccoli
+• Os pedidos vão do seu aparelho direto para o provedor escolhido
+• As chaves API ficam no armazenamento seguro do sistema — nunca em backups, logs ou exportações
+• Um provedor hospedado de fato recebe o pedido que você manda
 
-USE SEUS PRÓPRIOS ACESSOS
+O QUE CONTINUA SENDO SEU
+• Backups completos em JSON legível ou criptografados com senha (AES-256-GCM)
+• Arquivos Markdown para ler onde quiser ou entregar a outra IA
+• Importar nunca sobrescreve o que já está lá
 
-Mr Broccoli se conecta a serviços de IA de terceiros compatíveis usando as credenciais fornecidas por você. Assim, você controla os provedores, modelos, níveis de raciocínio e serviços de voz utilizados.
+19 idiomas, com árabe e urdu da direita para a esquerda. O idioma da interface, do ditado e da resposta são definidos separadamente. Suporte a leitor de tela, texto grande, contraste e movimento reduzido.
 
-As credenciais são armazenadas com segurança no seu dispositivo e usadas apenas para acessar o serviço correspondente. Disponibilidade, limites de uso, termos e possíveis cobranças são definidos por cada provedor.
+O QUE ELE NÃO FAZ
+Sem conta na nuvem, sem sincronização entre aparelhos, sem IA hospedada por nós, sem créditos inclusos, sem trocas silenciosas do seu modelo ou da sua voz e sem ações autônomas em seu nome. As respostas da IA não são orientação médica, jurídica ou financeira.
 
-FEITO PARA SER CLARO
-
-A configuração guiada ajuda a preparar raciocínio, escuta, fala e pesquisa na web. Testes de conexão individuais e diagnósticos integrados facilitam a identificação de problemas.
-
-A interface objetiva oferece:
-
-• Conversas por voz e texto
-• 19 idiomas de interface
-• Temas claro e escuro
-• Layouts em modo retrato e paisagem
-• Esforço do modelo e estilos de resposta configuráveis
-• Histórico e transcrições de conversas
-• Respostas faladas com pausa e repetição
-• Pesquisa fundamentada na web opcional
-
-Mr Broccoli não finge que toda resposta precisa ser instantânea. Ele foi feito para quem aceita esperar por uma resposta que vale a pena ouvir.
+Sem assinatura. Como não há sistema de contas, comprar em uma loja não libera o app na outra.
 ```
 
 ## Russian (`ru-RU`)
@@ -567,61 +651,67 @@ Mr Broccoli não finge que toda resposta precisa ser instantânea. Ele foi feito
 ### Short description
 
 ```text
-Качество важнее скорости: ИИ голосом или текстом с выбранными моделями.
+Голосовой ИИ с вашими ключами API. Выберите модель. Слушайте ответ.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli — голосовой ИИ-клиент для тех, кому качество ответа важнее скорости его получения.
+Mr Broccoli — голосовое ИИ-приложение для тех, у кого уже есть собственные аккаунты у провайдеров. Добавьте свои ключи, выберите, какая именно модель ответит, и послушайте ответ. Ничего не проходит через наш сервер, потому что его просто нет.
 
-КАЧЕСТВО ВАЖНЕЕ СКОРОСТИ — ДАЖЕ В ГОЛОСОВОМ ОБЩЕНИИ
+ПЕРЕД ПОКУПКОЙ
+Mr Broccoli построен вокруг ваших собственных ключей API от OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter или Alibaba Qwen. Покупка даёт вам доступ к приложению. Использование ИИ в неё не входит — провайдер выставляет вам счёт напрямую за то, что вы потратили.
 
-Многие голосовые сервисы отдают приоритет мгновенным ответам. Mr Broccoli выбирает противоположный подход: в голосовых беседах вы также можете использовать мощные модели и уровни рассуждения по своему выбору. Если для более качественного ответа требуется больше времени, приложение предоставляет его модели и наглядно показывает ожидание, а не незаметно жертвует качеством ради скорости.
+ГОВОРИТЕ, А НЕ ПЕЧАТАЙТЕ
+• Говорите, печатайте или прикрепите изображение
+• Ответы читаются вслух, как только готов первый абзац
+• Переходите по абзацам, ставьте на паузу, продолжайте или начинайте заново
+• Сеанс вождения для разговоров без рук: ждёт, пока вы закончите, отсчитывает, отправляет, произносит ответ и снова слушает
+• Распознавание речи системой, моделью на устройстве или вашим провайдером
 
-Говорите естественно или вводите текст, когда вам удобнее. Оба способа ввода равноправны: начните с большой кнопки микрофона или проведите пальцем к полному текстовому полю. Mr Broccoli отправляет запрос через выбранный режим ответа и может озвучивать результат естественными фрагментами по абзацам.
+КТО ОТВЕЧАЕТ
+• Сохраните до четырёх маршрутов — провайдер, точная модель и глубина рассуждения
+• Переключайтесь посреди разговора, не теряя контекст
+• Главный экран показывает, кто ответит следующим и с какой глубиной
+• Каждый ответ фиксирует маршрут, который его действительно создал, включая запасной
 
-ВЫБЕРИТЕ, КАК РАССУЖДАЕТ MR BROCCOLI
+НАСТРОЙТЕ КАЖДЫЙ РАЗГОВОР
+• Длина: кратко, обычно или подробно
+• Тон: профессиональный, непринуждённый, нердовский, лаконичный, сократовский или ELI5
+• Собственные инструкции для модели и для озвучивания
+• Отдельный голос для каждого разговора
+Задайте общие значения и переопределяйте их в конкретных разговорах.
 
-• Подключайте поддерживаемых поставщиков ИИ и модели
-• Создавайте режимы ответа из поставщика, модели и уровня усилий
-• Переключайте режимы прямо на главном экране
-• Используйте Суперрежим, чтобы несколько выбранных моделей отвечали независимо, оценивали ответы друг друга в течение заданного числа раундов и формировали итоговый ответ
-• Включайте веб-поиск с подтверждёнными источниками для вопросов, требующих актуальной информации
-• Сохраняйте, просматривайте и управляйте расшифровками разговоров
+ВАШИ РАЗГОВОРЫ
+• Хранятся в локальной базе данных на вашем устройстве
+• Ищите, закрепляйте, архивируйте, переименовывайте, делитесь или удаляйте
+• Сворачивайте и разворачивайте записи в сплошной расшифровке
+• Ветвитесь от любого сообщения, чтобы попробовать другое направление, не теряя исходное
+• Блокируйте отдельные разговоры паролем или биометрией
 
-СОЗДАЙТЕ СОБСТВЕННУЮ ГОЛОСОВУЮ ЦЕПОЧКУ
+КОГДА НУЖНО БОЛЬШЕ
+• Веб-поиск с источниками, прикреплёнными к ответу
+• Совет: несколько моделей отвечают, проверяют друг друга, затем одна обобщает
+• Запросы с изображением к совместимым моделям
+• Необязательное обращение к прошлым разговорам, полностью на устройстве
 
-• Выбирайте распознавание речи на устройстве или через поставщика
-• Используйте системные голоса, Kokoro на устройстве или голоса поставщиков
-• Настраивайте резервные голосовые маршруты и их порядок
-• Независимо выбирайте языки интерфейса, распознавания и озвучивания
-• Слушайте длинные ответы абзац за абзацем, пока готовится следующее аудио
-• Используйте режим вождения для непрерывного общения без помощи рук
-• Прослушивайте голоса и проверяйте отдельные возможности поставщиков
+ПРИВАТНОСТЬ
+• Нет аккаунта Mr Broccoli и нет сервера Mr Broccoli
+• Запросы идут прямо с вашего устройства к выбранному провайдеру
+• Ключи API остаются в защищённом хранилище системы — никогда в резервных копиях, журналах или экспортах
+• Облачный провайдер, разумеется, получает отправленный ему запрос
 
-ИСПОЛЬЗУЙТЕ СОБСТВЕННЫЕ ДОСТУПЫ К СЕРВИСАМ
+ЧТО ОСТАЁТСЯ ВАШИМ
+• Полные резервные копии в читаемом JSON или зашифрованные парольной фразой (AES-256-GCM)
+• Архивы в Markdown — читать где угодно или передать другому ИИ
+• Импорт никогда не перезаписывает то, что уже есть
 
-Mr Broccoli подключается к поддерживаемым сторонним ИИ-сервисам с помощью предоставленных вами учётных данных. Вы сами контролируете поставщиков, модели, уровни рассуждения и речевые сервисы.
+19 языков, включая арабский и урду справа налево. Язык интерфейса, диктовки и ответа настраиваются отдельно. Поддержка экранного диктора, крупного текста, контраста и уменьшенного движения.
 
-Учётные данные безопасно хранятся на вашем устройстве и используются только для доступа к соответствующему сервису. Доступность, лимиты, условия и возможные расходы определяются каждым поставщиком.
+ЧЕГО ПРИЛОЖЕНИЕ НЕ ДЕЛАЕТ
+Нет облачного аккаунта, нет синхронизации между устройствами, нет размещённого нами ИИ, нет включённых кредитов, нет тихой подмены выбранной модели или голоса и нет самостоятельных действий от вашего имени. Ответы ИИ не являются медицинской, юридической или финансовой консультацией.
 
-СОЗДАНО ДЛЯ ЯСНОСТИ
-
-Пошаговая настройка помогает подготовить рассуждение, прослушивание, озвучивание и веб-поиск. Отдельные проверки подключений и встроенная диагностика упрощают поиск проблем.
-
-Сосредоточенный интерфейс поддерживает:
-
-• Голосовые и текстовые разговоры
-• 19 языков интерфейса
-• Светлую и тёмную темы
-• Книжную и альбомную ориентации
-• Настраиваемые усилия модели и стили ответа
-• Историю и расшифровки разговоров
-• Озвученные ответы с паузой и повтором
-• Необязательный веб-поиск с подтверждёнными источниками
-
-Mr Broccoli не делает вид, что каждый ответ должен быть мгновенным. Он создан для тех, кто готов подождать ответ, который действительно стоит услышать.
+Без подписки. Поскольку системы аккаунтов нет, покупка в одном магазине не открывает приложение в другом.
 ```
 
 ## Simplified Chinese (`zh-CN`)
@@ -629,61 +719,67 @@ Mr Broccoli не делает вид, что каждый ответ долже�
 ### Short description
 
 ```text
-质量优先而非速度：通过语音或文字使用你选择的 AI 模型。
+用你自己的 API 密钥语音对话。选模型，听答案。
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli 是一款以语音为核心的 AI 客户端，面向重视回答质量胜过响应速度的用户。
+Mr Broccoli 是一款语音优先的 AI 应用，面向已经拥有自己服务商账号的人。填入密钥，指定由哪个模型回答，然后听答案。没有任何内容经过我们的服务器，因为我们根本没有服务器。
 
-质量优先于速度——语音交流也不例外
+购买前请注意
+Mr Broccoli 围绕你自己的 API 密钥构建，支持 OpenAI、Anthropic、Google Gemini、xAI、Mistral、DeepSeek、OpenRouter 和阿里云通义千问。购买后即可使用本 App，但不包含 AI 使用量——用了多少由服务商直接向你收费。
 
-许多语音体验追求即时回复。Mr Broccoli 选择相反的方向：在语音对话中，你也可以使用自己选择的高能力模型和推理等级。如果更好的回答需要更多时间，应用会把时间留给模型，并清楚展示等待进度，而不是为了速度悄悄牺牲质量。
+用说的，别用打的
+• 说话、打字，或附上一张图片
+• 第一段一写好就开始朗读
+• 按段落跳转、暂停、继续或重头播放
+• 驾驶会话用于免提对话：等你说完、倒计时、发送、念出答案，然后重新聆听
+• 语音识别可用系统、本机模型或你的服务商
 
-你可以自然地说话，也可以随时输入文字。两种输入方式都是一等交互：从醒目的麦克风按钮开始，或滑动切换到完整文本输入框。Mr Broccoli 会通过你选择的回答模式发送请求，并以自然的段落片段朗读回答。
+由谁回答
+• 最多保存四条路线——服务商、具体模型和推理力度
+• 对话中途切换，不丢上下文
+• 主屏会告诉你下一轮由谁回答、用什么力度
+• 每个答案都会记录真正产生它的路线，包括任何回退
 
-选择 MR BROCCOLI 的思考方式
+逐个对话调校
+• 长度：简短、正常或详尽
+• 语气：专业、随意、书呆子、精炼、苏格拉底式或 ELI5
+• 你自己的模型指令和朗读指令
+• 每个对话单独指定声音
+先设全局默认值，再按对话覆盖。
 
-• 连接受支持的 AI 服务商和模型
-• 创建由服务商、模型和推理强度组成的回答模式
-• 直接在主屏幕切换回答模式
-• 使用终极模式，让多个选定模型独立回答，在可配置的轮次中相互审阅，并综合生成最终答案
-• 为需要最新信息的问题启用有来源依据的网页搜索
-• 保存、回顾和管理对话记录
+你的对话
+• 保存在本机的本地数据库中
+• 搜索、置顶、归档、重命名、分享或删除
+• 在连续的文字记录中折叠和展开条目
+• 从任意消息分支，试另一个方向而不丢掉原来的
+• 用密码或生物识别锁住单个对话
 
-构建你自己的语音流程
+想要更多时
+• 联网搜索，来源附在答案上
+• 评议会：多个模型作答、互相审阅，再由一个汇总
+• 向兼容模型发送带图片的提问
+• 可选调取以往对话，全部在本机完成
 
-• 选择设备端或服务商提供的语音识别
-• 选择系统原生、设备端 Kokoro 或服务商语音
-• 明确配置语音备用方案及其顺序
-• 分别选择界面、语音识别和朗读语言
-• 在后续音频准备期间，逐段收听较长回答
-• 使用驾驶模式进行免手持的连续语音对话
-• 试听语音并逐项测试服务商能力
+隐私
+• 没有 Mr Broccoli 账号，也没有 Mr Broccoli 服务器
+• 请求从你的设备直接发往你选定的服务商
+• API 密钥留在操作系统的安全存储中——绝不出现在备份、日志或导出文件里
+• 云端服务商当然会收到你发给它的请求
 
-使用你自己的服务商访问权限
+始终属于你
+• 完整备份，可选可读 JSON 或口令加密（AES-256-GCM）
+• Markdown 存档，随处可读，也可交给别的 AI
+• 导入绝不覆盖已有内容
 
-Mr Broccoli 使用你提供的凭据连接受支持的第三方 AI 服务。你可以自行控制使用哪些服务商、模型、推理等级和语音服务。
+19 种语言，含从右到左的阿拉伯语和乌尔都语。界面、听写和回答语言可分别设置。全面支持屏幕阅读器、大字体、对比度和减弱动态效果。
 
-凭据会安全存储在你的设备上，并且仅用于访问相应服务。服务可用性、使用限额、条款和可能产生的费用均由各服务商决定。
+不做的事
+没有云账号，不跨设备同步，不由我们托管 AI，不附赠额度，不悄悄更换你选的模型或声音，也不代你自行行动。AI 的回答不构成医疗、法律或财务建议。
 
-为清晰而设计
-
-引导式设置可帮助你配置思考、聆听、朗读和网页搜索。单项连接测试与内置诊断功能让配置问题更容易定位。
-
-简洁专注的界面支持：
-
-• 语音和文字对话
-• 19 种界面语言
-• 浅色和深色外观
-• 竖屏和横屏布局
-• 可配置的模型推理强度与回答风格
-• 对话历史与记录
-• 支持暂停和重播的语音回答
-• 可选的有依据网页搜索
-
-Mr Broccoli 不会假装每个答案都必须瞬间到达。它为愿意等待真正值得一听的回答而打造。
+没有订阅。由于没有账号体系，在一个商店购买不会解锁另一个商店的应用。
 ```
 
 ## Arabic (`ar`)
@@ -691,61 +787,67 @@ Mr Broccoli 不会假装每个答案都必须瞬间到达。它为愿意等待�
 ### Short description
 
 ```text
-الجودة قبل السرعة: ذكاء اصطناعي بالصوت أو النص مع النماذج التي تختارها.
+ذكاء اصطناعي بالصوت بمفاتيح API الخاصة بك. اختر النموذج واستمع.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli هو عميل ذكاء اصطناعي يركز على الصوت، لمن يهتمون بجودة الإجابة أكثر من سرعة وصولها.
+Mr Broccoli تطبيق ذكاء اصطناعي يعتمد على الصوت، لمن لديهم بالفعل حسابات خاصة بهم لدى المزوّدين. أضف مفاتيحك، واختر بالضبط النموذج الذي يجيب، ثم استمع إلى الرد. لا شيء يمر عبر خادم لنا، ببساطة لأنه غير موجود.
 
-الجودة قبل السرعة — حتى في المحادثات الصوتية
+قبل الشراء
+بُني Mr Broccoli حول مفاتيح API الخاصة بك من OpenAI وAnthropic وGoogle Gemini وxAI وMistral وDeepSeek وOpenRouter وAlibaba Qwen. يمنحك الشراء التطبيق. وهو لا يشمل استخدام الذكاء الاصطناعي؛ فالمزوّد يحاسبك مباشرة على ما تستهلكه.
 
-تعطي تجارب صوتية كثيرة الأولوية للردود الفورية. يتخذ Mr Broccoli النهج المعاكس: يمكنك في المحادثات الصوتية أيضًا استخدام النماذج القوية ومستويات الاستدلال التي تختارها. وإذا احتاجت الإجابة الأفضل إلى وقت أطول، يمنح التطبيق النموذج ذلك الوقت ويجعل الانتظار واضحًا، بدلًا من التضحية بالجودة من أجل السرعة دون تنبيهك.
+تحدّث بدل الكتابة
+• تحدّث أو اكتب أو أرفق صورة
+• تُقرأ الإجابات بصوت مسموع فور جاهزية الفقرة الأولى
+• تنقّل بين الفقرات، أوقف مؤقتاً، استأنف أو ابدأ من جديد
+• جلسة القيادة للمحادثة دون استخدام اليدين: تنتظر حتى تنتهي، تعد تنازلياً، ترسل، تنطق الإجابة ثم تعود للاستماع
+• التعرّف على الكلام عبر النظام أو نموذج على الجهاز أو مزوّدك
 
-تحدث بطبيعتك أو اكتب عندما يناسبك ذلك. طريقتا الإدخال متساويتان في الأهمية: ابدأ بزر الميكروفون الكبير أو اسحب للوصول إلى حقل النص الكامل. يرسل Mr Broccoli طلبك عبر وضع الرد الذي اخترته، ويمكنه قراءة الإجابة بصوت عالٍ في مقاطع طبيعية مرتبة حسب الفقرات.
+من يجيب
+• احفظ حتى أربعة مسارات: المزوّد والنموذج الدقيق وعمق التفكير
+• بدّل بينها في منتصف المحادثة دون فقدان السياق
+• تعرض الشاشة الرئيسية من سيجيب في الدور التالي وبأي عمق
+• كل إجابة تسجّل المسار الذي أنتجها فعلاً، بما في ذلك أي مسار احتياطي
 
-اختر كيف يفكر MR BROCCOLI
+اضبط كل محادثة
+• الطول: موجز أو عادي أو مفصّل
+• الأسلوب: مهني، عفوي، تقني، مقتضب، سقراطي أو ELI5
+• تعليماتك الخاصة للنموذج وللإلقاء
+• صوت محدد لكل محادثة
+حدّد قيماً عامة، ثم تجاوزها في كل محادثة على حدة.
 
-• صِل مزوّدي ونماذج الذكاء الاصطناعي المدعومة
-• أنشئ أوضاع رد تجمع بين المزوّد والنموذج ومستوى الجهد
-• بدّل أوضاع الرد مباشرة من الشاشة الرئيسية
-• استخدم الوضع الفائق كي تجيب عدة نماذج مختارة بصورة مستقلة، وتراجع إجابات بعضها خلال عدد الجولات الذي تحدده، ثم تصوغ ردًا نهائيًا
-• فعّل بحث الويب المستند إلى مصادر للأسئلة التي تحتاج إلى معلومات حديثة
-• احفظ نصوص محادثاتك وراجعها وأدرها
+محادثاتك
+• محفوظة في قاعدة بيانات محلية على جهازك
+• ابحث، ثبّت، أرشف، أعد التسمية، شارك أو احذف
+• اطوِ العناصر وافردها داخل نص متصل
+• تفرّع من أي رسالة لتجربة اتجاه آخر دون فقدان الأصل
+• اقفل محادثات بعينها بكلمة مرور أو ببصمة
 
-أنشئ مسار الصوت الخاص بك
+عندما تريد المزيد
+• بحث في الويب، مع إرفاق المصادر بالإجابة
+• المجلس: عدة نماذج تجيب، تراجع بعضها بعضاً، ثم يلخّص واحد منها
+• طلبات مصحوبة بصورة إلى النماذج المتوافقة
+• استدعاء اختياري لمحادثاتك السابقة، بالكامل على الجهاز
 
-• اختر التعرف على الكلام من الجهاز أو من أحد المزوّدين
-• اختر أصوات النظام أو Kokoro على الجهاز أو أصوات المزوّدين
-• اضبط بدائل صوتية مقصودة وترتيب استخدامها
-• اختر لغات الواجهة والتعرف على الكلام والردود المنطوقة كلًا على حدة
-• استمع إلى الإجابات الطويلة فقرة بعد فقرة أثناء تجهيز الصوت التالي
-• استخدم وضع القيادة لمحادثة صوتية مستمرة دون استخدام اليدين
-• استمع إلى معاينات الأصوات واختبر قدرات كل مزوّد على حدة
+الخصوصية
+• لا حساب لـ Mr Broccoli ولا خادم لـ Mr Broccoli
+• تنتقل الطلبات مباشرة من جهازك إلى المزوّد الذي اخترته
+• تبقى مفاتيح API في التخزين الآمن لنظام التشغيل، ولا تظهر أبداً في النسخ الاحتياطية أو السجلات أو التصدير
+• المزوّد المستضاف يتلقى بالطبع الطلب الذي ترسله إليه
 
-استخدم بيانات وصولك إلى المزوّدين
+ما يبقى لك
+• نسخ احتياطية كاملة بصيغة JSON مقروءة أو مشفّرة بعبارة مرور (AES-256-GCM)
+• أرشيف Markdown تقرأه في أي مكان أو تسلّمه لذكاء اصطناعي آخر
+• الاستيراد لا يستبدل أبداً ما هو موجود
 
-يتصل Mr Broccoli بخدمات ذكاء اصطناعي خارجية مدعومة باستخدام بيانات الاعتماد التي تقدمها. وبذلك تتحكم في المزوّدين والنماذج ومستويات الاستدلال وخدمات الصوت التي تستخدمها.
+19 لغة، من بينها العربية والأردية من اليمين إلى اليسار. تُضبط لغة الواجهة والإملاء والإجابة كل على حدة. دعم كامل لقارئ الشاشة والنص الكبير والتباين وتقليل الحركة.
 
-تُخزَّن بيانات الاعتماد بأمان على جهازك، ولا تُستخدم إلا للوصول إلى الخدمة المعنية. ويحدد كل مزوّد مدى التوفر وحدود الاستخدام والشروط وأي تكاليف محتملة.
+ما لا يفعله
+لا حساب سحابي، ولا مزامنة بين الأجهزة، ولا ذكاء اصطناعي نستضيفه نحن، ولا رصيد مضمّن، ولا تبديل صامت للنموذج أو الصوت الذي اخترته، ولا تصرفات تلقائية نيابة عنك. إجابات الذكاء الاصطناعي ليست استشارة طبية أو قانونية أو مالية.
 
-مصمم من أجل الوضوح
-
-يساعدك الإعداد الموجّه على ضبط التفكير والاستماع والتحدث وبحث الويب. وتسهّل اختبارات الاتصال الفردية وأدوات التشخيص المدمجة تحديد مشكلات الإعداد.
-
-تدعم الواجهة المركزة:
-
-• المحادثات الصوتية والنصية
-• 19 لغة للواجهة
-• المظهرين الفاتح والداكن
-• التخطيطين الرأسي والأفقي
-• جهد النموذج وأنماط الرد القابلة للضبط
-• سجل المحادثات ونصوصها
-• الردود المنطوقة مع الإيقاف المؤقت والإعادة
-• بحث ويب اختياري مستند إلى مصادر
-
-لا يدّعي Mr Broccoli أن كل إجابة يجب أن تكون فورية. لقد صُمم لمن يفضلون انتظار إجابة تستحق الاستماع.
+بلا اشتراك. ولعدم وجود نظام حسابات، فإن الشراء من متجر لا يفتح التطبيق في المتجر الآخر.
 ```
 
 ## Japanese (`ja-JP`)
@@ -753,61 +855,67 @@ Mr Broccoli هو عميل ذكاء اصطناعي يركز على الصوت، �
 ### Short description
 
 ```text
-速さより品質。選んだAIモデルを音声でもテキストでも。
+自分のAPIキーで使う音声AI。モデルを選び、答えを聞く。
 ```
 
 ### Full description
 
 ```text
-Mr Broccoliは、答えが届く速さよりも、その質を大切にする人のための音声中心AIクライアントです。
+Mr Broccoli は、すでに各プロバイダのアカウントを持っている人のための音声AIアプリです。キーを登録し、どのモデルが答えるかを正確に選び、返ってきた答えを聞く。当社のサーバーは経由しません。そもそも存在しないからです。
 
-音声でも、速さより品質を
+購入前に
+Mr Broccoli は、OpenAI、Anthropic、Google Gemini、xAI、Mistral、DeepSeek、OpenRouter、Alibaba Qwen の自分のAPIキーを使う前提で作られています。購入するとアプリを利用できます。AIの利用料は含まれません。使った分はプロバイダから直接請求されます。
 
-多くの音声体験は即答を優先します。Mr Broccoliはその逆です。音声会話でも、自分で選んだ高性能なモデルと推論レベルを利用できます。より良い答えに時間が必要なら、アプリはモデルにその時間を与え、待機状況を見える形で示します。速さのために品質をひそかに落とすことはありません。
+打つのではなく、話す
+• 話す、打つ、画像を添える
+• 最初の段落ができた時点から読み上げを開始
+• 段落単位で移動、一時停止、再開、最初から再生
+• ハンズフリー用のドライブモード。話し終わるのを待ち、カウントダウンし、送信し、答えを読み上げ、また聞き取りに戻ります
+• 音声認識はシステム、端末上のモデル、プロバイダのいずれかで
 
-自然に話すことも、都合に合わせて入力することもできます。どちらも対等な操作方法です。大きなマイクボタンから始めるか、スワイプして完全なテキスト欄へ切り替えます。Mr Broccoliは選択した応答モードでリクエストを送り、回答を自然な段落単位で読み上げられます。
+誰が答えるか
+• 経路を4つまで保存 — プロバイダ、正確なモデル、推論の深さ
+• 会話の途中でも文脈を保ったまま切り替え
+• ホーム画面に、次に誰がどの深さで答えるかを表示
+• 各回答には、実際に生成した経路とフォールバックが記録されます
 
-MR BROCCOLIの考え方を選ぶ
+会話ごとに調整
+• 長さ：簡潔、標準、詳細
+• トーン：プロフェッショナル、カジュアル、ナード、簡潔、ソクラテス式、ELI5
+• モデルと読み上げへの独自の指示
+• 会話ごとの声
+既定値を全体に設定し、会話単位で上書きできます。
 
-• 対応するAIプロバイダーとモデルを接続
-• プロバイダー、モデル、思考量を組み合わせた応答モードを作成
-• ホーム画面から応答モードを直接切り替え
-• 究極モードで複数の選択モデルに個別回答させ、設定したラウンド数だけ互いの回答を検討させて、最終回答を統合
-• 最新情報が必要な質問では、根拠のあるウェブ検索を有効化
-• 会話の記録を保存、再確認、管理
+あなたの会話
+• 端末内のローカルデータベースに保存
+• 検索、ピン留め、アーカイブ、名前変更、共有、削除
+• 連続した文字起こしの中で各項目を折りたたみ・展開
+• 任意のメッセージから分岐し、元を残したまま別の方向を試す
+• 個別の会話をパスワードまたは生体認証でロック
 
-自分だけの音声パイプラインを構築
+もっと必要なときは
+• ウェブ検索。出典は回答に添付されます
+• 評議会：複数のモデルが答え、互いに検証し、ひとつがまとめます
+• 対応モデルへの画像付きリクエスト
+• 過去の会話の参照（任意、すべて端末上）
 
-• 端末またはプロバイダーの音声認識を選択
-• システム音声、端末上のKokoro、またはプロバイダー音声を選択
-• 明示的な音声フォールバックと使用順序を設定
-• インターフェイス、認識、読み上げの言語を個別に選択
-• 次の音声を準備しながら、長い回答を段落ごとに再生
-• ドライブモードでハンズフリーの連続音声会話
-• 音声を試聴し、プロバイダーの各機能を個別にテスト
+プライバシー
+• Mr Broccoli のアカウントもサーバーもありません
+• リクエストは端末から、選んだプロバイダへ直接送られます
+• APIキーはOSの安全な保管領域に残ります。バックアップ、ログ、書き出しには決して含まれません
+• ホスト型プロバイダには当然そのリクエストが届きます。
 
-自分のプロバイダーアクセスを使用
+持ち出せるもの
+• 完全バックアップ。読めるJSON、またはパスフレーズ暗号化（AES-256-GCM）
+• どこでも読めて、他のAIにも渡せるMarkdownアーカイブ
+• 取り込みが既存のデータを上書きすることはありません
 
-Mr Broccoliは、あなたが提供する認証情報を使って、対応する外部AIサービスへ接続します。利用するプロバイダー、モデル、推論レベル、音声サービスを自分で管理できます。
+アラビア語とウルドゥー語の右横書きを含む19言語。画面表示、音声入力、回答の言語はそれぞれ個別に設定できます。スクリーンリーダー、大きな文字、コントラスト、視差効果の低減に対応。
 
-認証情報は端末内に安全に保存され、該当サービスへのアクセスにのみ使われます。利用可能状況、使用制限、規約、発生し得る料金は各プロバイダーが定めます。
+やらないこと
+クラウドアカウントなし、端末間同期なし、当社によるAIホスティングなし、クレジット同梱なし、選んだモデルや声を黙って差し替えることなし、あなたの代わりに勝手に動くこともなし。AIの回答は医療・法律・金融の助言ではありません。
 
-分かりやすさを重視した設計
-
-ガイド付き設定で、思考、聞き取り、読み上げ、ウェブ検索を準備できます。個別の接続テストと内蔵診断により、設定上の問題を見つけやすくしています。
-
-集中できるインターフェイスが対応する機能：
-
-• 音声とテキストの会話
-• 19のインターフェイス言語
-• ライトとダークの外観
-• 縦向きと横向きのレイアウト
-• 設定可能なモデルの思考量と応答スタイル
-• 会話履歴と記録
-• 一時停止と再生に対応した音声回答
-• 任意の根拠付きウェブ検索
-
-Mr Broccoliは、すべての答えが即座に届くふりをしません。聞く価値のある答えを待てる人のために作られています。
+サブスクリプションはありません。アカウント制度がないため、一方のストアでの購入がもう一方でアプリを解除することはありません。
 ```
 
 ## Hungarian (`hu-HU`)
@@ -815,61 +923,67 @@ Mr Broccoliは、すべての答えが即座に届くふりをしません。聞
 ### Short description
 
 ```text
-Minőség a gyorsaság előtt: MI szóban vagy írásban, választott modellekkel.
+Hangvezérelt MI a saját API-kulcsaiddal. Válassz modellt. Hallgasd meg.
 ```
 
 ### Full description
 
 ```text
-A Mr Broccoli egy hangközpontú MI-kliens azoknak, akik számára a válasz minősége fontosabb annál, hogy milyen gyorsan érkezik meg.
+A Mr Broccoli hangvezérelt MI-alkalmazás azoknak, akiknek már van saját fiókjuk a szolgáltatóknál. Add meg a kulcsaidat, válaszd ki pontosan, melyik modell válaszoljon, és hallgasd meg a választ. Semmi nem megy át a mi szerverünkön, mert nincs ilyen.
 
-MINŐSÉG A GYORSASÁG ELŐTT — HANGGAL IS
+VÁSÁRLÁS ELŐTT
+A Mr Broccoli a saját API-kulcsaid köré épül: OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter vagy Alibaba Qwen. A vásárlással megkapod az alkalmazást. Az MI-használatot nem tartalmazza — a szolgáltatód közvetlenül számlázza neked, amit elhasználsz.
 
-Sok hangalapú élmény az azonnali válaszokat részesíti előnyben. A Mr Broccoli ennek az ellenkezőjét teszi: a beszélt beszélgetésekben is az általad választott nagy képességű modelleket és következtetési szinteket használhatod. Ha egy jobb válasz több időt igényel, az alkalmazás megadja ezt az időt a modellnek, és láthatóvá teszi a várakozást, ahelyett hogy észrevétlenül feláldozná a minőséget a gyorsaságért.
+BESZÉLJ GÉPELÉS HELYETT
+• Beszélj, gépelj vagy csatolj képet
+• A válaszokat felolvassa, amint az első bekezdés elkészült
+• Ugorj bekezdésenként, szüneteltess, folytasd vagy kezdd újra
+• Vezetési mód a kihangosított körökhöz: megvárja, míg befejezed, visszaszámol, elküldi, felolvassa a választ és újra figyel
+• Beszédfelismerés a rendszerrel, eszközön futó modellel vagy a szolgáltatóddal
 
-Beszélj természetesen, vagy gépelj, amikor az kényelmesebb. Mindkét beviteli mód teljes értékű vezérlő: kezdd a nagy mikrofongombbal, vagy lapozz a teljes szövegmezőhöz. A Mr Broccoli a kiválasztott válaszmódon keresztül küldi el a kérésedet, és természetes, bekezdésalapú részekben fel is olvashatja a választ.
+KI VÁLASZOL
+• Ments el akár négy útvonalat — szolgáltató, pontos modell és gondolkodási mélység
+• Válts köztük beszélgetés közben a kontextus elvesztése nélkül
+• A főképernyő megmutatja, ki válaszol és milyen mélységgel
+• Minden válasz rögzíti a ténylegesen használt útvonalat, a tartalékokkal együtt
 
-VÁLASZD KI, HOGYAN GONDOLKODJON A MR BROCCOLI
+ÁLLÍTS BE MINDEN BESZÉLGETÉST
+• Hossz: rövid, normál vagy alapos
+• Hangnem: profi, laza, nerdes, tömör, szókratészi vagy ELI5
+• Saját modell- és felolvasási utasítások
+• Külön hang beszélgetésenként
+Adj meg globális alapértékeket, és írd felül őket beszélgetésenként.
 
-• Csatlakoztass támogatott MI-szolgáltatókat és modelleket
-• Hozz létre szolgáltatót, modellt és erőfeszítési szintet kombináló válaszmódokat
-• Válts közvetlenül a kezdőképernyőn a válaszmódok között
-• A Szuper módban több kiválasztott modell önállóan válaszol, a beállított fordulókon át értékeli egymás válaszait, majd összegzi a végső választ
-• Kapcsold be a forrásokra épülő webes keresést az aktuális információt igénylő kérdésekhez
-• Őrizd meg, tekintsd át és kezeld a beszélgetések átiratait
+A BESZÉLGETÉSEID
+• Helyi adatbázisban maradnak az eszközödön
+• Keress, rögzíts, archiválj, nevezz át, ossz meg vagy törölj
+• Csukd össze és nyisd ki a bejegyzéseket egyetlen folyamatos átiratban
+• Ágazz el bármelyik üzenettől, hogy más irányt próbálj az eredeti elvesztése nélkül
+• Zárj le egyes beszélgetéseket jelszóval vagy biometriával
 
-ÉPÍTSD FEL SAJÁT HANGFOLYAMATODAT
+HA TÖBBET SZERETNÉL
+• Webes keresés, a forrásokkal a válasz mellett
+• Tanács: több modell válaszol, átnézik egymást, majd egy összegez
+• Képes kérések a kompatibilis modelleknek
+• Választható visszanyúlás korábbi beszélgetésekhez, teljesen az eszközön
 
-• Válassz eszközön futó vagy szolgáltatói beszédfelismerést
-• Használj rendszerhangot, eszközön futó Kokorót vagy szolgáltatói hangot
-• Állíts be tudatos hangalapú tartalékútvonalakat és azok sorrendjét
-• Külön válaszd ki a felület, a felismerés és a felolvasás nyelvét
-• Hallgasd a hosszú válaszokat bekezdésenként, miközben a következő hanganyag készül
-• Használd a vezetési módot folyamatos, kéz nélküli hangbeszélgetéshez
-• Hallgasd meg a hangokat, és teszteld külön a szolgáltatók képességeit
+ADATVÉDELEM
+• Nincs Mr Broccoli fiók és nincs Mr Broccoli szerver
+• A kérések közvetlenül az eszközödről mennek a választott szolgáltatóhoz
+• Az API-kulcsok a rendszer biztonságos tárolójában maradnak — soha nem kerülnek mentésbe, naplóba vagy exportba
+• A felhős szolgáltató természetesen megkapja a neki küldött kérést
 
-HASZNÁLD SAJÁT SZOLGÁLTATÓI HOZZÁFÉRÉSED
+AMI A TIÉD MARAD
+• Teljes mentések olvasható JSON-ként vagy jelmondattal titkosítva (AES-256-GCM)
+• Markdown-archívumok, bárhol olvashatók vagy átadhatók egy másik MI-nek
+• Az importálás soha nem írja felül azt, ami már megvan
 
-A Mr Broccoli az általad megadott hitelesítő adatokkal csatlakozik a támogatott külső MI-szolgáltatásokhoz. Így te irányítod a használt szolgáltatókat, modelleket, következtetési szinteket és beszédszolgáltatásokat.
+19 nyelv, köztük a jobbról balra író arab és urdu. A felület, a diktálás és a válasz nyelve külön állítható. Képernyőolvasó, nagy szöveg, kontraszt és csökkentett mozgás támogatott.
 
-A hitelesítő adatok biztonságosan az eszközödön maradnak, és csak a megfelelő szolgáltatás elérésére használja őket az alkalmazás. Az elérhetőséget, használati korlátokat, feltételeket és lehetséges költségeket az egyes szolgáltatók határozzák meg.
+AMIT NEM CSINÁL
+Nincs felhőfiók, nincs eszközök közti szinkron, nincs általunk üzemeltetett MI, nincs benne kredit, nincs csendes modell- vagy hangcsere, és nem cselekszik önállóan a nevedben. Az MI válaszai nem minősülnek orvosi, jogi vagy pénzügyi tanácsnak.
 
-AZ ÁTLÁTHATÓSÁGRA TERVEZVE
-
-Az irányított beállítás segít a gondolkodás, hallgatás, beszéd és webes keresés konfigurálásában. Az egyedi kapcsolati tesztek és a beépített diagnosztika megkönnyítik a problémák felismerését.
-
-A letisztult felület támogatja:
-
-• A hang- és szövegalapú beszélgetéseket
-• A 19 felületi nyelvet
-• A világos és sötét megjelenést
-• Az álló és fekvő elrendezést
-• A beállítható modell-erőfeszítést és válaszstílusokat
-• A beszélgetési előzményeket és átiratokat
-• A szüneteltethető és ismételhető felolvasott válaszokat
-• Az opcionális, forrásalapú webes keresést
-
-A Mr Broccoli nem tesz úgy, mintha minden válasznak azonnal meg kellene érkeznie. Azoknak készült, akik hajlandók várni egy meghallgatásra érdemes válaszra.
+Nincs előfizetés. Mivel nincs fiókrendszer, az egyik áruházban vásárolt hozzáférés a másikban nem oldja fel az alkalmazást.
 ```
 
 ## Czech (`cs-CZ`)
@@ -877,61 +991,67 @@ A Mr Broccoli nem tesz úgy, mintha minden válasznak azonnal meg kellene érkez
 ### Short description
 
 ```text
-Kvalita před rychlostí: AI hlasem či textem s modely podle vašeho výběru.
+Hlasová AI s vlastními API klíči. Vyberte model. Poslechněte si odpověď.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli je hlasově zaměřený klient AI pro lidi, kterým záleží více na kvalitě odpovědi než na rychlosti jejího doručení.
+Mr Broccoli je hlasová AI aplikace pro ty, kdo už mají vlastní účty u poskytovatelů. Přidejte své klíče, vyberte přesně ten model, který má odpovědět, a poslechněte si odpověď. Nic neprochází přes náš server, protože žádný nemáme.
 
-KVALITA PŘED RYCHLOSTÍ — I PŘI HLASOVÉM POUŽITÍ
+NEŽ KOUPÍTE
+Mr Broccoli je postavený kolem vašich vlastních API klíčů od OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter nebo Alibaba Qwen. Nákup vám zpřístupní aplikaci. Nezahrnuje využití AI — poskytovatel vám účtuje přímo to, co spotřebujete.
 
-Mnoho hlasových služeb upřednostňuje okamžité odpovědi. Mr Broccoli volí opačný přístup: také v mluvených konverzacích můžete používat schopné modely a úrovně uvažování podle vlastního výběru. Pokud lepší odpověď vyžaduje více času, aplikace ho modelu poskytne a čekání zviditelní, místo aby nenápadně vyměnila kvalitu za rychlost.
+MLUVTE MÍSTO PSANÍ
+• Mluvte, pište nebo přiložte obrázek
+• Odpovědi se čtou nahlas, jakmile je hotový první odstavec
+• Přeskakujte po odstavcích, pozastavte, pokračujte nebo začněte znovu
+• Relace řízení pro rozhovory bez rukou: počká, až domluvíte, odpočítá, odešle, přečte odpověď a znovu poslouchá
+• Rozpoznávání řeči systémem, modelem v zařízení nebo vaším poskytovatelem
 
-Mluvte přirozeně nebo pište, kdykoli se vám to hodí. Oba způsoby zadávání jsou plnohodnotné ovládací prvky: začněte velkým tlačítkem mikrofonu nebo přejeďte k úplnému textovému poli. Mr Broccoli odešle požadavek přes zvolený režim odpovědi a může výsledek přečíst v přirozených úsecích po odstavcích.
+KDO ODPOVÍDÁ
+• Uložte až čtyři trasy — poskytovatel, přesný model a míra uvažování
+• Přepínejte je uprostřed rozhovoru bez ztráty kontextu
+• Úvodní obrazovka ukazuje, kdo odpoví a s jakou mírou
+• Každá odpověď zaznamená trasu, která ji skutečně vytvořila, včetně náhradní
 
-ZVOLTE, JAK MÁ MR BROCCOLI UVAŽOVAT
+NASTAVTE KAŽDÝ ROZHOVOR
+• Délka: stručná, normální nebo důkladná
+• Tón: profesionální, uvolněný, nerdský, úsporný, sokratovský nebo ELI5
+• Vlastní pokyny pro model i pro přednes
+• Konkrétní hlas pro daný rozhovor
+Nastavte globální výchozí hodnoty a přepište je u jednotlivých rozhovorů.
 
-• Připojte podporované poskytovatele AI a modely
-• Vytvořte režimy odpovědi kombinující poskytovatele, model a úroveň úsilí
-• Přepínejte režimy přímo na domovské obrazovce
-• Použijte Superrežim, ve kterém několik vybraných modelů odpovídá samostatně, během nastaveného počtu kol hodnotí odpovědi ostatních a vytvoří závěrečnou odpověď
-• Zapněte webové vyhledávání založené na zdrojích pro otázky vyžadující aktuální informace
-• Ukládejte, procházejte a spravujte přepisy konverzací
+VAŠE ROZHOVORY
+• Uložené v lokální databázi ve vašem zařízení
+• Hledejte, připínejte, archivujte, přejmenovávejte, sdílejte nebo mažte
+• Sbalujte a rozbalujte položky v souvislém přepisu
+• Větvete od libovolné zprávy a zkoušejte jiný směr bez ztráty originálu
+• Zamykejte jednotlivé rozhovory heslem nebo biometrií
 
-SESTAVTE SI VLASTNÍ HLASOVÝ ŘETĚZEC
+KDYŽ CHCETE VÍC
+• Vyhledávání na webu se zdroji připojenými k odpovědi
+• Rada: několik modelů odpoví, vzájemně se zkontrolují a jeden vše shrne
+• Dotazy s obrázkem na kompatibilní modely
+• Volitelné sáhnutí do dřívějších rozhovorů, celé v zařízení
 
-• Vyberte rozpoznávání řeči v zařízení nebo od poskytovatele
-• Použijte systémové hlasy, Kokoro v zařízení nebo hlasy poskytovatelů
-• Nastavte záměrné hlasové záložní možnosti a jejich pořadí
-• Nezávisle zvolte jazyky rozhraní, rozpoznávání a mluvených odpovědí
-• Poslouchejte dlouhé odpovědi po odstavcích, zatímco se připravuje další zvuk
-• Použijte režim jízdy pro průběžnou hlasovou konverzaci bez použití rukou
-• Poslechněte si náhledy hlasů a otestujte jednotlivé možnosti poskytovatelů
+SOUKROMÍ
+• Žádný účet Mr Broccoli a žádný server Mr Broccoli
+• Požadavky jdou z vašeho zařízení přímo k vybranému poskytovateli
+• API klíče zůstávají v bezpečném úložišti systému — nikdy v zálohách, protokolech ani exportech
+• Hostovaný poskytovatel samozřejmě obdrží požadavek, který mu pošlete
 
-POUŽIJTE VLASTNÍ PŘÍSTUP K POSKYTOVATELŮM
+CO ZŮSTÁVÁ VAŠE
+• Úplné zálohy jako čitelný JSON nebo šifrované heslem (AES-256-GCM)
+• Archivy v Markdownu ke čtení kdekoli nebo k předání jiné AI
+• Import nikdy nepřepíše to, co už tam je
 
-Mr Broccoli se připojuje k podporovaným službám AI třetích stran pomocí přihlašovacích údajů, které zadáte. Máte tak kontrolu nad používanými poskytovateli, modely, úrovněmi uvažování a hlasovými službami.
+19 jazyků, včetně arabštiny a urdštiny zprava doleva. Jazyk rozhraní, diktování a odpovědi se nastavují zvlášť. Podpora čtečky obrazovky, velkého textu, kontrastu a omezeného pohybu.
 
-Přihlašovací údaje jsou bezpečně uloženy ve vašem zařízení a používají se pouze k přístupu k odpovídající službě. Dostupnost, limity, podmínky a případné poplatky stanovují jednotliví poskytovatelé.
+CO NEDĚLÁ
+Žádný cloudový účet, žádná synchronizace mezi zařízeními, žádná AI hostovaná námi, žádný zahrnutý kredit, žádné tiché výměny vašeho modelu nebo hlasu a žádné samostatné akce vaším jménem. Odpovědi AI nejsou lékařská, právní ani finanční rada.
 
-NAVRŽENO PRO PŘEHLEDNOST
-
-Průvodce nastavením vám pomůže připravit uvažování, poslech, mluvení a webové vyhledávání. Samostatné testy připojení a vestavěná diagnostika usnadňují nalezení problémů.
-
-Soustředěné rozhraní podporuje:
-
-• Hlasové a textové konverzace
-• 19 jazyků rozhraní
-• Světlý a tmavý vzhled
-• Rozložení na výšku a na šířku
-• Nastavitelné úsilí modelu a styly odpovědí
-• Historii a přepisy konverzací
-• Mluvené odpovědi s pozastavením a opakováním
-• Volitelné webové vyhledávání založené na zdrojích
-
-Mr Broccoli nepředstírá, že každá odpověď musí přijít okamžitě. Je určen lidem, kteří jsou ochotni počkat na odpověď, kterou stojí za to slyšet.
+Bez předplatného. Protože neexistuje systém účtů, nákup v jednom obchodě neodemkne aplikaci v druhém.
 ```
 
 ## Polish (`pl-PL`)
@@ -939,61 +1059,67 @@ Mr Broccoli nepředstírá, že každá odpověď musí přijít okamžitě. Je 
 ### Short description
 
 ```text
-Jakość ponad szybkość: AI głosem lub tekstem z wybranymi modelami.
+AI głosem z twoimi kluczami API. Wybierz model. Posłuchaj odpowiedzi.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli to skoncentrowany na głosie klient AI dla osób, które cenią jakość odpowiedzi bardziej niż szybkość jej otrzymania.
+Mr Broccoli to głosowa aplikacja AI dla osób, które mają już własne konta u dostawców. Dodaj swoje klucze, wybierz dokładnie ten model, który ma odpowiedzieć, i posłuchaj odpowiedzi. Nic nie przechodzi przez nasz serwer, bo takiego nie ma.
 
-JAKOŚĆ PONAD SZYBKOŚĆ — TAKŻE W ROZMOWIE GŁOSOWEJ
+ZANIM KUPISZ
+Mr Broccoli jest zbudowany wokół twoich własnych kluczy API od OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter lub Alibaba Qwen. Zakup daje ci dostęp do aplikacji. Nie obejmuje korzystania z AI — dostawca rozlicza cię bezpośrednio za zużycie.
 
-Wiele usług głosowych stawia na natychmiastowe odpowiedzi. Mr Broccoli wybiera odwrotne podejście: również w rozmowach głosowych możesz korzystać z wydajnych modeli i poziomów rozumowania wybranych przez siebie. Jeśli lepsza odpowiedź wymaga więcej czasu, aplikacja daje go modelowi i pokazuje oczekiwanie, zamiast po cichu poświęcać jakość dla szybkości.
+MÓW, NIE PISZ
+• Mów, pisz albo dołącz obraz
+• Odpowiedzi są czytane na głos, gdy tylko gotowy jest pierwszy akapit
+• Przeskakuj akapitami, wstrzymuj, wznawiaj lub zaczynaj od nowa
+• Sesja jazdy do rozmów bez użycia rąk: czeka, aż skończysz, odlicza, wysyła, wypowiada odpowiedź i znów słucha
+• Rozpoznawanie mowy przez system, model na urządzeniu albo twojego dostawcę
 
-Mów naturalnie albo pisz, gdy jest Ci wygodniej. Obie metody wprowadzania są równorzędnymi elementami sterowania: zacznij od dużego przycisku mikrofonu lub przesuń do pełnego pola tekstowego. Mr Broccoli wysyła żądanie przez wybrany tryb odpowiedzi i może odczytać wynik w naturalnych fragmentach podzielonych na akapity.
+KTO ODPOWIADA
+• Zapisz do czterech tras — dostawca, dokładny model i poziom rozumowania
+• Zmieniaj je w trakcie rozmowy bez utraty kontekstu
+• Ekran główny pokazuje, kto odpowie i na jakim poziomie
+• Każda odpowiedź zapisuje trasę, która ją naprawdę wygenerowała, łącznie z awaryjną
 
-WYBIERZ, JAK MR BROCCOLI MA MYŚLEĆ
+USTAW KAŻDĄ ROZMOWĘ
+• Długość: zwięzła, normalna lub wyczerpująca
+• Ton: profesjonalny, swobodny, nerdowski, zwięzły, sokratejski lub ELI5
+• Własne instrukcje dla modelu i dla lektora
+• Konkretny głos dla danej rozmowy
+Ustaw wartości globalne i nadpisuj je w poszczególnych rozmowach.
 
-• Połącz obsługiwanych dostawców AI i modele
-• Twórz tryby odpowiedzi łączące dostawcę, model i poziom wysiłku
-• Przełączaj tryby bezpośrednio na ekranie głównym
-• Użyj Supertrybu, aby kilka wybranych modeli odpowiedziało niezależnie, oceniło wzajemnie swoje odpowiedzi w ustalonej liczbie rund i zsyntetyzowało odpowiedź końcową
-• Włącz wyszukiwanie internetowe oparte na źródłach dla pytań wymagających aktualnych informacji
-• Zapisuj, przeglądaj i zarządzaj transkrypcjami rozmów
+TWOJE ROZMOWY
+• Trzymane w lokalnej bazie danych na twoim urządzeniu
+• Szukaj, przypinaj, archiwizuj, zmieniaj nazwy, udostępniaj lub usuwaj
+• Zwijaj i rozwijaj wpisy w ciągłym zapisie
+• Rozgałęziaj od dowolnej wiadomości, by sprawdzić inny kierunek bez utraty oryginału
+• Blokuj wybrane rozmowy hasłem lub biometrią
 
-ZBUDUJ WŁASNY POTOK GŁOSOWY
+GDY POTRZEBUJESZ WIĘCEJ
+• Wyszukiwanie w sieci, ze źródłami dołączonymi do odpowiedzi
+• Rada: kilka modeli odpowiada, sprawdza się nawzajem, a jeden podsumowuje
+• Zapytania z obrazem do zgodnych modeli
+• Opcjonalne sięganie do wcześniejszych rozmów, w całości na urządzeniu
 
-• Wybierz rozpoznawanie mowy na urządzeniu lub u dostawcy
-• Korzystaj z głosów systemowych, Kokoro na urządzeniu lub głosów dostawców
-• Skonfiguruj świadomie wybrane głosowe opcje awaryjne i ich kolejność
-• Niezależnie wybieraj języki interfejsu, rozpoznawania i odpowiedzi mówionych
-• Słuchaj długich odpowiedzi akapit po akapicie, gdy przygotowywany jest kolejny dźwięk
-• Użyj trybu jazdy do ciągłej rozmowy głosowej bez użycia rąk
-• Odsłuchuj głosy i testuj poszczególne funkcje dostawców
+PRYWATNOŚĆ
+• Brak konta Mr Broccoli i brak serwera Mr Broccoli
+• Zapytania idą prosto z twojego urządzenia do wybranego dostawcy
+• Klucze API zostają w bezpiecznym magazynie systemu — nigdy w kopiach, logach ani eksportach
+• Hostowany dostawca oczywiście dostaje zapytanie, które mu wysyłasz
 
-KORZYSTAJ Z WŁASNEGO DOSTĘPU DO DOSTAWCÓW
+TO ZOSTAJE TWOJE
+• Pełne kopie jako czytelny JSON albo zaszyfrowane hasłem (AES-256-GCM)
+• Archiwa Markdown do czytania wszędzie albo przekazania innej AI
+• Import nigdy nie nadpisuje tego, co już jest
 
-Mr Broccoli łączy się z obsługiwanymi usługami AI innych firm za pomocą podanych przez Ciebie danych dostępowych. Dzięki temu kontrolujesz dostawców, modele, poziomy rozumowania i usługi głosowe.
+19 języków, w tym arabski i urdu pisane od prawej do lewej. Język interfejsu, dyktowania i odpowiedzi ustawia się osobno. Obsługa czytnika ekranu, dużego tekstu, kontrastu i ograniczonego ruchu.
 
-Dane dostępowe są bezpiecznie przechowywane na urządzeniu i używane tylko do łączenia z odpowiednią usługą. Dostępność, limity użycia, warunki i ewentualne opłaty określają poszczególni dostawcy.
+CZEGO NIE ROBI
+Brak konta w chmurze, brak synchronizacji między urządzeniami, brak AI hostowanej przez nas, brak dołączonych środków, brak cichej zmiany twojego modelu lub głosu i brak samodzielnych działań w twoim imieniu. Odpowiedzi AI nie są poradą medyczną, prawną ani finansową.
 
-ZAPROJEKTOWANY Z MYŚLĄ O PRZEJRZYSTOŚCI
-
-Konfiguracja z przewodnikiem pomaga ustawić myślenie, słuchanie, mówienie i wyszukiwanie internetowe. Oddzielne testy połączeń i wbudowana diagnostyka ułatwiają wykrywanie problemów.
-
-Skupiony interfejs obsługuje:
-
-• Rozmowy głosowe i tekstowe
-• 19 języków interfejsu
-• Jasny i ciemny wygląd
-• Układ pionowy i poziomy
-• Konfigurowalny wysiłek modelu i style odpowiedzi
-• Historię i transkrypcje rozmów
-• Odpowiedzi mówione z pauzą i powtarzaniem
-• Opcjonalne wyszukiwanie internetowe oparte na źródłach
-
-Mr Broccoli nie udaje, że każda odpowiedź musi być natychmiastowa. Powstał dla osób, które są gotowe poczekać na odpowiedź wartą wysłuchania.
+Bez subskrypcji. Ponieważ nie ma systemu kont, zakup w jednym sklepie nie odblokowuje aplikacji w drugim.
 ```
 
 ## Turkish (`tr-TR`)
@@ -1001,61 +1127,67 @@ Mr Broccoli nie udaje, że każda odpowiedź musi być natychmiastowa. Powstał 
 ### Short description
 
 ```text
-Hızdan önce kalite: Seçtiğiniz modellerle sesli veya yazılı yapay zekâ.
+Kendi API anahtarlarınızla sesli yapay zekâ. Modeli seçin. Yanıtı dinleyin.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli, bir yanıtın geliş hızından çok kalitesini önemseyenler için ses odaklı bir yapay zekâ istemcisidir.
+Mr Broccoli, sağlayıcılarda zaten kendi hesabı olanlar için tasarlanmış sesli bir yapay zekâ uygulamasıdır. Anahtarlarınızı ekleyin, tam olarak hangi modelin yanıtlayacağını seçin ve yanıtı dinleyin. Hiçbir şey bize ait bir sunucudan geçmez, çünkü öyle bir sunucu yok.
 
-SESLİ İLETİŞİMDE DE HIZDAN ÖNCE KALİTE
+SATIN ALMADAN ÖNCE
+Mr Broccoli, OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter veya Alibaba Qwen'den aldığınız kendi API anahtarlarınız üzerine kuruludur. Satın aldığınızda uygulamayı kullanabilirsiniz. Yapay zekâ kullanımını içermez — tükettiğinizi sağlayıcınız doğrudan size faturalandırır.
 
-Birçok ses deneyimi anında yanıt vermeye öncelik tanır. Mr Broccoli tam tersini yapar: sesli görüşmelerde de seçtiğiniz yetenekli modelleri ve akıl yürütme seviyelerini kullanmanıza izin verir. Daha iyi bir yanıt daha fazla zaman gerektiriyorsa uygulama bu zamanı modele tanır ve beklemeyi görünür kılar; hız uğruna kaliteden sessizce vazgeçmez.
+YAZMAK YERİNE KONUŞUN
+• Konuşun, yazın ya da bir görsel ekleyin
+• Yanıtlar, ilk paragraf hazır olur olmaz sesli okunur
+• Paragraf paragraf atlayın, duraklatın, sürdürün veya baştan başlatın
+• Eller serbest turlar için Sürüş Oturumu: siz bitirene kadar bekler, geri sayar, gönderir, yanıtı seslendirir ve yeniden dinlemeye geçer
+• Sistem, cihazdaki bir model veya sağlayıcınız üzerinden konuşma tanıma
 
-Doğal biçimde konuşun veya size uygun olduğunda yazın. Her iki giriş yöntemi de birinci sınıf denetimlerdir: büyük mikrofon düğmesiyle başlayın ya da tam metin alanına kaydırın. Mr Broccoli isteğinizi seçtiğiniz yanıt modu üzerinden gönderir ve yanıtı doğal, paragraf tabanlı parçalar hâlinde seslendirebilir.
+KİM YANITLIYOR
+• Dört rotaya kadar kaydedin — sağlayıcı, tam model ve akıl yürütme düzeyi
+• Konuşmanın ortasında bağlamı kaybetmeden geçiş yapın
+• Ana ekran, sırada kimin ve hangi düzeyde yanıtlayacağını söyler
+• Her yanıt, kendisini gerçekten üreten rotayı ve varsa yedeğini kaydeder
 
-MR BROCCOLI’NİN NASIL DÜŞÜNECEĞİNİ SEÇİN
+HER SOHBETİ AYARLAYIN
+• Uzunluk: kısa, normal veya kapsamlı
+• Üslup: profesyonel, samimi, meraklı, öz, Sokratik veya ELI5
+• Kendi model ve seslendirme yönergeleriniz
+• Sohbet başına belirli bir ses
+Genel varsayılanları belirleyin, sohbet bazında geçersiz kılın.
 
-• Desteklenen yapay zekâ sağlayıcılarını ve modellerini bağlayın
-• Sağlayıcı, model ve çaba seviyesini birleştiren yanıt modları oluşturun
-• Yanıt modları arasında doğrudan ana ekrandan geçiş yapın
-• Süper Mod ile seçilen birden fazla modelin bağımsız yanıt vermesini, belirlediğiniz turlar boyunca birbirlerini değerlendirmesini ve nihai bir yanıt oluşturmasını sağlayın
-• Güncel bilgi gerektiren sorular için kaynaklara dayalı web aramasını açın
-• Görüşme dökümlerinizi saklayın, yeniden inceleyin ve yönetin
+SOHBETLERİNİZ
+• Cihazınızdaki yerel bir veritabanında tutulur
+• Arayın, sabitleyin, arşivleyin, yeniden adlandırın, paylaşın veya silin
+• Kesintisiz bir dökümde girdileri katlayın ve açın
+• Herhangi bir mesajdan dallanarak özgününü kaybetmeden başka bir yön deneyin
+• Belirli sohbetleri parola veya biyometriyle kilitleyin
 
-KENDİ SES AKIŞINIZI KURUN
+DAHA FAZLASINI İSTEDİĞİNİZDE
+• Web araması, kaynaklar yanıta iliştirilmiş halde
+• Konsey: birkaç model yanıtlar, birbirini inceler, biri sentezler
+• Uyumlu modellere görselli istekler
+• Geçmiş sohbetlerinizden isteğe bağlı hatırlama, tamamen cihaz üzerinde
 
-• Cihaz veya sağlayıcı tabanlı konuşma tanımayı seçin
-• Sistem seslerini, cihazdaki Kokoro’yu veya sağlayıcı seslerini kullanın
-• Bilinçli ses yedeklerini ve sıralarını yapılandırın
-• Arayüz, tanıma ve sesli yanıt dillerini birbirinden bağımsız seçin
-• Sonraki ses hazırlanırken uzun yanıtları paragraf paragraf dinleyin
-• Eller serbest ve kesintisiz sesli görüşme için sürüş modunu kullanın
-• Sesleri önceden dinleyin ve sağlayıcı yeteneklerini tek tek test edin
+GİZLİLİK
+• Mr Broccoli hesabı yok, Mr Broccoli sunucusu yok
+• İstekler cihazınızdan doğrudan seçtiğiniz sağlayıcıya gider
+• API anahtarları işletim sisteminin güvenli deposunda kalır — yedeklerde, günlüklerde veya dışa aktarımlarda asla yer almaz
+• Bulut sağlayıcı, ona gönderdiğiniz isteği elbette alır
 
-KENDİ SAĞLAYICI ERİŞİMİNİZİ KULLANIN
+SİZİN KALAN
+• Okunabilir JSON veya parola ifadesiyle şifrelenmiş (AES-256-GCM) tam yedekler
+• Her yerde okunabilen ya da başka bir yapay zekâya verilebilen Markdown arşivleri
+• İçe aktarma, hâlihazırda var olanın üzerine asla yazmaz
 
-Mr Broccoli, sağladığınız kimlik bilgileriyle desteklenen üçüncü taraf yapay zekâ hizmetlerine bağlanır. Böylece kullandığınız sağlayıcılar, modeller, akıl yürütme seviyeleri ve ses hizmetleri sizin kontrolünüzde kalır.
+Sağdan sola yazılan Arapça ve Urduca dâhil 19 dil. Arayüz, dikte ve yanıt dili ayrı ayrı ayarlanır. Ekran okuyucu, büyük metin, kontrast ve azaltılmış hareket desteklenir.
 
-Kimlik bilgileri cihazınızda güvenli biçimde saklanır ve yalnızca ilgili hizmete erişmek için kullanılır. Kullanılabilirlik, kullanım sınırları, koşullar ve olası ücretler ilgili sağlayıcılar tarafından belirlenir.
+YAPMADIKLARI
+Bulut hesabı yok, cihazlar arası eşitleme yok, bizim barındırdığımız yapay zekâ yok, dâhil kredi yok, seçtiğiniz modelin veya sesin sessizce değiştirilmesi yok ve sizin adınıza özerk eylem yok. Yapay zekâ yanıtları tıbbi, hukuki veya finansal tavsiye değildir.
 
-NETLİK İÇİN TASARLANDI
-
-Yönlendirmeli kurulum; düşünme, dinleme, konuşma ve web aramasını yapılandırmanıza yardımcı olur. Ayrı bağlantı testleri ve yerleşik tanılama araçları sorunları bulmayı kolaylaştırır.
-
-Odaklı arayüz şunları destekler:
-
-• Sesli ve yazılı görüşmeler
-• 19 arayüz dili
-• Açık ve koyu görünüm
-• Dikey ve yatay düzen
-• Yapılandırılabilir model çabası ve yanıt stilleri
-• Görüşme geçmişi ve dökümleri
-• Duraklatma ve yineleme denetimli sesli yanıtlar
-• İsteğe bağlı, kaynaklara dayalı web araması
-
-Mr Broccoli her yanıtın anında gelmesi gerektiğini iddia etmez. Dinlemeye değer bir yanıt için beklemeyi kabul edenler için tasarlanmıştır.
+Abonelik yok. Hesap sistemi bulunmadığından, bir mağazadan yapılan satın alma diğerinde uygulamayı açmaz.
 ```
 
 ## Swedish (`sv-SE`)
@@ -1063,121 +1195,133 @@ Mr Broccoli her yanıtın anında gelmesi gerektiğini iddia etmez. Dinlemeye de
 ### Short description
 
 ```text
-Kvalitet före snabbhet: AI via röst eller text med modellerna du väljer.
+Röststyrd AI med dina egna API-nycklar. Välj modell. Lyssna på svaret.
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli är en röstfokuserad AI-klient för personer som bryr sig mer om svarets kvalitet än hur snabbt det kommer.
+Mr Broccoli är en röststyrd AI-app för dig som redan har egna konton hos leverantörerna. Lägg till dina nycklar, välj exakt vilken modell som svarar och lyssna på svaret. Ingenting går via någon server hos oss, för det finns ingen.
 
-KVALITET FÖRE SNABBHET — ÄVEN MED RÖST
+INNAN DU KÖPER
+Mr Broccoli är byggd kring dina egna API-nycklar från OpenAI, Anthropic, Google Gemini, xAI, Mistral, DeepSeek, OpenRouter eller Alibaba Qwen. Köpet ger dig appen. Det ingår ingen AI-användning — din leverantör fakturerar dig direkt för det du förbrukar.
 
-Många röstupplevelser prioriterar omedelbara svar. Mr Broccoli gör tvärtom: även i talade samtal kan du använda de kraftfulla modeller och resonemangsnivåer som du själv väljer. Om ett bättre svar tar längre tid får modellen den tiden, och appen gör väntan synlig i stället för att tyst byta bort kvalitet mot snabbhet.
+PRATA I STÄLLET FÖR ATT SKRIVA
+• Tala, skriv eller bifoga en bild
+• Svaren läses upp så snart första stycket är klart
+• Hoppa stycke för stycke, pausa, återuppta eller börja om
+• Körläge för handsfree-turer: väntar tills du talat färdigt, räknar ner, skickar, läser upp svaret och lyssnar igen
+• Taligenkänning via systemet, en modell på enheten eller din leverantör
 
-Tala naturligt eller skriv när det passar dig bättre. Båda inmatningssätten är fullvärdiga kontroller: börja med den stora mikrofonknappen eller svep till hela textfältet. Mr Broccoli skickar din begäran genom valt svarsläge och kan läsa upp svaret i naturliga, styckebaserade delar.
+VEM SOM SVARAR
+• Spara upp till fyra rutter — leverantör, exakt modell och resonemangsnivå
+• Byt mitt i samtalet utan att tappa sammanhanget
+• Startskärmen visar vem som svarar härnäst och på vilken nivå
+• Varje svar registrerar rutten som faktiskt gav det, inklusive reservvägar
 
-VÄLJ HUR MR BROCCOLI SKA TÄNKA
+STÄLL IN VARJE SAMTAL
+• Längd: kort, normal eller grundlig
+• Ton: professionell, avslappnad, nördig, koncis, sokratisk eller ELI5
+• Egna instruktioner för modell och uppläsning
+• En bestämd röst per samtal
+Sätt globala standardvärden och åsidosätt dem per samtal.
 
-• Anslut AI-leverantörer och modeller som stöds
-• Skapa svarslägen som kombinerar leverantör, modell och ansträngningsnivå
-• Växla svarsläge direkt från startskärmen
-• Använd Superläge för att låta flera valda modeller svara oberoende, granska varandra under ett valfritt antal rundor och sammanställa ett slutligt svar
-• Aktivera källbaserad webbsökning för frågor som kräver aktuell information
-• Spara, återbesök och hantera dina samtalsutskrifter
+DINA SAMTAL
+• Sparas i en lokal databas på din enhet
+• Sök, fäst, arkivera, byt namn, dela eller radera
+• Fäll ihop och ut poster i en löpande utskrift
+• Förgrena från valfritt meddelande och pröva en annan riktning utan att förlora originalet
+• Lås enskilda samtal med lösenord eller biometri
 
-BYGG DITT EGET RÖSTFLÖDE
+NÄR DU VILL HA MER
+• Webbsökning, med källorna bifogade till svaret
+• Råd: flera modeller svarar, granskar varandra och en sammanfattar
+• Bildfrågor till kompatibla modeller
+• Valfri återblick på tidigare samtal, helt på enheten
 
-• Välj taligenkänning på enheten eller från en leverantör
-• Använd systemröster, Kokoro på enheten eller leverantörsröster
-• Konfigurera avsiktliga röstreserver och deras ordning
-• Välj språk för gränssnitt, igenkänning och upplästa svar oberoende av varandra
-• Lyssna på långa svar stycke för stycke medan nästa ljud förbereds
-• Använd körläget för fortlöpande, handsfree röstsamtal
-• Förhandslyssna på röster och testa enskilda leverantörsfunktioner
+INTEGRITET
+• Inget Mr Broccoli-konto och ingen Mr Broccoli-server
+• Förfrågningar går direkt från din enhet till den leverantör du valt
+• API-nycklar stannar i systemets säkra lagring — aldrig i säkerhetskopior, loggar eller export
+• En hostad leverantör tar förstås emot förfrågan du skickar
 
-ANVÄND DIN EGEN LEVERANTÖRSÅTKOMST
+DITT FÖRBLIR DITT
+• Fullständiga säkerhetskopior som läsbar JSON eller lösenordskrypterade (AES-256-GCM)
+• Markdown-arkiv att läsa var som helst eller lämna vidare till en annan AI
+• En import skriver aldrig över det som redan finns
 
-Mr Broccoli ansluter till AI-tjänster från tredje part som stöds med autentiseringsuppgifter som du tillhandahåller. Det ger dig kontroll över de leverantörer, modeller, resonemangsnivåer och rösttjänster du använder.
+19 språk, med arabiska och urdu från höger till vänster. Språk för gränssnitt, diktering och svar ställs in var för sig. Stöd för skärmläsare, stor text, kontrast och reducerad rörelse.
 
-Autentiseringsuppgifter lagras säkert på din enhet och används endast för åtkomst till motsvarande tjänst. Tillgänglighet, användningsgränser, villkor och eventuella avgifter bestäms av respektive leverantör.
+VAD DEN INTE GÖR
+Inget molnkonto, ingen synkning mellan enheter, ingen AI hostad av oss, inga inkluderade krediter, inga tysta byten av din modell eller röst och inga självständiga handlingar i ditt namn. AI-svar är inte medicinsk, juridisk eller ekonomisk rådgivning.
 
-DESIGNAD FÖR TYDLIGHET
-
-Guidad konfiguration hjälper dig att ställa in tänkande, lyssning, tal och webbsökning. Enskilda anslutningstester och inbyggd diagnostik gör det enklare att hitta problem.
-
-Det fokuserade gränssnittet stöder:
-
-• Röst- och textsamtal
-• 19 gränssnittsspråk
-• Ljust och mörkt utseende
-• Stående och liggande layout
-• Konfigurerbar modellansträngning och svarsstilar
-• Samtalshistorik och utskrifter
-• Upplästa svar med paus och upprepning
-• Valfri källbaserad webbsökning
-
-Mr Broccoli låtsas inte att varje svar måste komma omedelbart. Det är byggt för personer som kan vänta på ett svar som är värt att höra.
+Ingen prenumeration. Eftersom det saknas kontosystem låser ett köp i en butik inte upp appen i den andra.
 ```
 
-## Urdu (`ur-PK`)
+## Urdu (`ur`)
 
 ### Short description
 
 ```text
-رفتار سے پہلے معیار: آپ کے منتخب AI ماڈلز کے ساتھ آواز یا متن۔
+اپنی API کلیدوں کے ساتھ آوازی AI۔ ماڈل چنیں، جواب سنیں۔
 ```
 
 ### Full description
 
 ```text
-Mr Broccoli آواز کو ترجیح دینے والا AI کلائنٹ ہے، ان لوگوں کے لیے جو جواب کی رفتار سے زیادہ اس کے معیار کو اہمیت دیتے ہیں۔
+Mr Broccoli ایک آواز پر مرکوز AI ایپ ہے، ان لوگوں کے لیے جن کے پاس پہلے ہی اپنے فراہم کنندہ اکاؤنٹس موجود ہیں۔ اپنی کلیدیں شامل کریں، بالکل وہی ماڈل چنیں جو جواب دے، اور جواب سنیں۔ کچھ بھی ہمارے سرور سے ہو کر نہیں گزرتا، کیونکہ ایسا کوئی سرور ہے ہی نہیں۔
 
-رفتار سے پہلے معیار — آواز میں بھی
+خریدنے سے پہلے
+Mr Broccoli آپ کی اپنی API کلیدوں کے گرد بنایا گیا ہے: OpenAI، Anthropic، Google Gemini، xAI، Mistral، DeepSeek، OpenRouter یا Alibaba Qwen۔ خریداری سے آپ کو ایپ ملتی ہے۔ اس میں AI کا استعمال شامل نہیں — جتنا آپ استعمال کریں گے، اس کا بل آپ کا فراہم کنندہ براہِ راست آپ کو بھیجے گا۔
 
-بہت سے صوتی تجربات فوری جواب کو ترجیح دیتے ہیں۔ Mr Broccoli اس کے برعکس طریقہ اختیار کرتا ہے: صوتی گفتگو میں بھی آپ اپنے منتخب کردہ طاقتور ماڈلز اور استدلال کی سطحیں استعمال کر سکتے ہیں۔ اگر بہتر جواب کے لیے زیادہ وقت درکار ہو تو ایپ ماڈل کو وہ وقت دیتی ہے اور انتظار واضح کرتی ہے، بجائے اس کے کہ رفتار کے لیے خاموشی سے معیار قربان کر دے۔
+لکھنے کے بجائے بولیں
+• بولیں، لکھیں یا تصویر منسلک کریں
+• پہلا پیراگراف تیار ہوتے ہی جواب پڑھ کر سنایا جاتا ہے
+• پیراگراف کے حساب سے آگے پیچھے جائیں، روکیں، جاری رکھیں یا دوبارہ شروع کریں
+• ہاتھ آزاد رکھ کر بات کرنے کے لیے ڈرائیو سیشن: آپ کے بولنے کے ختم ہونے کا انتظار کرتا ہے، گنتی کرتا ہے، بھیجتا ہے، جواب بولتا ہے اور پھر سننے لگتا ہے
+• تقریر کی شناخت نظام سے، آلے پر موجود ماڈل سے یا آپ کے فراہم کنندہ سے
 
-فطری انداز میں بولیں یا جب مناسب ہو ٹائپ کریں۔ دونوں طریقے برابر اہمیت رکھتے ہیں: بڑے مائیکروفون بٹن سے شروع کریں یا مکمل ٹیکسٹ فیلڈ کی طرف سوائپ کریں۔ Mr Broccoli آپ کی درخواست منتخب جوابی موڈ کے ذریعے بھیجتا ہے اور جواب کو قدرتی، پیراگراف پر مبنی حصوں میں بلند آواز سے پڑھ سکتا ہے۔
+کون جواب دے گا
+• چار راستے تک محفوظ کریں — فراہم کنندہ، عین ماڈل اور سوچ کی گہرائی
+• گفتگو کے بیچ میں سیاق کھوئے بغیر بدلیں
+• ہوم اسکرین بتاتی ہے کہ اگلا جواب کون اور کس گہرائی سے دے گا
+• ہر جواب اُس راستے کو درج کرتا ہے جس نے اسے واقعی بنایا، بشمول متبادل
 
-منتخب کریں کہ MR BROCCOLI کیسے سوچے
+ہر گفتگو کو ترتیب دیں
+• طوالت: مختصر، عام یا تفصیلی
+• لہجہ: پیشہ ورانہ، بےتکلف، نرڈی، جامع، سقراطی یا ELI5
+• ماڈل اور پڑھنے کے اپنے ہدایات
+• ہر گفتگو کے لیے الگ آواز
+عمومی اقدار مقرر کریں اور ہر گفتگو میں انہیں بدلیں۔
 
-• معاون AI فراہم کنندگان اور ماڈلز منسلک کریں
-• فراہم کنندہ، ماڈل اور کوشش کی سطح ملا کر جوابی موڈ بنائیں
-• ہوم اسکرین سے براہ راست جوابی موڈ تبدیل کریں
-• اعلیٰ موڈ میں کئی منتخب ماڈلز کو آزادانہ جواب دینے، مقررہ راؤنڈز میں ایک دوسرے کے جوابات کا جائزہ لینے اور حتمی جواب تیار کرنے دیں
-• تازہ معلومات والے سوالات کے لیے ذرائع پر مبنی ویب تلاش فعال کریں
-• گفتگو کے متن محفوظ کریں، دوبارہ دیکھیں اور منظم کریں
+آپ کی گفتگوئیں
+• آپ کے آلے پر مقامی ڈیٹابیس میں رہتی ہیں
+• تلاش کریں، پن کریں، محفوظ کریں، نام بدلیں، شیئر کریں یا حذف کریں
+• مسلسل ٹرانسکرپٹ میں اندراجات سمیٹیں اور کھولیں
+• کسی بھی پیغام سے شاخ بنا کر دوسری سمت آزمائیں، اصل کھوئے بغیر
+• انفرادی گفتگو کو پاس ورڈ یا بایومیٹرک سے مقفل کریں
 
-اپنا صوتی نظام بنائیں
+جب مزید چاہیے
+• ویب تلاش، ذرائع جواب کے ساتھ منسلک
+• کونسل: کئی ماڈل جواب دیتے ہیں، ایک دوسرے کو پرکھتے ہیں، پھر ایک خلاصہ کرتا ہے
+• ہم آہنگ ماڈلز کو تصویر کے ساتھ درخواستیں
+• پرانی گفتگو سے اختیاری رجوع، مکمل طور پر آلے پر
 
-• ڈیوائس یا فراہم کنندہ کی تقاریر شناخت منتخب کریں
-• سسٹم، ڈیوائس پر Kokoro یا فراہم کنندہ کی آوازیں منتخب کریں
-• واضح صوتی متبادل اور ان کی ترتیب مقرر کریں
-• انٹرفیس، شناخت اور بولے گئے جواب کی زبانیں الگ الگ منتخب کریں
-• اگلی آڈیو کی تیاری کے دوران طویل جوابات پیراگراف بہ پیراگراف سنیں
-• مسلسل ہینڈز فری صوتی گفتگو کے لیے ڈرائیونگ موڈ استعمال کریں
-• آوازوں کا پیش منظر سنیں اور فراہم کنندہ کی انفرادی صلاحیتیں جانچیں
+رازداری
+• نہ Mr Broccoli اکاؤنٹ، نہ Mr Broccoli سرور
+• درخواستیں آپ کے آلے سے سیدھی آپ کے منتخب فراہم کنندہ کو جاتی ہیں
+• API کلیدیں نظام کے محفوظ ذخیرے میں رہتی ہیں — بیک اپ، لاگز یا برآمدات میں کبھی نہیں
+• میزبان فراہم کنندہ کو وہ درخواست بلاشبہ ملتی ہے جو آپ اسے بھیجتے ہیں
 
-اپنی فراہم کنندہ رسائی استعمال کریں
+جو آپ کا رہتا ہے
+• مکمل بیک اپ، پڑھنے کے قابل JSON یا پاس فریز سے مخفی (AES-256-GCM)
+• Markdown آرکائیوز، کہیں بھی پڑھیں یا کسی دوسرے AI کو دے دیں
+• درآمد پہلے سے موجود چیزوں کو کبھی نہیں مٹاتی
 
-Mr Broccoli آپ کی فراہم کردہ اسناد کے ذریعے معاون تھرڈ پارٹی AI خدمات سے منسلک ہوتا ہے۔ اس طرح استعمال ہونے والے فراہم کنندگان، ماڈلز، استدلال کی سطحوں اور صوتی خدمات پر اختیار آپ کے پاس رہتا ہے۔
+19 زبانیں، جن میں دائیں سے بائیں لکھی جانے والی عربی اور اردو شامل ہیں۔ انٹرفیس، ڈکٹیشن اور جواب کی زبان الگ الگ مقرر ہوتی ہے۔ اسکرین ریڈر، بڑا متن، کنٹراسٹ اور کم حرکت کی مکمل معاونت۔
 
-اسناد آپ کے ڈیوائس پر محفوظ طریقے سے رکھی جاتی ہیں اور صرف متعلقہ خدمت تک رسائی کے لیے استعمال ہوتی ہیں۔ دستیابی، استعمال کی حدود، شرائط اور ممکنہ اخراجات ہر فراہم کنندہ طے کرتا ہے۔
+یہ کیا نہیں کرتی
+کوئی کلاؤڈ اکاؤنٹ نہیں، آلات کے درمیان ہم آہنگی نہیں، ہماری میزبانی والی AI نہیں، کوئی کریڈٹ شامل نہیں، آپ کے چنے ماڈل یا آواز کی خاموش تبدیلی نہیں، اور آپ کی طرف سے خودمختار کارروائی نہیں۔ AI کے جوابات طبی، قانونی یا مالی مشورہ نہیں ہیں۔
 
-وضاحت کے لیے ڈیزائن کیا گیا
-
-رہنمائی والا سیٹ اپ سوچنے، سننے، بولنے اور ویب تلاش کو ترتیب دینے میں مدد دیتا ہے۔ الگ الگ کنکشن ٹیسٹ اور بلٹ اِن تشخیص مسائل تلاش کرنا آسان بناتے ہیں۔
-
-مرکوز انٹرفیس میں شامل ہیں:
-
-• آواز اور متن کی گفتگو
-• 19 انٹرفیس زبانیں
-• روشن اور تاریک انداز
-• پورٹریٹ اور لینڈ اسکیپ لے آؤٹ
-• قابل ترتیب ماڈل کوشش اور جوابی انداز
-• گفتگو کی تاریخ اور متن
-• توقف اور دوبارہ چلانے والے صوتی جوابات
-• اختیاری، ذرائع پر مبنی ویب تلاش
-
-Mr Broccoli یہ دعویٰ نہیں کرتا کہ ہر جواب فوری ہونا چاہیے۔ یہ ان لوگوں کے لیے بنایا گیا ہے جو سننے کے قابل جواب کا انتظار کر سکتے ہیں۔
+کوئی سبسکرپشن نہیں۔ چونکہ اکاؤنٹ کا نظام نہیں، اس لیے ایک اسٹور پر خریداری دوسرے اسٹور پر ایپ نہیں کھولتی۔
 ```

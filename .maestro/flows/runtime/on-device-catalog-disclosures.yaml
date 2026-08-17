@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: Stage-owned on-device model catalogs
+name: Stage-owned on-device speech catalogs
 tags:
   - runtime
   - on-device
@@ -15,25 +15,6 @@ tags:
     id: main-settings-button
 - assertVisible:
     id: settings-page-overview
-
-# Thinking owns local response models.
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-thinking
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-thinking
-- assertVisible:
-    id: settings-page-thinking
-- tapOn:
-    id: thinking-add-model
-- assertVisible:
-    id: thinking-add-sheet
-- assertVisible:
-    id: thinking-local-model-qwen3-0.6b-q8
-- tapOn: "Dismiss"
-- tapOn:
-    id: settings-back-button
 
 # Listening owns local recognition models.
 - scrollUntilVisible:

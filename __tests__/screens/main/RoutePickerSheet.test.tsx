@@ -71,6 +71,26 @@ describe("RoutePickerSheet", () => {
     ).toBe(false);
   });
 
+  it("keeps an open-ended route list inside a scroll view", () => {
+    const extendedModes = [
+      ...modes,
+      ...Array.from({ length: 5 }, (_, index) => ({
+        id: `mode-${index + 3}`,
+        route: {
+          provider: "openai" as const,
+          model: "gpt-5.4",
+        },
+      })),
+    ];
+    const { screen } = renderSheet({
+      modes: extendedModes,
+      readyModes: extendedModes.map(({ id }) => id),
+    });
+
+    expect(screen.getByTestId("route-picker-list")).toBeTruthy();
+    expect(screen.getByTestId("route-picker-row-mode-7")).toBeTruthy();
+  });
+
   it("switches who answers next and closes", () => {
     const { onClose, onSelect, screen } = renderSheet();
 

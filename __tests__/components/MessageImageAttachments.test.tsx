@@ -6,6 +6,17 @@ import { MessageImageAttachments } from "../../src/components/MessageImageAttach
 import { lightColors } from "../../src/theme/colors";
 
 describe("MessageImageAttachments", () => {
+  const image = (id: string) => ({
+    byteSize: 128,
+    height: 48,
+    id,
+    kind: "image" as const,
+    mimeType: "image/jpeg" as const,
+    sharedWithProviders: [],
+    uri: `file://${id}.jpg`,
+    width: 64,
+  });
+
   it("keeps remove inside a 44pt target with the approved control shape", () => {
     const onRemove = jest.fn();
     const screen = render(
@@ -41,5 +52,22 @@ describe("MessageImageAttachments", () => {
 
     fireEvent.press(remove);
     expect(onRemove).toHaveBeenCalledWith("image-1");
+  });
+
+  it("wraps a four-image transcript gallery instead of clipping a strip", () => {
+    const screen = render(
+      <MessageImageAttachments
+        attachments={[image("one"), image("two"), image("three"), image("four")]}
+        colors={lightColors}
+        layout="grid"
+        t={((key: string) => key) as never}
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(screen.getByTestId("message-image-grid").props.style),
+    ).toEqual(expect.objectContaining({ flexWrap: "wrap" }));
+    expect(screen.getAllByLabelText("attachedImageLabel")).toHaveLength(4);
+    expect(screen.queryByTestId("message-image-strip")).toBeNull();
   });
 });

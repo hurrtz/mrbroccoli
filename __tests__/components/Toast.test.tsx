@@ -3,8 +3,6 @@ import { act, fireEvent } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { Toast } from "../../src/components/Toast";
-import { LocalizationProvider } from "../../src/i18n";
-import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 describe("Toast", () => {
@@ -77,7 +75,7 @@ describe("Toast", () => {
     ).toBeUndefined();
   });
 
-  it("waits behind a focused sheet before starting its dismissal clock", () => {
+  it("stays visible above a focused sheet and keeps its dismissal clock", () => {
     jest.useFakeTimers();
     const onDismiss = jest.fn();
     const screen = renderWithProviders(
@@ -89,17 +87,6 @@ describe("Toast", () => {
       />,
     );
 
-    expect(screen.queryByTestId("toast")).toBeNull();
-    act(() => jest.advanceTimersByTime(10_000));
-    expect(onDismiss).not.toHaveBeenCalled();
-
-    screen.rerender(
-      <ThemeProvider mode="light">
-        <LocalizationProvider language="en">
-          <Toast message="Export finished." onDismiss={onDismiss} visible />
-        </LocalizationProvider>
-      </ThemeProvider>,
-    );
     expect(screen.getByTestId("toast")).toBeTruthy();
     act(() => jest.advanceTimersByTime(4_200));
     expect(onDismiss).toHaveBeenCalledTimes(1);

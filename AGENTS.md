@@ -102,29 +102,12 @@ applies.
 
 ## Main Architecture
 
-- `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, LLM, playback, setup, and persistence behavior live outside the screen component.
-- `src/components/IntroBanner.tsx` and `src/components/introFlow/` are the
-  first-run introduction: a violet gradient banner row over the workspace
-  opening a three-step full-screen walkthrough (welcome, setup, live test),
-  with the automatic on-device setup step backed by
-  `src/screens/main/useAutoSetupJob.ts` and the shared card under
-  `src/components/autoSetup/`. The final step runs an ephemeral test turn
-  through `src/screens/main/useIntroTestTurn.ts` — a real voice-pipeline run
-  with local-only callbacks, so nothing is persisted. The close control stays
-  available throughout every visit so a BYOK user can leave before configuring
-  on-device models; closing does not set `settings.introCompleted`. Before the
-  first completion, the live test remains gated on a ready reasoning route and
-  Done remains gated on a successful test. `introTheme.ts` derives the flow
-  palette from the light/dark app theme while keeping the banner deliberately
-  distinct, and `useIntroPlayback.ts` activates the audio session the voice
-  pipeline leaves off while idle. Its audio examples are bundled under
-  `assets/intro-audio/intro-<lang>.m4a`, one per interface language; the
-  welcome step's on-screen dialogue must state the question each recording
-  actually answers, per language. Adding a language means a recording
-  normalized to -16 LUFS, an entry in `introClips.ts`, and localized dialogue
-  keys in `introTranslations.ts`; `docs/promo-audio-texts/<lang>.md` holds the
-  source text and records which provider voiced it. The blocking setup wizards
-  were removed; the app opens directly into the workspace.
+- `src/screens/MainScreen.tsx` is the main composition root. It wires focused hooks and services into the workspace and secondary surfaces; recording, transcription, provider LLM, playback, provider readiness, and persistence behavior live outside the screen component.
+- Mr Broccoli is a paid-upfront BYOK app. First launch opens the workspace
+  directly; no onboarding, edition entitlement, in-app purchase, or local LLM
+  exists. Missing response-provider configuration routes the user to
+  Connections. Optional downloaded STT/TTS remain secondary speech routes in
+  Listening and Speaking.
 - `src/features/settings/AntSettingsModal.tsx` is the configuration entry point. Its historical `Ant` prefix remains for import stability, but the app no longer depends on Ant Design. Navigation/frame concerns live in `AntSettingsFrame.tsx`; page routing lives in `AntSettingsPageContent.tsx`; reusable non-visual settings logic lives in `src/features/settings-core/`.
 - Shared buttons, inputs, lists, dialogs, and tags live in `src/design-system/NativeControls.tsx`; settings cards, fields, and pickers live under `src/features/settings/settings-primitives/`. Keep these React Native-owned controls dependency-light and accessible.
 - `src/screens/main/MainScreenRouteByline.tsx` is the home-screen route selector: one line stating who answers the next turn and at what effort, opening `RoutePickerSheet.tsx`.
@@ -479,6 +462,11 @@ components instead of generic ones. It is build tooling only.
 `design-system/` is a byte-faithful copy of the approved claude.ai/design
 project. It is the source of truth for product design intent; `src/` is the
 implementation of that intent, and the two are reconciled deliberately.
+
+- An explicit product decision recorded in the root living specs may retire a
+  mirrored surface before the next design re-import. In that case, keep the
+  mirror byte-faithful, do not implement the retired specimen, and record the
+  temporary drift in `DOCS_INDEX.md`.
 
 - **It is a mirror, not app code.** Nothing under `app/` or `src/` imports it,
   and it ships in no bundle. Its React is browser React, not React Native.

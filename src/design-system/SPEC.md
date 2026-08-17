@@ -29,14 +29,20 @@ framework or hiding platform behavior behind excessive abstraction.
   tags, switches, and related control primitives.
 - `IconButton.tsx` owns the standard icon-only interactive control.
 - `Switch.tsx` is the product's one switch: a 46x28 track inside a 44pt
-  target. It was promoted here from settings once the introduction needed it
-  too — a control used by two features is no longer feature-specific.
-- `VoiceOrb.tsx`, `OrbSatellite.tsx`, `ConversationSettingsSummary.tsx`,
-  and `TranscriptHandle.tsx` own the orb-centred
+  target. It is shared by settings and workspace features rather than being
+  feature-specific.
+- `VoiceOrb.tsx`, `OrbTransport.tsx`, `OrbSatellite.tsx`,
+  `AttachmentPopover.tsx`, `WorkspaceHeader.tsx`,
+  `ConversationSettingsSummary.tsx`, and `TranscriptHandle.tsx` own the orb-centred
   workspace controls introduced by the approved design system. They are
   presentation-only: every string arrives translated from the caller, and the
   orb's diameter is passed in by the screen that measured its space.
-  `OrbSatellite` and `ConversationSettingsSummary` also expose icon-only compact
+  `OrbTransport` permanently reserves the orb plus four-key orbit footprint so
+  phase changes cannot move the primary action. `AttachmentPopover` is an
+  anchored, transparent, horizontally scrolling image-management surface.
+  `WorkspaceHeader` combines portrait route selection and the full-row
+  conversation-settings target. `OrbSatellite` and
+  `ConversationSettingsSummary` also expose icon-only compact
   forms that preserve their labelled 44-point control when the owning layout
   cannot safely render optional visible copy. The conversation summary's full
   visible row is its one press target; the trailing control glyph is
@@ -53,23 +59,29 @@ framework or hiding platform behavior behind excessive abstraction.
 ## Interaction Invariants
 
 - `VoiceOrb` is the stable home-stage affordance, including blocked states; it
-  must not be exchanged for a legacy full-width CTA. Its ring footprint can
-  represent a whole-turn estimate and current-phase clock, with a track plus red
-  counter-clockwise tail after the estimate. Interpolation belongs on the
+  must not be exchanged for a legacy full-width CTA. One continuous
+  double-width ring represents the recording window, the whole-turn estimate
+  from submission to first speech, or spoken-reply read position, with a track
+  plus red counter-clockwise tail after the turn estimate. Interpolation belongs on the
   Reanimated UI thread so streamed-content renders cannot reduce ring frame
   rate; callers provide semantic values and remaining durations, never a JS
   animation interval. A timing may target a measured boundary short of one, so
   speaking can interpolate within the current clip without claiming an
-  incomplete reply is finished. Its approved anatomy is core disc,
-  screen-coloured gap, inner phase ring, then the outer whole-turn ring flush
-  against it; no tinted halo may occupy the gap. When both bands carry the same
-  state and progress, they render as one double-width stroke centred over that
-  exact footprint so adjacent SVG edges cannot expose a raster seam. They split
-  into two strokes only while they carry different clocks. Its core glyph names
-  the action the next press performs, never the state the pipeline is in, so it
-  must agree with the action label rendered beside it. Held speech is the case
-  where those diverge: the phase stays `speaking` while the pending action
-  reverses, so the glyph resolves to resume rather than pause.
+  incomplete reply is finished. Its approved anatomy is core disc, one
+  screen-coloured gap, and one thick ring; adjacent SVG strokes must never be
+  used to simulate a single band because their rasterized edges expose a seam.
+  The ring stays on neutral `turnTrack` and `turnInk` tokens in every phase;
+  phase colour belongs only to the disc. The disc-to-ring gap remains about
+  three points. Its glyph says the press action at the ends (`mic`, `stop`,
+  `pause`/`play`) and names intermediate work (`text-align-left` or mirrored
+  right, `brain`, `global`, `circuitry`, `user-sound`). Held speech keeps the
+  speaking phase and ring position while its glyph reverses to play.
+- `OrbTransport` shows no keys at idle but always owns the same measured box.
+  Stop remains active throughout a turn; Restart, Back, and Forward are enabled
+  only during spoken playback. `OrbSatellite` has no persistent container;
+  active toggles use filled accent glyphs plus matching labels, disabled
+  controls rest at 38%, and its Image form may replace the glyph with up to
+  three thumbnail layers without changing the row geometry.
 - Every interactive target is at least 44 by 44 points, including icon-only
   buttons. A smaller decorative glyph may sit inside that target.
 - Pressed, disabled, selected, destructive, loading, error, and focus states
@@ -77,6 +89,9 @@ framework or hiding platform behavior behind excessive abstraction.
 - Controls expose role, label, state, hint, and value where applicable.
 - Modals isolate screen-reader focus, keep backdrop-only dismiss layers out of
   the accessibility tree, and retain a labelled close action.
+- Toast feedback uses its own transparent native presentation above the current
+  drawer, sheet, or dialog. Opening a modal must never hide a toast or defer its
+  dismissal clock until that modal closes.
 - `Modal` forwards the native dismissal callback. Callers that replace one
   modal with a sibling surface wait for that callback on iOS and provide their
   own Android fallback; hiding React state alone does not prove the native view
@@ -155,9 +170,10 @@ framework or hiding platform behavior behind excessive abstraction.
 
 ## Control Shape and Size
 
-- Every control is a squircle on the radius scale. Two exceptions, both about
-  the voice: the workspace orb and the introduction's play action. Toggles
-  included — state reads from border and fill, not from shape.
+- Every contained control is a squircle on the radius scale. The workspace
+  voice orb is the deliberate circular exception; satellites are deliberately
+  borderless location keys whose switch state reads from filled glyph weight
+  plus colour rather than a persistent container.
 - Pills belong to things that are not buttons: status tags, selection chips,
   the fork tag, stepper dots, badges. Every button takes the control radius.
 - One commit button: the full-width primary action is 48pt on the control
@@ -168,8 +184,9 @@ framework or hiding platform behavior behind excessive abstraction.
 ## Icon Contract
 
 Application glyphs use `PhosphorIcon` with regular weight and semantic size
-tokens. Raw numeric glyph sizes and direct imports from another icon family are
-not supported. Two intentional exceptions exist: the official provider-brand
+tokens. Filled weight is reserved for active workspace satellite switches. Raw
+numeric glyph sizes and direct imports from another icon family are not
+supported. Two intentional exceptions exist: the official provider-brand
 SVGs in `ProviderIcon.tsx` use the semantic visual-size scale but retain their
 official brand geometry, and the voice orb passes its proportionally computed
 glyph size through `PhosphorIcon`'s `visualSize`, because the orb's diameter is

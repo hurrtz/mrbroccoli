@@ -21,7 +21,6 @@ import {
   getAvailableResponseModes,
   getResponseModeRoute,
 } from "../../utils/responseModes";
-import { getLocalModel } from "../../constants/localModels";
 
 export function getMainScreenRouteConfiguration(
   settings: Settings,
@@ -29,10 +28,6 @@ export function getMainScreenRouteConfiguration(
 ) {
   const activeResponseMode = settings.activeResponseMode;
   const activeResponseRoute = getResponseModeRoute(settings);
-  const localLlmModelId =
-    activeResponseRoute.runtime === "local"
-      ? activeResponseRoute.localModelId
-      : undefined;
   const provider = activeResponseRoute.provider;
   const providerApiKey = settings.apiKeys[provider].trim();
   const model = activeResponseRoute.model;
@@ -45,7 +40,6 @@ export function getMainScreenRouteConfiguration(
           rounds: settings.ulraModeRounds,
           routes: settings.responseModes
             .filter(({ id }) => availableResponseModeSet.has(id))
-            .filter(({ route }) => route.runtime !== "local")
             .filter(
               ({ route }) => !getProviderCircuitState(route.provider, "llm"),
             )
@@ -104,12 +98,9 @@ export function getMainScreenRouteConfiguration(
     globalSelectedTtsVoice,
     model,
     modelEffort,
-    localLlmModelId,
     provider,
     providerApiKey,
-    providerLabel: localLlmModelId
-      ? getLocalModel(localLlmModelId).name
-      : PROVIDER_LABELS[provider],
+    providerLabel: PROVIDER_LABELS[provider],
     selectedSttModel,
     selectedTtsModel,
     sttApiKey,
@@ -119,12 +110,10 @@ export function getMainScreenRouteConfiguration(
     ulraMode: ulraMode && ulraMode.routes.length > 1 ? ulraMode : undefined,
     voiceInputDisabled:
       !conversationsLoaded ||
-      (!localLlmModelId &&
-        !hasProviderCredentialForCapability(provider, providerApiKey, "llm")),
-    webSearchActive:
-      !localLlmModelId && webSearchMode !== "off" && webSearchReady,
+      !hasProviderCredentialForCapability(provider, providerApiKey, "llm"),
+    webSearchActive: webSearchMode !== "off" && webSearchReady,
     webSearchApiKey,
-    webSearchMode: localLlmModelId ? "off" : webSearchMode,
+    webSearchMode,
     webSearchOptions,
     webSearchProvider,
     webSearchReady,

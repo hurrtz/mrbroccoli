@@ -52,9 +52,6 @@ export const DEFAULT_PROVIDER_TTS_VOICES: ProviderTtsVoiceSelections =
  * `updateApiKey`, so this placeholder is replaced before it is ever relied on.
  */
 export const MIN_RESPONSE_MODES = 1;
-// The approved Thinking surface exposes no more than four switchable slots.
-// Persistence normalizes to the same bound so the editor and runtime agree.
-export const MAX_RESPONSE_MODES = 4;
 export const DEFAULT_RESPONSE_MODE_COUNT = 3;
 
 const NEUTRAL_RESPONSE_MODE_ROUTE = {

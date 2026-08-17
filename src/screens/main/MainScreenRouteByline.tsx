@@ -1,7 +1,6 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { getLocalModel } from "../../constants/localModels";
 import { getProviderModelName } from "../../constants/models";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import { ProviderIcon } from "../../components/ProviderIcon";
@@ -36,14 +35,9 @@ export function MainScreenRouteByline({
   const { colors } = useTheme();
   const { language, t } = useLocalization();
   const route = mode.route;
-  const local = route.runtime === "local" && Boolean(route.localModelId);
-  const modelName = local
-    ? getLocalModel(route.localModelId!).name
-    : getProviderModelName(route.provider, route.model);
+  const modelName = getProviderModelName(route.provider, route.model);
   const effortLabel = getResponseModeRouteEffortLabel(route, language);
-  const effortOptions = local
-    ? []
-    : getModelEffortOptions(route.provider, route.model);
+  const effortOptions = getModelEffortOptions(route.provider, route.model);
   const displayedEffortLabel =
     effortOptions.length === 0 ? t("normal") : (effortLabel ?? t("normal"));
 
@@ -58,15 +52,11 @@ export function MainScreenRouteByline({
       style={[styles.row, { borderBottomColor: colors.border }]}
       testID="route-byline"
     >
-      {local ? (
-        <PhosphorIcon color={colors.text} name="cpu" size="feature" />
-      ) : (
-        <ProviderIcon
-          color={colors.text}
-          provider={route.provider}
-          size="feature"
-        />
-      )}
+      <ProviderIcon
+        color={colors.text}
+        provider={route.provider}
+        size="feature"
+      />
       <Text
         numberOfLines={1}
         style={[styles.model, { color: colors.text }]}

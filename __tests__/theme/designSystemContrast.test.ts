@@ -74,7 +74,7 @@ const PAIRINGS: Pairing[] = [
   // Readiness dots on the settings canvas and cards (Phase 4).
   ["readiness ready dot on canvas", (c) => c.success, (c) => c.background, GRAPHICAL_FLOOR],
   ["readiness broken dot on canvas", (c) => c.danger, (c) => c.background, GRAPHICAL_FLOOR],
-  ["readiness attention ring on canvas", (c) => c.premium, (c) => c.background, GRAPHICAL_FLOOR],
+  ["readiness attention ring on canvas", (c) => c.attention, (c) => c.background, GRAPHICAL_FLOOR],
 ];
 
 describe.each([

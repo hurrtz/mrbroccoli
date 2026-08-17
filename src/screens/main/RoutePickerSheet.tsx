@@ -1,7 +1,6 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { getLocalModel } from "../../constants/localModels";
 import { getProviderModelName, PROVIDER_LABELS } from "../../constants/models";
 import { Modal } from "../../design-system/NativeControls";
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
@@ -31,15 +30,10 @@ function RouteRow({
   ready: boolean;
 }) {
   const { colors } = useTheme();
-  const { language, t } = useLocalization();
+  const { language } = useLocalization();
   const route = mode.route;
-  const local = route.runtime === "local" && Boolean(route.localModelId);
-  const providerLabel = local
-    ? t("settingsOnDevice")
-    : PROVIDER_LABELS[route.provider];
-  const modelName = local
-    ? getLocalModel(route.localModelId!).name
-    : getProviderModelName(route.provider, route.model);
+  const providerLabel = PROVIDER_LABELS[route.provider];
+  const modelName = getProviderModelName(route.provider, route.model);
   const effortLabel = getResponseModeRouteEffortLabel(route, language);
 
   return (
@@ -63,15 +57,11 @@ function RouteRow({
       ]}
       testID={`route-picker-row-${mode.id}`}
     >
-      {local ? (
-        <PhosphorIcon color={colors.text} name="cpu" size="feature" />
-      ) : (
-        <ProviderIcon
-          color={colors.text}
-          provider={route.provider}
-          size="feature"
-        />
-      )}
+      <ProviderIcon
+        color={colors.text}
+        provider={route.provider}
+        size="feature"
+      />
       <View style={styles.copy}>
         <Text
           numberOfLines={1}
@@ -130,7 +120,12 @@ export function RoutePickerSheet({
       }
       visible={visible}
     >
-      <View style={styles.list} testID="route-picker-list">
+      <ScrollView
+        contentContainerStyle={styles.list}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        testID="route-picker-list"
+      >
         {modes.map((mode) => (
           <RouteRow
             active={mode.id === selected}
@@ -143,7 +138,7 @@ export function RoutePickerSheet({
             ready={readyModes.includes(mode.id)}
           />
         ))}
-      </View>
+      </ScrollView>
     </Modal>
   );
 }

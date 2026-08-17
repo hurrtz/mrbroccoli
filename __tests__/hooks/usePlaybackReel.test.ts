@@ -101,6 +101,27 @@ describe("playback reel", () => {
     ]);
   });
 
+  it("restarts the current reply from its first paragraph", async () => {
+    const { enqueueAudio, enqueueThree, startChunk, stopPlayback, view } =
+      setup();
+    enqueueThree();
+    startChunk(2);
+    enqueueAudio.mockClear();
+
+    expect(view.result.current.canRestartReply).toBe(true);
+    await act(async () => {
+      await view.result.current.restartReply();
+    });
+
+    expect(stopPlayback).toHaveBeenCalledTimes(1);
+    expect(enqueueAudio.mock.calls.map(([uri]) => uri)).toEqual([
+      "file://one.m4a",
+      "file://two.m4a",
+      "file://three.m4a",
+    ]);
+    expect(view.result.current.readingProgress).toBe(0);
+  });
+
   it("sends back to the paragraph's own start once it is under way", async () => {
     // Under two seconds back means the paragraph before; after that it means
     // the start of the one being read.

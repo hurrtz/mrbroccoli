@@ -29,14 +29,13 @@ function clamp01(value: number) {
 }
 
 /**
- * Derives the orb's two clocks from the signals the session already has.
+ * Derives the orb's single progress clock from signals the session already has.
  *
- * Recording uses the recording cap. During processing, the inner ring uses
- * the current phase's learned clock while the outer ring uses the whole turn
- * to first speech. Past the outer estimate, overtime rises and the orb fills
- * with red. Speaking holds a full turn ring and carries how much of the reply
- * has been read, so Back and Forward move the arc by what the paragraph they
- * skip actually holds.
+ * Recording uses the recording cap. During processing, the ring measures the
+ * whole turn from submission to first speech; it deliberately does not expose
+ * per-phase estimates. Past that estimate, overtime rises and the orb fills
+ * with red. Speaking carries how much of the reply has been read, so Back and
+ * Forward move the arc by what the paragraph they skip actually holds.
  *
  * **Decision:** the speaking arc advances at spoken-clip boundaries rather
  * than on a clock. Neither the native queue nor the speech engine reports a
@@ -44,7 +43,7 @@ function clamp01(value: number) {
  * character weights are a measurement.
  */
 export function useOrbTurnProgress({
-  phaseTimingProgress,
+  phaseTimingProgress: _phaseTimingProgress,
   readingProgress,
   readingProgressTiming,
   recordingMaxMs,
@@ -94,15 +93,6 @@ export function useOrbTurnProgress({
     };
   }
 
-  const phaseEstimatedMs = phaseTimingProgress
-    ? Math.max(1000, phaseTimingProgress.estimatedMs)
-    : 0;
-  const phaseElapsedMs = phaseTimingProgress
-    ? Math.max(0, nowMs - phaseTimingProgress.startedAt)
-    : 0;
-  const phaseProgress = phaseTimingProgress
-    ? clamp01(phaseElapsedMs / phaseEstimatedMs)
-    : 0;
   const estimatedMs = speechStartProgress
     ? Math.max(1000, speechStartProgress.estimatedMs)
     : 0;
@@ -119,12 +109,12 @@ export function useOrbTurnProgress({
     speechStartProgress && elapsedMs < estimatedMs,
   );
   return {
-    phaseProgress,
+    phaseProgress: turnProgress,
     turnProgress,
     overtime,
     phaseProgressTiming:
-      phaseTimingProgress && phaseProgress < 1
-        ? { durationMs: Math.max(0, phaseEstimatedMs - phaseElapsedMs) }
+      speechStartProgress && turnProgress < 1
+        ? { durationMs: Math.max(0, estimatedMs - elapsedMs) }
         : undefined,
     turnProgressTiming:
       speechStartProgress && turnProgress < 1

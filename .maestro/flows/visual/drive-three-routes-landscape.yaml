@@ -12,8 +12,6 @@ tags:
 - setOrientation: PORTRAIT
 - assertVisible:
     id: main-screen
-- assertVisible:
-    id: intro-banner
 
 # A harmless placeholder credential exercises the normal route derivation
 # without making a provider request. State and Keychain are cleared per run.

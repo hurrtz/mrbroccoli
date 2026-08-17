@@ -4,7 +4,6 @@ import { fireEvent, render } from "@testing-library/react-native";
 
 import { IconAction } from "../../src/features/settings/settings-primitives/IconAction";
 import { LocalModelRouteGroup } from "../../src/features/settings/settings-primitives/LocalModelRouteGroup";
-import { PremiumBand } from "../../src/features/settings/settings-primitives/PremiumBand";
 import { SettingsPillAction } from "../../src/features/settings/settings-primitives/SettingsPillAction";
 import { RouteOptionRow } from "../../src/features/settings/settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../../src/features/settings/settings-primitives/SettingsGroup";
@@ -13,7 +12,6 @@ import { VoicePickerSheet } from "../../src/features/settings/settings-primitive
 import { getLocalModel } from "../../src/constants/localModels";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
-import { lightColors } from "../../src/theme/colors";
 import { DEFAULT_SETTINGS } from "../../src/types";
 import type { LocalModelSettingsController } from "../../src/features/settings-core/useLocalModelSettings";
 
@@ -216,8 +214,6 @@ describe("settings design primitives", () => {
         capability="stt"
         title="Who listens"
         footer="Choose a recognition route."
-        freeProviderRoutes={[]}
-        isPremium
         localModels={
           {
             benchmarks: {},
@@ -242,8 +238,6 @@ describe("settings design primitives", () => {
             testModel,
           } as unknown as LocalModelSettingsController
         }
-        onOpenPremium={jest.fn()}
-        premiumCopy="Premium routes"
         providerRoutes={[]}
         settings={DEFAULT_SETTINGS}
       />,
@@ -255,32 +249,6 @@ describe("settings design primitives", () => {
     ).toEqual({ checked: false, disabled: true });
     fireEvent.press(screen.getByTestId("local-model-test-whisper-tiny"));
     expect(testModel).toHaveBeenCalledWith(model);
-  });
-
-  it("uses the premium gradient tokens and keeps its upgrade action operable", () => {
-    const onPress = jest.fn();
-    const screen = wrap(
-      <PremiumBand
-        testID="premium-band"
-        premiumLabel="Premium"
-        copy="Connect providers and add more routes."
-        actionLabel="Upgrade"
-        onPress={onPress}
-      />,
-    );
-
-    expect(screen.getByTestId("premium-band").props.colors).toEqual([
-      lightColors.premiumGradientSoftStart,
-      lightColors.premiumGradientSoftMiddle,
-      lightColors.premiumGradientSoftEnd,
-    ]);
-    expect(
-      StyleSheet.flatten(
-        screen.getByTestId("premium-band-badge").props.style,
-      ),
-    ).toMatchObject({ borderRadius: 18, height: 36, width: 36 });
-    fireEvent.press(screen.getByLabelText("Upgrade"));
-    expect(onPress).toHaveBeenCalledTimes(1);
   });
 
   it("renders compact settings actions as controls rather than pills", () => {

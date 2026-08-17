@@ -23,7 +23,6 @@ import type {
 import type { SpeechDiagnosticsContext } from "../speech/diagnostics";
 import type { UlraModeConfig } from "../ulraMode";
 import type {
-  LocalLlmModelId,
   LocalSttModelId,
   LocalTtsModelId,
 } from "../../constants/localModels";
@@ -79,7 +78,6 @@ export interface RunVoicePipelineParams {
   messages: Message[];
   model: string;
   modelEffort?: string;
-  localLlmModelId?: LocalLlmModelId;
   provider: Provider;
   providerApiKey: string;
   sttMode: SttBackendMode;

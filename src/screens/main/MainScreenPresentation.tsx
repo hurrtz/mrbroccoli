@@ -10,8 +10,6 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ConversationDrawer } from "../../components/ConversationDrawer";
-import { IntroFlowScreen } from "../../components/introFlow/IntroFlowScreen";
-import { PremiumUpgradeModal } from "../../components/PremiumUpgradeModal";
 import { Toast } from "../../components/Toast";
 import { AntSettingsModal } from "../../features/settings/AntSettingsModal";
 import type { AppLanguage } from "../../i18n/localeRegistry";
@@ -28,13 +26,11 @@ interface MainScreenPresentationProps {
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
   councilDisclosure: React.ComponentProps<typeof DisclosureDialog>;
   imageConsent: React.ComponentProps<typeof DisclosureDialog>;
-  intro: React.ComponentProps<typeof IntroFlowScreen>;
   imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
   ipadLayout: IpadLayout;
   isLandscape: boolean;
   language: AppLanguage;
-  premiumUpgrade: React.ComponentProps<typeof PremiumUpgradeModal>;
   settingsModal: React.ComponentProps<typeof AntSettingsModal>;
   styleSheet: React.ComponentProps<typeof StyleSheetModal>;
   surfaceTransition: { label: string; visible: boolean };
@@ -47,13 +43,11 @@ export function MainScreenPresentation({
   conversationDrawer,
   councilDisclosure,
   imageConsent,
-  intro,
   imageSource,
   isDark,
   ipadLayout,
   isLandscape,
   language,
-  premiumUpgrade,
   settingsModal,
   styleSheet,
   surfaceTransition,
@@ -104,9 +98,6 @@ export function MainScreenPresentation({
       />
       <Toast {...toast} />
 
-      {/* Setup no longer takes the screen. A new user lands in the real
-          workspace and is offered a path from the intro banner, or contextually
-          when they try a turn with nothing configured. */}
       {ipadLayout.isRegularWidth ? (
         <View style={styles.ipadShell} testID="ipad-regular-shell">
           <ConversationDrawer
@@ -142,11 +133,9 @@ export function MainScreenPresentation({
 
       <StyleSheetModal {...styleSheet} />
       <AntSettingsModal {...settingsModal} />
-      <PremiumUpgradeModal {...premiumUpgrade} />
       {!ipadLayout.isRegularWidth ? (
         <ConversationDrawer {...conversationDrawer} />
       ) : null}
-      <IntroFlowScreen {...intro} />
     </SafeAreaView>
   );
 }

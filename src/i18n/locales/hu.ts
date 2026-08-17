@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const hu = {
   ...conversationKnowledgeTranslations.hu,
   ...imagePromptTranslations.hu,
   ...onDeviceTranslations.hu,
-  ...onboardingTranslations.hu,
-  ...introTranslations.hu,
-  ...premiumTranslations.hu,
+  ...localSpeechTranslations.hu,
+  ...settingsTranslations.hu,
   ...transcriptEditTranslations.hu,
   ...workspaceTranslations.hu,
   ...sessionLockTranslations.hu,
-  ...autoSetupTranslations.hu,
   appName: "Brokkoli úr",
   retry: "Próbáld újra",
   dismiss: "Bezárás",
@@ -40,7 +36,6 @@ export const hu = {
   settings: "Beállítások",
   settingsReleaseVersion: ({ version }) => `Verzió ${version}`,
   all: "Összes",
-  firstRun: "Első indítás",
   instructions: "Utasítások",
   providers: "Szolgáltatók",
   webSearch: "Webes keresés",
@@ -213,10 +208,10 @@ export const hu = {
   createApiKey: "Hitelesítő adatok",
   apiKey: "API-kulcs",
   aboutThisProvider: "Erről a szolgáltatóról",
-  openRouterOnboardingTitle: "Egy kulcs, több szolgáltató",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Egy kulcs, több szolgáltató",
+  openRouterGatewayDescription:
     "Hozz létre egy dedikált OpenRouter-kulcsot, illessze be alább, és használd több szolgáltató pillanatkép-alapú modelljeit anélkül, hogy bármelyik közvetlen kapcsolatát lecserélné.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Kérés elérési útja: ez az eszköz → OpenRouter → kiválasztott upstream szolgáltató",
   openRouterKeys: "OpenRouter kulcsok",
   providerStatusInvalid: "Érvénytelen",

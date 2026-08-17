@@ -1,5 +1,5 @@
 import React from "react";
-import { act, fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render, within } from "@testing-library/react-native";
 import { AccessibilityInfo, Keyboard, StyleSheet, View } from "react-native";
 
 import { Circle } from "react-native-svg";
@@ -66,7 +66,6 @@ jest.mock("react-native-gesture-handler", () => {
         { gesture, testID: `${gesture.kind}-gesture-detector` },
         children,
       ),
-    TouchableOpacity: require("react-native").TouchableOpacity,
   };
 });
 
@@ -190,10 +189,10 @@ describe("MainScreenVoiceStage composer", () => {
         screen.getByTestId("voice-text-input-viewport").props.style,
       ),
     ).toMatchObject({
-      flexBasis: 196,
+      flexBasis: 227,
       flexGrow: 0,
       flexShrink: 1,
-      maxHeight: 196,
+      maxHeight: 227,
     });
     expect(
       StyleSheet.flatten(
@@ -219,40 +218,12 @@ describe("MainScreenVoiceStage composer", () => {
         screen.getByTestId("voice-text-input-viewport").props.style,
       ),
     ).toMatchObject({
-      flexBasis: 150,
+      flexBasis: 174,
       flexGrow: 0,
       flexShrink: 1,
-      maxHeight: 150,
+      maxHeight: 174,
     });
     expect(screen.getByTestId("landscape-stage-controls")).toBeTruthy();
-  });
-
-  it("previews prompt images without owning the add control", () => {
-    const onRemoveImage = jest.fn();
-    const screen = renderStage(
-      <MainScreenVoiceStage
-        {...createProps({
-          attachments: [
-            {
-              id: "image-1",
-              kind: "image",
-              uri: "file:///message-images/image-1.jpg",
-              mimeType: "image/jpeg",
-              width: 1200,
-              height: 800,
-              byteSize: 1000,
-              sharedWithProviders: [],
-            },
-          ],
-          onRemoveImage,
-        })}
-      />,
-    );
-
-    fireEvent.press(screen.getByLabelText("Remove attached image 1"));
-
-    expect(onRemoveImage).toHaveBeenCalledWith("image-1");
-    expect(screen.queryByLabelText("Add image")).toBeNull();
   });
 
   it("rests on the voice orb as the screen's one loud element", () => {
@@ -288,6 +259,18 @@ describe("MainScreenVoiceStage composer", () => {
     expect(
       StyleSheet.flatten(screen.getByTestId("pager-chevron-right").props.style),
     ).toEqual(expect.objectContaining({ height: 44, width: 44 }));
+    // The arrows are siblings of the pager's pan target, so a failed pan
+    // finalizer cannot overwrite an ordinary tap's completed transition.
+    expect(
+      within(screen.getByTestId("pan-gesture-detector")).queryByTestId(
+        "pager-chevron-right",
+      ),
+    ).toBeNull();
+    expect(
+      within(screen.getByTestId("pager-chevron-layer")).getByTestId(
+        "pager-chevron-right",
+      ),
+    ).toBeTruthy();
 
     fireEvent.press(orb);
     expect(onPress).toHaveBeenCalledTimes(1);
@@ -302,7 +285,7 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(
       StyleSheet.flatten(screen.getByTestId("voice-orb-idle").props.style),
-    ).toEqual(expect.objectContaining({ height: 148, width: 148 }));
+    ).toEqual(expect.objectContaining({ height: 120, width: 120 }));
   });
 
   it("blocks prompt CTAs when the selected voice route is unavailable", () => {
@@ -636,28 +619,25 @@ describe("MainScreenVoiceStage composer", () => {
     expect(onPressOut).toHaveBeenCalledTimes(1);
   });
 
-  it.each(["toggle-to-talk", "drive-session"] as const)(
-    "treats one %s orb tap as one toggle instead of a zero-length hold",
-    (inputMode) => {
-      const onPress = jest.fn();
-      const onPressIn = jest.fn();
-      const onPressOut = jest.fn();
-      const screen = renderStage(
-        <MainScreenVoiceStage
-          {...createProps({ inputMode, onPress, onPressIn, onPressOut })}
-        />,
-      );
+  it("treats one tap-to-talk orb tap as one toggle instead of a zero-length hold", () => {
+    const onPress = jest.fn();
+    const onPressIn = jest.fn();
+    const onPressOut = jest.fn();
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({ onPress, onPressIn, onPressOut })}
+      />,
+    );
 
-      const orb = screen.getByTestId("voice-orb-idle");
-      expect(orb.props.onPressIn).toBeUndefined();
-      expect(orb.props.onPressOut).toBeUndefined();
-      fireEvent.press(orb);
+    const orb = screen.getByTestId("voice-orb-idle");
+    expect(orb.props.onPressIn).toBeUndefined();
+    expect(orb.props.onPressOut).toBeUndefined();
+    fireEvent.press(orb);
 
-      expect(onPressIn).not.toHaveBeenCalled();
-      expect(onPressOut).not.toHaveBeenCalled();
-      expect(onPress).toHaveBeenCalledTimes(1);
-    },
-  );
+    expect(onPressIn).not.toHaveBeenCalled();
+    expect(onPressOut).not.toHaveBeenCalled();
+    expect(onPress).toHaveBeenCalledTimes(1);
+  });
 
   it("does not focus the text composer when a swipe selects it", () => {
     const requestFrame = jest
@@ -691,6 +671,76 @@ describe("MainScreenVoiceStage composer", () => {
       expect.any(Function),
     );
     requestFrame.mockRestore();
+  });
+
+  it("does not focus the text composer when an arrow selects it", () => {
+    const requestFrame = jest
+      .spyOn(global, "requestAnimationFrame")
+      .mockImplementation(() => 0);
+    const onInputSurfaceChange = jest.fn();
+    const screen = renderStage(
+      <MainScreenVoiceStage {...createProps({ onInputSurfaceChange })} />,
+    );
+    fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+      nativeEvent: { layout: { width: 320 } },
+    });
+    requestFrame.mockClear();
+    const { withTiming } = jest.requireMock("react-native-reanimated") as {
+      withTiming: jest.Mock;
+    };
+    withTiming.mockClear();
+
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
+
+    expect(onInputSurfaceChange).toHaveBeenCalledWith("text");
+    expect(requestFrame).not.toHaveBeenCalled();
+    expect(withTiming).toHaveBeenCalledWith(
+      -352,
+      { duration: 220 },
+      expect.any(Function),
+    );
+    requestFrame.mockRestore();
+  });
+
+  it.each([
+    ["right", [-352, -704, -352, -704, -352]],
+    ["left", [352, 0, 352, 0, 352]],
+  ] as const)(
+    "keeps every repeated %s-arrow page entering from that side",
+    (direction, expectedTargets) => {
+      const screen = renderStage(<MainScreenVoiceStage {...createProps()} />);
+      fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+        nativeEvent: { layout: { width: 320 } },
+      });
+      const { withTiming } = jest.requireMock("react-native-reanimated") as {
+        withTiming: jest.Mock;
+      };
+      withTiming.mockClear();
+
+      for (const expectedTarget of expectedTargets) {
+        fireEvent.press(screen.getByTestId(`pager-chevron-${direction}`));
+        expect(withTiming).toHaveBeenLastCalledWith(
+          expectedTarget,
+          { duration: 220 },
+          expect.any(Function),
+        );
+      }
+    },
+  );
+
+  it("keeps both pager arrows fully active when the prompt route is disabled", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage {...createProps({ disabled: true })} />,
+    );
+
+    for (const direction of ["left", "right"] as const) {
+      const arrow = screen.getByTestId(`pager-chevron-${direction}`);
+      expect(arrow.props.accessibilityState).toEqual({ disabled: false });
+      expect(StyleSheet.flatten(arrow.props.style).opacity).toBe(1);
+    }
+
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
+    expect(screen.getByPlaceholderText("Type a message")).toBeTruthy();
   });
 
   it("preserves an unfinished text draft while the pipeline is active", () => {
@@ -810,53 +860,17 @@ describe("MainScreenVoiceStage composer", () => {
     // Recording reads the track colour, not the wash, and the glyph says what
     // tapping does.
     expect(
-      screen.getByTestId("phosphor-icon-stop", hiddenIconQuery),
+      within(orb).getByTestId("phosphor-icon-stop", hiddenIconQuery),
     ).toBeTruthy();
     expect(screen.queryByTestId("active-waveform")).toBeNull();
     expect(
-      screen.getAllByTestId("pager-chevron-left", hiddenIconQuery)[0].props
-        .accessibilityState,
-    ).toEqual({ disabled: true });
-  });
-
-  it("shows the Drive silence countdown in the recording orb", () => {
-    const screen = renderStage(
-      <MainScreenVoiceStage
-        {...createProps({
-          driveSilenceCountdownSeconds: 3,
-          driveVoiceActive: false,
-          inputMode: "drive-session",
-          isActive: true,
-          recordingStartedAtMs: Date.now(),
-          visualPhase: "recording",
-        })}
-      />,
-    );
-
-    expect(screen.getByTestId("voice-orb-core-label").props.children).toBe(
-      "3",
-    );
+      screen.getByTestId("pager-chevron-layer", hiddenIconQuery).props
+        .pointerEvents,
+    ).toBe("none");
     expect(
-      StyleSheet.flatten(screen.getByTestId("voice-orb-core-label").props.style)
-        .color,
-    ).toBe(lightColors.danger);
-    expect(screen.getByTestId("voice-orb-active").props.accessibilityLabel).toBe(
-      "Sends in 3…",
-    );
-
-    screen.rerender(
-      <MainScreenVoiceStage
-        {...createProps({
-          driveSilenceCountdownSeconds: 3,
-          driveVoiceActive: true,
-          inputMode: "drive-session",
-          isActive: true,
-          recordingStartedAtMs: Date.now(),
-          visualPhase: "recording",
-        })}
-      />,
-    );
-    expect(screen.queryByTestId("voice-orb-core-label")).toBeNull();
+      screen.getByTestId("pager-chevron-left", hiddenIconQuery).props
+        .accessibilityState,
+    ).toEqual({ disabled: false });
   });
 
   it("announces voice pipeline phase changes without announcing every ETA tick", () => {
@@ -909,12 +923,13 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
-    // 5s into a 10s cap: the inner ring's progress arc is present alongside
+    // 5s into a 10s cap: the ring's progress arc is present alongside
     // its track, drawn in the recording track colour.
     const strokes = screen
       .UNSAFE_getAllByType(Circle)
       .map((circle) => circle.props.stroke);
-    expect(strokes).toContain(lightColors.phaseRecordingTrack);
+    expect(strokes).toContain(lightColors.turnTrack);
+    expect(strokes).toContain(lightColors.turnInk);
     now.mockRestore();
   });
 
@@ -938,16 +953,16 @@ describe("MainScreenVoiceStage composer", () => {
       />,
     );
 
-    // Half way through the estimate: the outer ring draws turn ink over the
-    // turn track. The pre-mounted late arcs have a full dash offset until the
-    // UI-thread delay expires, so they are visually absent here.
+    // Half way through the estimate: the neutral thick ring draws its progress
+    // ink over its track. Phase colour belongs to the core, not the ring.
     let strokes = screen
       .UNSAFE_getAllByType(Circle)
       .map((circle) => circle.props.stroke);
-    expect(strokes).toContain(lightColors.turnInk);
     expect(strokes).toContain(lightColors.turnTrack);
+    expect(strokes).toContain(lightColors.turnInk);
+    expect(strokes).not.toContain(lightColors.phaseThinking);
 
-    // A full estimate past the deadline: both rings carry the red tail.
+    // A full estimate past the deadline: the single ring carries the red tail.
     now.mockReturnValue(30_000);
     screen.rerender(
       <MainScreenVoiceStage
@@ -971,7 +986,7 @@ describe("MainScreenVoiceStage composer", () => {
       .map((circle) => circle.props.stroke);
     expect(
       strokes.filter((stroke) => stroke === lightColors.danger),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
     now.mockRestore();
   });
 
@@ -993,7 +1008,7 @@ describe("MainScreenVoiceStage composer", () => {
     const circles = screen.UNSAFE_getAllByType(Circle);
     expect(
       circles.filter((circle) => circle.props.stroke === lightColors.danger),
-    ).toHaveLength(2);
+    ).toHaveLength(1);
     expect(
       circles
         .filter((circle) => circle.props.stroke === lightColors.danger)
@@ -1015,9 +1030,9 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("voice-orb-core").props.style)
         .backgroundColor,
     ).toBe(lightColors.phaseThinking);
-    // The orb wears brain for thinking; robot stays on the retired bar.
+    // Thinking uses the circuitry glyph from the latest phase vocabulary.
     expect(
-      screen.getByTestId("phosphor-icon-brain", hiddenIconQuery),
+      screen.getByTestId("phosphor-icon-circuitry", hiddenIconQuery),
     ).toBeTruthy();
     expect(
       screen.queryByTestId("phosphor-icon-info-circle", hiddenIconQuery),
@@ -1043,7 +1058,7 @@ describe("MainScreenVoiceStage composer", () => {
         .backgroundColor,
     ).toBe(lightColors.phaseThinkingBriefly);
     expect(
-      screen.getByTestId("phosphor-icon-thunderbolt", hiddenIconQuery),
+      screen.getByTestId("phosphor-icon-brain", hiddenIconQuery),
     ).toBeTruthy();
   });
 

@@ -1,8 +1,11 @@
 import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
 import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
-import { VoiceOrb } from "../../design-system/VoiceOrb";
-import { MessageImageAttachments } from "../../components/MessageImageAttachments";
+import {
+  fitOrbTransportSize,
+  getOrbTransportLayout,
+  OrbTransport,
+} from "../../design-system/OrbTransport";
 import { useOrbTurnProgress } from "./useOrbTurnProgress";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
 import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
@@ -12,12 +15,9 @@ import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager
 export type { InputSurface } from "./voiceTextInputPager/types";
 
 export function VoiceTextInputPager({
-  attachments = [],
   colors,
   compactPromptNotice = false,
   disabled,
-  driveSilenceCountdownSeconds = null,
-  driveVoiceActive = false,
   footer,
   initialSurface = "voice",
   initialTextInputFocused = false,
@@ -25,10 +25,13 @@ export function VoiceTextInputPager({
   inputMode,
   isActive,
   onInputSurfaceChange,
-  onRemoveImage,
   onPress,
   onPressIn,
   onPressOut,
+  onRestartReply,
+  onSeekBack,
+  onSeekForward,
+  onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
   onTextInputFocusChange,
@@ -42,11 +45,14 @@ export function VoiceTextInputPager({
   readingProgressTiming = null,
   recordingMaxMs,
   recordingStartedAtMs,
+  rtl = false,
+  showTransportLabels = true,
   phaseTimingProgress,
   speechStartProgress,
   maxOrbSize,
   statusLabel,
   t,
+  transportLabels,
   visualPhase,
   voiceInputUnavailableMessage = null,
 }: VoiceTextInputPagerProps) {
@@ -63,17 +69,17 @@ export function VoiceTextInputPager({
     onTextMessageChange,
     submissionDisabled: Boolean(promptBlockedMessage),
   });
-  // The orb is the largest circle that fits between the two 44pt surface
-  // controls and inside the measured stage. The clamp preserves a useful tap
-  // target on constrained windows without hard-coding one portrait size.
-  const stageSize = Math.max(
-    96,
-    Math.min(
-      maxOrbSize,
-      viewportHeight || maxOrbSize,
-      Math.max(96, pager.pageWidth - 92),
-    ),
+  const maximumTransportLayout = getOrbTransportLayout(
+    maxOrbSize,
+    showTransportLabels,
   );
+  const stageSize = fitOrbTransportSize({
+    availableHeight: viewportHeight || maximumTransportLayout.height,
+    availableWidth: pager.pageWidth || maximumTransportLayout.width,
+    labels: showTransportLabels,
+    maximum: maxOrbSize,
+    minimum: Math.min(120, maxOrbSize),
+  });
   const derivedProgress = useOrbTurnProgress({
     phaseTimingProgress: phaseTimingProgress ?? null,
     readingProgress,
@@ -84,14 +90,9 @@ export function VoiceTextInputPager({
     visualPhase,
   });
   const progress = orbProgressOverride ?? derivedProgress;
-  const showDriveCountdown =
-    inputMode === "drive-session" &&
-    visualPhase === "recording" &&
-    !driveVoiceActive &&
-    driveSilenceCountdownSeconds !== null;
-  const activeOrbLabel = showDriveCountdown
-    ? t("driveSendsIn", { seconds: driveSilenceCountdownSeconds })
-    : statusLabel;
+  const activeOrbLabel = statusLabel;
+  const activeOrbInteractive =
+    visualPhase === "recording" || visualPhase === "speaking";
   const showCompactPromptAction =
     compactPromptNotice &&
     Boolean(onResolvePromptBlock) &&
@@ -125,13 +126,6 @@ export function VoiceTextInputPager({
       style={[styles.root, footer ? styles.rootWithFooter : null]}
       testID="voice-text-input-stage"
     >
-      <MessageImageAttachments
-        attachments={attachments}
-        colors={colors}
-        compact
-        onRemove={disabled || isActive ? undefined : onRemoveImage}
-        t={t}
-      />
       <View
         testID="voice-text-input-viewport"
         onLayout={handleViewportLayout}
@@ -140,7 +134,10 @@ export function VoiceTextInputPager({
           footer
             ? [
                 styles.viewportWithFooter,
-                { flexBasis: maxOrbSize, maxHeight: maxOrbSize },
+                {
+                  flexBasis: maximumTransportLayout.height,
+                  maxHeight: maximumTransportLayout.height,
+                },
               ]
             : null,
         ]}
@@ -154,6 +151,10 @@ export function VoiceTextInputPager({
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
+          onRestartReply={onRestartReply}
+          onSeekBack={onSeekBack}
+          onSeekForward={onSeekForward}
+          onStopPlayback={onStopPlayback}
           onSelectSurface={pager.selectSurface}
           onSubmitTextMessage={pager.handleSubmitTextMessage}
           onTextFocusChange={pager.handleTextFocusChange}
@@ -164,7 +165,10 @@ export function VoiceTextInputPager({
           stageSize={stageSize}
           statusLabel={statusLabel}
           submissionDisabled={Boolean(promptBlockedMessage)}
+          rtl={rtl}
+          showTransportLabels={showTransportLabels}
           t={t}
+          transportLabels={transportLabels}
           textFocused={pager.textFocused}
           textInputGesture={pager.textInputGesture}
           textInputRef={pager.textInputRef}
@@ -180,41 +184,41 @@ export function VoiceTextInputPager({
             style={[styles.activeActionOverlay, styles.activeOrbOverlay]}
             testID={`voice-stage-${visualPhase}-orb`}
           >
-            <VoiceOrb
-              coreLabel={
-                showDriveCountdown
-                  ? String(driveSilenceCountdownSeconds)
-                  : undefined
-              }
-              coreLabelColor={
-                showDriveCountdown &&
-                driveSilenceCountdownSeconds !== null &&
-                driveSilenceCountdownSeconds <= 3
-                  ? colors.danger
-                  : undefined
-              }
-              label={activeOrbLabel}
-              onPress={inputMode === "push-to-talk" ? undefined : onPress}
-              onPressIn={inputMode === "push-to-talk" ? onPressIn : undefined}
-              onPressOut={inputMode === "push-to-talk" ? onPressOut : undefined}
-              overtime={progress.overtime}
-              overtimeTiming={progress.overtimeTiming}
-              // The orb keeps the speaking phase while held, so the glyph is
-              // what has to flip to the resume action the label already names.
-              paused={playbackPaused}
+            <OrbTransport
+              labels={showTransportLabels}
+              onBack={onSeekBack}
+              onForward={onSeekForward}
+              onRestart={onRestartReply}
+              onStop={onStopPlayback}
               phase={visualPhase}
-              // Pausing stops a clock, but where the reply has been read to is
-              // a position — it stays put until playback moves again.
-              phaseProgress={progress.phaseProgress}
-              phaseProgressTiming={
-                visualPhase === "speaking" && playbackPaused
-                  ? undefined
-                  : progress.phaseProgressTiming
-              }
-              size={stageSize}
-              testID="voice-orb-active"
-              turnProgress={progress.turnProgress}
-              turnProgressTiming={progress.turnProgressTiming}
+              testID="orb-transport-active"
+              transportLabels={transportLabels}
+              voiceOrb={{
+                label: activeOrbLabel,
+                onPress:
+                  activeOrbInteractive && inputMode !== "push-to-talk"
+                    ? onPress
+                    : undefined,
+                onPressIn:
+                  activeOrbInteractive && inputMode === "push-to-talk"
+                    ? onPressIn
+                    : undefined,
+                onPressOut:
+                  activeOrbInteractive && inputMode === "push-to-talk"
+                    ? onPressOut
+                    : undefined,
+                overtime: progress.overtime,
+                overtimeTiming: progress.overtimeTiming,
+                paused: playbackPaused,
+                phase: visualPhase,
+                phaseProgress: progress.phaseProgress,
+                phaseProgressTiming: progress.phaseProgressTiming,
+                rtl,
+                size: stageSize,
+                testID: "voice-orb-active",
+                turnProgress: progress.turnProgress,
+                turnProgressTiming: progress.turnProgressTiming,
+              }}
             />
           </View>
         ) : null}

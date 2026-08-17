@@ -306,17 +306,17 @@ export function ProviderConnectionPanel({
           }}
         >
           <Text style={[styles.connectionSectionTitle, { color: colors.text }]}>
-            {t("openRouterOnboardingTitle")}
+            {t("openRouterGatewayTitle")}
           </Text>
           <Text
             style={[styles.connectionBodyText, { color: colors.textSecondary }]}
           >
-            {t("openRouterOnboardingDescription")}
+            {t("openRouterGatewayDescription")}
           </Text>
           <Text
             style={[styles.connectionBodyText, { color: colors.textMuted }]}
           >
-            {t("openRouterOnboardingRoute")}
+            {t("openRouterGatewayRoute")}
           </Text>
         </AntSettingsCard>
       ) : null}

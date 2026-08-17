@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const ar = {
   ...conversationKnowledgeTranslations.ar,
   ...imagePromptTranslations.ar,
   ...onDeviceTranslations.ar,
-  ...onboardingTranslations.ar,
-  ...introTranslations.ar,
-  ...premiumTranslations.ar,
+  ...localSpeechTranslations.ar,
+  ...settingsTranslations.ar,
   ...transcriptEditTranslations.ar,
   ...workspaceTranslations.ar,
   ...sessionLockTranslations.ar,
-  ...autoSetupTranslations.ar,
   appName: "السيد بروكلي",
   retry: "أعد المحاولة",
   dismiss: "إغلاق",
@@ -40,7 +36,6 @@ export const ar = {
   settings: "الإعدادات",
   settingsReleaseVersion: ({ version }) => `الإصدار ${version}`,
   all: "الكل",
-  firstRun: "التشغيل لأول مرة",
   instructions: "تعليمات",
   providers: "المزوّدون",
   webSearch: "بحث الويب",
@@ -211,10 +206,10 @@ export const ar = {
   createApiKey: "بيانات الاعتماد",
   apiKey: "مفتاح API",
   aboutThisProvider: "حول هذا المزوّد",
-  openRouterOnboardingTitle: "مفتاح واحد، ومزوّدون متعددون",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "مفتاح واحد، ومزوّدون متعددون",
+  openRouterGatewayDescription:
     "أنشئ مفتاح OpenRouter مخصصًا، والصقه أدناه، واستخدم نماذج اللقطات الثابتة من عدة مزوّدين دون استبدال أي اتصال مباشر.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "مسار الطلب: هذا الجهاز → OpenRouter → المزوّد الأصلي المحدد",
   openRouterKeys: "مفاتيح OpenRouter",
   providerStatusInvalid: "غير صالح",

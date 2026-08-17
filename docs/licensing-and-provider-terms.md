@@ -31,15 +31,8 @@ unreviewed dependency licenses during validation.
   iOS. This removes the LGPL-2.1/LGPL-2.0 components from distributable builds.
 - `react-native-sherpa-onnx` is MIT licensed; Sherpa ONNX is Apache-2.0;
   ONNX Runtime is MIT; libarchive and zstd use permissive licenses.
-- `llama.rn` and its included `llama.cpp` runtime are MIT licensed.
-- `expo-iap` and its OpenIAP Apple and Google bindings are MIT licensed. Store
-  purchases remain subject to the current Apple Developer and Google Play
-  distribution agreements and billing policies.
 - Optional on-device models are never bundled. The catalogue pins their source,
   artifact size, SHA-256 digest, and license before download:
-  - Qwen3 0.6B, 1.7B, and 4B and Qwen3.5 0.8B GGUF files: Apache-2.0.
-  - IBM Granite 4.0 1B and Mistral Ministral 3 3B Reasoning GGUF files:
-    Apache-2.0.
   - Whisper Tiny, Base, and Small: MIT; Omnilingual ASR 300M v2 int8 and
     Qwen3-ASR 0.6B int8: Apache-2.0; NVIDIA Parakeet TDT 0.6B v3 int8:
     CC-BY-4.0.
@@ -96,7 +89,7 @@ The app now builds against
 (Apache-2.0 fork of sherpa-onnx built with `SHERPA_ONNX_ENABLE_ESPEAK=OFF`)
 with phonemization routed into
 [libphonemize](https://github.com/hurrtz/libphonemize) (Apache-2.0), which
-covers every Free conversation language. `npm run espeak-free:verify`
+covers every supported conversation language. `npm run espeak-free:verify`
 checks the installed binaries for real eSpeak markers, and
 `node scripts/install-espeak-free-runtime.mjs` installs the verified
 prebuilts into the wrapper. Language packs are pinned, checksum-verified

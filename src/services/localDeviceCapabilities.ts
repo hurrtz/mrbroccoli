@@ -170,12 +170,6 @@ export function evaluateLocalModelEligibility(
     reasons.push("platform");
   }
   if (
-    model.runtime === "llama-rn" &&
-    !/(arm64|aarch64|x86_64)/i.test(snapshot.architecture)
-  ) {
-    reasons.push("architecture");
-  }
-  if (
     snapshot.physicalMemoryBytes < model.requirements.minimumPhysicalMemoryBytes
   ) {
     reasons.push("memory");

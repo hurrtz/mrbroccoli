@@ -1,0 +1,12 @@
+app_identifier("com.tobiaswinkler.app.mrbroccoli")
+package_name("com.tobiaswinkler.app.mrbroccoli")
+
+# Credentials live in fastlane/.env, which fastlane loads automatically and
+# .gitignore excludes. Copy fastlane/.env.example to get started, then run
+# `bundle exec fastlane doctor` to confirm they resolve.
+#
+# These two are optional and only used if a lane ever falls back to Apple ID
+# authentication; the App Store Connect API key is the normal path. A blank
+# dotenv entry still defines the variable, so treat empty as unset.
+apple_id(ENV["APPLE_ID"]) unless ENV["APPLE_ID"].to_s.strip.empty?
+team_id(ENV["APPLE_TEAM_ID"]) unless ENV["APPLE_TEAM_ID"].to_s.strip.empty?

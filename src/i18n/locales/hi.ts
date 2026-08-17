@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const hi = {
   ...conversationKnowledgeTranslations.hi,
   ...imagePromptTranslations.hi,
   ...onDeviceTranslations.hi,
-  ...onboardingTranslations.hi,
-  ...introTranslations.hi,
-  ...premiumTranslations.hi,
+  ...localSpeechTranslations.hi,
+  ...settingsTranslations.hi,
   ...transcriptEditTranslations.hi,
   ...workspaceTranslations.hi,
   ...sessionLockTranslations.hi,
-  ...autoSetupTranslations.hi,
   appName: "मिस्टर ब्रोकली",
   retry: "पुन: प्रयास करें",
   dismiss: "बंद करें",
@@ -40,7 +36,6 @@ export const hi = {
   settings: "सेटिंग्स",
   settingsReleaseVersion: ({ version }) => `संस्करण ${version}`,
   all: "सभी",
-  firstRun: "पहला लॉन्च",
   instructions: "निर्देश",
   providers: "प्रदाता",
   webSearch: "वेब खोज",
@@ -211,10 +206,10 @@ export const hi = {
   createApiKey: "क्रेडेंशियल",
   apiKey: "API कुंजी",
   aboutThisProvider: "इस प्रदाता के बारे में",
-  openRouterOnboardingTitle: "एक कुंजी, एकाधिक प्रदाता",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "एक कुंजी, एकाधिक प्रदाता",
+  openRouterGatewayDescription:
     "एक समर्पित OpenRouter कुंजी बनाएं, इसे नीचे चिपकाएं, और किसी भी सीधे कनेक्शन को बदले बिना कई प्रदाताओं से स्नैपशॉट-समर्थित मॉडल का उपयोग करें।",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "अनुरोध पथ: यह डिवाइस → OpenRouter → चयनित अपस्ट्रीम प्रदाता",
   openRouterKeys: "OpenRouter कुंजियाँ",
   providerStatusInvalid: "अमान्य",

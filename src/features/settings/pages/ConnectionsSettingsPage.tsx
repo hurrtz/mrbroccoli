@@ -38,8 +38,6 @@ import {
   ProviderAboutModal,
   ProviderConnectionPanel,
 } from "../ProviderConnectionPanel";
-import { PremiumBand } from "../settings-primitives/PremiumBand";
-import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsSheet } from "../settings-primitives/SettingsSheet";
 import { styles } from "../styles";
@@ -341,8 +339,6 @@ export function ConnectionsSettingsPage({
   getProviderCircuitState,
   getProviderHealthState,
   getProviderValidationState,
-  isPremium,
-  onOpenPremium,
   onTextInputFocus,
   onUpdateApiKey,
   onValidateAll,
@@ -352,8 +348,6 @@ export function ConnectionsSettingsPage({
   settings: Settings;
   focusProvider?: Provider;
   focusCatalogProviderId?: CatalogProviderId;
-  isPremium: boolean;
-  onOpenPremium: () => void;
 } & ProviderActions) {
   const { t } = useLocalization();
   const preferredFocusProvider =
@@ -362,16 +356,16 @@ export function ConnectionsSettingsPage({
       ? getAppProviderForCatalogProviderId(focusCatalogProviderId)
       : null);
   const [selectedProvider, setSelectedProvider] =
-    React.useState<Provider | null>(isPremium ? preferredFocusProvider : null);
+    React.useState<Provider | null>(preferredFocusProvider);
   const [aboutProvider, setAboutProvider] = React.useState<Provider | null>(
     null,
   );
 
   React.useEffect(() => {
-    if (isPremium && preferredFocusProvider) {
+    if (preferredFocusProvider) {
       setSelectedProvider(preferredFocusProvider);
     }
-  }, [isPremium, preferredFocusProvider]);
+  }, [preferredFocusProvider]);
 
   const providers = PROVIDER_ORDER.filter((provider) =>
     Object.hasOwn(settings.apiKeys, provider),
@@ -396,9 +390,9 @@ export function ConnectionsSettingsPage({
       >
         {providers.map((provider, index) => {
           const capabilities = getProviderCapabilities(provider);
-          const last = index === providers.length - 1 && isPremium;
+          const last = index === providers.length - 1;
 
-          return isPremium ? (
+          return (
             <ProviderRow
               key={provider}
               capabilities={capabilities}
@@ -407,28 +401,8 @@ export function ConnectionsSettingsPage({
               provider={provider}
               onPress={() => setSelectedProvider(provider)}
             />
-          ) : (
-            <RouteOptionRow
-              key={provider}
-              testID={`provider-card-${provider}`}
-              label={PROVIDER_LABELS[provider]}
-              locked
-              meta={capabilities
-                .map((capability) => getCapabilityLabel(capability, t))
-                .join(" · ")}
-              onSelect={() => undefined}
-            />
           );
         })}
-        {!isPremium ? (
-          <PremiumBand
-            actionLabel={t("upgradeToPremium")}
-            copy={t("premiumBenefitProviders")}
-            onPress={onOpenPremium}
-            premiumLabel={t("premium")}
-            testID="connections-premium-upgrade-band"
-          />
-        ) : null}
       </SettingsGroup>
 
       <ProviderConnectionSheet

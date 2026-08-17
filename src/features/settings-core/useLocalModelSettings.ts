@@ -1,5 +1,5 @@
 import React from "react";
-import { AccessibilityInfo, Platform } from "react-native";
+import { AccessibilityInfo } from "react-native";
 
 import {
   LOCAL_MODEL_CATALOG,
@@ -7,8 +7,7 @@ import {
   type LocalModelDefinition,
   type LocalModelId,
 } from "../../constants/localModels";
-import { MAX_RESPONSE_MODES } from "../../constants/providers/defaults";
-import { FREE_SPEECH_LANGUAGE_OPTIONS } from "../../constants/speechLanguages";
+import { SPEECH_LANGUAGE_OPTIONS } from "../../constants/speechLanguages";
 import { useKeepAwakeWhile } from "../../hooks/useKeepAwakeWhile";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
 import { useModelDownloadService } from "../../hooks/useModelDownloadService";
@@ -20,7 +19,6 @@ import {
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
 } from "../../services/localDeviceCapabilities";
-import { benchmarkLocalLlm } from "../../services/localLlm";
 import {
   downloadLocalModel,
   removeLocalModel,
@@ -36,23 +34,13 @@ import {
   probeNativeSpeechCapabilities,
   type NativeSpeechCapabilities,
 } from "../../services/nativeSpeechCapabilities";
-import {
-  evaluateOfflineProfileReadiness,
-  getLocalCatalogInstallStatuses,
-} from "../../services/offlineProfileManager";
-import {
-  getAppliedOfflineProfileSettingsUpdate,
-  selectOfflineProfile,
-  type OfflineProfileOverrides,
-} from "../../services/offlineProfile";
+import { getLocalCatalogInstallStatuses } from "../../services/localSpeechModelManager";
 import { benchmarkKokoroModel } from "../../services/kokoroTts";
-import { buildStorePromoLocalDeviceSnapshot } from "../../services/storePromoPresentation";
 import type {
   Settings,
   SpeechLanguage,
   VoicePreviewRequest,
 } from "../../types";
-import { getNextResponseModeId } from "../../utils/responseModes";
 
 import {
   getLocalLanguageSettingsUpdate,
@@ -89,49 +77,27 @@ function benchmarkStatusLabelKey(result?: LocalModelBenchmarkResult) {
 
 export function useLocalModelSettings({
   active,
-  isPremium,
   kokoroModel,
   onPreviewVoice,
   onUpdate,
   settings,
-  storePromoPreview = false,
 }: {
   active: boolean;
-  isPremium: boolean;
   kokoroModel: KokoroModelController;
   onPreviewVoice: (request: VoicePreviewRequest) => Promise<void>;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
   settings: Settings;
-  storePromoPreview?: boolean;
 }) {
   const { t } = useLocalization();
-  const storePromoSnapshot = React.useMemo(
-    () =>
-      storePromoPreview
-        ? buildStorePromoLocalDeviceSnapshot(
-            Platform.OS === "ios" ? "ios" : "android",
-          )
-        : null,
-    [storePromoPreview],
-  );
   const [snapshot, setSnapshot] = React.useState<LocalDeviceSnapshot | null>(
-    storePromoSnapshot,
+    null,
   );
   const [probeError, setProbeError] = React.useState<string | null>(null);
   const [nativeSpeechCapabilities, setNativeSpeechCapabilities] =
-    React.useState<NativeSpeechCapabilities | null>(
-      storePromoPreview
-        ? {
-            recognitionAvailable: true,
-            onDeviceRecognitionAvailable: true,
-            targetLocaleInstalled: true,
-            nativeSttEligible: true,
-          }
-        : null,
-    );
-  const [probing, setProbing] = React.useState(!storePromoPreview);
+    React.useState<NativeSpeechCapabilities | null>(null);
+  const [probing, setProbing] = React.useState(true);
   const [busy, setBusy] = React.useState<LocalModelBusyAction | null>(null);
   const [progress, setProgress] = React.useState<
     Partial<Record<LocalModelId, LocalModelDownloadProgress>>
@@ -165,11 +131,6 @@ export function useLocalModelSettings({
     });
 
   const refreshModelState = React.useCallback(async () => {
-    if (storePromoPreview) {
-      setInstalls({});
-      setBenchmarks({});
-      return;
-    }
     const [nextInstalls, nextBenchmarks] = await Promise.all([
       getLocalCatalogInstallStatuses({
         phonemeLanguages: settings.localLanguages,
@@ -178,21 +139,9 @@ export function useLocalModelSettings({
     ]);
     setInstalls(nextInstalls);
     setBenchmarks(nextBenchmarks);
-  }, [settings.localLanguages, storePromoPreview]);
+  }, [settings.localLanguages]);
 
   const runDeviceProbe = React.useCallback(async () => {
-    if (storePromoSnapshot) {
-      setSnapshot(storePromoSnapshot);
-      setNativeSpeechCapabilities({
-        recognitionAvailable: true,
-        onDeviceRecognitionAvailable: true,
-        targetLocaleInstalled: true,
-        nativeSttEligible: true,
-      });
-      setProbeError(null);
-      setProbing(false);
-      return;
-    }
     setProbing(true);
     setProbeError(null);
     try {
@@ -216,7 +165,7 @@ export function useLocalModelSettings({
     } finally {
       setProbing(false);
     }
-  }, [settings.localLanguages, storePromoSnapshot]);
+  }, [settings.localLanguages]);
 
   React.useEffect(() => {
     if (!active) {
@@ -237,85 +186,15 @@ export function useLocalModelSettings({
     );
   }, [settings.localLanguages, snapshot]);
 
-  const getReadyFreeProfileUpdate = React.useCallback(
-    (overrides: OfflineProfileOverrides) => {
-      if (isPremium || !snapshot) {
-        return null;
-      }
-      const selection = selectOfflineProfile({
-        languages: settings.localLanguages,
-        snapshot,
-        installedModelIds: new Set(
-          Object.entries(installs)
-            .filter(([, status]) => status?.verified)
-            .map(([modelId]) => modelId as LocalModelId),
-        ),
-        benchmarks,
-        overrides,
-        nativeSttEligible: nativeSpeechCapabilities?.nativeSttEligible,
-      });
-      if (selection.status !== "ready") {
-        return null;
-      }
-      const readiness = evaluateOfflineProfileReadiness({
-        profile: selection.profile,
-        snapshot,
-        installs,
-        benchmarks,
-      });
-      return readiness.ready
-        ? getAppliedOfflineProfileSettingsUpdate(
-            settings,
-            selection.profile,
-            overrides,
-          )
-        : null;
-    },
-    [
-      benchmarks,
-      installs,
-      isPremium,
-      nativeSpeechCapabilities?.nativeSttEligible,
-      settings,
-      snapshot,
-    ],
-  );
-
-  const applyFreeOverrides = React.useCallback(
-    (overrides: OfflineProfileOverrides) => {
-      const readyUpdate = getReadyFreeProfileUpdate(overrides);
-      onUpdate(
-        readyUpdate ?? {
-          freeOfflineSetupCompleted: false,
-          freeOfflineProfileOverrides: overrides,
-        },
-      );
-    },
-    [getReadyFreeProfileUpdate, onUpdate],
-  );
-
   const toggleLanguage = React.useCallback(
     (language: SpeechLanguage) => {
-      const nextSettings = getLocalLanguageSettingsUpdate(
-        settings,
-        language,
-        !isPremium,
-      );
+      const nextSettings = getLocalLanguageSettingsUpdate(settings, language);
       if (!nextSettings) {
         return;
       }
-      onUpdate(
-        isPremium
-          ? nextSettings
-          : {
-              ...nextSettings,
-              freeOnboardingLanguageInitialized: true,
-              freeOfflineSetupCompleted: false,
-              freeOfflineProfileOverrides: {},
-            },
-      );
+      onUpdate(nextSettings);
     },
-    [isPremium, onUpdate, settings],
+    [onUpdate, settings],
   );
 
   const downloadModel = React.useCallback(
@@ -410,9 +289,7 @@ export function useLocalModelSettings({
       setBusy({ action: "test", modelId: model.id });
       try {
         let result: LocalModelBenchmarkResult;
-        if (model.capability === "llm") {
-          result = await benchmarkLocalLlm(model.id);
-        } else if (model.capability === "stt") {
+        if (model.capability === "stt") {
           result = await benchmarkLocalStt(
             model.id,
             settings.localLanguages.length === 1
@@ -473,24 +350,6 @@ export function useLocalModelSettings({
 
   const selectModel = React.useCallback(
     (model: LocalModelDefinition) => {
-      if (!isPremium) {
-        const current = settings.freeOfflineProfileOverrides;
-        if (model.capability === "llm") {
-          applyFreeOverrides(
-            model.responseProfile === "thorough"
-              ? { ...current, thoroughLlmModelId: model.id }
-              : { ...current, quickLlmModelId: model.id },
-          );
-          return;
-        }
-        if (model.capability === "stt") {
-          applyFreeOverrides({ ...current, sttModelId: model.id });
-          return;
-        }
-        applyFreeOverrides({ ...current, ttsModelId: model.id });
-        return;
-      }
-
       if (model.capability === "stt") {
         onUpdate({
           localSttModelId: model.id,
@@ -513,50 +372,13 @@ export function useLocalModelSettings({
                 ttsMode: "local",
               },
         );
-        return;
       }
-
-      const existing = settings.responseModes.find(
-        ({ route }) => route.localModelId === model.id,
-      );
-      if (existing) {
-        onUpdate({ activeResponseMode: existing.id });
-        return;
-      }
-      const route = {
-        runtime: "local" as const,
-        localModelId: model.id,
-        provider: settings.lastProvider,
-        model: model.name,
-      };
-      if (settings.responseModes.length >= MAX_RESPONSE_MODES) {
-        onUpdate({
-          responseModes: settings.responseModes.map((entry) =>
-            entry.id === settings.activeResponseMode
-              ? { ...entry, route }
-              : entry,
-          ),
-        });
-        return;
-      }
-      const id = getNextResponseModeId(settings.responseModes);
-      onUpdate({
-        activeResponseMode: id,
-        responseModes: [...settings.responseModes, { id, route }],
-      });
     },
-    [applyFreeOverrides, isPremium, onUpdate, settings],
+    [onUpdate],
   );
 
   const isModelSelected = React.useCallback(
     (model: LocalModelDefinition) => {
-      if (model.capability === "llm") {
-        return settings.responseModes.some(
-          ({ id, route }) =>
-            id === settings.activeResponseMode &&
-            route.localModelId === model.id,
-        );
-      }
       if (model.capability === "stt") {
         return (
           settings.sttMode === "local" && settings.localSttModelId === model.id
@@ -572,24 +394,10 @@ export function useLocalModelSettings({
   const selectNativeRoute = React.useCallback(
     (capability: "stt" | "tts") => {
       if (capability === "stt") {
-        if (!isPremium) {
-          applyFreeOverrides({
-            ...settings.freeOfflineProfileOverrides,
-            sttModelId: null,
-          });
-          return;
-        }
         onUpdate({
           sttMode: "native",
           nativeSttRequiresOnDevice: false,
           localSttModelId: null,
-        });
-        return;
-      }
-      if (!isPremium) {
-        applyFreeOverrides({
-          ...settings.freeOfflineProfileOverrides,
-          ttsModelId: null,
         });
         return;
       }
@@ -599,12 +407,7 @@ export function useLocalModelSettings({
         spokenRepliesEnabled: true,
       });
     },
-    [
-      applyFreeOverrides,
-      isPremium,
-      onUpdate,
-      settings.freeOfflineProfileOverrides,
-    ],
+    [onUpdate],
   );
 
   const selectNativeVoice = React.useCallback(
@@ -622,7 +425,7 @@ export function useLocalModelSettings({
     compatibleModels,
     downloadModel,
     errors,
-    freeLanguageOptions: FREE_SPEECH_LANGUAGE_OPTIONS,
+    speechLanguageOptions: SPEECH_LANGUAGE_OPTIONS,
     installs,
     isModelSelected,
     kokoroModel,

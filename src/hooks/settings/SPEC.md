@@ -48,14 +48,22 @@ alert; they do not silently pretend success.
 Startup loads public settings, SecureStore keys, and runtime capability
 overrides before producing the normalized settings snapshot.
 
+It also performs a best-effort one-time cleanup of the retired local-response
+directory. Cleanup targets only `local-models/llm`; downloaded STT and TTS
+artifacts are preserved.
+
 `mergeSettings` owns compatibility with historical installs, including:
 
 - removed or renamed provider IDs and their per-provider maps;
 - the historical standalone Grok key, migrated to xAI;
 - legacy response-mode names and route shapes;
 - provider model aliases and retired model selections;
-- historical scalar fields, invalid enum values, and removed settings;
+  - historical scalar fields, invalid enum values, and removed settings;
+  - the retired `drive-session` input mode, migrated to `toggle-to-talk`
+    because Hands free is now session state rather than a stored mode;
 - speech language, voice, and fallback normalization; and
+- removal of retired introduction fields and local-response routes while
+  preserving local STT/TTS choices; and
 - defaults for fields introduced after the stored snapshot was written.
 
 The normalized public shape is written forward after load when it differs from
@@ -80,7 +88,9 @@ errors must not permanently remove a model or effort.
 - Updating an API key persists only to SecureStore and updates the in-memory
   route state.
 - Response modes retain stable IDs while their route may change.
-- Adding and removing modes respects the configured minimum and maximum.
+- Adding and removing modes preserves the configured minimum but has no fixed
+  maximum; every saved route remains reachable in scrolling Settings and home
+  lists.
 - Removing the active mode selects a remaining mode atomically.
 - Provider/model updates normalize reasoning effort and capability before
   becoming active.
@@ -96,7 +106,7 @@ When `Settings` changes, review together:
 - mutation helpers and persistence exclusion rules;
 - app-data backup portability;
 - Settings UI and main-screen route composition;
-- Free offline profile application; and
+- retired-field and retired-artifact cleanup; and
 - focused settings, response-mode, and backup tests.
 
 ## Evidence

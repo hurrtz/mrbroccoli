@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: App Store promotional screenshots
+name: App Store BYOK story screenshots
 tags:
   - store-promos
   - ios
@@ -13,15 +13,12 @@ tags:
 - tapOn:
     text: Cancel
     optional: true
-
-# Premium story: a deterministic completed exchange with the next turn held
-# in a stable thinking phase. No provider call is made.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium&colorScheme=${COLOR_SCHEME}"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}"
 - tapOn:
     text: Open
     optional: true
 - assertVisible:
-    id: store-promo-fixture-ready-premium
+    id: store-promo-fixture-ready-conversation
 - stopApp
 - launchApp
 - assertVisible:
@@ -31,7 +28,7 @@ tags:
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
-    path: 01-premium-active-conversation
+    path: 01-voice-first-conversation
 - tapOn:
     id: transcript-handle
 - assertVisible:
@@ -39,143 +36,10 @@ tags:
 - assertVisible:
     id: transcript-message-promo-assistant-2
 - takeScreenshot:
-    path: 02-transcript-drawer
-- stopApp
-
-# Free story: two complete exchanges at rest.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=free&colorScheme=${COLOR_SCHEME}"
+    path: 02-complete-transcript
 - tapOn:
-    text: Open
-    optional: true
-- assertVisible:
-    id: store-promo-fixture-ready-free
-- stopApp
-- launchApp
-- assertVisible:
-    id: ^app-locale-${LOCALE}$
-- assertVisible:
-    id: voice-stage-idle
-- assertVisible:
-    id: transcript-handle
-- takeScreenshot:
-    path: 03-free-conversation
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS != 'ipad'}
-    commands:
-      - tapOn:
-          id: main-settings-button
-      - assertVisible:
-          id: settings-page-overview
-      - scrollUntilVisible:
-          element:
-            id: settings-premium-upgrade-band-action
-          direction: DOWN
-      - tapOn:
-          id: settings-premium-upgrade-band-action
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS == 'ipad'}
-    commands:
-      - tapOn:
-          id: conversation-drawer-settings
-      - assertVisible:
-          id: settings-page-connections
-      - scrollUntilVisible:
-          element:
-            id: connections-premium-upgrade-band-action
-          direction: DOWN
-      - tapOn:
-          id: connections-premium-upgrade-band-action
-- assertVisible:
-    id: premium-upgrade-scroll
-- assertVisible:
-    id: premium-value-card
-- takeScreenshot:
-    path: 04-premium-price
-- stopApp
-
-# Reseed a genuine first-run intro in the same locale. The fixture projects a
-# fixed proposal from the checked-in device profile; it never starts a scan.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding&colorScheme=${COLOR_SCHEME}"
-- tapOn:
-    text: Open
-    optional: true
-- assertVisible:
-    id: store-promo-fixture-ready-onboarding
-- stopApp
-- launchApp
-- assertVisible:
-    id: main-screen
-- assertVisible:
-    id: ^app-locale-${LOCALE}$
-- assertVisible:
-    id: intro-banner
-- tapOn:
-    id: intro-banner
-- assertVisible:
-    id: intro-flow-content
-- assertVisible:
-    id: intro-welcome-step
-- takeScreenshot:
-    path: 05-onboarding-welcome
-- tapOn:
-    id: intro-stepper-dot-1
-- assertVisible:
-    id: intro-setup-step
-- assertVisible:
-    id: auto-setup-card
-- assertVisible:
-    id: auto-setup-proposal
-- scrollUntilVisible:
-    element:
-      id: auto-setup-install
-    direction: DOWN
-- takeScreenshot:
-    path: 06-onboarding-setup
-- stopApp
-
-# Reseed the same first-run flow with a deterministic offline-ready profile.
-# This unlocks the final try step without downloads or provider calls.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=onboarding-ready&colorScheme=${COLOR_SCHEME}"
-- tapOn:
-    text: Open
-    optional: true
-- assertVisible:
-    id: store-promo-fixture-ready-onboarding-ready
-- stopApp
-- launchApp
-- assertVisible:
-    id: main-screen
-- assertVisible:
-    id: ^app-locale-${LOCALE}$
-- assertVisible:
-    id: intro-banner
-- tapOn:
-    id: intro-banner
-- assertVisible:
-    id: intro-flow-content
-- tapOn:
-    id: intro-stepper-dot-2
-- assertVisible:
-    id: intro-try-step
-- takeScreenshot:
-    path: 07-onboarding-try
-- stopApp
-
-# Return to Premium for organization and configuration surfaces.
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=premium&colorScheme=${COLOR_SCHEME}"
-- tapOn:
-    text: Open
-    optional: true
-- assertVisible:
-    id: store-promo-fixture-ready-premium
-- stopApp
-- launchApp
-- assertVisible:
-    id: ^app-locale-${LOCALE}$
-- assertVisible:
-    id: voice-stage-thinking
+    id: transcript-sheet-header-close
+- waitForAnimationToEnd
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -192,16 +56,8 @@ tags:
     id: conversation-drawer-item-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS == 'ipad'}
-    commands:
-      - tapOn:
-          id: conversation-drawer-item-promo-branch
-      - assertVisible:
-          id: transcript-handle
 - takeScreenshot:
-    path: 08-conversation-branches
+    path: 03-conversation-branches
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -226,7 +82,7 @@ tags:
       - assertVisible:
           id: settings-page-connections
 - takeScreenshot:
-    path: 09-premium-settings
+    path: 04-byok-settings
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -245,12 +101,8 @@ tags:
           id: settings-ipad-category-row-thinking
 - assertVisible:
     id: settings-page-thinking
-- assertVisible:
-    id: settings-modal-title
-- assertVisible:
-    id: settings-close-button
 - takeScreenshot:
-    path: 10-premium-thinking
+    path: 05-choose-exact-model
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -271,50 +123,13 @@ tags:
           id: settings-ipad-category-row-speaking
 - assertVisible:
     id: settings-page-speaking
-- assertVisible:
-    id: settings-modal-title
-- assertVisible:
-    id: settings-close-button
 - takeScreenshot:
-    path: 11-premium-speaking
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS != 'ipad'}
-    commands:
-      - tapOn:
-          id: settings-back-button
-      - scrollUntilVisible:
-          element:
-            id: settings-overview-row-app
-          direction: DOWN
-      - tapOn:
-          id: settings-overview-row-app
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS == 'ipad'}
-    commands:
-      - tapOn:
-          id: settings-ipad-category-row-app
-- assertVisible:
-    id: settings-page-app
-- assertVisible:
-    id: ^app-settings-page-${LOCALE}$
-- assertVisible:
-    id: automatic-setup-group
-- assertVisible:
-    id: auto-setup-card
-- assertVisible:
-    id: settings-modal-title
-- assertVisible:
-    id: settings-close-button
-- takeScreenshot:
-    path: 12-automatic-setup
+    path: 06-choose-your-voice
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
-
 - assertVisible:
     id: conversation-settings-summary-control
 - tapOn:
@@ -322,4 +137,4 @@ tags:
 - assertVisible:
     id: conversation-settings-drawer
 - takeScreenshot:
-    path: 13-conversation-settings
+    path: 07-conversation-settings

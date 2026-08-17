@@ -13,7 +13,6 @@ import {
   getModelEffortTransportValue,
 } from "../utils/modelEffort";
 import type {
-  LocalLlmModelId,
   LocalSttModelId,
   LocalTtsModelId,
 } from "../constants/localModels";
@@ -37,7 +36,6 @@ interface CreateTurnReceiptParams {
   provider: Provider;
   model: string;
   modelEffort?: string;
-  localLlmModelId?: LocalLlmModelId;
   language: AppLanguage;
   spokenRepliesEnabled: boolean;
   ttsMode: TtsBackendMode;
@@ -59,7 +57,6 @@ export function createTurnReceipt({
   provider,
   model,
   modelEffort,
-  localLlmModelId,
   language,
   spokenRepliesEnabled,
   ttsMode,
@@ -96,14 +93,14 @@ export function createTurnReceipt({
             : undefined,
     },
     requestedRoute: {
-      provider: localLlmModelId ? null : provider,
-      model: localLlmModelId ?? model,
-      runtime: localLlmModelId ? "local" : "provider",
+      provider,
+      model,
+      runtime: "provider",
     },
     actualRoute: {
-      provider: localLlmModelId ? null : provider,
-      model: localLlmModelId ?? model,
-      runtime: localLlmModelId ? "local" : "provider",
+      provider,
+      model,
+      runtime: "provider",
     },
     effort:
       modelEffort && effortOption

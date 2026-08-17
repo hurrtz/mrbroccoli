@@ -14,8 +14,6 @@ import {
 } from "../../src/services/providerResilience";
 import { ProviderRequestError } from "../../src/services/providerErrors";
 import { retrieveConversationKnowledge } from "../../src/services/conversationKnowledge";
-import { streamLocalChat } from "../../src/services/localLlm";
-import { recordDebugLogEvent } from "../../src/services/debugLogCapture";
 
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
@@ -40,10 +38,6 @@ jest.mock("../../src/services/webSearch", () => ({
 
 jest.mock("../../src/services/conversationKnowledge", () => ({
   retrieveConversationKnowledge: jest.fn(),
-}));
-
-jest.mock("../../src/services/localLlm", () => ({
-  streamLocalChat: jest.fn(),
 }));
 
 jest.mock("../../src/services/ulraMode", () => ({
@@ -372,99 +366,6 @@ describe("runVoicePipeline", () => {
         message: "Anthropic's reply ended before it was complete. Try again.",
       }),
     );
-  });
-
-  it("passes source-backed past knowledge to an on-device response", async () => {
-    (retrieveConversationKnowledge as jest.Mock).mockResolvedValue({
-      context: "SOURCE 1 — Private architecture\nUser: Keep inference local.",
-      metadata: {
-        engine: "local-hybrid-v1",
-        sources: [
-          {
-            conversationId: "architecture",
-            title: "Private architecture",
-            updatedAt: "2026-08-01T08:00:00.000Z",
-          },
-        ],
-      },
-    });
-    (streamLocalChat as jest.Mock).mockResolvedValue({
-      fullText: "I will keep inference local.",
-      usage: {
-        kind: "reply",
-        source: "estimated",
-        promptTokens: 20,
-        completionTokens: 7,
-        totalTokens: 27,
-      },
-      termination: {
-        completionTokenLimit: 384,
-        contextFull: false,
-        limitReached: false,
-        stoppedEos: true,
-        stoppedWord: false,
-      },
-    });
-    const callbacks = {
-      onTranscription: jest.fn(),
-      onLlmStart: jest.fn(),
-      onChunk: jest.fn(),
-      onResponseDone: jest.fn(),
-      onAudioReady: jest.fn(),
-      onSpeechTextReady: jest.fn(),
-      onError: jest.fn(),
-    };
-
-    await runVoicePipeline({
-      transcriptionOverride: "What did we decide?",
-      messages: [],
-      currentConversationId: "current",
-      conversationKnowledgeExcludedIds: ["locked"],
-      pastConversationKnowledgeEnabled: true,
-      model: "qwen3-0.6b-q8",
-      localLlmModelId: "qwen3-0.6b-q8",
-      provider: "openai",
-      providerApiKey: "",
-      sttMode: "native",
-      ttsMode: "native",
-      ttsVoice: "alloy",
-      replyPlayback: "wait",
-      spokenRepliesEnabled: false,
-      assistantInstructions: "Be accurate.",
-      responseLength: "normal",
-      responseTone: "professional",
-      language: "en",
-      callbacks,
-    });
-
-    expect(streamChat).not.toHaveBeenCalled();
-    expect(streamLocalChat).toHaveBeenCalledWith(
-      expect.objectContaining({
-        modelId: "qwen3-0.6b-q8",
-        pastConversationKnowledge: expect.stringContaining(
-          "Keep inference local",
-        ),
-      }),
-    );
-    expect(callbacks.onResponseDone).toHaveBeenCalledWith(
-      "I will keep inference local.",
-      expect.objectContaining({ totalTokens: 27 }),
-      expect.objectContaining({
-        conversationKnowledge: expect.objectContaining({
-          sources: [
-            expect.objectContaining({ conversationId: "architecture" }),
-          ],
-        }),
-      }),
-    );
-    expect(recordDebugLogEvent).toHaveBeenCalledWith({
-      event: "voice-pipeline-local-llm-finished",
-      payload: expect.objectContaining({
-        completionTokenLimit: 384,
-        completionTokens: 7,
-        limitReached: false,
-      }),
-    });
   });
 
   it("uses a native transcript override and skips provider STT", async () => {

@@ -25,11 +25,8 @@ import {
 
 test("Android maps its split flows to deterministic fixture scenes", () => {
   assert.deepEqual(STORE_PROMO_ANDROID_FLOW_SCENES, [
-    "premium",
-    "free",
-    "onboarding",
-    "onboarding-ready",
-    "premium",
+    "conversation",
+    "conversation",
   ]);
   assert.equal(
     STORE_PROMO_ANDROID_FLOW_SCENES.length,
@@ -40,9 +37,9 @@ test("Android maps its split flows to deterministic fixture scenes", () => {
 test("Android fixture URLs remain one device-shell argument", () => {
   assert.equal(
     quoteAndroidShellArgument(
-      "mrbroccoli://store-promos?locale=de&scene=premium",
+      "mrbroccoli://store-promos?locale=de&scene=conversation",
     ),
-    "'mrbroccoli://store-promos?locale=de&scene=premium'",
+    "'mrbroccoli://store-promos?locale=de&scene=conversation'",
   );
 });
 

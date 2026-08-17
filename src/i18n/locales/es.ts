@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const es = {
   ...conversationKnowledgeTranslations.es,
   ...imagePromptTranslations.es,
   ...onDeviceTranslations.es,
-  ...onboardingTranslations.es,
-  ...introTranslations.es,
-  ...premiumTranslations.es,
+  ...localSpeechTranslations.es,
+  ...settingsTranslations.es,
   ...transcriptEditTranslations.es,
   ...workspaceTranslations.es,
   ...sessionLockTranslations.es,
-  ...autoSetupTranslations.es,
   appName: "Sr. Brócoli",
   retry: "Reintentar",
   dismiss: "Cerrar",
@@ -40,7 +36,6 @@ export const es = {
   settings: "Ajustes",
   settingsReleaseVersion: ({ version }) => `Versión ${version}`,
   all: "Todos",
-  firstRun: "Primer inicio",
   instructions: "Instrucciones",
   providers: "Proveedores",
   webSearch: "Búsqueda web",
@@ -212,10 +207,10 @@ export const es = {
   createApiKey: "Credenciales",
   apiKey: "Clave API",
   aboutThisProvider: "Acerca de este proveedor",
-  openRouterOnboardingTitle: "Una clave, múltiples proveedores",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Una clave, múltiples proveedores",
+  openRouterGatewayDescription:
     "Crea una clave OpenRouter dedicada, pégala a continuación y utiliza modelos respaldados por instantáneas de varios proveedores sin reemplazar ninguna conexión directa.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Ruta de solicitud: este dispositivo → OpenRouter → proveedor ascendente seleccionado",
   openRouterKeys: "Claves de OpenRouter",
   providerStatusInvalid: "Inválido",

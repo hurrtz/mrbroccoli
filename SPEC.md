@@ -6,8 +6,7 @@ code_paths:
   - android/**
   - ios/**
 dependencies:
-  - Apple App Store and StoreKit
-  - Google Play and Play Billing
+  - Apple App Store and Google Play distribution
   - user-selected AI providers
 validations:
   - make pre-push
@@ -23,8 +22,8 @@ last_validated_sha: 7db5c94
 ## Purpose
 
 Mr Broccoli is a voice-first mobile workspace for deliberate AI conversations.
-It lets a person speak naturally, route each turn to suitable local or hosted
-intelligence, and receive a clear, listenable answer while retaining control
+It lets a person speak naturally, route each turn to a chosen hosted model,
+and receive a clear, listenable answer while retaining control
 over models, credentials, data, cost, and memory.
 
 **Decision:** Depth is preferred over artificial immediacy. The product may wait
@@ -43,11 +42,11 @@ The app owns:
 - local, system, and provider speech routes;
 - conversation history, branches, summaries, provenance, and optional
   cross-session retrieval;
-- deterministic on-device model selection, download, verification, and
+- optional on-device speech-model selection, download, verification, and
   benchmarking;
 - readable and encrypted backup, non-destructive restore, and portable AI
   conversation archives;
-- a permanent Free/Premium edition boundary; and
+- a paid-upfront, bring-your-own-key distribution model; and
 - release-grade accessibility, localization, diagnostics, and native lifecycle
   behavior on Android and universal iOS across iPhone and iPad.
 
@@ -55,34 +54,17 @@ The core product has no Mr Broccoli application backend, account system,
 provider proxy, or server-side conversation store. Provider calls go from the
 device to the selected provider using credentials supplied by the user.
 
-## Editions
+## Commercial And Provider Boundary
 
-### Free
+Mr Broccoli is sold as a paid app. There is no in-app edition, entitlement,
+subscription, included inference, or Mr Broccoli-hosted provider account. The
+purchase grants the app; the user supplies and pays for every hosted AI
+provider credential and request.
 
-Free mode provides a complete local conversation chain without a provider
-account. Setup selects a single conversation language, evaluates the current
-device, downloads only the required curated artifacts after consent, verifies
-their hashes, benchmarks them, and applies a compatible local LLM/STT/TTS
-profile. A system speech route may replace a downloaded speech model when the
-device proves it suitable.
-
-**Decision:** Free is an operational profile, not a collection of UI flags. Its
-effective settings are derived as a coherent route set so a stale Premium
-setting cannot leak a network capability into Free execution.
-
-### Premium
-
-Premium is a permanent, non-consumable, same-platform store entitlement with
-product ID `com.tobiaswinkler.app.mrbroccoli.premium.lifetime`. It unlocks user
-provider connections, provider response modes, web search, image prompts,
-Drive Session, Model Council, past-conversation knowledge, portable conversation
-archives, and advanced response controls.
-
-**Decision:** The entitlement remains serverless. Apple or Google is the
-ownership authority; a locally cached verified entitlement makes startup and
-offline use practical, then store reconciliation corrects it when available.
-Cross-platform ownership would require a backend and is outside the current
-boundary.
+**Decision:** Response generation is BYOK-only. Optional system and downloaded
+on-device STT/TTS remain available as secondary speech engines, but the app
+does not download or run a local response model and does not present a Free or
+offline conversation mode.
 
 ## Main Capabilities
 
@@ -90,9 +72,10 @@ boundary.
 
 - Voice, text, and image-assisted turns share one conversation model.
 - A response mode is a stable user-facing slot whose route selects a provider
-  model or a local model and, where supported, a reasoning-effort option.
-- Thinking exposes at most four coexisting response-mode slots so their order
-  remains a legible home-screen choice across native layouts.
+  model and, where supported, a reasoning-effort option.
+- Thinking exposes an open-ended ordered list of response-mode slots. Settings
+  and the home picker scroll rather than silently discarding routes beyond a
+  fixed count.
 - Changing response modes inside a conversation preserves the conversation
   context; each assistant message records the route that actually answered.
 - Length, tone, model instructions, speech instructions, and voice are global
@@ -106,7 +89,9 @@ boundary.
 
 ### Voice
 
-- Input supports push-to-talk, toggle-to-talk, and Drive Session.
+- Input supports push-to-talk and toggle-to-talk. A session-scoped Hands free
+  switch wraps either input mode with adaptive voice-activity detection,
+  spoken countdown cues, auto-submit, reply playback, and automatic re-arming.
 - Speech recognition may use the system recognizer, a downloaded local model,
   or a capability-gated provider route.
 - Spoken replies may use system speech, downloaded Kokoro/Piper speech, or a
@@ -131,17 +116,16 @@ boundary.
 - TTS fallback routes are explicit, ordered, and opt-in. The runtime may honor
   a previously persisted policy, but current Settings does not expose a
   fallback editor, and System speech has no hidden fallback.
-- Drive Session re-arms capture only through its explicit session state and is
-  designed for hands-free use, interruption, background continuation, and
-  native remote controls.
+- Hands free starts disabled for every app session, re-arms capture only
+  through its explicit session state, and supports interruption, background
+  continuation, and native remote controls without becoming a persisted input
+  mode.
 
 ### Intelligence
 
 - Eight hosted LLM-capable routes are supported: OpenAI, OpenRouter,
   Anthropic, Google Gemini, xAI, Mistral, DeepSeek, and Alibaba Qwen. ElevenLabs
   is an additional speech-only provider.
-- Curated local Qwen models are normal response routes, not disguised hosted
-  providers.
 - Model Council runs independent model contributions, adversarial review
   rounds, and final synthesis. The visible synthesis is independently bounded
   so a provider cannot stream an effectively unbounded answer into the mobile
@@ -227,21 +211,10 @@ boundary.
 - Interactive controls have at least a 44-by-44-point target, modals isolate
   screen-reader focus, and dynamic announcements are rate-limited to meaningful
   state changes.
-- The three-step introduction uses one full-width 48-point bottom action on
-  every page. Welcome is a fixed, non-scrolling canvas; Setup and Try scroll
-  within the pager while the action remains fixed. Its close action is always
-  available, including before setup, and closing without completion leaves the
-  invitation available. The welcome preview is five
-  prompt-and-response exchanges whose final localized prompt matches the
-  bundled spoken answer; earlier exchanges recede beneath an eased
-  canvas-coloured veil sized as a share of the page, and the final response
-  explains the play hand-off. The veil must reach the canvas completely at the
-  heading, so the oldest exchange dissolves rather than lingering as a ghost,
-  and must behave identically without native view dependencies on Android,
-  iPhone, and iPad in both colour schemes. **Decision:** the veil is the only
-  mechanism that fades those exchanges. Blur is additive softness applied only
-  where the platform resolves it, so the effect degrades to the veil alone
-  rather than to a visibly different screen.
+- First launch opens the real workspace immediately. Missing provider
+  configuration is resolved through Connections; there is no onboarding
+  funnel, bundled preview recording, automatic local-response setup, or
+  completion gate.
 - **Decision:** iPad is an adaptive form factor of the same iOS product, not a
   separate app. Compact iPad windows reuse the phone interface exactly; regular
   windows expose persistent navigation and wider information layouts while
@@ -249,19 +222,20 @@ boundary.
   Split View, and Stage Manager resizing.
 - The same production identifiers remain
   `com.tobiaswinkler.app.mrbroccoli`; `.dev` and `.maestro` identities are
-  isolated test installations and must not weaken production entitlement or
-  fixture boundaries.
+  isolated test installations and must not weaken production fixture
+  boundaries.
 
 ## Core Terms
 
 - **Response mode** — a named slot in `settings.responseModes` containing one
-  local or provider response route. `activeResponseMode` selects the home route.
+  provider response route. `activeResponseMode` selects the home route.
 - **Voice turn** — the abortable pipeline from captured audio or text through
   context, optional search/deliberation, response generation, and optional
   speech playback.
-- **Drive Session** — an opt-in stateful voice mode that automatically re-arms
-  listening after a completed reply when it remains engaged.
-- **Model Council** — a Premium multi-model deliberation protocol with independent
+- **Hands free** — a session-scoped switch around the selected manual input
+  mode that automatically submits after detected speech ends and re-arms
+  listening after a completed reply while it remains enabled.
+- **Model Council** — a multi-model deliberation protocol with independent
   positions, shared immutable review snapshots, explicit convergence, bounded
   participant calls, and evidence-led synthesis.
 - **Conversation summary** — a compact, editable representation of older turns
@@ -279,8 +253,8 @@ boundary.
 
 ## External Dependencies
 
-- **Dependency:** Apple App Store / StoreKit and Google Play / Play Billing own
-  Premium product availability, purchase, and same-platform restoration.
+- **Dependency:** Apple App Store and Google Play own paid-app distribution and
+  store-level purchase restoration. The app has no runtime purchase surface.
 - **Dependency:** Hosted provider behavior, model availability, account voices,
   quota, and terms can change independently of this repository. Runtime
   manifests and release validation must be rechecked before distribution.
@@ -303,7 +277,7 @@ boundary.
 
 - [`app/SPEC.md`](./app/SPEC.md) — Expo Router entry and isolated promo route.
 - [`src/SPEC.md`](./src/SPEC.md) — source-tree ownership map.
-- [`src/context/SPEC.md`](./src/context/SPEC.md) — settings and Premium contexts.
+- [`src/context/SPEC.md`](./src/context/SPEC.md) — root settings context.
 - [`src/hooks/settings/SPEC.md`](./src/hooks/settings/SPEC.md) — settings storage,
   migration, and mutation rules.
 - [`src/hooks/conversations/SPEC.md`](./src/hooks/conversations/SPEC.md) —
@@ -311,7 +285,7 @@ boundary.
 - [`src/screens/main/SPEC.md`](./src/screens/main/SPEC.md) — conversation workspace
   behavior.
 - [`src/features/settings/SPEC.md`](./src/features/settings/SPEC.md) — settings
-  information architecture and edition gating.
+  information architecture.
 - [`src/constants/providers/SPEC.md`](./src/constants/providers/SPEC.md) — hosted
   provider and model manifest policy.
 - [`src/services/SPEC.md`](./src/services/SPEC.md) — service boundaries, local

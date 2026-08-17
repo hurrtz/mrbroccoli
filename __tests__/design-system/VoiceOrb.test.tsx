@@ -52,22 +52,24 @@ describe("VoiceOrb", () => {
   });
 
   it("clamps the core to the ring holding it below the crossover", () => {
-    // Below the crossover the 79% proportion overtakes the inner ring's hole
-    // (size - 30); an unclamped core would go oval against it.
+    // The core stays inside the thick ring and leaves a visible 3pt radial
+    // screen-colour gap at every supported size.
     const screen = renderOrb({ size: 100 });
     const core = flatten(screen.getByTestId("voice-orb-core").props.style);
 
     expect(core.width).toBe(100 - 30);
   });
 
-  it("keeps the approved 79% core proportion above the crossover", () => {
+  it("keeps a 3pt radial gap between the core and ring", () => {
     const screen = renderOrb({ size: 196 });
+    const gap = flatten(screen.getByTestId("voice-orb-core-gap").props.style);
     const core = flatten(screen.getByTestId("voice-orb-core").props.style);
 
-    expect(core.width).toBe(Math.floor(196 * 0.79));
+    expect(core.width).toBe(166);
+    expect(((gap.width as number) - (core.width as number)) / 2).toBe(3);
   });
 
-  it("keeps only the screen-colour gap between the core and flush rings", () => {
+  it("keeps only the screen-colour gap between the core and continuous ring", () => {
     const screen = renderOrb({ phase: "thinking", size: 196 });
     const gap = flatten(screen.getByTestId("voice-orb-core-gap").props.style);
     const core = flatten(screen.getByTestId("voice-orb-core").props.style);
@@ -75,8 +77,9 @@ describe("VoiceOrb", () => {
 
     expect(gap.backgroundColor).toBe(lightColors.background);
     expect(gap.width).toBe(196 - 6 * 4);
-    expect(core.width).toBe(Math.floor(196 * 0.79));
-    expect(circles[0].props.r - circles[1].props.r).toBe(6);
+    expect(core.width).toBe(166);
+    expect(circles).toHaveLength(1);
+    expect(circles[0].props.strokeWidth).toBe(12);
   });
 
   it("draws one continuous double-width ring at rest", () => {
@@ -84,7 +87,7 @@ describe("VoiceOrb", () => {
     const circles = screen.UNSAFE_getAllByType(Circle);
 
     expect(circles).toHaveLength(1);
-    expect(circles[0].props.stroke).toBe("rgba(68, 160, 85, 0.16)");
+    expect(circles[0].props.stroke).toBe(lightColors.turnTrack);
     expect(circles[0].props.strokeWidth).toBe(12);
   });
 
@@ -101,7 +104,8 @@ describe("VoiceOrb", () => {
         .UNSAFE_getAllByType(Circle)
         .map((circle) => circle.props.stroke);
 
-      expect(strokes).not.toContain(lightColors.turnInk);
+      expect(strokes).toContain(lightColors.turnTrack);
+      expect(strokes).toContain(lightColors.turnInk);
       for (const circle of screen.UNSAFE_getAllByType(Circle)) {
         expect(circle.props.strokeWidth).toBe(12);
       }
@@ -109,7 +113,7 @@ describe("VoiceOrb", () => {
     }
   });
 
-  it("draws both clocks during a turn", () => {
+  it("draws only the whole-turn clock during processing", () => {
     const screen = renderOrb({
       phase: "searching",
       phaseProgress: 0.66,
@@ -120,10 +124,13 @@ describe("VoiceOrb", () => {
 
     expect(strokes).toContain(lightColors.turnTrack);
     expect(strokes).toContain(lightColors.turnInk);
-    expect(strokes).toContain(lightColors.phaseSearching);
+    expect(strokes).not.toContain(lightColors.phaseSearching);
+    expect(circles.every((circle) => circle.props.strokeWidth === 12)).toBe(
+      true,
+    );
   });
 
-  it("fills both rings with red as the turn runs late", () => {
+  it("fills the single ring with red as the turn runs late", () => {
     const screen = renderOrb({
       phase: "thinking",
       turnProgress: 1,
@@ -133,19 +140,33 @@ describe("VoiceOrb", () => {
       .UNSAFE_getAllByType(Circle)
       .filter((circle) => circle.props.stroke === lightColors.danger);
 
-    expect(dangerArcs).toHaveLength(2);
+    expect(dangerArcs).toHaveLength(1);
   });
 
   it.each([
     ["idle", "mic"],
     ["recording", "stop"],
-    ["thinking", "brain"],
+    ["thinking-briefly", "brain"],
+    ["transcribing", "text-align-left"],
+    ["thinking", "circuitry"],
+    ["searching", "global"],
+    ["synthesizing", "user-sound"],
     ["speaking", "pause"],
   ] as const)("shows what tapping does in the %s phase", (phase, icon) => {
     const screen = renderOrb({ phase, phaseProgress: 0.2 });
 
     expect(
       screen.getByTestId(`phosphor-icon-${icon}`, {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+  });
+
+  it("mirrors the transcribing glyph in right-to-left interfaces", () => {
+    const screen = renderOrb({ phase: "transcribing", rtl: true });
+
+    expect(
+      screen.getByTestId("phosphor-icon-text-align-right", {
         includeHiddenElements: true,
       }),
     ).toBeTruthy();
@@ -167,6 +188,52 @@ describe("VoiceOrb", () => {
         includeHiddenElements: true,
       }),
     ).toBeNull();
+  });
+
+  it("holds the speaking ring while paused and resumes its clock", () => {
+    const reanimated = jest.requireMock("react-native-reanimated") as {
+      cancelAnimation: jest.Mock;
+      withTiming: jest.Mock;
+    };
+    const screen = renderOrb({
+      paused: false,
+      phase: "speaking",
+      phaseProgress: 0.25,
+      phaseProgressTiming: { durationMs: 1_000, target: 0.75 },
+    });
+    expect(reanimated.withTiming).toHaveBeenCalled();
+
+    reanimated.cancelAnimation.mockClear();
+    reanimated.withTiming.mockClear();
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <VoiceOrb
+          label="Tap to speak"
+          paused
+          phase="speaking"
+          phaseProgress={0.25}
+          phaseProgressTiming={{ durationMs: 1_000, target: 0.75 }}
+        />
+      </ThemeProvider>,
+    );
+
+    expect(reanimated.cancelAnimation).toHaveBeenCalled();
+    expect(reanimated.withTiming).not.toHaveBeenCalled();
+    expect(screen.UNSAFE_getAllByType(Circle)).not.toHaveLength(0);
+
+    reanimated.withTiming.mockClear();
+    screen.rerender(
+      <ThemeProvider mode="light">
+        <VoiceOrb
+          label="Tap to speak"
+          paused={false}
+          phase="speaking"
+          phaseProgress={0.25}
+          phaseProgressTiming={{ durationMs: 1_000, target: 0.75 }}
+        />
+      </ThemeProvider>,
+    );
+    expect(reanimated.withTiming).toHaveBeenCalled();
   });
 
   it("ignores paused outside the speaking phase", () => {
@@ -200,7 +267,7 @@ describe("VoiceOrb", () => {
     expect(orb.props.accessibilityLabel).toBe("Antippen zum Sprechen");
   });
 
-  it("colours the recording phase from the track, not the wash", () => {
+  it("keeps the neutral progress ring independent from the phase colour", () => {
     const screen = renderOrb(
       { phase: "recording", phaseProgress: 0.4 },
       "dark",
@@ -209,7 +276,9 @@ describe("VoiceOrb", () => {
       .UNSAFE_getAllByType(Circle)
       .map((circle) => circle.props.stroke);
 
-    expect(strokes).toContain(darkColors.phaseRecordingTrack);
+    expect(strokes).toContain(darkColors.turnTrack);
+    expect(strokes).toContain(darkColors.turnInk);
+    expect(strokes).not.toContain(darkColors.phaseRecordingTrack);
     expect(strokes).not.toContain(darkColors.phaseRecording);
   });
 });

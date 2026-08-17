@@ -38,13 +38,13 @@ function device(
 describe("local device model eligibility", () => {
   it("accepts a model when platform, memory, and storage fit", () => {
     expect(
-      evaluateLocalModelEligibility(getLocalModel("qwen3-1.7b-q8"), device()),
+      evaluateLocalModelEligibility(getLocalModel("whisper-small"), device()),
     ).toEqual({ eligible: true, reasons: [] });
   });
 
   it("excludes permanently impossible memory and storage combinations", () => {
     const result = evaluateLocalModelEligibility(
-      getLocalModel("qwen3-1.7b-q8"),
+      getLocalModel("whisper-small"),
       device({ physicalMemoryBytes: 3 * GIB, freeStorageBytes: 1 * GIB }),
     );
 
@@ -62,15 +62,6 @@ describe("local device model eligibility", () => {
     expect(result).toEqual({ eligible: true, reasons: [] });
   });
 
-  it("excludes local LLMs on unsupported 32-bit architectures", () => {
-    const result = evaluateLocalModelEligibility(
-      getLocalModel("qwen3-0.6b-q8"),
-      device({ architecture: "armeabi-v7a" }),
-    );
-
-    expect(result.eligible).toBe(false);
-    expect(result.reasons).toEqual(["architecture"]);
-  });
 });
 
 describe("benchmark verdict persistence", () => {
@@ -82,7 +73,7 @@ describe("benchmark verdict persistence", () => {
     overrides: Partial<LocalModelBenchmarkResult>,
   ): LocalModelBenchmarkResult {
     return {
-      modelId: "qwen3-1.7b-q8",
+      modelId: "whisper-small",
       catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
       testedAt: "2026-08-06T00:00:00.000Z",
       status: "viable",
@@ -104,7 +95,7 @@ describe("benchmark verdict persistence", () => {
     );
 
     const stored = await getLocalModelBenchmarkResults();
-    expect(stored["qwen3-1.7b-q8"]?.status).toBe("viable");
+    expect(stored["whisper-small"]?.status).toBe("viable");
   });
 
   it("discards a non-viable verdict measured under pressure", async () => {
@@ -115,7 +106,7 @@ describe("benchmark verdict persistence", () => {
     );
 
     const stored = await getLocalModelBenchmarkResults();
-    expect(stored["qwen3-1.7b-q8"]).toBeUndefined();
+    expect(stored["whisper-small"]).toBeUndefined();
   });
 
   it("keeps a non-viable verdict from an unpressured run", async () => {
@@ -124,6 +115,6 @@ describe("benchmark verdict persistence", () => {
     );
 
     const stored = await getLocalModelBenchmarkResults();
-    expect(stored["qwen3-1.7b-q8"]?.status).toBe("below-target");
+    expect(stored["whisper-small"]?.status).toBe("below-target");
   });
 });

@@ -18,10 +18,6 @@ export const MAESTRO_SCREEN_READER_FLOW =
   ".maestro/flows/accessibility/screen-reader-home.yaml";
 export const MAESTRO_ORB_FLOW =
   ".maestro/flows/runtime/orb-phase-progress.yaml";
-export const MAESTRO_ANDROID_AUTO_SETUP_FLOW =
-  ".maestro/flows/runtime/android-low-memory-auto-setup.yaml";
-export const MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW =
-  ".maestro/flows/runtime/android-eligible-auto-setup.yaml";
 export const MAESTRO_LOCALIZED_SCREENSHOTS = Object.freeze([
   "language-picker",
   "settings-app-01",
@@ -50,6 +46,21 @@ export const RETIRED_MAESTRO_SELECTORS = Object.freeze([
   "intro-back-face",
   "intro-close-face",
   "auto-setup-manual",
+  "auto-setup-card",
+  "auto-setup-proposal",
+  "auto-setup-install",
+  "automatic-setup-group",
+  "intro-banner",
+  "intro-flow-content",
+  "intro-welcome-play",
+  "intro-welcome-stop",
+  "intro-stepper-dot-1",
+  "intro-stepper-dot-2",
+  "intro-setup-step",
+  "intro-try-step",
+  "intro-auto-start",
+  "intro-manual-switch",
+  "intro-manual-catalogue",
   "intro-install-local",
   "intro-connect-provider",
   "intro-open-stt",
@@ -260,14 +271,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const screenReaderFlowPath = path.join(cwd, MAESTRO_SCREEN_READER_FLOW);
   const orbFlowPath = path.join(cwd, MAESTRO_ORB_FLOW);
   const orbRunnerPath = path.join(cwd, "scripts/run-orb-matrix.mjs");
-  const androidAutoSetupFlowPath = path.join(
-    cwd,
-    MAESTRO_ANDROID_AUTO_SETUP_FLOW,
-  );
-  const androidEligibleAutoSetupFlowPath = path.join(
-    cwd,
-    MAESTRO_ANDROID_ELIGIBLE_AUTO_SETUP_FLOW,
-  );
   const configPath = path.join(cwd, ".maestro/config.yaml");
 
   for (const filePath of [
@@ -278,8 +281,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     screenReaderFlowPath,
     orbFlowPath,
     orbRunnerPath,
-    androidAutoSetupFlowPath,
-    androidEligibleAutoSetupFlowPath,
     configPath,
   ]) {
     if (!fs.existsSync(filePath)) {
@@ -303,14 +304,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   const screenReaderFlow = fs.readFileSync(screenReaderFlowPath, "utf8");
   const orbFlow = fs.readFileSync(orbFlowPath, "utf8");
   const orbRunner = fs.readFileSync(orbRunnerPath, "utf8");
-  const androidAutoSetupFlow = fs.readFileSync(
-    androidAutoSetupFlowPath,
-    "utf8",
-  );
-  const androidEligibleAutoSetupFlow = fs.readFileSync(
-    androidEligibleAutoSetupFlowPath,
-    "utf8",
-  );
   const checkedInMaestroSource = readCheckedInMaestroSource(cwd);
   const maestroSource = [checkedInMaestroSource, orbRunner].join("\n");
 
@@ -354,27 +347,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   }
 
   for (const selector of [
-    "intro-stepper-dot-1",
-    "intro-setup-step",
-    "intro-auto-start",
-    "intro-banner-dismiss",
-    "Recommended for this phone",
-    "Download and install",
-    "auto-setup-install",
-    "auto-setup-done-state",
-    "auto-setup-done",
-    "Installed and selected.",
-    "thinking-slot-mode-1",
-    "model-storage-group",
-  ]) {
-    if (!androidEligibleAutoSetupFlow.includes(selector)) {
-      errors.push(
-        `Android eligible automatic-setup coverage is missing selector: ${selector}`,
-      );
-    }
-  }
-
-  for (const selector of [
     "voice-stage-${PHASE}",
     "${ORB_ID}",
     "${SCREENSHOT_NAME}",
@@ -407,43 +379,13 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     );
   }
 
-  for (const selector of [
-    "intro-stepper-dot-1",
-    "intro-setup-step",
-    "intro-auto-start",
-    "auto-setup-card",
-    "No suitable set for this phone",
-    "Try again",
-    "intro-manual-switch",
-    "intro-manual-catalogue",
-    "intro-manual-llm",
-    "settings-page-thinking",
-    "thinking-add-model",
-  ]) {
-    if (!androidAutoSetupFlow.includes(selector)) {
-      errors.push(
-        `Android automatic-setup coverage is missing selector: ${selector}`,
-      );
-    }
-  }
-
-  for (const selector of ["intro-banner", "main-screen"]) {
+  for (const selector of ["main-screen"]) {
     if (!screenReaderFlow.includes(selector)) {
       errors.push(`Screen-reader preparation is missing selector: ${selector}`);
     }
   }
 
   for (const selector of [
-    "intro-banner",
-    "intro-banner-dismiss",
-    "intro-flow-content",
-    "intro-welcome-play",
-    "intro-welcome-stop",
-    "intro-stepper-dot-1",
-    "intro-setup-step",
-    "intro-auto-start",
-    "intro-manual-switch",
-    "intro-manual-catalogue",
     "main-screen",
     "settings-page-overview",
     "settings-page-app",
@@ -464,7 +406,6 @@ export function validateMaestroSuite(cwd = process.cwd()) {
   }
 
   for (const selector of [
-    "intro-banner",
     "main-screen",
     "conversation-drawer-empty-state",
     "settings-page-overview",

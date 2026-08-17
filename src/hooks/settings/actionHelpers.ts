@@ -13,7 +13,6 @@ import {
   getSuggestedResponseModeRoute,
 } from "../../utils/responseModes";
 import {
-  MAX_RESPONSE_MODES,
   MIN_RESPONSE_MODES,
 } from "../../constants/providers/defaults";
 import {
@@ -118,10 +117,6 @@ export function createResponseModeUpdater(setSettings: SetSettings) {
 export function createResponseModeAdder(setSettings: SetSettings) {
   return () => {
     setSettings((prev) => {
-      if (prev.responseModes.length >= MAX_RESPONSE_MODES) {
-        return prev;
-      }
-
       const sourceRoute =
         getSuggestedResponseModeRoute(prev) ??
         prev.responseModes[prev.responseModes.length - 1]?.route ??
@@ -178,13 +173,12 @@ export function createResponseModeRemover(setSettings: SetSettings) {
 function hasUsableResponseMode(settings: Settings): boolean {
   return settings.responseModes.some(
     ({ route }) =>
-      (route.runtime === "local" && Boolean(route.localModelId)) ||
-      (route.model.trim().length > 0 &&
-        hasProviderCredentialForCapability(
-          route.provider,
-          settings.apiKeys[route.provider],
-          "llm",
-        )),
+      route.model.trim().length > 0 &&
+      hasProviderCredentialForCapability(
+        route.provider,
+        settings.apiKeys[route.provider],
+        "llm",
+      ),
   );
 }
 

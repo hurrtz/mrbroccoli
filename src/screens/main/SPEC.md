@@ -22,8 +22,8 @@ last_validated_sha: 7db5c94
 
 The main workspace keeps a spoken conversation understandable and controllable
 while many independent concerns are active: recording, transcription,
-reasoning, search, streaming, speech playback, persistence, Drive Session,
-edition policy, and secondary surfaces.
+reasoning, search, streaming, speech playback, persistence, Hands free,
+provider readiness, and secondary surfaces.
 
 `MainScreen.tsx` is the composition root. Focused controllers under this
 directory own lifecycle and interaction behavior; presentation components
@@ -33,19 +33,17 @@ receive already-derived state and callbacks.
 
 - The primary action is the voice orb, the workspace's one loud element. It
   always represents the current voice phase: idle, recording, transcribing,
-  brief thinking, searching, thinking, synthesizing, or speaking. Two
-  concentric rings say one thing per phase: at rest both fade to the quiet
-  phase colour, recording and speaking combine them into one indicator (the
-  recording window, then the read position), and transcribing through
-  synthesizing keeps two clocks — the inner one the current phase against
-  itself, the outer one the whole turn against its speech-start estimate. Past
-  the estimate both fill with red. The gap between the core disc and the inner
-  ring is only ever a gap: the screen reads through it in every phase, while
-  the inner and outer rings meet flush. The orb is sized from the space the
-  column actually leaves it, clamped between 96pt and its surface ceiling (196
-  phone portrait, 104 phone landscape; 168-224 across regular-iPad states), so
-  the intro banner, transcript dock, or a landscape split simply makes it
-  smaller.
+  brief thinking, searching, thinking, synthesizing, or speaking. One thick
+  continuous ring says one thing at a time: the recording window, the complete
+  turn from submission to first speech, then the spoken reply's read position.
+  Individual processing-phase estimates are not visualized. Past the turn
+  estimate the ring fills with red. Pausing speech preserves the measured read
+  position and holds its interpolation until playback resumes. The gap between
+  the core disc and the ring is only ever a gap: the screen reads through it in
+  every phase. The orb is sized from the space the
+  column actually leaves it, clamped between 120pt and its surface ceiling (196
+  phone portrait, 150 phone landscape; 204-224 across regular-iPad states), so
+  a transcript dock or landscape split simply makes it smaller.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
   the voice/text pager discoverable without competing with the voice action.
   **Decision:** the pager is a closed circle — every decisive swipe and every
@@ -59,45 +57,57 @@ receive already-derived state and callbacks.
   wrapping swipe shows the other surface rather than empty canvas. Rejected
   alternative: clamping the track between the two pages, which answered a
   wrapping drag with nothing moving and made a circle that existed only in the
-  release handler. Both chevrons still disable together while a turn is
-  active. Image attach, Model Council,
+  release handler. The chevrons sit in a stable sibling layer outside the pan
+  recognizer, so an ordinary tap owns exactly one completed transition. The
+  pressed side owns the incoming direction on every cycle: repeated right-arrow
+  taps always bring the next surface from the right, and repeated left-arrow
+  taps always bring it from the left. While visible, both keep their full
+  active treatment and never inherit route readiness; during an active turn the
+  layer is hidden and non-interactive rather than shown disabled. Image attach,
+  Model Council,
   and Web Search stay in the satellite
   row below the stage and show their unavailable state instead of changing the
   workspace geometry.
 - The orb remains in its measured slot even when a route is blocked or
   unavailable. It becomes disabled with the translated reason as its accessible
   name; an explicit notice beneath the stage is the only setup action and
-  opens the owning settings page. A turn control or text submission never opens
-  the introduction.
-- The route byline above the stage states who answers the next turn and at
-  what effort — one line at every model count, with the model list in a sheet
-  opened from it. Tapping an available model commits the selection and closes
-  the sheet immediately; there is no separate Done step. With a single
-  configured model it becomes a credit line;
+  opens the owning settings page.
+- Portrait places route and conversation settings in one quiet raised block,
+  14pt below the top bar: two equal 44pt rows separated by a hairline. The
+  leading row states who answers the next turn and at what effort; the second
+  row states the effective conversation settings and is one complete press
+  target. Landscape and regular iPad retain the uncontained route byline plus
+  compact settings control because their narrow control columns cannot carry
+  the block. The model list opens in a scrolling sheet; tapping an available
+  model commits and closes immediately, with no Done step. With one configured
+  model the first row becomes a credit line;
   effort is named, not plotted — the word alone carries it and routes without
   an adjustable effort read `Normal`;
   when no route is usable it renders nothing rather than another credential or
   setup card.
-- In portrait, the conversation's quick settings read as one centred muted
-  line of labelled values under the byline, ordered as the sheet presents them.
+- The conversation's quick settings read as one muted line of labelled values,
+  ordered as the sheet presents them. Hands free is prefixed while enabled.
   The complete 44pt row opens the conversation style sheet; its trailing glyph
   is decorative. Landscape floats that compact control over the stage's
   top-right corner as an icon instead of giving it a row: the words cost the
-  orb height the narrow column cannot spare. At accessibility-large text, portrait keeps that labelled control but
-  omits the decorative sentence, uses the title-only introduction banner, and
+  orb height the narrow column cannot spare. At accessibility-large text,
+  portrait keeps that labelled control but omits the decorative sentence and
   makes the satellite row icon-only. This preserves the complete blocked-route
   warning, status, and transcript affordance without overlap. Landscape keeps
   the same interactions and the warning's complete accessible name, but the
   constrained blocked-route card shows only its actionable label.
-- **Decision:** the ring under the orb belongs to the phase. Idle carries the
-  composing controls (image, Council, Web); any running turn swaps them for the
-  transport verbs (Restart, Back, Forward, Stop) at the same geometry. A drive
-  session shows transport in every phase, idle included, because the loop must
-  be stoppable at rest, and its Stop becomes Resume. Transport verbs tint their
-  glyph and label only. Drive mode adds no controls of its own and its silence
-  countdown is spoken, never drawn.
-- Restart replays the response from its first word through the same path as a
-  transcript replay, and is live only while he speaks.
+- **Decision:** one location has one meaning. The composing row permanently
+  holds Image, Council, Web, and Hands free. Image, Council, and Web stay visible
+  but rest at 38% during a turn or Hands-free loop; Hands free remains live in
+  both directions. Turn transport orbits the orb: Back and Forward on its
+  flanks, Restart and Stop on the lower diagonals, 34pt clear of the edge. The
+  orbit reserves its full footprint even at idle, but its keys render only
+  during a turn, so the orb never jumps when work begins. Stop is live through
+  every turn phase; the three seek controls become live only while speaking.
+  Transport verbs tint glyph and label only, and the silence countdown remains
+  spoken rather than drawn.
+- Restart rewinds the active playback reel to the response's first word without
+  requiring the voice session to stop first, and is live only while he speaks.
 - Back and Forward move between the reply's paragraphs. Back means the start of
   the paragraph being read, unless it began under two seconds ago, when it
   means the paragraph before; Forward always means the next paragraph's start.
@@ -144,9 +154,13 @@ receive already-derived state and callbacks.
   It reads as one continuous script with a fixed speaker margin, provider or
   user identity, and a quiet connecting line rather than separate message
   cards. Opening an existing conversation folds every row; only a newly
-  arriving row opens automatically. Copy, branch, share, replay, and full turn
-  metrics appear only on an open row, while compact metadata remains visible
-  when usage details are enabled. Swiping a row exposes explicit removal.
+  arriving row opens automatically. Edit, copy, branch, share, replay, and
+  report actions remain outside the folded content and are therefore always
+  reachable. Compact source, route, and duration metadata sits inside the
+  foldable message content when usage details are enabled, so a folded row
+  hides it and an opened row exposes one button. That button opens a scrollable
+  receipt modal rather than expanding inline. Swiping a row exposes explicit
+  removal.
   In portrait the transcript demotes to a peeking handle at the bottom edge
   with a grip and the translated title `Transcript`; the visible handle never
   varies with message count and does not repeat model, age, or reply content.
@@ -174,6 +188,12 @@ receive already-derived state and callbacks.
   restarting recording, playback, or another request.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
+- Pending images live in the Image satellite's fixed-size thumbnail deck and
+  never add a row to the stage. Its anchored, undimmed popover shows a sideways
+  scrolling list with per-image removal and Add; it closes after the native
+  picker returns with new images. Persisted message images wrap into a
+  transcript gallery so four or more attachments remain reachable through
+  normal transcript scrolling.
 - Adding an image opens an app-owned source sheet. Camera or photo-library
   presentation waits until that sheet has completed native dismissal on iOS
   and uses a bounded Android fallback, so native pickers never compete with an
@@ -183,15 +203,18 @@ receive already-derived state and callbacks.
   non-dismissible disclosures with explicit cancel and enable actions. They
   suppress workspace toasts while visible and must preserve the exact model,
   round, and call count that the user reviewed.
+- Toast feedback is presented above the active native surface, including the
+  transcript drawer, settings sheets, and receipt modal; it is never queued
+  invisibly behind them.
 - The pager always opens on voice. The composer stays available through its
   labelled 44pt chevrons and horizontal gesture, but route readiness never
   automatically pages the workspace to text. The composer is outlined in the
-  accent at rest, not only when focused. A chevron selection may focus the
-  composer as an explicit text action; swiping to it preserves keyboard state
-  and never opens the keyboard by itself.
-- Push-to-talk alone owns press-in and press-out recording boundaries. Toggle
-  and Drive modes receive one completed orb press per tap; they must not also
-  start on press-in and stop on press-out.
+  accent at rest, not only when focused. Neither a chevron nor a swipe focuses
+  the composer or opens the keyboard; only a direct field action does. A layout
+  remount restores focus only when the field actually held it beforehand.
+- Push-to-talk alone owns press-in and press-out recording boundaries.
+  Toggle-to-talk receives one completed orb press per tap; Hands free wraps
+  either mode without adding a third persisted input-mode value.
 - A message telling someone to type must leave typing working. This separates
   an unusable voice route from a prompt block, which stops both routes.
 - Controls that cannot be used at all stay visible but disabled when they are
@@ -200,17 +223,17 @@ receive already-derived state and callbacks.
   accessibility label states why, and Settings owns the remedy. Controls that
   are only briefly unavailable, such as during an active turn, also stay
   visible and disabled.
-- The satellites — image attach, Model Council, and Web Search — sit in a row
+- The satellites — Image, Model Council, Web Search, and Hands free — sit in a row
   under the portrait orb. The orb or composer and that row form one vertically
   centered stage cluster with the design-system's 18-point separation; surplus
   height surrounds the cluster instead of opening a device-dependent gap or
   pushing the controls down against the transcript handle. They change how the
   next turn is answered, so they
   read as notes on that action rather than settings to pass through on the way in.
-  Toggles carry a squircle well that tints when on; momentary actions stay
-  borderless. During speech the row also carries the stop and barge-in
-  actions, because the orb has one press.
-- Landscape retains the Council and Web toggles but omits image attachment and
+  All targets are borderless at rest. Active switches fill and accent their
+  glyph and label; an accent-soft squircle appears only while pressed. During a
+  turn the row never changes species because transport belongs to the orbit.
+- Landscape retains Council, Web, and Hands free but omits image attachment and
   the portrait quick-settings sentence. The portrait Image satellite owns the
   attachment entry point; the composer owns only the pending-attachment preview
   and its remove action.
@@ -251,246 +274,40 @@ receive already-derived state and callbacks.
 - The active conversation is snapshotted for a turn. A completion must not be
   written into a different conversation selected while work was in flight.
 
-## Effective Edition Behavior
+## Provider Readiness
 
-Free mode is a complete offline experience rather than Premium with random
-controls disabled. `useFreeOfflineMode.ts` derives a viable local response,
-listening, and speaking profile from installed and benchmarked capabilities.
-The derived effective settings drive the turn and status UI without corrupting
-the user's persisted Premium choices.
+The response runtime is BYOK-only. The active response mode must resolve to a
+configured provider key and a currently usable provider model. Provider
+readiness is derived from that route; local speech-model readiness can satisfy
+listening or speaking only and can never satisfy response generation.
 
-Premium exposes hosted providers, BYOK, configurable routes, web search, Uber
-Mode, provider speech, and advanced conversation controls. Entitlement state
-comes from the Premium context; the screen does not infer it from the presence
-of a key or a local model.
+A missing or blocked provider route leaves the workspace geometry intact and
+exposes one contextual action to Connections or Thinking. The action dismisses
+its current native surface before presenting Settings. There is no first-run
+wizard, local-response profile, edition projection, purchase sheet, or
+entitlement gate.
 
-**Decision:** Switching editions must be reversible. Free-mode adaptation is a
-runtime projection, not a destructive settings migration. Completing Free
-setup preserves configured provider response modes alongside the local Free
-routes; the Free runtime ignores them and they return untouched with Premium.
+**Decision:** Legacy stored local response routes and onboarding fields are
+normalized away on settings load. Configured provider response modes survive
+that migration, while optional local STT/TTS preferences remain intact.
 
-## Onboarding
+## Hands Free
 
-There is no blocking setup surface. A new install opens directly into the
-workspace, with a dismissible intro banner above it that opens a three-step
-introduction: a welcome that demonstrates instead of describing, one setup
-screen with a single green path, and a live test where the user judges the
-result. It is full-screen on phones and compact iPad windows; regular iPad
-centres the same flow in a card capped at 640pt, and pager offsets derive from
-that measured card rather than the whole window.
+Hands free is an explicit session state machine around the selected manual
+input mode, not a third persisted mode or repeating timer:
 
-**Decision:** The three steps replace the earlier seven-page wizard (design
-system, owner-resolved 2026-08). Premium is not a walkthrough step. Its only
-handoff inside the flow is the explicit provider path on Setup, because adding
-provider credentials requires Premium; otherwise the first Premium surface a
-new user meets is the settings overview after the app has proven itself. The
-welcome step shows a stored dialogue whose crisp final question is the question
-the bundled recording actually answers, in every language; switching the
-language swaps the on-screen dialogue and the audio together so the pairing
-holds. The manual catalogue behind the setup step's switch renders real route
-state and hands acquisition to the owning stage pages (Thinking, Listening,
-Speaking); the fully inline download-test-unlock lifecycle inside the flow
-remains an open follow-up.
-
-**Decision:** First-run integrity: until the introduction has been completed
-once (`introCompleted`), the flow offers no close control, step two's forward
-action stays disabled until the exact active reasoning route can run, every
-step-selection and paging path keeps the final test step unreachable until that
-same readiness condition holds, and step three's Done stays disabled until one
-ephemeral test turn succeeds. A provider route requires its credential; a local
-route requires a verified install plus a viable benchmark that matches the
-current device. A ready backup mode cannot unlock a different unavailable
-active route. If readiness is lost while the final step is open, a first run
-returns to Setup and aborts the ephemeral run. A re-entry restores close on
-steps one and two and permits navigation across all three, but the microphone
-still remains disabled without a runnable route; step three never shows close —
-Done is the exit.
-
-**Decision:** The test turn is ephemeral by construction: it runs one real
-voice-pipeline turn on the user's configured routes with an empty history and
-callbacks that hold only local state, so nothing reaches the conversation
-store. The number shown is release-to-speech latency — the figure that
-improves when routes change. A native STT route first transcribes the captured
-file through the platform recognizer, then supplies that transcript to the
-shared pipeline because provider transcription deliberately rejects `native`.
-The turn retains the configured TTS fallback order, treats a late speech error
-as a failed test, and stops only playback that the introduction itself started
-when the flow closes, unmounts, or another test starts. Shared player
-cancellation is reset before a new test or replay. Exit and unmount also abort
-recorded-file recognition, stop and delete an active capture, and delete a
-capture URI that arrives after the run became stale.
-
-The automatic setup step carries the shared `AutoSetupCard` with its header
-hidden — the step title and body already say what it is. The job behind it
-lives above every screen that shows it (`useAutoSetupJob` at the composition
-root): the introduction's step and the App & diagnostics setup group plus the
-home-screen `BackgroundTaskBar` are
-views of one state, so leaving the introduction mid-install keeps the download
-running and reachable. Its six
-states run offer → scanning → proposal → installing → done or failed; nothing
-downloads before the proposal has been seen; the staged ~2.5s measurement
-reveals only real device readings; a transfer failure keeps completed models
-and retry resumes the queue rather than starting over. A persisted completed
-profile is rechecked against pinned installs and current-device benchmarks on
-the next launch; a ready profile restores the card's Ready verdict, while a
-stale benchmark proposes testing only. Completing the automatic install
-persists that same completion marker, so this revalidation path also applies
-after a later app launch. A zero-byte proposal uses neutral setup
-wording rather than claiming it will download again. When a model instead
-fails its device benchmark, retry re-runs selection so the durable result can
-propose the next viable model without discarding verified downloads. The
-outcome is announced by the card where the card is visible and by the home
-`BackgroundTaskBar` otherwise — never both. The completed home row remains
-available briefly so its destination is actionable; install failure remains
-there until the user opens setup or retries. Setup progress and outcomes do
-not use transient toasts. Scanning and installation each expose a labelled
-Cancel action. Cancelling a scan returns to the offer; cancelling an install
-returns to its proposal, retains completed artifacts, and can resume. The
-abort signal reaches downloads and interruptible benchmarks, and a cancelled
-run may neither publish an outcome nor apply settings after the fact.
-
-The identity-guarded `.maestro` onboarding scene is the only exception to the
-shared-job presentation rule: it suspends the live job and passes a fixed
-proposal only to the introduction. Settings and the home task row retain the
-same suspended job, while Free readiness stays false so the proposal cannot
-unlock Try or claim that setup completed. Every store-promo scene suspends
-background automatic setup and provider voice-directory loading before fixture
-identity hydration completes and for the scene's lifetime. Onboarding also
-suppresses Intro's catalogue install and benchmark readers, so the fixed
-proposal cannot trigger a hardware, filesystem, model, or provider probe.
-
-**Decision:** The introduction follows the app's light or dark theme. Only the
-workspace banner keeps a palette of its own -- violet, in both themes -- because
-it is the one surface that has to interrupt. An earlier version made the whole
-flow permanently dark so it would read as a distinct place; in a light app that
-landed as two products stitched together.
-
-**Decision:** Steps are walkable in both directions -- by swiping, from the
-stepper, and from the header back control -- and the stepper draws dots with a
-dash for the current position rather than a "step 4 of 6" label. A one-way flow
-made the last step a dead end: someone there could neither check what they had
-skipped nor revisit a decision, and a counter said where they were but nothing
-about what they had passed. Back sits in the header beside the close control
-because both are ways out of the flow; the footer carries only forward motion,
-which becomes a labelled Done action on the last step. The final action stays
-where forward motion has lived throughout the flow; removing it left an empty
-gap that looked like a missing control rather than a deliberate ending.
-Header controls expose 44-point touch targets around 40-point visual faces.
-On a first run, the final step's dot exposes disabled accessibility state until
-the reasoning route is ready, and horizontal paging observes the same boundary;
-re-entry and backward navigation remain unrestricted.
-The welcome step's language picker isolates assistive focus and excludes its
-backdrop from the accessibility tree.
-
-**Decision:** The banner offers no dismissal until the introduction has been
-opened at least once, and a completed purchase removes it outright. An exit
-available before the card has ever been read makes getting rid of it the
-easiest thing to do on a first launch; after a purchase the invitation has
-nothing left to invite. It stays reversible from App & diagnostics.
-
-**Decision:** Headings are centred, because each step is a single column with
-nothing beside it. In the setup step's manual catalogue, each pipeline group
-carries a Required or Optional tag pill on its caption — the required group is
-the one hard requirement, and the optional groups say what already covers
-them: the phone's own recognizer and voice. The welcome step carries the
-language picker over the bundled examples, because letting someone hear the
-app in their own language argues for setting it up better than a claim does.
-
-On phones and compact iPad windows, landscape contracts the workspace
-invitation to the approved 48-point, title-only banner so the voice stage
-remains stable. Regular iPad keeps the full title, explanation, action, and
-eligible dismiss control in both orientations; its content-pane pattern does
-not change merely because the window became wider than tall.
-
-Transient toasts belong to the main workspace layer. If a sheet, introduction,
-or full-screen secondary surface is open, one pending toast waits without
-consuming its display interval and starts its four-second clock only after
-that surface closes. Newer notices still replace older ones. **Decision:** the
-sessions drawer is the one exception — feedback for actions begun there
-(automatic naming's success and failure) renders inside the drawer modal
-itself, because deferring it hid the outcome behind the surface the user was
-still looking at. The persistent iPad sidebar is inline, so it uses the single
-workspace toast and must not mount a second live-region copy.
-
-The introduction is opened from its banner, never as a side effect of attempting
-a turn. The manual catalogue shows every route at a glance — the system route,
-the recommended-tier on-device models with their real install and test state,
-and the provider path — so the default decision is judgeable on that screen;
-"More models" is the only hand-off per group. Provider keys are entered under
-Connections; manual local LLM, STT, and TTS acquisition belongs to Thinking,
-Listening, and Speaking respectively.
-Blocked Free-runtime notices lead to the shared automatic setup under App &
-diagnostics rather than duplicating setup or hijacking the introduction.
-
-Speech-input readiness follows the selected backend. The local route reads
-`localSttModelId` directly; provider picker state is not evidence that a
-downloaded recognizer is selected. Completing an automatic profile must make
-its verified local recognizer immediately available on the home voice surface.
-
-**Decision:** The provider route leads to the purchase rather than to the
-provider page, because provider keys are a Premium capability. Intro dismisses
-its native modal before the purchase sheet opens; leaving without buying
-reopens the same Intro visit on Setup. The Settings handoff follows the same
-dismiss-then-present rule. Backing out of either destination should not cost
-someone the introduction they were part-way through, and sibling native modals
-must never overlap during that return.
-
-**Decision:** A model download holds a screen wake lock and runs under an
-Android `dataSync` foreground service for its whole duration, and can be
-cancelled from the control that started it. Downloads run inside the app
-process, including the ones the speech runtime fetches for itself, so Doze,
-battery saver, and an app switch each cut a multi-gigabyte transfer within
-about a minute. The wake lock alone only answers a sleeping screen while the
-app is in front. iOS needs no service: its long transfers already run on a
-background URL session.
-
-**Decision:** Every onboarding action opens the settings page that owns the
-work, not settings in general. Manual response, recognition, and voice actions
-open Thinking, Listening, and Speaking, where download progress, verification,
-and failure remain visible. The background automatic-setup row opens App &
-diagnostics, the page that owns that shared job.
-
-**Decision:** Setup stopped being a gate. Requiring a multi-gigabyte download
-before the app could be seen made the setup cost the first impression. The
-trade is that a user can now reach a microphone with nothing configured, which
-the contextual entry point exists to answer.
-
-**Decision:** An install that already has provider keys starts with the banner
-dismissed. It has nothing to be introduced to.
-
-**Decision:** The audio examples are bundled, one per interface language,
-roughly twenty-one megabytes in total. Store-hosted on-demand delivery was
-built and removed: it cost an iOS app extension and a Play Core dependency to
-save an amount nobody would notice once the content settled at one message per
-language instead of six. Every install carries all nineteen.
-
-Each clip carries a visible pre-recorded label and never plays automatically,
-so it cannot be read as what the user's own configuration will produce. Every
-clip is loudness-matched to -16 LUFS; the delivered recordings spanned -15.0 to
--30.3 LUFS, and without matching a listener would strain at one language and be
-startled by the next.
-
-**Dependency:** The app holds no audio session while idle, so the voice pipeline
-owns the device rather than keeping it open. Example playback activates the
-session on demand and holds it across a language change: releasing the previous
-player would otherwise tear the session down and silence the clip the next one
-was about to play, with no error surfacing anywhere.
-
-## Drive Session
-
-Drive Session is an explicit state machine, not a repeating timer:
-
-- entering the mode enables automatic continuation but does not silently begin
-  recording;
-- engaging authorizes the active hands-free session;
+- every app session starts disabled;
+- enabling engages the loop and immediately requests listening when idle;
 - a completed reply may request one subsequent arm only while the session is
   engaged and automatic continuation remains enabled;
-- pause clears a pending arm and preserves a safe stopped state;
-- resume requests a new arm explicitly;
-- suspend, mode exit, app lifecycle changes, cancellation, or fatal turn
-  failure disengage the session; and
-- remote controls and large on-screen controls dispatch the same state-machine
-  events.
+- disabling clears a pending arm without cancelling the current response;
+- enabling during a response arms the next turn rather than interrupting it;
+- Stop abandons the current turn but leaves the loop enabled and requests the
+  next turn when safe;
+- background suspension temporarily disengages capture while preserving the
+  enabled switch for foreground re-engagement; and
+- native remote controls and the on-screen car switch dispatch the same
+  state-machine transition.
 
 Acoustic cues describe state changes but never substitute for visible or
 screen-reader-accessible state.
@@ -533,7 +350,7 @@ always available; Face ID or fingerprint is offered only when its authenticated
 SecureStore marker exists. Failed or cancelled authentication keeps the
 overview in place, does not load the conversation, and shows the localized
 equivalent of “The session was not unlocked, so it was not loaded.” Locking an
-active conversation first resets recording, generation, Drive state, and
+active conversation first resets recording, generation, Hands-free state, and
 playback, then clears it from the workspace. The setup copy explicitly states
 that this access control does not encrypt the conversation database. Until the
 session is unlocked, its quick menu exposes only authentication/removal and
@@ -566,7 +383,7 @@ turn.
 
 ## Store-Promo Fixtures
 
-Deterministic screenshots may inject conversations, phases, edition state,
+Deterministic screenshots may inject conversations, phases, provider routes,
 drawers, and settings only in the `.maestro` application identity. Fixture
 state must never become a hidden production feature or be reachable in the
 production package.
@@ -580,7 +397,7 @@ When changing the workspace:
 2. trace turn cancellation, app lifecycle, and conversation-switch behavior;
 3. keep visual phase, status copy, accessibility announcements, and remote
    controls consistent;
-4. verify both Free effective settings and Premium persisted settings;
+4. verify provider readiness and legacy-settings normalization;
 5. add a regression test at the state-machine, hook, or presentation boundary;
 6. verify compact and regular iPad resizing when layout ownership changes; and
 7. update [`DESIGN.md`](./DESIGN.md) when orchestration or ownership changes.

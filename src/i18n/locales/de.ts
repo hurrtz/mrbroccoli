@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const de = {
   ...conversationKnowledgeTranslations.de,
   ...imagePromptTranslations.de,
   ...onDeviceTranslations.de,
-  ...onboardingTranslations.de,
-  ...introTranslations.de,
-  ...premiumTranslations.de,
+  ...localSpeechTranslations.de,
+  ...settingsTranslations.de,
   ...transcriptEditTranslations.de,
   ...workspaceTranslations.de,
   ...sessionLockTranslations.de,
-  ...autoSetupTranslations.de,
   appName: "Mr. Brokkoli",
   retry: "Erneut versuchen",
   dismiss: "Schließen",
@@ -40,7 +36,6 @@ export const de = {
   settings: "Einstellungen",
   settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Alle",
-  firstRun: "Erster Start",
   instructions: "Anweisungen",
   providers: "Anbieter",
   webSearch: "Websuche",
@@ -213,10 +208,10 @@ export const de = {
   createApiKey: "Zugangsdaten",
   apiKey: "API-Schlüssel",
   aboutThisProvider: "Über diesen Anbieter",
-  openRouterOnboardingTitle: "Ein Key, mehrere Anbieter",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Ein Key, mehrere Anbieter",
+  openRouterGatewayDescription:
     "Erstelle einen eigenen OpenRouter-Key, füge ihn unten ein und nutze Snapshot-Modelle mehrerer Anbieter, ohne direkte Verbindungen zu ersetzen.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Anfrageweg: dieses Gerät → OpenRouter → ausgewählter Upstream-Anbieter",
   openRouterKeys: "OpenRouter-Keys",
   providerStatusInvalid: "Ungültig",

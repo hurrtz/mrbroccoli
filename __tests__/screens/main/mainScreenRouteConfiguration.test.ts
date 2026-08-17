@@ -99,40 +99,6 @@ describe("mainScreenRouteConfiguration", () => {
     expect(result.globalSelectedTtsVoice).toBe("com.apple.voice.samantha");
   });
 
-  it("runs a local response mode without a key and disables web search", () => {
-    const settings = {
-      ...DEFAULT_SETTINGS,
-      activeResponseMode: "mode-1",
-      responseModes: [
-        {
-          id: "mode-1",
-          route: {
-            runtime: "local" as const,
-            localModelId: "qwen3-0.6b-q8" as const,
-            provider: "openai" as const,
-            model: "Qwen3 0.6B",
-          },
-        },
-      ],
-      webSearchMode: "on" as const,
-      webSearchProvider: "openai" as const,
-      apiKeys: {
-        ...DEFAULT_SETTINGS.apiKeys,
-        openai: "search-only-key",
-      },
-    };
-
-    expect(getMainScreenRouteConfiguration(settings, true)).toEqual(
-      expect.objectContaining({
-        localLlmModelId: "qwen3-0.6b-q8",
-        providerLabel: "Qwen3 0.6B",
-        voiceInputDisabled: false,
-        webSearchActive: false,
-        webSearchMode: "off",
-      }),
-    );
-  });
-
   it("builds Uber routes only from ready home-screen models", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

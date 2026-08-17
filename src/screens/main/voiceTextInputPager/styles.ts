@@ -13,6 +13,13 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   rootWithFooter: {
     justifyContent: "center",
   },
+  pendingAttachments: {
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+    zIndex: 2,
+  },
   viewport: {
     width: "100%",
     minHeight: 68,
@@ -29,6 +36,11 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   viewportWithFooter: {
     flexGrow: 0,
     flexShrink: 1,
+  },
+  pagerShell: {
+    height: "100%",
+    position: "relative",
+    width: "100%",
   },
   track: {
     flexDirection: "row",
@@ -52,8 +64,8 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   inputSwitchRow: {
     alignItems: "center",
     flexDirection: "row",
-    gap: 2,
     height: "100%",
+    paddingHorizontal: 46,
     width: "100%",
   },
   inputSwitchSurface: {
@@ -70,8 +82,16 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     justifyContent: "center",
     width: 44,
   },
-  surfaceChevronDisabled: {
-    opacity: 0.22,
+  chevronLayer: {
+    ...StyleSheet.absoluteFill,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  chevronLayerCovered: {
+    opacity: 0,
+  },
+  chevronSpacer: {
+    flex: 1,
   },
   orbSlot: {
     alignItems: "center",

@@ -1,6 +1,5 @@
 import {
   InputMode,
-  MessageImageAttachment,
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
@@ -16,10 +15,6 @@ export interface VoiceTextInputPagerProps {
   compactPromptNotice?: boolean;
   colors: Colors;
   disabled: boolean;
-  driveAutoContinueEnabled?: boolean;
-  driveSilenceCountdownSeconds?: number | null;
-  driveSessionCanRepeat?: boolean;
-  driveVoiceActive?: boolean;
   /** Controls that stay attached to the measured orb/composer slot. */
   footer?: ReactNode;
   initialSurface?: InputSurface;
@@ -28,15 +23,13 @@ export interface VoiceTextInputPagerProps {
   inputMode: InputMode;
   isActive: boolean;
   onInputSurfaceChange?: (surface: InputSurface) => void;
-  attachments?: MessageImageAttachment[];
-  onRemoveImage?: (attachmentId: string) => void;
-  onDriveContinue?: () => void | Promise<void>;
-  onDriveRepeat?: () => void | Promise<void>;
-  onDriveStop?: () => void | Promise<void>;
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
   onInterruptPlayback?: () => void;
+  onRestartReply?: () => void;
+  onSeekBack?: () => void;
+  onSeekForward?: () => void;
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
@@ -54,6 +47,8 @@ export interface VoiceTextInputPagerProps {
   readingProgressTiming?: OrbTurnProgress["phaseProgressTiming"] | null;
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
+  rtl?: boolean;
+  showTransportLabels?: boolean;
   phaseTimingProgress?: VoiceTimingProgress | null;
   speechStartProgress?: VoiceTimingProgress | null;
   /**
@@ -63,6 +58,12 @@ export interface VoiceTextInputPagerProps {
   maxOrbSize: number;
   statusLabel: string;
   t: TranslateFn;
+  transportLabels: {
+    back: string;
+    forward: string;
+    restart: string;
+    stop: string;
+  };
   visualPhase: VoiceVisualPhase;
   /**
    * Retires the voice control when no route can hear the user, without

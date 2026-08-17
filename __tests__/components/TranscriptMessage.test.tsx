@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { TranscriptMessage } from "../../src/components/TranscriptMessage";
@@ -120,11 +120,12 @@ describe("TranscriptMessage", () => {
     expect(body.props.numberOfLines).toBe(3);
   });
 
-  it("lets a short collapsed message expand so its actions remain reachable", () => {
+  it("keeps actions outside a collapsed message", () => {
     const onToggle = jest.fn();
-    const screen = renderMessage({ onToggle });
+    const onCopy = jest.fn(async () => true);
+    const screen = renderMessage({ onCopy, onToggle });
 
-    expect(screen.queryByLabelText("Copy")).toBeNull();
+    expect(screen.getByLabelText("Copy")).toBeTruthy();
     expect(
       screen.getByTestId("transcript-toggle-assistant-1").props
         .accessibilityState,
@@ -135,13 +136,13 @@ describe("TranscriptMessage", () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
-  it("shows bare 44-point message actions only while expanded", () => {
+  it("shows bare 44-point message actions regardless of fold state", () => {
     const onBranch = jest.fn();
     const onCopy = jest.fn();
     const onShare = jest.fn();
     const onRepeat = jest.fn();
     const screen = renderMessage({
-      expanded: true,
+      expanded: false,
       onBranch,
       onCopy,
       onRepeat,
@@ -165,19 +166,62 @@ describe("TranscriptMessage", () => {
     });
   });
 
-  it("keeps compact metadata visible and expands full usage metrics", () => {
-    const screen = renderMessage({
-      showUsageStats: true,
-      message: {
-        ...baseMessage,
-        usage: {
-          kind: "reply",
-          source: "estimated",
-          promptTokens: 120,
-          completionTokens: 30,
-          totalTokens: 150,
+  it("copies from the transcript and confirms success in place", async () => {
+    const onCopy = jest.fn(async () => true);
+    const screen = renderMessage({ onCopy });
+
+    fireEvent.press(screen.getByTestId("transcript-copy-assistant-1"));
+
+    expect(onCopy).toHaveBeenCalledWith(baseMessage);
+    await waitFor(() =>
+      expect(screen.getByLabelText("Message copied.")).toBeTruthy(),
+    );
+    expect(
+      screen.getByTestId("phosphor-icon-check", {
+        includeHiddenElements: true,
+      }),
+    ).toBeTruthy();
+  });
+
+  it("keeps metadata inside expanded content and opens full metrics in a modal", () => {
+    const message = {
+      ...baseMessage,
+      content:
+        "This answer is deliberately long enough to fold. Its compact metadata belongs inside the expanded content while the action bar remains available outside of it for quick transcript actions.",
+      metadata: {
+        webSearch: {
+          provider: "openai" as const,
+          model: "gpt-5.4-mini",
+          query: "What changed this week?",
+          summary: "Several relevant updates shipped this week.",
+          sources: [
+            {
+              title: "Release notes",
+              url: "https://example.com/release-notes",
+            },
+          ],
         },
       },
+      usage: {
+        kind: "reply" as const,
+        source: "estimated" as const,
+        promptTokens: 120,
+        completionTokens: 30,
+        totalTokens: 150,
+      },
+    };
+    const collapsed = renderMessage({
+      showUsageStats: true,
+      message,
+    });
+
+    expect(collapsed.queryByTestId("transcript-meta-assistant-1")).toBeNull();
+    collapsed.unmount();
+
+    const screen = renderMessage({
+      expanded: true,
+      showUsageStats: true,
+      message,
     });
 
     expect(
@@ -192,6 +236,12 @@ describe("TranscriptMessage", () => {
     expect(screen.getByTestId("transcript-metrics-assistant-1")).toBeTruthy();
     expect(screen.getByText("Estimated Usage")).toBeTruthy();
     expect(screen.getByText("Est. 120 in · 30 out · 150 total")).toBeTruthy();
+    expect(screen.getByText("Several relevant updates shipped this week.")).toBeTruthy();
+    expect(
+      screen.getByText("Release notes · https://example.com/release-notes"),
+    ).toBeTruthy();
+    expect(screen.queryByText("Search query")).toBeNull();
+    expect(screen.queryByText("What changed this week?")).toBeNull();
   });
 
   it("renders one council provider mark per participant and exposes swipe removal", () => {

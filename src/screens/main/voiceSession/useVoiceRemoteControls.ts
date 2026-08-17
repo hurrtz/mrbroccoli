@@ -12,41 +12,35 @@ import type { TranslateFn } from "../shared";
 
 interface UseVoiceRemoteControlsParams {
   canRepeat: boolean;
-  driveActive: boolean;
-  driveEnabled: boolean;
+  handsFreeEnabled: boolean;
   isRecording: boolean;
-  onContinueDrive: () => void;
-  onPauseDrive: () => void;
   onRepeat: () => Promise<void>;
   onStopRecording: () => Promise<void>;
+  onToggleHandsFree: () => void;
   player: AudioPlayerController;
   t: TranslateFn;
 }
 
 export function useVoiceRemoteControls({
   canRepeat,
-  driveActive,
-  driveEnabled,
+  handsFreeEnabled,
   isRecording,
-  onContinueDrive,
-  onPauseDrive,
   onRepeat,
   onStopRecording,
+  onToggleHandsFree,
   player,
   t,
 }: UseVoiceRemoteControlsParams) {
   const callbacksRef = useRef({
-    onContinueDrive,
-    onPauseDrive,
     onRepeat,
     onStopRecording,
+    onToggleHandsFree,
     player,
   });
   callbacksRef.current = {
-    onContinueDrive,
-    onPauseDrive,
     onRepeat,
     onStopRecording,
+    onToggleHandsFree,
     player,
   };
 
@@ -61,13 +55,9 @@ export function useVoiceRemoteControls({
           : "playback-active"
         : "inactive";
     }
-    if (driveEnabled) {
-      return driveActive ? "drive-active" : "drive-paused";
-    }
-    return "inactive";
+    return handsFreeEnabled ? "drive-active" : "drive-paused";
   }, [
-    driveActive,
-    driveEnabled,
+    handsFreeEnabled,
     isRecording,
     player.isPlaybackPaused,
     player.isPlaying,
@@ -77,7 +67,7 @@ export function useVoiceRemoteControls({
   useEffect(() => {
     setVoiceRemoteControlState({
       canRepeat,
-      continueLabel: t("continueDriveSession"),
+      continueLabel: t("handsFree"),
       mode,
       pauseLabel: t("pause"),
       phaseLabel:
@@ -85,7 +75,7 @@ export function useVoiceRemoteControls({
           ? t("listening")
           : mode.startsWith("playback")
             ? t("speaking")
-            : t("driveSession"),
+            : t("handsFree"),
       repeatLabel: t("repeatDriveReply"),
       stopLabel: t("stop"),
     });
@@ -104,18 +94,10 @@ export function useVoiceRemoteControls({
         return;
       }
       if (action === "pause") {
-        if (current.player.isPlaying) {
-          void current.player.pausePlayback();
-        } else {
-          current.onPauseDrive();
-        }
+        current.onToggleHandsFree();
         return;
       }
-      if (current.player.isPlaybackPaused) {
-        void current.player.resumePlayback();
-      } else {
-        current.onContinueDrive();
-      }
+      current.onToggleHandsFree();
     };
 
     return subscribeToVoiceRemoteActions(handleAction);

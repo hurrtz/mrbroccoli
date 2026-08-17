@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const sv = {
   ...conversationKnowledgeTranslations.sv,
   ...imagePromptTranslations.sv,
   ...onDeviceTranslations.sv,
-  ...onboardingTranslations.sv,
-  ...introTranslations.sv,
-  ...premiumTranslations.sv,
+  ...localSpeechTranslations.sv,
+  ...settingsTranslations.sv,
   ...transcriptEditTranslations.sv,
   ...workspaceTranslations.sv,
   ...sessionLockTranslations.sv,
-  ...autoSetupTranslations.sv,
   appName: "Herr Broccoli",
   retry: "Försök igen",
   dismiss: "Stäng",
@@ -40,7 +36,6 @@ export const sv = {
   settings: "Inställningar",
   settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Alla",
-  firstRun: "Första körningen",
   instructions: "Instruktioner",
   providers: "Leverantörer",
   webSearch: "Webbsökning",
@@ -210,10 +205,10 @@ export const sv = {
   createApiKey: "Autentiseringsuppgifter",
   apiKey: "API-nyckel",
   aboutThisProvider: "Om denna leverantör",
-  openRouterOnboardingTitle: "En nyckel, flera leverantörer",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "En nyckel, flera leverantörer",
+  openRouterGatewayDescription:
     "Skapa en dedikerad OpenRouter-nyckel, klistra in den nedan och använd ögonblicksbildsbaserade modeller från flera leverantörer utan att ersätta någon direkt anslutning.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Sökväg för begäran: denna enhet → OpenRouter → vald uppströmsleverantör",
   openRouterKeys: "OpenRouter-nycklar",
   providerStatusInvalid: "Ogiltig",

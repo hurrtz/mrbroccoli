@@ -9,16 +9,10 @@ import {
 // reused for its replacement bytes.
 export const LOCAL_MODEL_CATALOG_VERSION = 3;
 
-export type LocalModelCapability = "llm" | "stt" | "tts";
-export type LocalModelRuntime = "llama-rn" | "sherpa-onnx";
+export type LocalModelCapability = "stt" | "tts";
+export type LocalModelRuntime = "sherpa-onnx";
 export type LocalModelPlatform = "android" | "ios";
 export type LocalModelId =
-  | "qwen3-0.6b-q8"
-  | "qwen3.5-0.8b-q8"
-  | "granite-4.0-1b-q4"
-  | "qwen3-1.7b-q8"
-  | "ministral-3-3b-reasoning-q4"
-  | "qwen3-4b-q4"
   | "whisper-tiny"
   | "whisper-base"
   | "whisper-small"
@@ -41,15 +35,6 @@ export type LocalModelId =
   | "piper-ru-ru-denis"
   | "piper-it-it-paola"
   | "piper-it-it-riccardo";
-export type LocalLlmModelId = Extract<
-  LocalModelId,
-  | "qwen3-0.6b-q8"
-  | "qwen3.5-0.8b-q8"
-  | "granite-4.0-1b-q4"
-  | "qwen3-1.7b-q8"
-  | "ministral-3-3b-reasoning-q4"
-  | "qwen3-4b-q4"
->;
 export type LocalSttModelId = Extract<
   LocalModelId,
   | "whisper-tiny"
@@ -87,9 +72,7 @@ export interface LocalModelRequirements {
 
 export interface LocalModelBenchmarkTarget {
   maximumLoadMs: number;
-  /** LLM only. */
-  minimumTokensPerSecond?: number;
-  /** Speech models only. Processing seconds divided by audio seconds. */
+  /** Processing seconds divided by audio seconds. */
   maximumRealtimeFactor?: number;
 }
 
@@ -100,7 +83,7 @@ interface LocalModelBase {
   description: string;
   /** Controls the detail label shown in model pickers. */
   catalogTier: "recommended" | "advanced";
-  /** Higher values win automatic setup after device and language filtering. */
+  /** Higher values appear first after device and language filtering. */
   automaticPriority?: number;
   runtime: LocalModelRuntime;
   languages: readonly SpeechLanguage[];
@@ -112,15 +95,6 @@ interface LocalModelBase {
   downloadUrl: string;
   requirements: LocalModelRequirements;
   benchmark: LocalModelBenchmarkTarget;
-}
-
-export interface LocalLlmModelDefinition extends LocalModelBase {
-  id: LocalLlmModelId;
-  capability: "llm";
-  runtime: "llama-rn";
-  fileName: string;
-  contextTokens: number;
-  responseProfile: "quick" | "thorough";
 }
 
 export interface LocalSttModelDefinition extends LocalModelBase {
@@ -141,21 +115,12 @@ export interface LocalTtsModelDefinition extends LocalModelBase {
 }
 
 export type LocalModelDefinition =
-  LocalLlmModelDefinition | LocalSttModelDefinition | LocalTtsModelDefinition;
+  LocalSttModelDefinition | LocalTtsModelDefinition;
 
 const ALL_SPEECH_LANGUAGES = [...SPEECH_LANGUAGE_OPTIONS];
 const MOBILE_PLATFORMS = ["android", "ios"] as const;
 const MIB = 1024 * 1024;
 const GIB = 1024 * MIB;
-
-const qwenRequirements = (
-  minimumMemoryGiB: number,
-  installedBytes: number,
-) => ({
-  minimumPhysicalMemoryBytes: minimumMemoryGiB * GIB,
-  minimumFreeStorageBytes: installedBytes + 768 * MIB,
-  platforms: MOBILE_PLATFORMS,
-});
 
 const speechRequirements = (
   minimumMemoryGiB: number,
@@ -167,161 +132,6 @@ const speechRequirements = (
 });
 
 export const LOCAL_MODEL_CATALOG = [
-  {
-    id: "qwen3-0.6b-q8",
-    capability: "llm",
-    name: "Qwen3 0.6B",
-    description: "Small multilingual response model; fastest local option.",
-    catalogTier: "recommended",
-    automaticPriority: 10,
-    runtime: "llama-rn",
-    languages: ALL_SPEECH_LANGUAGES,
-    fileName: "Qwen3-0.6B-Q8_0.gguf",
-    downloadBytes: 639_446_688,
-    installedBytes: 639_446_688,
-    sha256: "9465e63a22add5354d9bb4b99e90117043c7124007664907259bd16d043bb031",
-    license: "Apache-2.0",
-    sourceUrl: "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF",
-    downloadUrl:
-      "https://huggingface.co/Qwen/Qwen3-0.6B-GGUF/resolve/main/Qwen3-0.6B-Q8_0.gguf?download=true",
-    requirements: qwenRequirements(3, 639_446_688),
-    benchmark: {
-      maximumLoadMs: 35_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "quick",
-  },
-  {
-    id: "qwen3.5-0.8b-q8",
-    capability: "llm",
-    name: "Qwen3.5 0.8B",
-    description:
-      "Newer compact multilingual model for users who want another quick-response option.",
-    catalogTier: "advanced",
-    automaticPriority: 20,
-    runtime: "llama-rn",
-    languages: ALL_SPEECH_LANGUAGES,
-    fileName: "Qwen3.5-0.8B-Q8_0.gguf",
-    downloadBytes: 833_592_096,
-    installedBytes: 833_592_096,
-    sha256: "37ae482d336108d23516fa35e8e0c4126688d81018b87178a18d752a1357814f",
-    license: "Apache-2.0",
-    sourceUrl: "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF",
-    downloadUrl:
-      "https://huggingface.co/ggml-org/Qwen3.5-0.8B-GGUF/resolve/main/Qwen3.5-0.8B-Q8_0.gguf?download=true",
-    requirements: qwenRequirements(4, 833_592_096),
-    benchmark: {
-      maximumLoadMs: 45_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "quick",
-  },
-  {
-    id: "granite-4.0-1b-q4",
-    capability: "llm",
-    name: "Granite 4.0 1B",
-    description:
-      "Compact alternative for English and the supported Western European languages.",
-    catalogTier: "advanced",
-    automaticPriority: 30,
-    runtime: "llama-rn",
-    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
-    fileName: "granite-4.0-1b-Q4_K_M.gguf",
-    downloadBytes: 1_023_645_440,
-    installedBytes: 1_023_645_440,
-    sha256: "22ec0f9cc99a90185312de3c882c84e7bd6789bdd050389844380a01a831d7f1",
-    license: "Apache-2.0",
-    sourceUrl: "https://huggingface.co/ibm-granite/granite-4.0-1b-GGUF",
-    downloadUrl:
-      "https://huggingface.co/ibm-granite/granite-4.0-1b-GGUF/resolve/main/granite-4.0-1b-Q4_K_M.gguf?download=true",
-    requirements: qwenRequirements(4, 1_023_645_440),
-    benchmark: {
-      maximumLoadMs: 45_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "quick",
-  },
-  {
-    id: "qwen3-1.7b-q8",
-    capability: "llm",
-    name: "Qwen3 1.7B",
-    description: "Higher-quality multilingual responses on stronger phones.",
-    catalogTier: "recommended",
-    automaticPriority: 10,
-    runtime: "llama-rn",
-    languages: ALL_SPEECH_LANGUAGES,
-    fileName: "Qwen3-1.7B-Q8_0.gguf",
-    downloadBytes: 1_834_426_016,
-    installedBytes: 1_834_426_016,
-    sha256: "061b54daade076b5d3362dac252678d17da8c68f07560be70818cace6590cb1a",
-    license: "Apache-2.0",
-    sourceUrl: "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF",
-    downloadUrl:
-      "https://huggingface.co/Qwen/Qwen3-1.7B-GGUF/resolve/main/Qwen3-1.7B-Q8_0.gguf?download=true",
-    requirements: qwenRequirements(6, 1_834_426_016),
-    benchmark: {
-      maximumLoadMs: 55_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "thorough",
-  },
-  {
-    id: "ministral-3-3b-reasoning-q4",
-    capability: "llm",
-    name: "Ministral 3 3B Reasoning",
-    description:
-      "Purpose-built reasoning alternative for high-end phones and supported European languages.",
-    catalogTier: "advanced",
-    automaticPriority: 30,
-    runtime: "llama-rn",
-    languages: ["en", "de", "es", "fr", "it", "pt", "pt-BR"],
-    fileName: "Ministral-3-3B-Reasoning-2512-Q4_K_M.gguf",
-    downloadBytes: 2_147_021_472,
-    installedBytes: 2_147_021_472,
-    sha256: "7e9516cc01a039bb3e2d41227cdf388849bc1c942c4624c84567b1684cd9c0fc",
-    license: "Apache-2.0",
-    sourceUrl:
-      "https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512-GGUF",
-    downloadUrl:
-      "https://huggingface.co/mistralai/Ministral-3-3B-Reasoning-2512-GGUF/resolve/main/Ministral-3-3B-Reasoning-2512-Q4_K_M.gguf?download=true",
-    requirements: qwenRequirements(8, 2_147_021_472),
-    benchmark: {
-      maximumLoadMs: 70_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "thorough",
-  },
-  {
-    id: "qwen3-4b-q4",
-    capability: "llm",
-    name: "Qwen3 4B",
-    description:
-      "Larger multilingual reasoning option, including Russian, for high-end phones.",
-    catalogTier: "advanced",
-    automaticPriority: 30,
-    runtime: "llama-rn",
-    languages: ALL_SPEECH_LANGUAGES,
-    fileName: "Qwen3-4B-Q4_K_M.gguf",
-    downloadBytes: 2_497_280_256,
-    installedBytes: 2_497_280_256,
-    sha256: "7485fe6f11af29433bc51cab58009521f205840f5b4ae3a32fa7f92e8534fdf5",
-    license: "Apache-2.0",
-    sourceUrl: "https://huggingface.co/Qwen/Qwen3-4B-GGUF",
-    downloadUrl:
-      "https://huggingface.co/Qwen/Qwen3-4B-GGUF/resolve/main/Qwen3-4B-Q4_K_M.gguf?download=true",
-    requirements: qwenRequirements(8, 2_497_280_256),
-    benchmark: {
-      maximumLoadMs: 75_000,
-      minimumTokensPerSecond: 3,
-    },
-    contextTokens: 4_096,
-    responseProfile: "thorough",
-  },
   {
     id: "whisper-tiny",
     capability: "stt",

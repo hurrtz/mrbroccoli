@@ -3,7 +3,7 @@ import React from "react";
 import { TextInput, TouchableOpacity, View } from "react-native";
 import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
-import { VoiceOrb } from "../../../design-system/VoiceOrb";
+import { OrbTransport } from "../../../design-system/OrbTransport";
 import { Colors } from "../../../theme/colors";
 import { InputMode } from "../../../types";
 import { TranslateFn } from "../shared";
@@ -20,17 +20,24 @@ interface InputSurfacePagesProps {
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
-  onSelectSurface: (surface: InputSurface) => void;
+  onRestartReply?: () => void;
+  onSeekBack?: () => void;
+  onSeekForward?: () => void;
+  onStopPlayback: () => void;
+  onSelectSurface: (direction: "left" | "right") => void;
   onSubmitTextMessage: () => void;
   onTextFocusChange: (focused: boolean) => void;
   onTextMessageChange: (text: string) => void;
   pageWidth: number;
   panGesture: GestureType;
   promptBlockedMessage: string | null;
+  rtl: boolean;
+  showTransportLabels: boolean;
   stageSize: number;
   statusLabel: string;
   submissionDisabled: boolean;
   t: TranslateFn;
+  transportLabels: React.ComponentProps<typeof OrbTransport>["transportLabels"];
   voiceInputUnavailableMessage: string | null;
   textFocused: boolean;
   textInputGesture: GestureType;
@@ -47,14 +54,12 @@ interface InputSurfacePagesProps {
 function SurfaceChevron({
   colors,
   direction,
-  disabled,
   onPress,
   t,
   target,
 }: {
   colors: Colors;
   direction: "left" | "right";
-  disabled: boolean;
   onPress: () => void;
   t: TranslateFn;
   /** Where this caret leads. On a circular pager both carets on a page lead
@@ -69,14 +74,10 @@ function SurfaceChevron({
         target === "voice" ? "showVoiceInput" : "showTextInput",
       )}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: false }}
       activeOpacity={0.7}
-      disabled={disabled}
       onPress={onPress}
-      style={[
-        styles.surfaceChevron,
-        disabled ? styles.surfaceChevronDisabled : null,
-      ]}
+      style={styles.surfaceChevron}
     >
       <PhosphorIcon
         name={direction}
@@ -93,10 +94,17 @@ function VoiceInputSurface({
   onPress,
   onPressIn,
   onPressOut,
+  onRestartReply,
+  onSeekBack,
+  onSeekForward,
+  onStopPlayback,
   promptBlockedMessage,
   stageSize,
   statusLabel,
   submissionDisabled,
+  rtl,
+  showTransportLabels,
+  transportLabels,
   voiceInputUnavailableMessage,
 }: Pick<
   InputSurfacePagesProps,
@@ -105,35 +113,56 @@ function VoiceInputSurface({
   | "onPress"
   | "onPressIn"
   | "onPressOut"
+  | "onRestartReply"
+  | "onSeekBack"
+  | "onSeekForward"
+  | "onStopPlayback"
   | "promptBlockedMessage"
   | "stageSize"
   | "statusLabel"
   | "submissionDisabled"
+  | "rtl"
+  | "showTransportLabels"
+  | "transportLabels"
   | "voiceInputUnavailableMessage"
 >) {
   const actionDisabled =
     disabled || Boolean(voiceInputUnavailableMessage) || submissionDisabled;
   // Setup and availability reasons belong beside the orb, never in place of
   // it. The orb remains the stable primary affordance and does not secretly
-  // become an introduction shortcut when no route is usable.
+  // become a setup shortcut when no route is usable.
   const surfaceLabel = voiceInputUnavailableMessage ?? promptBlockedMessage;
 
   return (
     <View style={styles.orbSlot} testID="voice-input-surface">
-      <VoiceOrb
-        disabled={actionDisabled}
-        label={surfaceLabel ?? statusLabel}
-        onPress={
-          actionDisabled || inputMode === "push-to-talk" ? undefined : onPress
-        }
-        onPressIn={
-          actionDisabled || inputMode !== "push-to-talk" ? undefined : onPressIn
-        }
-        onPressOut={
-          actionDisabled || inputMode !== "push-to-talk" ? undefined : onPressOut
-        }
-        size={stageSize}
-        testID="voice-orb-idle"
+      <OrbTransport
+        labels={showTransportLabels ?? true}
+        onBack={onSeekBack}
+        onForward={onSeekForward}
+        onRestart={onRestartReply}
+        onStop={onStopPlayback}
+        phase="idle"
+        testID="orb-transport-idle"
+        transportLabels={transportLabels}
+        voiceOrb={{
+          disabled: actionDisabled,
+          label: surfaceLabel ?? statusLabel,
+          onPress:
+            actionDisabled || inputMode === "push-to-talk"
+              ? undefined
+              : onPress,
+          onPressIn:
+            actionDisabled || inputMode !== "push-to-talk"
+              ? undefined
+              : onPressIn,
+          onPressOut:
+            actionDisabled || inputMode !== "push-to-talk"
+              ? undefined
+              : onPressOut,
+          rtl,
+          size: stageSize,
+          testID: "voice-orb-idle",
+        }}
       />
     </View>
   );
@@ -245,80 +274,79 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
     voicePageStyle,
   } = props;
 
+  const targetSurface = activeSurface === "voice" ? "text" : "voice";
+
   return (
-    <GestureDetector gesture={panGesture}>
-      <Animated.View
-        testID="voice-text-input-pager"
+    <View style={styles.pagerShell} testID="voice-text-input-pager-shell">
+      <GestureDetector gesture={panGesture}>
+        <Animated.View
+          testID="voice-text-input-pager"
+          accessibilityElementsHidden={isActive}
+          importantForAccessibility={isActive ? "no-hide-descendants" : "auto"}
+          pointerEvents={isActive ? "none" : "auto"}
+          style={[
+            styles.track,
+            { width: pageWidth * 2 + PAGE_GAP },
+            trackAnimatedStyle,
+            isActive ? styles.trackCovered : null,
+          ]}
+        >
+          <Animated.View
+            accessibilityElementsHidden={activeSurface !== "voice"}
+            importantForAccessibility={
+              activeSurface === "voice" ? "yes" : "no-hide-descendants"
+            }
+            style={[styles.page, { width: pageWidth }, voicePageStyle]}
+          >
+            <View style={styles.inputSwitchRow}>
+              <View style={styles.inputSwitchSurface}>
+                <VoiceInputSurface {...props} />
+              </View>
+            </View>
+          </Animated.View>
+
+          <Animated.View
+            accessibilityElementsHidden={activeSurface !== "text"}
+            importantForAccessibility={
+              activeSurface === "text" ? "yes" : "no-hide-descendants"
+            }
+            style={[styles.page, { width: pageWidth }, textPageStyle]}
+          >
+            <View style={styles.inputSwitchRow}>
+              <View style={styles.inputSwitchSurface}>
+                <TextInputSurface {...props} />
+              </View>
+            </View>
+          </Animated.View>
+        </Animated.View>
+      </GestureDetector>
+
+      <View
         accessibilityElementsHidden={isActive}
         importantForAccessibility={isActive ? "no-hide-descendants" : "auto"}
-        pointerEvents={isActive ? "none" : "auto"}
+        pointerEvents={isActive ? "none" : "box-none"}
         style={[
-          styles.track,
-          { width: pageWidth * 2 + PAGE_GAP },
-          trackAnimatedStyle,
-          isActive ? styles.trackCovered : null,
+          styles.chevronLayer,
+          isActive ? styles.chevronLayerCovered : null,
         ]}
+        testID="pager-chevron-layer"
       >
-        <Animated.View
-          accessibilityElementsHidden={activeSurface !== "voice"}
-          importantForAccessibility={
-            activeSurface === "voice" ? "yes" : "no-hide-descendants"
-          }
-          style={[styles.page, { width: pageWidth }, voicePageStyle]}
-        >
-          <View style={styles.inputSwitchRow}>
-            <SurfaceChevron
-              direction="left"
-              colors={props.colors}
-              disabled={isActive || props.disabled}
-              onPress={() => onSelectSurface("text")}
-              t={props.t}
-              target="text"
-            />
-            <View style={styles.inputSwitchSurface}>
-              <VoiceInputSurface {...props} />
-            </View>
-            <SurfaceChevron
-              direction="right"
-              colors={props.colors}
-              disabled={isActive || props.disabled}
-              onPress={() => onSelectSurface("text")}
-              t={props.t}
-              target="text"
-            />
-          </View>
-        </Animated.View>
-
-        <Animated.View
-          accessibilityElementsHidden={activeSurface !== "text"}
-          importantForAccessibility={
-            activeSurface === "text" ? "yes" : "no-hide-descendants"
-          }
-          style={[styles.page, { width: pageWidth }, textPageStyle]}
-        >
-          <View style={styles.inputSwitchRow}>
-            <SurfaceChevron
-              direction="left"
-              colors={props.colors}
-              disabled={isActive || props.disabled}
-              onPress={() => onSelectSurface("voice")}
-              t={props.t}
-              target="voice"
-            />
-            <View style={styles.inputSwitchSurface}>
-              <TextInputSurface {...props} />
-            </View>
-            <SurfaceChevron
-              direction="right"
-              colors={props.colors}
-              disabled={isActive || props.disabled}
-              onPress={() => onSelectSurface("voice")}
-              t={props.t}
-              target="voice"
-            />
-          </View>
-        </Animated.View>
-      </Animated.View>
-    </GestureDetector>
+        <SurfaceChevron
+          direction="left"
+          colors={props.colors}
+          onPress={() => onSelectSurface("left")}
+          t={props.t}
+          target={targetSurface}
+        />
+        <View pointerEvents="none" style={styles.chevronSpacer} />
+        <SurfaceChevron
+          direction="right"
+          colors={props.colors}
+          onPress={() => onSelectSurface("right")}
+          t={props.t}
+          target={targetSurface}
+        />
+      </View>
+    </View>
   );
 }

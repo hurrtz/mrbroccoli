@@ -100,7 +100,6 @@ android {
     namespace 'com.tobiaswinkler.app.mrbroccoli'
 
     defaultConfig {
-        missingDimensionStrategy "platform", "play"
         applicationId 'com.tobiaswinkler.app.mrbroccoli'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
@@ -156,16 +155,6 @@ android {
             def enableLegacyPackaging = findProperty('expo.useLegacyPackaging') ?: 'false'
             useLegacyPackaging enableLegacyPackaging.toBoolean()
 
-            // The local LLM route is deliberately CPU-only and benchmarked on
-            // each phone. Keep llama.rn's portable libraries; its optional
-            // ARM feature, OpenCL, Hexagon, and x86 tuning variants would add
-            // roughly 66 MiB per ARM install without being selected here.
-            excludes += [
-                '**/librnllama_v8*.so',
-                '**/librnllama_jni_v8*.so',
-                '**/librnllama_x86_64.so',
-                '**/librnllama_jni_x86_64.so',
-            ]
         }
     }
     androidResources {
@@ -225,7 +214,6 @@ tasks.configureEach { task ->
 }
 
 dependencies {
-    implementation "io.github.hyochan.openiap:openiap-google:3.0.0"
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("com.google.android.material:material:1.14.0")

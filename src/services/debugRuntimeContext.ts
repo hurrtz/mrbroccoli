@@ -1,7 +1,23 @@
 import Constants from "expo-constants";
 import * as Network from "expo-network";
-import { AppState, Dimensions, I18nManager, Platform } from "react-native";
-import { getApplicationId } from "./developmentEntitlement";
+import {
+  AppState,
+  Dimensions,
+  I18nManager,
+  NativeModules,
+  Platform,
+} from "react-native";
+
+export async function getApplicationId() {
+  const diagnostics = NativeModules.MrBroccoliDiagnostics as
+    | { getApplicationId?: () => Promise<string | null> }
+    | undefined;
+  try {
+    return (await diagnostics?.getApplicationId?.()) ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function buildDebugRuntimeContext(
   appContext: Record<string, unknown>,

@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const zhCN = {
   ...conversationKnowledgeTranslations.zhCN,
   ...imagePromptTranslations.zhCN,
   ...onDeviceTranslations["zh-CN"],
-  ...onboardingTranslations["zh-CN"],
-  ...introTranslations["zh-CN"],
-  ...premiumTranslations["zh-CN"],
+  ...localSpeechTranslations["zh-CN"],
+  ...settingsTranslations["zh-CN"],
   ...transcriptEditTranslations["zh-CN"],
   ...workspaceTranslations["zh-CN"],
   ...sessionLockTranslations.zhCN,
-  ...autoSetupTranslations["zh-CN"],
   appName: "西兰花先生",
   retry: "重试",
   dismiss: "关闭",
@@ -40,7 +36,6 @@ export const zhCN = {
   settings: "设置",
   settingsReleaseVersion: ({ version }) => `版本 ${version}`,
   all: "全部",
-  firstRun: "首次运行",
   instructions: "说明",
   providers: "提供商",
   webSearch: "网页搜索",
@@ -209,10 +204,10 @@ export const zhCN = {
   createApiKey: "凭据",
   apiKey: "API 密钥",
   aboutThisProvider: "关于该提供商",
-  openRouterOnboardingTitle: "一个密钥，多个提供商",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "一个密钥，多个提供商",
+  openRouterGatewayDescription:
     "创建专用的 OpenRouter 密钥，将其粘贴到下面，并使用来自多个提供商的快照支持模型，而无需替换任何直接连接。",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "请求路径：本设备→OpenRouter→选择的上游提供商",
   openRouterKeys: "OpenRouter 密钥",
   providerStatusInvalid: "无效",

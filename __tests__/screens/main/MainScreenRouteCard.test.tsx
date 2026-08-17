@@ -75,29 +75,32 @@ describe("MainScreenRouteCard", () => {
     expect(onOpenRoutePicker).not.toHaveBeenCalled();
   });
 
-  it("labels routes without an effort control as Normal without dots", () => {
-    const localMode = {
-      id: "mode-1" as const,
-      route: {
-        runtime: "local" as const,
-        localModelId: "qwen3-0.6b-q8" as const,
-        provider: "openai" as const,
-        model: "Qwen3 0.6B",
-      },
-    };
+  it("uses the two-row workspace header in portrait", () => {
+    const onOpenRoutePicker = jest.fn();
+    const onOpenSettings = jest.fn();
     const screen = renderWithProviders(
       <MainScreenRouteCard
         activeResponseMode="mode-1"
-        availableResponseModes={["mode-1"]}
-        onOpenRoutePicker={jest.fn()}
-        responseModes={[localMode]}
+        availableResponseModes={["mode-1", "mode-2"]}
+        onOpenRoutePicker={onOpenRoutePicker}
+        presentation="workspace-header"
+        responseModes={responseModes}
+        settingsSummary={{
+          accessibilityLabel: "Conversation settings",
+          onPress: onOpenSettings,
+          summary: "Length: Brief · Tone: Balanced · Voice: Heart",
+        }}
       />,
     );
 
-    expect(screen.getByTestId("route-byline-effort").props.children).toBe(
-      "Normal",
-    );
-    expect(screen.queryByTestId("route-byline-effort-dots")).toBeNull();
+    expect(screen.getByTestId("workspace-header-model")).toBeTruthy();
+    expect(
+      screen.getByText("Length: Brief · Tone: Balanced · Voice: Heart"),
+    ).toBeTruthy();
+    fireEvent.press(screen.getByTestId("workspace-header-model"));
+    fireEvent.press(screen.getByTestId("workspace-header-settings"));
+    expect(onOpenRoutePicker).toHaveBeenCalledTimes(1);
+    expect(onOpenSettings).toHaveBeenCalledTimes(1);
   });
 
   it("removes the old provider card when no route is ready", () => {

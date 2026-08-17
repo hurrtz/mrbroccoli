@@ -26,8 +26,9 @@ transport selection, reasoning-effort mapping, streaming, image payload
 preparation, provenance, usage estimation, internal tasks, and response
 fallback metadata.
 
-Local model execution remains in `localLlm.ts`; the voice pipeline selects that
-path before entering hosted routing.
+Every normalized response route is a hosted BYOK provider route. Local models
+may transcribe or synthesize speech, but do not enter this service as response
+generators.
 
 ## Transport Boundary
 

@@ -38,8 +38,7 @@ import {
   disableRuntimeCapabilityConfiguration,
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
-import { createAutoSetupJob } from "../test-utils/autoSetupJobFixture";
-import { getLocalCatalogInstallStatuses } from "../../src/services/offlineProfileManager";
+import { getLocalCatalogInstallStatuses } from "../../src/services/localSpeechModelManager";
 import { getLocalModelBenchmarkResults } from "../../src/services/localDeviceCapabilities";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
@@ -115,7 +114,7 @@ jest.mock("../../src/services/speech/diagnostics", () => ({
   clearSpeechDiagnostics: jest.fn(),
 }));
 
-jest.mock("../../src/services/offlineProfileManager", () => ({
+jest.mock("../../src/services/localSpeechModelManager", () => ({
   getLocalCatalogInstallStatuses: jest.fn(async () => ({})),
 }));
 
@@ -183,11 +182,8 @@ function createSettingsModalElement(
       <LocalizationProvider language={language}>
         <SettingsModal
           visible
-          isPremium
           archivedConversationCount={0}
-          developmentEntitlementMode={null}
           settings={DEFAULT_SETTINGS}
-          autoSetup={createAutoSetupJob()}
           kokoroModel={kokoroModel}
           providerVoiceDirectories={{}}
           onUpdate={jest.fn()}
@@ -202,9 +198,7 @@ function createSettingsModalElement(
           onPreviewVoice={jest.fn(async () => undefined)}
           onStopPreviewVoice={jest.fn(async () => undefined)}
           onValidateProviderCapability={jest.fn(async () => undefined)}
-          onOpenPremium={jest.fn()}
           onOpenArchivedConversations={jest.fn()}
-          onSetDevelopmentEntitlementMode={jest.fn(async () => undefined)}
           conversationArchive={{
             chooseDirectory: jest.fn(async () => undefined),
             configured: false,
@@ -577,228 +571,6 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("opens local listening choices in place for Free users", async () => {
-    const onOpenPremium = jest.fn();
-    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-listening"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("listening-settings-page")).toBeTruthy();
-    });
-    expect(onOpenPremium).not.toHaveBeenCalled();
-    expect(screen.getByText("Who listens")).toBeTruthy();
-    expect(
-      screen.getByText(
-        "One choice across every runtime. A radio unlocks only after a viable test — testing is the egg, and it cracks when a model fails. Removing an installed model is a swipe. Provider routes appear once connected under Connections.",
-      ),
-    ).toBeTruthy();
-    expect(screen.getByTestId("settings-stt-route-native")).toBeTruthy();
-    expect(
-      screen.getByTestId("settings-stt-route-provider-openai"),
-    ).toBeTruthy();
-    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
-      checked: false,
-      disabled: true,
-    });
-  });
-
-  it("keeps Thinking's local model lifecycle usable and locks hosted routes in place for Free", async () => {
-    const onOpenPremium = jest.fn();
-    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-thinking"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("thinking-settings-page")).toBeTruthy();
-    });
-    expect(onOpenPremium).not.toHaveBeenCalled();
-
-    fireEvent.press(screen.getByTestId("thinking-add-model"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("thinking-local-models")).toBeTruthy();
-      expect(screen.getByTestId("thinking-provider-openai")).toBeTruthy();
-    });
-    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
-      checked: false,
-      disabled: true,
-    });
-    expect(
-      screen.getAllByTestId(/^local-model-download-/).length,
-    ).toBeGreaterThan(0);
-
-    const addSheetModal = screen
-      .UNSAFE_getAllByType(NativeModal)
-      .find(
-        (modal) =>
-          modal.findAllByProps({ testID: "thinking-add-sheet" }).length > 0,
-      );
-    const addSheet = screen.getByTestId("thinking-add-sheet");
-    fireEvent.press(within(addSheet).getAllByLabelText("Unlock Premium")[0]);
-    expect(onOpenPremium).not.toHaveBeenCalled();
-    act(() => {
-      addSheetModal?.props.onDismiss();
-    });
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
-  });
-
-  it("keeps provider routes visible but locked in Free Connections", async () => {
-    const onOpenPremium = jest.fn();
-    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-connections"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("connections-settings-page")).toBeTruthy();
-    });
-    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
-      checked: false,
-      disabled: true,
-    });
-    expect(screen.queryByTestId("provider-connection-sheet-openai")).toBeNull();
-
-    fireEvent.press(screen.getByLabelText("Unlock Premium"));
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
-  });
-
-  it("keeps Nobody usable and provider routes locked in Free Search", async () => {
-    const onOpenPremium = jest.fn();
-    const onUpdate = jest.fn();
-    const screen = renderSettingsModal({
-      isPremium: false,
-      onOpenPremium,
-      onUpdate,
-    });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-search"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("search-settings-page")).toBeTruthy();
-    });
-    expect(screen.getByLabelText("Nobody").props.accessibilityState).toEqual({
-      checked: true,
-      disabled: false,
-    });
-    expect(screen.getByLabelText("OpenAI").props.accessibilityState).toEqual({
-      checked: false,
-      disabled: true,
-    });
-
-    fireEvent.press(screen.getByLabelText("Nobody"));
-    expect(onUpdate).toHaveBeenCalledWith({ webSearchMode: "off" });
-    fireEvent.press(screen.getByLabelText("Unlock Premium"));
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
-  });
-
-  it("shows the same seven sections on the Free overview", async () => {
-    const screen = renderSettingsModal({ isPremium: false });
-
-    await waitFor(() => {
-      expect(
-        screen.getByTestId("settings-overview-row-connections"),
-      ).toBeTruthy();
-    });
-    expect(screen.getByTestId("settings-premium-upgrade")).toBeTruthy();
-
-    for (const page of [
-      "connections",
-      "thinking",
-      "search",
-      "listening",
-      "speaking",
-      "data",
-      "app",
-    ]) {
-      expect(screen.getByTestId(`settings-overview-row-${page}`)).toBeTruthy();
-    }
-    expect(screen.queryByTestId("settings-overview-row-local")).toBeNull();
-  });
-
-  it("keeps the complete Data and App structure visible in Free", async () => {
-    const onUpdate = jest.fn();
-    const screen = renderSettingsModal({ isPremium: false, onUpdate });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
-
-    await waitFor(() => {
-      expect(screen.getByText("App data backup")).toBeTruthy();
-    });
-    expect(screen.getByText("Past conversation knowledge")).toBeTruthy();
-    expect(screen.getByText("Archived conversations")).toBeTruthy();
-    expect(screen.getByText("Storage · 0 MB in models")).toBeTruthy();
-    expect(screen.getByText("Premium")).toBeTruthy();
-
-    fireEvent.press(screen.getByLabelText("Back to overview"));
-    fireEvent.press(screen.getByTestId("settings-overview-row-app"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("app-language-picker")).toBeTruthy();
-    });
-    expect(screen.getByText("Theme")).toBeTruthy();
-    expect(screen.getByText("Recent Speech Activity")).toBeTruthy();
-    expect(screen.getByText("Usage stats in transcripts")).toBeTruthy();
-    expect(screen.getByText("Automatic setup")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("settings-debug-log-button"));
-    expect(onUpdate).toHaveBeenCalledWith({ showDebugLogButton: true });
-    expect(
-      screen.getByTestId("runtime-compatibility-overrides-section"),
-    ).toBeTruthy();
-  });
-
-  it("lets Free users disconnect an archive configured before downgrade", async () => {
-    const disconnect = jest.fn(async () => undefined);
-    const screen = renderSettingsModal({
-      isPremium: false,
-      conversationArchive: {
-        chooseDirectory: jest.fn(async () => undefined),
-        configured: true,
-        directoryName: "Mr Broccoli",
-        disconnect,
-        error: null,
-        lastSyncedAt: null,
-        loaded: true,
-        syncNow: jest.fn(async () => undefined),
-        syncing: false,
-      },
-    });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
-
-    await waitFor(() => {
-      expect(screen.getByTestId("archived-conversations-row")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByTestId("archived-conversations-row"));
-    expect(screen.getByTestId("disconnect-conversation-archive")).toBeTruthy();
-
-    fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
-    expect(disconnect).toHaveBeenCalledTimes(1);
-  });
-
-  it("dismisses the archive sheet before opening Premium", async () => {
-    const onOpenPremium = jest.fn();
-    const screen = renderSettingsModal({ isPremium: false, onOpenPremium });
-
-    fireEvent.press(screen.getByTestId("settings-overview-row-data"));
-    await waitFor(() => {
-      expect(screen.getByTestId("archived-conversations-row")).toBeTruthy();
-    });
-    fireEvent.press(screen.getByTestId("archived-conversations-row"));
-    const archiveSheetModal = screen
-      .UNSAFE_getAllByType(NativeModal)
-      .find(
-        (modal) =>
-          modal.findAllByProps({ testID: "archive-settings-sheet" }).length > 0,
-      );
-
-    fireEvent.press(screen.getByTestId("unlock-conversation-archive"));
-    expect(onOpenPremium).not.toHaveBeenCalled();
-    act(() => {
-      archiveSheetModal?.props.onDismiss();
-    });
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
-  });
-
   it("opens localized data backup controls and explains the API-key exclusion", async () => {
     const screen = renderSettingsModal();
 
@@ -994,6 +766,48 @@ describe("SettingsModal", () => {
     );
   });
 
+  it("keeps a functional but slower Kokoro benchmark selectable", async () => {
+    jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({
+      "kokoro-multilingual": {
+        installed: true,
+        path: "/models/kokoro",
+        verified: true,
+      },
+    });
+    jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({
+      "kokoro-multilingual": {
+        status: "below-target",
+      },
+    } as never);
+    const onUpdate = jest.fn();
+    const screen = renderSettingsModal({
+      focusTab: "tts",
+      kokoroModel: {
+        installed: true,
+        verified: true,
+        busy: null,
+        phase: null,
+        progress: 1,
+        error: null,
+        download: jest.fn(async () => true),
+        refresh: jest.fn(async () => undefined),
+        remove: jest.fn(async () => true),
+      },
+      onUpdate,
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Works, but slower than recommended/)).toBeTruthy();
+    });
+
+    fireEvent.press(screen.getByLabelText("Kokoro"));
+    expect(onUpdate).toHaveBeenCalledWith({
+      localTtsModelId: null,
+      spokenRepliesEnabled: true,
+      ttsMode: "kokoro",
+    });
+  });
+
   it("edits delivery instructions in a focused sheet only for a supporting route", async () => {
     const onUpdate = jest.fn();
     const screen = renderSettingsModal({
@@ -1031,23 +845,18 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("keeps the Speaking structure visible to Free users with provider routes locked", async () => {
+  it("shows provider speech routes only after their key is connected", async () => {
     const screen = renderSettingsModal({
       focusTab: "tts",
-      isPremium: false,
     });
 
     await waitFor(() => {
       expect(screen.getByText("Playback")).toBeTruthy();
       expect(screen.getByText("Who speaks")).toBeTruthy();
-      expect(
-        screen.getByTestId("settings-tts-route-provider-openai"),
-      ).toBeTruthy();
-      expect(screen.getByText("Unlock Premium")).toBeTruthy();
     });
     expect(
-      screen.getByLabelText("OpenAI").props.accessibilityState,
-    ).toMatchObject({ disabled: true });
+      screen.queryByTestId("settings-tts-route-provider-openai"),
+    ).toBeNull();
     expect(
       screen.getByLabelText("System voice").props.accessibilityState,
     ).toMatchObject({ checked: true });
@@ -1661,7 +1470,7 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Answering models")).toBeTruthy();
       expect(
         screen.getByText(
-          "Up to four; the home screen switches who answers the next turn. A model you don't have yet is downloaded or connected right here.",
+          "Add as many as you need; the home screen switches who answers the next turn. A model you don't have yet is downloaded or connected right here.",
         ),
       ).toBeTruthy();
       expect(screen.getAllByText("System Prompt")).toHaveLength(2);
@@ -1775,47 +1584,6 @@ describe("SettingsModal", () => {
       },
       { timeout: 5_000 },
     );
-  });
-
-  it("shows the entitlement simulator only for a .dev app variant", async () => {
-    const releaseScreen = renderSettingsModal();
-
-    fireEvent.press(releaseScreen.getByLabelText("Open App & diagnostics"));
-    await waitFor(() => {
-      expect(
-        releaseScreen.getByTestId("settings-modal-title").props.children,
-      ).toBe("App & diagnostics");
-    });
-    expect(
-      releaseScreen.queryByTestId("development-entitlement-mode"),
-    ).toBeNull();
-    releaseScreen.unmount();
-
-    const onSetDevelopmentEntitlementMode = jest.fn(async () => undefined);
-    const developmentScreen = renderSettingsModal({
-      developmentEntitlementMode: "free",
-      onSetDevelopmentEntitlementMode,
-    });
-
-    fireEvent.press(developmentScreen.getByLabelText("Open App & diagnostics"));
-    await waitFor(() => {
-      expect(
-        developmentScreen.getByTestId("development-entitlement-mode"),
-      ).toBeTruthy();
-    });
-    expect(
-      developmentScreen.getAllByText("Development entitlement").length,
-    ).toBeGreaterThan(0);
-
-    fireEvent.press(
-      developmentScreen.getByTestId("development-entitlement-mode"),
-    );
-    fireEvent.press(
-      developmentScreen.getByTestId(
-        "development-entitlement-mode-option-premium",
-      ),
-    );
-    expect(onSetDevelopmentEntitlementMode).toHaveBeenCalledWith("premium");
   });
 
   it("uses compact Input rows and the unified listening route picker", async () => {

@@ -37,7 +37,6 @@ export function useMainScreenResponseModeSelection({
       });
 
       if (
-        nextRoute.runtime !== "local" &&
         !hasProviderCredentialForCapability(
           nextProvider,
           settings.apiKeys[nextProvider],

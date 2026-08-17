@@ -64,9 +64,6 @@ function getThinkReadiness(
   context: SettingsReadinessContext,
 ) {
   const runnableModes = settings.responseModes.filter((mode) => {
-    if (mode.route.runtime === "local") {
-      return Boolean(mode.route.localModelId);
-    }
     const provider = mode.route.provider;
     return (
       context.llmProviders.includes(provider) &&

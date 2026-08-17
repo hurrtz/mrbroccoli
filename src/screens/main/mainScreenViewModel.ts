@@ -10,8 +10,6 @@ import {
 import { getStatusDisplayData } from "./statusSelectors";
 import { TranslateFn } from "./shared";
 import { getConversationUsageDisplayData } from "./usageSelectors";
-import { getLocalModel } from "../../constants/localModels";
-import { getResponseModeRoute } from "../../utils/responseModes";
 
 interface AudioSignalState {
   isActivelyPlaying: boolean;
@@ -46,14 +44,7 @@ export function getMainScreenViewModel({
   ttsProvider,
   visualPhaseOverride = null,
 }: GetMainScreenViewModelParams) {
-  const responseRoute = getResponseModeRoute(settings);
-  const localLlmModel =
-    responseRoute.runtime === "local" && responseRoute.localModelId
-      ? getLocalModel(responseRoute.localModelId)
-      : null;
-  const providerLabel = localLlmModel
-    ? t("settingsOnDevice")
-    : PROVIDER_LABELS[provider];
+  const providerLabel = PROVIDER_LABELS[provider];
   const runtimeVisualPhase: VoiceVisualPhase = isRecording
     ? "recording"
     : pipelinePhase === "transcribing"

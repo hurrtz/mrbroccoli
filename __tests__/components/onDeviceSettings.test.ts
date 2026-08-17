@@ -32,20 +32,6 @@ describe("on-device language settings", () => {
     });
   });
 
-  it("replaces the language when Free setup uses a single choice", () => {
-    expect(
-      getLocalLanguageSettingsUpdate(
-        settings({ localLanguages: ["en", "de"] }),
-        "it",
-        true,
-      ),
-    ).toMatchObject({
-      localLanguages: ["it"],
-      sttLanguage: "it",
-      ttsListenLanguages: ["it"],
-    });
-  });
-
   it("disables a selected local voice that cannot cover the new languages", () => {
     expect(
       getLocalLanguageSettingsUpdate(
@@ -89,29 +75,4 @@ describe("on-device model removal settings", () => {
     });
   });
 
-  it("removes a selected local response route and activates its fallback", () => {
-    const localMode = {
-      id: "mode-2",
-      route: {
-        runtime: "local" as const,
-        localModelId: "qwen3-0.6b-q8" as const,
-        provider: "openai" as const,
-        model: "Qwen3 0.6B",
-      },
-    };
-    const providerMode = DEFAULT_SETTINGS.responseModes[0];
-
-    expect(
-      getLocalModelRemovalSettingsUpdate(
-        settings({
-          activeResponseMode: localMode.id,
-          responseModes: [providerMode, localMode],
-        }),
-        getLocalModel("qwen3-0.6b-q8"),
-      ),
-    ).toMatchObject({
-      activeResponseMode: providerMode.id,
-      responseModes: [providerMode],
-    });
-  });
 });

@@ -12,28 +12,8 @@ const packageLock = JSON.parse(readText("package-lock.json"));
 const easConfig = JSON.parse(readText("eas.json"));
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
-const iosPodfileLock = readText("ios/Podfile.lock");
 const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
-const iosProductionScheme = readText(
-  "ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/MrBroccoli.xcscheme",
-);
-const iosStoreKitScheme = readText(
-  "ios/MrBroccoli.xcodeproj/xcshareddata/xcschemes/MrBroccoli-StoreKit.xcscheme",
-);
-const iosStoreKitConfiguration = JSON.parse(
-  readText("ios/MrBroccoli/MrBroccoli.storekit"),
-);
-const premiumConstants = readText("src/constants/premium.ts");
-const premiumEntitlementContext = readText(
-  "src/context/PremiumEntitlementContext.tsx",
-);
-const developmentEntitlement = readText(
-  "src/services/developmentEntitlement.ts",
-);
-const premiumProductId = premiumConstants.match(
-  /PREMIUM_PRODUCT_ID\s*=\s*\n?\s*"([^"]+)"/,
-)?.[1];
 const androidBuild = readText("android/app/build.gradle");
 const androidGradleProperties = readText("android/gradle.properties");
 const androidProguardRules = readText("android/app/proguard-rules.pro");
@@ -193,36 +173,6 @@ assertIncludes(
   androidBuild,
   "release {\n            if ((findProperty('mrBroccoliMaestroVariant') ?: 'false').toBoolean()) {\n                applicationIdSuffix '.maestro'",
 );
-assertExcludes(
-  "Premium entitlement does not depend on __DEV__",
-  premiumEntitlementContext,
-  "__DEV__",
-);
-assertExcludes(
-  "Premium entitlement does not depend on NODE_ENV",
-  premiumEntitlementContext,
-  "NODE_ENV",
-);
-assertIncludes(
-  "Development entitlement is gated by application ID suffix",
-  developmentEntitlement,
-  "applicationId?.endsWith(DEVELOPMENT_APPLICATION_ID_SUFFIX) === true",
-);
-assertIncludes(
-  "Maestro entitlement is gated by its isolated application ID suffix",
-  developmentEntitlement,
-  "applicationId?.endsWith(MAESTRO_APPLICATION_ID_SUFFIX) === true",
-);
-assertExcludes(
-  "Development entitlement does not depend on __DEV__",
-  developmentEntitlement,
-  "__DEV__",
-);
-assertExcludes(
-  "Development entitlement does not depend on NODE_ENV",
-  developmentEntitlement,
-  "NODE_ENV",
-);
 const iosDeploymentTargets = [
   ...iosProject.matchAll(/IPHONEOS_DEPLOYMENT_TARGET = ([^;]+);/g),
 ].map((match) => match[1]);
@@ -237,12 +187,6 @@ const iosTargetedDeviceFamilies = [
 const sqlitePlugin = appConfig.plugins.find(
   (plugin) => Array.isArray(plugin) && plugin[0] === "expo-sqlite",
 );
-const iapPlugin = appConfig.plugins.find(
-  (plugin) =>
-    plugin === "expo-iap" ||
-    (Array.isArray(plugin) && plugin[0] === "expo-iap"),
-);
-
 assertEqual("package.json version", packageJson.version, appConfig.version);
 assertEqual("EAS version source", easConfig.cli?.appVersionSource, "local");
 assertEqual(
@@ -297,70 +241,18 @@ assertEqual(
   sqlitePlugin?.[1]?.enableFTS,
   true,
 );
-assertEqual("Expo IAP plugin", Boolean(iapPlugin), true);
 assertEqual(
-  "Expo IAP package",
+  "Expo IAP package is absent",
   packageJson.dependencies?.["expo-iap"],
-  "^5.0.0",
+  undefined,
 );
 assertEqual(
-  "Expo IAP lockfile package",
-  packageLock.packages?.["node_modules/expo-iap"]?.version,
-  "5.0.0",
+  "Expo IAP lockfile package is absent",
+  packageLock.packages?.["node_modules/expo-iap"],
+  undefined,
 );
-assertIncludes("iOS Expo IAP pod", iosPodfileLock, "- ExpoIap (5.0.0):");
-assertIncludes("iOS OpenIAP pod", iosPodfileLock, "- openiap (3.0.0)");
-assertIncludes(
-  "iOS OpenIAP resource",
-  iosProject,
-  '"${PODS_ROOT}/openiap/openiap-versions.json"',
-);
-assertEqual(
-  "Premium product ID",
-  premiumProductId,
-  "com.tobiaswinkler.app.mrbroccoli.premium.lifetime",
-);
-assertIncludes(
-  "iOS In-App Purchase capability",
-  iosProject,
-  "com.apple.InAppPurchase = {",
-);
-assertIncludes(
-  "iOS StoreKit configuration project reference",
-  iosProject,
-  "MrBroccoli.storekit",
-);
-assertEqual(
-  "iOS StoreKit product count",
-  iosStoreKitConfiguration.products?.length,
-  1,
-);
-const premiumStoreKitProduct = iosStoreKitConfiguration.products?.[0];
-assertEqual(
-  "iOS StoreKit product ID",
-  premiumStoreKitProduct?.productID,
-  premiumProductId,
-);
-assertEqual(
-  "iOS StoreKit product type",
-  premiumStoreKitProduct?.type,
-  "NonConsumable",
-);
-assertEqual(
-  "iOS StoreKit product price",
-  premiumStoreKitProduct?.displayPrice,
-  "14.99",
-);
-assertIncludes(
-  "iOS local StoreKit scheme",
-  iosStoreKitScheme,
-  'identifier = "../MrBroccoli/MrBroccoli.storekit"',
-);
-assertEqual(
-  "iOS production scheme StoreKit isolation",
-  iosProductionScheme.includes("StoreKitConfigurationFileReference"),
-  false,
-);
+assertExcludes("iOS IAP capability is absent", iosProject, "com.apple.InAppPurchase");
+assertExcludes("iOS StoreKit fixture is absent", iosProject, "MrBroccoli.storekit");
 assertEqual(
   "iOS SQLite FTS build property",
   iosPodfileProperties["expo.sqlite.enableFTS"],
@@ -494,31 +386,12 @@ assertIncludes(
   androidInstrumentation,
   `const APP_PACKAGE = "${androidDevelopmentPackage}";`,
 );
-assertIncludes(
-  "Android Play Billing permission",
+assertExcludes(
+  "Android Play Billing permission is absent",
   androidManifest,
-  '<uses-permission android:name="com.android.vending.BILLING"/>',
+  "com.android.vending.BILLING",
 );
-assertIncludes(
-  "Android OpenIAP Play dependency",
-  androidBuild,
-  'implementation "io.github.hyochan.openiap:openiap-google:3.0.0"',
-);
-assertIncludes(
-  "Android OpenIAP Play dimension",
-  androidBuild,
-  'missingDimensionStrategy "platform", "play"',
-);
-assertIncludes(
-  "Android OpenIAP Horizon disabled",
-  androidGradleProperties,
-  "horizonEnabled=false",
-);
-assertIncludes(
-  "Android OpenIAP Fire OS disabled",
-  androidGradleProperties,
-  "fireOsEnabled=false",
-);
+assertExcludes("Android OpenIAP dependency is absent", androidBuild, "openiap");
 assertIncludes(
   "Android unused Sherpa FFmpeg disabled",
   androidGradleProperties,

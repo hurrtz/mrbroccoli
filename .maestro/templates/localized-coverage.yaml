@@ -10,8 +10,6 @@ tags:
       all: allow
 - assertVisible:
     id: main-screen
-- assertVisible:
-    id: intro-banner
 
 # Select the locale through the same settings surface a customer uses.
 - tapOn:
@@ -56,7 +54,7 @@ tags:
     path: ${PLATFORM}/locales/${LOCALE}/settings-app-01
 - scrollUntilVisible:
     element:
-      id: development-entitlement-mode
+      id: speech-diagnostics-row
     direction: DOWN
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/settings-app-02

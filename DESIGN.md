@@ -34,7 +34,7 @@ flowchart TB
     Voice --> STT[System, local, or provider STT]
     Voice --> Context[Summary and local knowledge context]
     Voice --> Search[Optional provider web search]
-    Voice --> LLM[Local or provider response]
+    Voice --> LLM[Selected BYOK provider response]
     Voice --> TTS[System, local, or provider TTS]
 
     Persistence --> Async[(AsyncStorage)]
@@ -54,13 +54,12 @@ flowchart TB
 1. gesture handling;
 2. shared settings;
 3. localization derived from loaded settings;
-4. Premium entitlement;
-5. theme and typography; and
-6. Expo Router navigation.
+4. theme and typography; and
+5. Expo Router navigation.
 
 `app/index.tsx` renders `MainScreen`. `MainScreen` is intentionally a
 composition root: it connects settings, conversations, recording, recognition,
-playback, Premium/Free policy, setup, backup, archives, diagnostics, and
+playback, provider readiness, backup, archives, diagnostics, and
 secondary surfaces. Runtime work belongs in hooks and services rather than in
 the JSX presentation tree.
 
@@ -69,43 +68,17 @@ settings, history, setup, receipts, and diagnostics are secondary surfaces so
 the default experience remains voice-first even though expert controls remain
 available.
 
-The first-run introduction is a three-page horizontal pager. Its welcome page
-renders a fixed five-exchange localized conversation from oldest and most
-obscured to a crisp final prompt and response, then plays the bundled answer in
-the selected interface language. A labelled close control remains available on
-every page; closing never records completion, so BYOK users can leave without
-installing an on-device profile and the invitation remains available. Welcome
-is a fixed View and never scrolls;
-Setup and Try use vertical page scrollers so expanded setup choices and live
-test results remain reachable. One `expo-linear-gradient` veil covers the top
-share of the welcome page, running from the active canvas at full strength
-under the heading to a transparent canvas below. Its eight stops sample
-`(1 - t)^2.2`, which concentrates the veil near the heading and trails it off
-with no visible stop boundary, and its height is a percentage of the page so
-the same proportion is covered on a small phone, a tall phone, and an iPad.
-This keeps the veil native-independent and visually consistent on Android,
-iPhone, and iPad in light and dark themes.
-
-**Decision:** the veil alone carries the recession, and Android additionally
-softens each veiled exchange through `filter`, which it resolves with
-RenderEffect. React Native exposes no iOS equivalent: `FilterType::Blur`
-reaches its SwiftUI wrapper only behind the default-off
-`enableSwiftUIBasedFilters` native flag. Approximating iOS blur through the
-text shadow renderer was rejected because it blurs glyphs while leaving bubble
-backgrounds and borders crisp, which reads as broken text rather than as
-distance. A per-group opacity ladder beneath the veil was rejected for banding:
-four brightness steps are visible where four blur steps are not. The fixed
-bottom action
-shares one geometry across pages; only the last page changes its label and
-completion gate. The Try voice action is circular to echo the home voice orb.
+First launch uses the same composition as every later launch. Provider
+readiness is derived from the active response mode and configured key; a
+missing route opens Connections from the attempted action instead of placing a
+setup layer in front of the workspace.
 
 The iOS presentation remains one component tree across iPhone and iPad.
 `resolveIpadLayout` maps the live window and native iPad identity into compact
 or regular presentation state. Compact windows take the unchanged phone tree;
 regular windows retain the same controllers while `MainScreenPresentation`
 adds the persistent conversations sidebar, `MainScreenWorkspace` selects the
-regular workspace geometry, Settings changes to master-detail, and Intro
-constrains its own pager to a centred card.
+regular workspace geometry, and Settings changes to master-detail.
 
 **Decision:** React Native does not expose UIKit's live horizontal size class
 to this shared tree, so 680pt is the centralized regular-width approximation.
@@ -139,7 +112,7 @@ sequenceDiagram
     Pipeline->>Context: compact thread and retrieve eligible history
     Context-->>Pipeline: bounded context plus source metadata
     Pipeline->>Intelligence: optional web search / Uber deliberation
-    Pipeline->>Intelligence: stream final local or hosted response
+    Pipeline->>Intelligence: stream final provider response
     Intelligence-->>Pipeline: chunks, actual route, usage metadata
     Pipeline->>Speech: queue complete paragraphs or final response
     Pipeline->>Store: append assistant response and turn receipt
@@ -174,9 +147,9 @@ results, images, and private deliberation text are data. Prompt builders mark
 them accordingly, and streamed output is guarded against accidentally exposing
 serialized internal context.
 
-Local LLM turns skip provider-backed summary refresh and provider web search;
-they can still use an existing active-conversation summary and locally retrieved
-history. This preserves the offline execution claim.
+Every response turn resolves through a configured provider route. Local
+services may still transcribe captured audio and synthesize speech, but never
+generate the assistant response.
 
 ## Persistence Architecture
 
@@ -192,7 +165,6 @@ history. This preserves the offline execution claim.
 | Past-conversation index             | derived cache                         | SQLite with FTS5 and local vectors                | Never                   |
 | Runtime capability overrides        | provider-confirmed device state       | AsyncStorage                                      | Never                   |
 | Local model installs and benchmarks | device-operational state              | app/model storage plus local state                | Never                   |
-| Premium cache                       | verified local entitlement            | SecureStore                                       | Never                   |
 | Debug captures                      | sanitized bounded diagnostics         | temporary/app diagnostics files                   | Never                   |
 
 Settings writes are serialized per storage key. Conversation writes run through
@@ -307,14 +279,14 @@ artifact. Device selection has four stages:
    Piper VITS voices also install their pinned libphonemize language pack before
    they are reported usable;
 3. load and benchmark the exact artifact on the current device; and
-4. construct one coherent offline profile from compatible LLM/STT/TTS routes.
+4. expose a verified local STT or TTS route in its owning settings page.
 
 Manual model management is distributed across the owning stage pages rather
-than exposed through a second device control plane: Thinking owns local LLMs,
-Listening owns local STT, Speaking owns local TTS, and Data & privacy owns
-removal-only storage cleanup. For Free, a stage-page choice is promoted to the
-persisted runtime only after the resulting complete profile passes the same
-install and current-device benchmark readiness check as automatic setup.
+than exposed through a second device control plane: Listening owns local STT,
+Speaking owns local TTS, and Data & privacy owns removal-only storage cleanup.
+Local speech routes remain secondary to system and provider routes and become
+selectable only after the exact artifact passes installation and the
+current-device benchmark readiness check.
 
 On iOS, Sherpa extracts speech archives with an explicit safe-entry policy:
 empty, `.` and `./` root records are ignored; every other entry must be a
@@ -337,21 +309,18 @@ libarchive's protection still reject links supplied by the archive.
 Preparation runs regardless of transient thermal, memory, or battery-saver
 pressure; the OS throttles on its own. Pressure is recorded per benchmark, and
 a missed-target verdict measured under pressure is never persisted as a durable
-incompatibility. Model quality tiers and measured device performance influence
-automatic selection; explicit advanced overrides remain possible only for
-functionally viable models.
+incompatibility. Model quality tiers and measured device performance inform the
+manual catalogue; only functionally viable models become selectable.
 
-## Edition Enforcement
+## Distribution And Fixture Boundary
 
-Premium state is provided above the main screen. The main screen derives
-effective runtime settings through the Free offline controller and passes
-edition-aware capabilities to presentation and settings surfaces.
+The stores sell the complete app up front. Runtime code contains no product
+lookup, purchase, restoration, cached entitlement, or development edition
+simulation.
 
-**Decision:** Production builds fail closed. Entitlement simulation is allowed
-only when the exact application ID ends in `.dev` or `.maestro`, determined by
-native runtime identity. Store-promo fixtures are additionally restricted to
-the exact `com.tobiaswinkler.app.mrbroccoli.maestro` application ID; neither
-facility can activate in the production package.
+**Decision:** Store-promo fixtures remain restricted to the exact
+`com.tobiaswinkler.app.mrbroccoli.maestro` application ID. They cannot activate
+in the production or `.dev` package.
 
 ## Native Boundaries
 

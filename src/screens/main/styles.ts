@@ -53,6 +53,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     minHeight: 0,
     gap: 6,
+    paddingTop: 14,
   },
   workspaceTranscript: {
     flex: 1,
@@ -99,9 +100,6 @@ export const styles = StyleSheet.create({
     alignItems: "stretch",
     gap: 8,
     paddingVertical: 8,
-  },
-  landscapeStageAreaDrive: {
-    justifyContent: "flex-start",
   },
   landscapeTranscriptCard: {
     flex: 1,

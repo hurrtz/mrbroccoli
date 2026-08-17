@@ -2,12 +2,7 @@ import React from "react";
 import { View } from "react-native";
 
 import { Colors } from "../../theme/colors";
-import {
-  InputMode,
-  MessageImageAttachment,
-  VoiceTimingProgress,
-  VoiceVisualPhase,
-} from "../../types";
+import { InputMode, VoiceTimingProgress, VoiceVisualPhase } from "../../types";
 
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
@@ -18,25 +13,24 @@ interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
   disabled?: boolean;
-  driveSilenceCountdownSeconds?: number | null;
-  driveVoiceActive?: boolean;
   /** Controls centred with the orb/composer as one measured cluster. */
   footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
   initialTextInputFocused?: boolean;
   initialTextMessage?: string;
-  attachments?: MessageImageAttachment[];
   inputMode: InputMode;
   isActive: boolean;
   layout?: "portrait" | "landscape";
   /** Surface-specific orb ceiling; the measured pager still shrinks below it. */
   maxOrbSize: number;
   onInputSurfaceChange?: (surface: InputSurface) => void;
-  onRemoveImage?: (attachmentId: string) => void;
   onPress: () => void;
   onPressIn: () => void;
   onPressOut: () => void;
   onInterruptPlayback?: () => void;
+  onRestartReply?: () => void;
+  onSeekBack?: () => void;
+  onSeekForward?: () => void;
   onStopPlayback: () => void;
   onResolvePromptBlock?: () => void;
   onSubmitTextMessage: (text: string) => void;
@@ -55,17 +49,15 @@ interface MainScreenVoiceStageProps {
   speechStartProgress?: VoiceTimingProgress | null;
   statusTitle: string;
   t: TranslateFn;
+  rtl?: boolean;
   visualPhase: VoiceVisualPhase;
   voiceInputUnavailableMessage?: string | null;
 }
 
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
-  attachments = [],
   colors,
   compactPromptNotice = false,
   disabled = false,
-  driveSilenceCountdownSeconds = null,
-  driveVoiceActive = false,
   footer,
   initialInputSurface,
   initialTextInputFocused,
@@ -75,11 +67,13 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   layout = "portrait",
   maxOrbSize,
   onInputSurfaceChange,
-  onRemoveImage,
   onPress,
   onPressIn,
   onPressOut,
   onInterruptPlayback,
+  onRestartReply,
+  onSeekBack,
+  onSeekForward,
   onStopPlayback,
   onResolvePromptBlock,
   onSubmitTextMessage,
@@ -98,6 +92,7 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   speechStartProgress = null,
   statusTitle,
   t,
+  rtl = false,
   visualPhase,
   voiceInputUnavailableMessage = null,
 }: MainScreenVoiceStageProps) {
@@ -119,12 +114,9 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         ]}
       >
         <VoiceTextInputPager
-          attachments={attachments}
           colors={colors}
           compactPromptNotice={compactPromptNotice}
           disabled={disabled}
-          driveSilenceCountdownSeconds={driveSilenceCountdownSeconds}
-          driveVoiceActive={driveVoiceActive}
           footer={footer}
           initialSurface={initialInputSurface}
           initialTextInputFocused={initialTextInputFocused}
@@ -133,11 +125,13 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           isActive={isActive}
           maxOrbSize={maxOrbSize}
           onInputSurfaceChange={onInputSurfaceChange}
-          onRemoveImage={onRemoveImage}
           onPress={onPress}
           onPressIn={onPressIn}
           onPressOut={onPressOut}
           onInterruptPlayback={onInterruptPlayback}
+          onRestartReply={onRestartReply}
+          onSeekBack={onSeekBack}
+          onSeekForward={onSeekForward}
           onStopPlayback={onStopPlayback}
           onResolvePromptBlock={onResolvePromptBlock}
           onSubmitTextMessage={onSubmitTextMessage}
@@ -156,6 +150,14 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           speechStartProgress={speechStartProgress}
           statusLabel={statusTitle}
           t={t}
+          rtl={rtl}
+          showTransportLabels={layout !== "landscape"}
+          transportLabels={{
+            back: t("transportBack"),
+            forward: t("transportForward"),
+            restart: t("transportRestart"),
+            stop: t("stop"),
+          }}
           visualPhase={visualPhase}
           voiceInputUnavailableMessage={voiceInputUnavailableMessage}
         />

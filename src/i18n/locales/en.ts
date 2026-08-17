@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const en = {
   ...conversationKnowledgeTranslations.en,
   ...imagePromptTranslations.en,
   ...onDeviceTranslations.en,
-  ...onboardingTranslations.en,
-  ...introTranslations.en,
-  ...premiumTranslations.en,
+  ...localSpeechTranslations.en,
+  ...settingsTranslations.en,
   ...transcriptEditTranslations.en,
   ...workspaceTranslations.en,
   ...sessionLockTranslations.en,
-  ...autoSetupTranslations.en,
   appName: "Mr Broccoli",
   retry: "Retry",
   dismiss: "Dismiss",
@@ -40,7 +36,6 @@ export const en = {
   settings: "Settings",
   settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "All",
-  firstRun: "First Run",
   instructions: "Instructions",
   providers: "Providers",
   webSearch: "Web Search",
@@ -209,10 +204,10 @@ export const en = {
   createApiKey: "Credentials",
   apiKey: "API key",
   aboutThisProvider: "About this provider",
-  openRouterOnboardingTitle: "One key, multiple providers",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "One key, multiple providers",
+  openRouterGatewayDescription:
     "Create a dedicated OpenRouter key, paste it below, and use snapshot-backed models from several providers without replacing any direct connection.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Request path: this device → OpenRouter → selected upstream provider",
   openRouterKeys: "OpenRouter keys",
   providerStatusInvalid: "Invalid",

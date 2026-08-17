@@ -12,12 +12,10 @@ jest.mock("../../src/services/voicePipeline/cleanup", () => ({
 }));
 
 jest.mock("../../src/services/playbackCues", () => ({
-  getDriveCountdownCueAudioUri: jest.fn(async (urgency: number) =>
-    `file:///tmp/drive-countdown-${urgency}.wav`
+  getDriveCountdownCueAudioUri: jest.fn(
+    async (urgency: number) => `file:///tmp/drive-countdown-${urgency}.wav`,
   ),
-  getDriveReadyCueAudioUri: jest.fn(async () =>
-    "file:///tmp/drive-ready.wav"
-  ),
+  getDriveReadyCueAudioUri: jest.fn(async () => "file:///tmp/drive-ready.wav"),
 }));
 
 const mockPlayNativeRecordingCue = jest.fn(async (_uri: string) => true);
@@ -25,6 +23,12 @@ const mockPlayNativeRecordingCue = jest.fn(async (_uri: string) => true);
 jest.mock("../../src/services/nativeWaveform", () => ({
   playNativeRecordingCue: (uri: string) => mockPlayNativeRecordingCue(uri),
 }));
+
+async function flushAsyncWork() {
+  for (let index = 0; index < 8; index += 1) {
+    await Promise.resolve();
+  }
+}
 
 describe("useVoiceSessionController", () => {
   beforeEach(() => {
@@ -38,9 +42,7 @@ describe("useVoiceSessionController", () => {
     jest.restoreAllMocks();
   });
 
-  function renderController(
-    overrides: Record<string, unknown> = {},
-  ) {
+  function renderController(overrides: Record<string, unknown> = {}) {
     const params = {
       abortRef: { current: null as AbortController | null },
       availableSttProviders: ["openai"],
@@ -108,7 +110,7 @@ describe("useVoiceSessionController", () => {
           couldntProcessVoiceInput: "process failed",
           couldntStartVoiceInput: "start failed",
           pausePlaybackUnavailable: "pause unavailable",
-        }[key] ?? key),
+        })[key] ?? key,
       ttsApiKey: "tts-key",
       ttsProvider: "openai" as const,
       stopReplay: jest.fn(async () => undefined),
@@ -118,7 +120,7 @@ describe("useVoiceSessionController", () => {
     const hook = renderHook(() =>
       useVoiceSessionController(
         params as unknown as Parameters<typeof useVoiceSessionController>[0],
-      )
+      ),
     );
     return {
       ...hook,
@@ -272,6 +274,19 @@ describe("useVoiceSessionController", () => {
     expect(params.setStreamingText).toHaveBeenCalledWith("");
   });
 
+  it("makes the small Stop action discard an active recording", async () => {
+    const { result, params } = renderController({ isRecording: true });
+
+    await act(async () => {
+      await result.current.handleStopPlayback();
+    });
+
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.handleVoiceCaptureDone).not.toHaveBeenCalled();
+    expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
+    expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
+  });
+
   it("processes a completed recording through the voice pipeline", async () => {
     const { result, params } = renderController({ isRecording: true });
 
@@ -337,10 +352,10 @@ describe("useVoiceSessionController", () => {
     expect(params.setPipelinePhase).toHaveBeenCalledWith("idle");
   });
 
-  it("starts Drive Session without a synthetic cue and arms recording", async () => {
+  it("starts Hands free without a synthetic cue and arms recording", async () => {
     const { result, params } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -348,22 +363,22 @@ describe("useVoiceSessionController", () => {
       },
     });
 
-    await act(async () => {
-      await result.current.handleTogglePress();
+    act(() => {
+      result.current.handleToggleHandsFree();
     });
 
     await waitFor(() => {
-      expect(result.current.driveAutoContinueEnabled).toBe(true);
+      expect(result.current.handsFreeEnabled).toBe(true);
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
     });
     expect(params.player.speakText).not.toHaveBeenCalled();
     expect(params.player.enqueueAudio).not.toHaveBeenCalled();
   });
 
-  it("does not auto-arm again when a Drive turn ends without a reply", async () => {
+  it("does not auto-arm again when a Hands-free turn ends without a reply", async () => {
     const { result, params, rerender } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -371,9 +386,12 @@ describe("useVoiceSessionController", () => {
       },
     });
 
-    await act(async () => {
-      await result.current.handleTogglePress();
+    act(() => {
+      result.current.handleToggleHandsFree();
     });
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
+    );
     params.isRecording = true;
     act(() => rerender());
     await act(async () => {
@@ -386,10 +404,10 @@ describe("useVoiceSessionController", () => {
     expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
   });
 
-  it("auto-arms after a completed Drive reply returns to idle", async () => {
+  it("auto-arms after a completed Hands-free reply returns to idle", async () => {
     const { result, params, rerender } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -404,9 +422,12 @@ describe("useVoiceSessionController", () => {
         }),
     );
 
-    await act(async () => {
-      await result.current.handleTogglePress();
+    act(() => {
+      result.current.handleToggleHandsFree();
     });
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
+    );
     params.isRecording = true;
     act(() => rerender());
     await act(async () => {
@@ -440,10 +461,10 @@ describe("useVoiceSessionController", () => {
     expect(params.player.waitForDrain).toHaveBeenCalledTimes(1);
   });
 
-  it("auto-arms again when a failed Drive turn returns to idle", async () => {
+  it("auto-arms again when a failed Hands-free turn returns to idle", async () => {
     const { result, params, rerender } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -451,9 +472,12 @@ describe("useVoiceSessionController", () => {
       },
     });
 
-    await act(async () => {
-      await result.current.handleTogglePress();
+    act(() => {
+      result.current.handleToggleHandsFree();
     });
+    await waitFor(() =>
+      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
+    );
     params.isRecording = true;
     act(() => rerender());
     await act(async () => {
@@ -472,10 +496,10 @@ describe("useVoiceSessionController", () => {
     expect(params.completedReplyVersion).toBe(0);
   });
 
-  it("measures ambient levels while a Drive turn is processing but not during playback", async () => {
+  it("measures ambient levels while a Hands-free turn is processing but not during playback", async () => {
     const { result, params, rerender } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -483,8 +507,12 @@ describe("useVoiceSessionController", () => {
       },
     });
 
+    act(() => {
+      result.current.handleToggleHandsFree();
+    });
     await act(async () => {
-      await result.current.handleTogglePress();
+      await Promise.resolve();
+      await Promise.resolve();
     });
     params.isRecording = true;
     act(() => rerender());
@@ -497,9 +525,7 @@ describe("useVoiceSessionController", () => {
     act(() => rerender());
 
     await waitFor(() =>
-      expect(
-        params.recorder.startAmbientMonitoring,
-      ).toHaveBeenCalledTimes(1),
+      expect(params.recorder.startAmbientMonitoring).toHaveBeenCalledTimes(1),
     );
 
     params.recorder.ambientMonitoring = true;
@@ -518,13 +544,13 @@ describe("useVoiceSessionController", () => {
     );
   });
 
-  it("uses the Drive Session primary action to cancel processing without immediately re-arming", async () => {
+  it("lets Stop abandon the current turn without disabling Hands free", async () => {
     const abortController = new AbortController();
     const { result, params } = renderController({
       abortRef: { current: abortController },
       isBusy: true,
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -532,20 +558,23 @@ describe("useVoiceSessionController", () => {
       },
     });
 
+    act(() => {
+      result.current.handleToggleHandsFree();
+    });
     await act(async () => {
-      await result.current.handleTogglePress();
+      await result.current.handleStopPlayback();
     });
 
     expect(abortController.signal.aborted).toBe(true);
     expect(params.player.stopPlayback).toHaveBeenCalledTimes(1);
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
-    expect(result.current.driveAutoContinueEnabled).toBe(true);
+    expect(result.current.handsFreeEnabled).toBe(true);
   });
 
-  it("pauses automatic continuation without cancelling the current turn", async () => {
+  it("turns Hands free off without cancelling the current turn", async () => {
     const { result, params } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -553,20 +582,21 @@ describe("useVoiceSessionController", () => {
       },
     });
 
-    await act(async () => {
-      await result.current.handleStopDriveSession();
+    act(() => {
+      result.current.handleToggleHandsFree();
+      result.current.handleToggleHandsFree();
     });
 
-    expect(result.current.driveAutoContinueEnabled).toBe(false);
+    expect(result.current.handsFreeEnabled).toBe(false);
     expect(params.recorder.stopRecording).not.toHaveBeenCalled();
     expect(params.player.stopPlayback).not.toHaveBeenCalled();
     expect(params.player.speakText).not.toHaveBeenCalled();
   });
 
-  it("resumes automatic continuation and arms recording when idle", async () => {
+  it("turns Hands free on and arms recording when idle", async () => {
     const { result, params } = renderController({
       settings: {
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         spokenRepliesEnabled: true,
         sttMode: "provider",
         ttsMode: "provider",
@@ -575,61 +605,21 @@ describe("useVoiceSessionController", () => {
     });
 
     act(() => {
-      result.current.handleStopDriveSession();
-    });
-    expect(result.current.driveAutoContinueEnabled).toBe(false);
-
-    await act(async () => {
-      result.current.handleContinueDriveSession();
+      result.current.handleToggleHandsFree();
     });
 
     await waitFor(() => {
-      expect(result.current.driveAutoContinueEnabled).toBe(true);
+      expect(result.current.handsFreeEnabled).toBe(true);
       expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
     });
   });
 
-  it("repeats the last reply and resumes listening only while auto continuation is enabled", async () => {
-    const { result, params } = renderController({
-      lastCompletedReplyRef: { current: "Last answer" },
-      settings: {
-        inputMode: "drive-session",
-        spokenRepliesEnabled: true,
-        sttMode: "provider",
-        ttsMode: "provider",
-        providerSttModels: {},
-      },
-    });
-
-    await act(async () => {
-      await result.current.handleRepeatDriveReply();
-    });
-
-    expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
-    expect(result.current.driveAutoContinueEnabled).toBe(true);
-    await waitFor(() =>
-      expect(params.recorder.startRecording).toHaveBeenCalledTimes(1),
-    );
-
-    act(() => {
-      result.current.handleStopDriveSession();
-    });
-    jest.clearAllMocks();
-
-    await act(async () => {
-      await result.current.handleRepeatDriveReply();
-    });
-
-    expect(params.playReplyText).toHaveBeenCalledWith("Last answer");
-    expect(params.recorder.startRecording).not.toHaveBeenCalled();
-  });
-
-  it("does not count down or auto-submit before the first Drive utterance", async () => {
+  it("does not count down or auto-submit before the first Hands-free utterance", async () => {
     jest.useFakeTimers();
     try {
       const { result, params, rerender } = renderController({
         settings: {
-          inputMode: "drive-session",
+          inputMode: "toggle-to-talk",
           spokenRepliesEnabled: true,
           sttMode: "provider",
           ttsMode: "provider",
@@ -637,8 +627,12 @@ describe("useVoiceSessionController", () => {
         },
       });
 
+      act(() => {
+        result.current.handleToggleHandsFree();
+      });
       await act(async () => {
-        await result.current.handleTogglePress();
+        await Promise.resolve();
+        await Promise.resolve();
       });
       params.isRecording = true;
       act(() => rerender());
@@ -648,7 +642,7 @@ describe("useVoiceSessionController", () => {
         await Promise.resolve();
       });
 
-      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+      expect(result.current.handsFreeSilenceCountdownSeconds).toBeNull();
       expect(params.recorder.stopRecording).not.toHaveBeenCalled();
       expect(params.handleVoiceCaptureDone).not.toHaveBeenCalled();
     } finally {
@@ -661,7 +655,7 @@ describe("useVoiceSessionController", () => {
     try {
       const { result, params, rerender } = renderController({
         settings: {
-          inputMode: "drive-session",
+          inputMode: "toggle-to-talk",
           spokenRepliesEnabled: true,
           sttMode: "provider",
           ttsMode: "provider",
@@ -669,9 +663,10 @@ describe("useVoiceSessionController", () => {
         },
       });
 
-      await act(async () => {
-        await result.current.handleTogglePress();
+      act(() => {
+        result.current.handleToggleHandsFree();
       });
+      await act(flushAsyncWork);
       params.isRecording = true;
       act(() => rerender());
 
@@ -721,7 +716,7 @@ describe("useVoiceSessionController", () => {
     try {
       const { result, params, rerender } = renderController({
         settings: {
-          inputMode: "drive-session",
+          inputMode: "toggle-to-talk",
           spokenRepliesEnabled: true,
           sttMode: "provider",
           ttsMode: "provider",
@@ -729,9 +724,10 @@ describe("useVoiceSessionController", () => {
         },
       });
 
-      await act(async () => {
-        await result.current.handleTogglePress();
+      act(() => {
+        result.current.handleToggleHandsFree();
       });
+      await act(flushAsyncWork);
       params.isRecording = true;
       act(() => rerender());
 
@@ -752,17 +748,17 @@ describe("useVoiceSessionController", () => {
         jest.advanceTimersByTime(8_300);
       });
 
-      expect(result.current.driveSilenceCountdownSeconds).toBe(2);
+      expect(result.current.handsFreeSilenceCountdownSeconds).toBe(2);
 
       advanceWithLevel(150, -44);
-      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+      expect(result.current.handsFreeSilenceCountdownSeconds).toBeNull();
 
       for (const levelDb of [-41, -45, -39, -43]) {
         advanceWithLevel(150, levelDb);
       }
 
-      expect(result.current.driveVoiceActive).toBe(true);
-      expect(result.current.driveSilenceCountdownSeconds).toBeNull();
+      expect(result.current.handsFreeVoiceActive).toBe(true);
+      expect(result.current.handsFreeSilenceCountdownSeconds).toBeNull();
 
       for (let index = 0; index < 10; index += 1) {
         advanceWithLevel(150, index % 2 === 0 ? -42 : -38);
@@ -793,7 +789,7 @@ describe("useVoiceSessionController", () => {
     try {
       const { result, params, rerender } = renderController({
         settings: {
-          inputMode: "drive-session",
+          inputMode: "toggle-to-talk",
           spokenRepliesEnabled: true,
           sttMode: "provider",
           ttsMode: "provider",
@@ -801,9 +797,10 @@ describe("useVoiceSessionController", () => {
         },
       });
 
-      await act(async () => {
-        await result.current.handleTogglePress();
+      act(() => {
+        result.current.handleToggleHandsFree();
       });
+      await act(flushAsyncWork);
       params.isRecording = true;
       act(() => rerender());
 
@@ -831,7 +828,7 @@ describe("useVoiceSessionController", () => {
 
       await act(async () => {
         jest.advanceTimersByTime(2_100);
-        await Promise.resolve();
+        await flushAsyncWork();
       });
 
       expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
@@ -848,7 +845,7 @@ describe("useVoiceSessionController", () => {
     try {
       const { result, params, rerender } = renderController({
         settings: {
-          inputMode: "drive-session",
+          inputMode: "toggle-to-talk",
           spokenRepliesEnabled: true,
           sttMode: "provider",
           ttsMode: "provider",
@@ -856,8 +853,8 @@ describe("useVoiceSessionController", () => {
         },
       });
 
-      await act(async () => {
-        await result.current.handleTogglePress();
+      act(() => {
+        result.current.handleToggleHandsFree();
       });
       params.isRecording = true;
       act(() => rerender());

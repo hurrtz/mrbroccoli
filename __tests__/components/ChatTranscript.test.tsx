@@ -142,7 +142,11 @@ describe("ChatTranscript follow-tail scrolling", () => {
     );
     const screen = render(renderTranscript("conversation-1", initialMessages));
 
-    expect(screen.queryByLabelText("Copy")).toBeNull();
+    expect(screen.getAllByLabelText("Copy")).toHaveLength(1);
+    expect(
+      screen.getByTestId("transcript-toggle-assistant-1").props
+        .accessibilityState,
+    ).toEqual({ expanded: false });
 
     const messagesWithNewReply = [
       ...initialMessages,
@@ -153,7 +157,7 @@ describe("ChatTranscript follow-tail scrolling", () => {
     ];
     screen.rerender(renderTranscript("conversation-1", messagesWithNewReply));
 
-    expect(screen.getAllByLabelText("Copy")).toHaveLength(1);
+    expect(screen.getAllByLabelText("Copy")).toHaveLength(2);
     expect(
       screen.getByTestId("transcript-toggle-assistant-2").props
         .accessibilityState,
@@ -161,7 +165,11 @@ describe("ChatTranscript follow-tail scrolling", () => {
 
     screen.rerender(renderTranscript("conversation-2", messagesWithNewReply));
 
-    expect(screen.queryByLabelText("Copy")).toBeNull();
+    expect(screen.getAllByLabelText("Copy")).toHaveLength(2);
+    expect(
+      screen.getByTestId("transcript-toggle-assistant-2").props
+        .accessibilityState,
+    ).toEqual({ expanded: false });
   });
 
   it("treats small native layout offsets as still being at the tail", () => {

@@ -10,7 +10,6 @@ import { launchSimulatorApp } from "./screen-reader/ios.mjs";
 const requiredControls = [
   ["main-conversations-button", "Conversations"],
   ["main-settings-button", "Settings"],
-  ["intro-banner", "Set up Mr Broccoli"],
   [
     "prompt-blocked-notice",
     "Add credentials in Settings before starting a voice session. Configure credentials",

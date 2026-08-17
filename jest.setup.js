@@ -20,11 +20,12 @@ jest.mock("react-native-safe-area-context", () => {
   };
 });
 
-jest.mock("expo-linear-gradient", () => {
-  const React = require("react");
-  const { View } = require("react-native");
-  return {
-    LinearGradient: ({ children, ...props }) =>
-      React.createElement(View, props, children),
-  };
-});
+jest.mock("expo-speech", () => ({
+  getAvailableVoicesAsync: jest.fn(() => Promise.resolve([])),
+}));
+
+jest.mock("@dr.pogodin/react-native-fs", () => ({
+  DocumentDirectoryPath: "/tmp",
+  exists: jest.fn(() => Promise.resolve(false)),
+  unlink: jest.fn(() => Promise.resolve()),
+}));

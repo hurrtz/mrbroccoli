@@ -45,11 +45,11 @@ function benchmark(
 
 describe("local model performance assessment", () => {
   it("reports exact current-device measurements instead of predicting", () => {
-    const model = getLocalModel("qwen3-0.6b-q8");
+    const model = getLocalModel("whisper-tiny");
     const result = assessLocalModelPerformance({
       model,
       snapshot,
-      benchmark: benchmark(model.id, { tokensPerSecond: 12.4 }),
+      benchmark: benchmark(model.id, { realtimeFactor: 0.42 }),
       models: LOCAL_MODEL_CATALOG,
     });
 
@@ -57,13 +57,13 @@ describe("local model performance assessment", () => {
       evidence: "measured",
       benchmarkStatus: "viable",
       loadMs: 420,
-      performance: { kind: "tokens-per-second", value: 12.4 },
+      performance: { kind: "realtime-factor", value: 0.42 },
     });
   });
 
   it("does not reuse a benchmark after the device OS changes", () => {
-    const model = getLocalModel("qwen3-0.6b-q8");
-    const stale = benchmark(model.id, { tokensPerSecond: 12.4 });
+    const model = getLocalModel("whisper-tiny");
+    const stale = benchmark(model.id, { realtimeFactor: 0.42 });
     stale.device = { ...stale.device, osVersion: "25.0" };
 
     expect(
@@ -76,19 +76,19 @@ describe("local model performance assessment", () => {
     ).toMatchObject({ evidence: "requirements", fit: "strong" });
   });
 
-  it("calibrates an untested LLM from a comparable model tested on this phone", () => {
-    const model = getLocalModel("qwen3-1.7b-q8");
-    const reference = benchmark("qwen3-0.6b-q8", { tokensPerSecond: 15 });
+  it("calibrates an untested speech model from a comparable model tested on this phone", () => {
+    const model = getLocalModel("whisper-base");
+    const reference = benchmark("whisper-tiny", { realtimeFactor: 0.35 });
     const result = assessLocalModelPerformance({
       model,
       snapshot,
-      benchmarks: { "qwen3-0.6b-q8": reference },
+      benchmarks: { "whisper-tiny": reference },
       models: LOCAL_MODEL_CATALOG,
     });
 
     expect(result.evidence).toBe("calibrated");
-    expect(result.referenceModelId).toBe("qwen3-0.6b-q8");
-    expect(result.performance?.kind).toBe("tokens-per-second");
+    expect(result.referenceModelId).toBe("whisper-tiny");
+    expect(result.performance?.kind).toBe("realtime-factor");
     expect(result.performance?.lowerBound).toBeLessThan(
       result.performance?.value ?? 0,
     );

@@ -29,10 +29,7 @@ function renderPage() {
   return renderWithProviders(
     <SpeakingSettingsPage
       activePreview={null}
-      allTtsProviders={[]}
-      isPremium
       localModels={{ nativeVoiceOptions: [] } as never}
-      onOpenPremium={jest.fn()}
       onPreviewKokoroVoice={jest.fn(async () => undefined)}
       onPreviewNativeVoice={jest.fn(async () => undefined)}
       onPreviewProviderVoice={jest.fn(async () => undefined)}

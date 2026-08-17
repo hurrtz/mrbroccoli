@@ -2,7 +2,6 @@ import React from "react";
 import * as Speech from "expo-speech";
 import { TextInput } from "react-native";
 
-import type { AutoSetupJobState } from "../../components/autoSetup/types";
 import type { CatalogProviderId } from "../../catalog/types";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import type { KokoroModelController } from "../../hooks/useKokoroModel";
@@ -12,7 +11,6 @@ import type {
   AppDataBackupRestoreResult,
 } from "../../services/appDataBackup";
 import type { ConversationArchiveController } from "../../hooks/useConversationArchive";
-import type { DevelopmentEntitlementMode } from "../../services/developmentEntitlement";
 import {
   Provider,
   ProviderCapability,
@@ -27,19 +25,12 @@ import {
 export interface SettingsModalProps {
   visible: boolean;
   suspended?: boolean;
-  /** The automatic on-device setup job shown under App & diagnostics. */
-  autoSetup: AutoSetupJobState;
-  isPremium: boolean;
-  developmentEntitlementMode: DevelopmentEntitlementMode | null;
-  onSetDevelopmentEntitlementMode: (
-    mode: DevelopmentEntitlementMode,
-  ) => Promise<void>;
   settings: Settings;
   kokoroModel: KokoroModelController;
   focusProvider?: Provider;
   focusCatalogProviderId?: CatalogProviderId;
   focusTab?: SettingsTab;
-  /** Direct page target, used by the introduction's deep links. */
+  /** Direct page target used by contextual workspace actions. */
   focusPage?: SettingsPage;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
@@ -71,12 +62,9 @@ export interface SettingsModalProps {
     provider: Provider,
     capability: ProviderCapability,
   ) => Promise<void>;
-  /** Opens purchase and returns to the page that originated the handoff. */
-  onOpenPremium: (returnPage?: SettingsPage) => void;
   archivedConversationCount: number;
   onOpenArchivedConversations: () => void;
   conversationArchive: ConversationArchiveController;
-  storePromoLocalDevicePreview?: boolean;
   onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,

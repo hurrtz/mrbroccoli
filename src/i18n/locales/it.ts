@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const it = {
   ...conversationKnowledgeTranslations.it,
   ...imagePromptTranslations.it,
   ...onDeviceTranslations.it,
-  ...onboardingTranslations.it,
-  ...introTranslations.it,
-  ...premiumTranslations.it,
+  ...localSpeechTranslations.it,
+  ...settingsTranslations.it,
   ...transcriptEditTranslations.it,
   ...workspaceTranslations.it,
   ...sessionLockTranslations.it,
-  ...autoSetupTranslations.it,
   appName: "Sig. Broccoli",
   retry: "Riprova",
   dismiss: "Chiudi",
@@ -40,7 +36,6 @@ export const it = {
   settings: "Impostazioni",
   settingsReleaseVersion: ({ version }) => `Versione ${version}`,
   all: "Tutti",
-  firstRun: "Primo avvio",
   instructions: "Istruzioni",
   providers: "Provider",
   webSearch: "Ricerca sul Web",
@@ -212,10 +207,10 @@ export const it = {
   createApiKey: "Credenziali",
   apiKey: "Chiave API",
   aboutThisProvider: "Informazioni su questo provider",
-  openRouterOnboardingTitle: "Una chiave, più provider",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Una chiave, più provider",
+  openRouterGatewayDescription:
     "Crea una chiave OpenRouter dedicata, incollala di seguito e utilizza modelli supportati da snapshot di diversi provider senza sostituire alcuna connessione diretta.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Percorso richiesta: questo dispositivo → OpenRouter → provider upstream selezionato",
   openRouterKeys: "Chiavi OpenRouter",
   providerStatusInvalid: "Non valido",

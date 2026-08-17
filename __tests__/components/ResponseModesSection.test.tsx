@@ -2,37 +2,9 @@ import React from "react";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { ThinkingSettingsPage } from "../../src/features/settings/pages/ThinkingSettingsPage";
-import type { LocalModelSettingsController } from "../../src/features/settings-core/useLocalModelSettings";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
-
-const localModels = {
-  benchmarks: {},
-  busy: null,
-  cancelDownload: jest.fn(),
-  compatibleModels: [],
-  downloadModel: jest.fn(),
-  freeLanguageOptions: [],
-  installs: {},
-  isModelSelected: jest.fn(() => false),
-  kokoroModel: { progress: 0 },
-  nativeSpeechCapabilities: null,
-  nativeVoiceOptions: [],
-  probeError: null,
-  probing: false,
-  progress: {},
-  refreshModelState: jest.fn(),
-  removeModel: jest.fn(),
-  runDeviceProbe: jest.fn(),
-  selectModel: jest.fn(),
-  selectNativeRoute: jest.fn(),
-  selectNativeVoice: jest.fn(),
-  selectedNativeVoice: "",
-  snapshot: null,
-  testModel: jest.fn(),
-  toggleLanguage: jest.fn(),
-} as unknown as LocalModelSettingsController;
 
 function renderPage(
   settings: Settings,
@@ -45,17 +17,13 @@ function renderPage(
     <ThemeProvider mode="light">
       <LocalizationProvider language="en">
         <ThinkingSettingsPage
-          allLlmProviders={["gemini", "openai"]}
-          isPremium
           llmProviders={["gemini", "openai"]}
-          localModels={localModels}
           settings={settings}
           onUpdate={overrides.onUpdate ?? jest.fn()}
           onUpdateResponseModeRoute={
             overrides.onUpdateResponseModeRoute ?? jest.fn()
           }
           onAddResponseMode={jest.fn()}
-          onOpenPremium={jest.fn()}
           onRemoveResponseMode={jest.fn()}
         />
       </LocalizationProvider>

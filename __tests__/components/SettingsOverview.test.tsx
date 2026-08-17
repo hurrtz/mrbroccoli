@@ -14,9 +14,7 @@ const hiddenIconQuery = { includeHiddenElements: true } as const;
 function overviewProps() {
   return {
     getProviderHealthState: jest.fn(() => "healthy" as const),
-    isPremium: true,
     onOpenPage: jest.fn(),
-    onOpenPremium: jest.fn(),
     readiness: {
       think: { state: "ready", summaryKey: "settingsReadinessReady" },
       listen: {
@@ -64,7 +62,7 @@ describe("AntSettingsOverview", () => {
     ).toBeTruthy();
   });
 
-  it("leads with the current edition and task-oriented groups", () => {
+  it("leads with readiness and task-oriented groups", () => {
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
@@ -73,10 +71,6 @@ describe("AntSettingsOverview", () => {
       </ThemeProvider>,
     );
 
-    expect(
-      screen.getByTestId("phosphor-icon-check-circle", hiddenIconQuery),
-    ).toBeTruthy();
-    expect(screen.getByText("Premium is unlocked")).toBeTruthy();
     expect(screen.getByText("Conversation")).toBeTruthy();
     expect(screen.getByText("Voice")).toBeTruthy();
     expect(screen.getByText("Privacy & app")).toBeTruthy();
@@ -147,33 +141,14 @@ describe("AntSettingsOverview", () => {
     expect(iconStyle.color).toBe(lightColors.textSecondary);
   });
 
-  it("omits the redundant Free edition card", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <LocalizationProvider language="en">
-          <AntSettingsOverview {...overviewProps()} isPremium={false} />
-        </LocalizationProvider>
-      </ThemeProvider>,
-    );
-
-    expect(screen.queryByTestId("settings-edition-card")).toBeNull();
-    expect(screen.queryByText("Private Offline · Free")).toBeNull();
-    expect(screen.getByText("Conversation")).toBeTruthy();
-    expect(screen.getByText("Voice")).toBeTruthy();
-    expect(screen.getByText("Privacy & app")).toBeTruthy();
-  });
-
-  it("keeps the same seven pages for Free and routes the band through one action", () => {
-    const onOpenPremium = jest.fn();
+  it("shows all seven BYOK settings sections", () => {
     const onOpenPage = jest.fn();
     const screen = render(
       <ThemeProvider mode="light">
         <LocalizationProvider language="en">
           <AntSettingsOverview
             {...overviewProps()}
-            isPremium={false}
             onOpenPage={onOpenPage}
-            onOpenPremium={onOpenPremium}
           />
         </LocalizationProvider>
       </ThemeProvider>,
@@ -192,24 +167,8 @@ describe("AntSettingsOverview", () => {
     ]) {
       expect(screen.getByTestId(`settings-overview-row-${page}`)).toBeTruthy();
     }
-    expect(screen.getAllByText("Premium").length).toBeGreaterThan(0);
-    fireEvent.press(screen.getByLabelText("Unlock Premium"));
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText("Unlock Premium")).toBeNull();
     fireEvent.press(screen.getByTestId("settings-overview-row-data"));
     expect(onOpenPage).toHaveBeenCalledWith("data");
-  });
-
-  it("lets Premium dismiss the one-time edition card", () => {
-    const screen = render(
-      <ThemeProvider mode="light">
-        <LocalizationProvider language="en">
-          <AntSettingsOverview {...overviewProps()} />
-        </LocalizationProvider>
-      </ThemeProvider>,
-    );
-
-    fireEvent.press(screen.getByLabelText("Dismiss"));
-    expect(screen.queryByTestId("settings-edition-card")).toBeNull();
-    expect(screen.getByTestId("settings-readiness-line")).toBeTruthy();
   });
 });

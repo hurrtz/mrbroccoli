@@ -1,7 +1,6 @@
 const REQUIRED_HOME_CONTROLS = [
   { id: "main-conversations-button", label: "Conversations" },
   { id: "main-settings-button", label: "Settings" },
-  { id: "intro-banner", label: "Set up Mr Broccoli" },
   {
     id: "prompt-blocked-notice",
     label:

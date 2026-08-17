@@ -13,6 +13,7 @@ import {
   ensureRuntimeCapabilityOverridesLoaded,
   subscribeToRuntimeCapabilityOverrides,
 } from "../services/runtimeCapabilityOverrides";
+import { removeRetiredLocalLlmArtifacts } from "../services/localModelManager";
 
 export function useSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -24,6 +25,9 @@ export function useSettings() {
     void Promise.all([
       loadStoredSettingsSnapshot(),
       ensureRuntimeCapabilityOverridesLoaded(),
+      removeRetiredLocalLlmArtifacts().catch((error) => {
+        console.warn("[local-models] failed to remove retired LLM artifacts", error);
+      }),
     ])
       .then(async ([{ storedSettings, apiKeys }]) => {
         if (!mounted) {

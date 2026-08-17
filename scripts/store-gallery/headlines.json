@@ -1,0 +1,174 @@
+{
+  "_comment": "Seven BYOK panel headlines in story order, keyed by the language directory names used in artifacts/store-promos/<platform>/<profile>/<scheme>/<lang>/. The current English story supersedes the retired local-response panel in the vendored COWORK brief. Translations follow the register already used in docs/google-play-listing-translations.md and carry no price, discount, ranking or promotional claim (Google Play policy). Non-English strings still need native review before publishing.",
+  "en": [
+    "Ask out loud. Hear an answer worth listening to.",
+    "Use the AI models you already trust.",
+    "Connect your provider directly. No middleman.",
+    "Every conversation, tuned to you.",
+    "Choose the voice—and how it speaks.",
+    "Listen now. Read and revisit it later.",
+    "Explore another direction without losing the thread."
+  ],
+  "de": [
+    "Frag laut. Hör eine Antwort, die zählt.",
+    "Nutze die KI-Modelle, denen du vertraust.",
+    "Verbinde deinen Anbieter direkt. Ohne Zwischenserver.",
+    "Jedes Gespräch, auf dich abgestimmt.",
+    "Wähle die Stimme – und ihren Klang.",
+    "Jetzt hören. Später lesen und nachlesen.",
+    "Neue Richtung erkunden, ohne den Faden zu verlieren."
+  ],
+  "fr": [
+    "Demandez à voix haute. Écoutez une vraie réponse.",
+    "Utilisez les modèles d'IA que vous connaissez.",
+    "Connectez directement votre fournisseur. Sans intermédiaire.",
+    "Chaque conversation, réglée pour vous.",
+    "Choisissez la voix – et son intonation.",
+    "Écoutez maintenant. Relisez quand vous voulez.",
+    "Explorez une autre piste sans perdre le fil."
+  ],
+  "es": [
+    "Pregunta en voz alta. Escucha una respuesta real.",
+    "Usa los modelos de IA en los que confías.",
+    "Conecta tu proveedor directamente. Sin intermediarios.",
+    "Cada conversación, ajustada a ti.",
+    "Elige la voz y cómo suena.",
+    "Escucha ahora. Léelo y repásalo después.",
+    "Explora otro camino sin perder el hilo."
+  ],
+  "it": [
+    "Chiedi ad alta voce. Ascolta una risposta vera.",
+    "Usa i modelli di IA di cui ti fidi.",
+    "Collega direttamente il tuo provider. Senza intermediari.",
+    "Ogni conversazione, calibrata su di te.",
+    "Scegli la voce e come parla.",
+    "Ascolta ora. Rileggi quando vuoi.",
+    "Esplora un'altra strada senza perdere il filo."
+  ],
+  "pt": [
+    "Pergunte em voz alta. Ouça uma resposta a sério.",
+    "Use os modelos de IA em que já confia.",
+    "Ligue diretamente o seu fornecedor. Sem intermediários.",
+    "Cada conversa, afinada para si.",
+    "Escolha a voz — e como fala.",
+    "Ouça agora. Leia e reveja mais tarde.",
+    "Explore outro caminho sem perder o fio."
+  ],
+  "pt-BR": [
+    "Pergunte em voz alta. Ouça uma resposta de verdade.",
+    "Use os modelos de IA em que você já confia.",
+    "Conecte seu provedor diretamente. Sem intermediários.",
+    "Cada conversa, ajustada para você.",
+    "Escolha a voz — e como ela fala.",
+    "Ouça agora. Leia e revise depois.",
+    "Explore outro caminho sem perder o fio."
+  ],
+  "sv": [
+    "Fråga högt. Hör ett svar värt att lyssna på.",
+    "Använd de AI-modeller du redan litar på.",
+    "Anslut din leverantör direkt. Utan mellanhänder.",
+    "Varje samtal, avstämt för dig.",
+    "Välj rösten – och hur den låter.",
+    "Lyssna nu. Läs och återvänd senare.",
+    "Utforska ett annat spår utan att tappa tråden."
+  ],
+  "pl": [
+    "Zapytaj na głos. Usłysz odpowiedź wartą uwagi.",
+    "Korzystaj z modeli AI, którym już ufasz.",
+    "Połącz się bezpośrednio z dostawcą. Bez pośrednika.",
+    "Każda rozmowa dostrojona do ciebie.",
+    "Wybierz głos i sposób mówienia.",
+    "Słuchaj teraz. Przeczytaj i wróć później.",
+    "Sprawdź inny kierunek, nie tracąc wątku."
+  ],
+  "cs": [
+    "Zeptejte se nahlas. Uslyšíte odpověď, která stojí za poslech.",
+    "Používejte modely AI, kterým už věříte.",
+    "Připojte poskytovatele přímo. Bez prostředníka.",
+    "Každý rozhovor vyladěný přesně pro vás.",
+    "Vyberte hlas – i to, jak mluví.",
+    "Poslouchejte teď. Přečtěte si to později.",
+    "Prozkoumejte jiný směr, aniž ztratíte nit."
+  ],
+  "hu": [
+    "Kérdezz hangosan. Hallgass meg egy igazi választ.",
+    "Használd azokat az AI-modelleket, amikben megbízol.",
+    "Csatlakoztasd közvetlenül a szolgáltatód. Nincs közvetítő.",
+    "Minden beszélgetés rád szabva.",
+    "Válaszd ki a hangot – és a stílusát.",
+    "Hallgasd most. Olvasd és nézd vissza később.",
+    "Fedezz fel új irányt, a fonál megmarad."
+  ],
+  "tr": [
+    "Sesli sorun. Dinlemeye değer bir yanıt alın.",
+    "Zaten güvendiğiniz yapay zekâ modellerini kullanın.",
+    "Sağlayıcınıza doğrudan bağlanın. Aracı yok.",
+    "Her sohbet, size göre ayarlanır.",
+    "Sesi ve nasıl konuştuğunu siz seçin.",
+    "Şimdi dinleyin. Sonra okuyup tekrar bakın.",
+    "Başka bir yönü, ipi kaçırmadan keşfedin."
+  ],
+  "ru": [
+    "Спросите вслух. Услышьте ответ, который стоит послушать.",
+    "Используйте модели ИИ, которым вы доверяете.",
+    "Подключите провайдера напрямую. Без посредников.",
+    "Каждый разговор настроен под вас.",
+    "Выберите голос — и как он звучит.",
+    "Слушайте сейчас. Читайте и возвращайтесь позже.",
+    "Исследуйте другое направление, не теряя нити."
+  ],
+  "uk": [
+    "Запитайте вголос. Почуйте відповідь, варту уваги.",
+    "Використовуйте моделі ШІ, яким ви довіряєте.",
+    "Підключіть провайдера напряму. Без посередників.",
+    "Кожна розмова налаштована саме під вас.",
+    "Оберіть голос — і те, як він звучить.",
+    "Слухайте зараз. Читайте й повертайтеся пізніше.",
+    "Дослідіть інший напрям, не втрачаючи нитки."
+  ],
+  "hi": [
+    "आवाज़ से पूछें। सुनने लायक जवाब पाएँ।",
+    "वही AI मॉडल चुनें जिन पर आप भरोसा करते हैं।",
+    "अपने प्रदाता से सीधे जुड़ें। कोई बिचौलिया नहीं।",
+    "हर बातचीत, आपके मुताबिक ढली हुई।",
+    "आवाज़ चुनें — और उसका अंदाज़ भी।",
+    "अभी सुनें। बाद में पढ़ें और दोहराएँ।",
+    "नई दिशा देखें, सिलसिला टूटे बिना।"
+  ],
+  "ja": [
+    "声で聞く。聞く価値のある答えが返る。",
+    "信頼しているAIモデルを、そのまま使える。",
+    "プロバイダーへ直接接続。仲介サーバーなし。",
+    "会話ごとに、あなた仕様へ調整。",
+    "声を選ぶ。話し方まで選べる。",
+    "今は聞く。あとで読み返せる。",
+    "話の筋を保ったまま、別の道へ。"
+  ],
+  "zh-CN": [
+    "开口就问，听到值得一听的回答。",
+    "使用你早已信赖的 AI 模型。",
+    "直接连接你的提供商。没有中间服务器。",
+    "每一次对话，都按你的方式调校。",
+    "挑选声音，也挑选说话的方式。",
+    "现在听，稍后再读、再回看。",
+    "换个方向探索，不丢原来的思路。"
+  ],
+  "ar": [
+    "اسأل بصوتك. واستمع إلى إجابة تستحق الإصغاء.",
+    "استخدم نماذج الذكاء الاصطناعي التي تثق بها.",
+    "اتصل بمزوّدك مباشرةً. بلا وسيط.",
+    "كل محادثة مضبوطة على مقاسك.",
+    "اختر الصوت — وطريقة نطقه.",
+    "استمع الآن. اقرأ وراجع لاحقًا.",
+    "استكشف اتجاهًا آخر دون أن تفقد الخيط."
+  ],
+  "ur": [
+    "بول کر پوچھیں۔ سننے کے قابل جواب سنیں۔",
+    "وہی AI ماڈل استعمال کریں جن پر آپ بھروسا کرتے ہیں۔",
+    "اپنے فراہم کنندہ سے براہ راست جڑیں۔ کوئی واسطہ نہیں۔",
+    "ہر گفتگو، آپ کے مطابق ترتیب دی گئی۔",
+    "آواز چنیں — اور اس کا اندازِ گفتگو بھی۔",
+    "ابھی سنیں۔ بعد میں پڑھیں اور دہرائیں۔",
+    "نئی سمت دیکھیں، سلسلہ توڑے بغیر۔"
+  ]
+}

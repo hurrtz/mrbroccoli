@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const ptBR = {
   ...conversationKnowledgeTranslations.ptBR,
   ...imagePromptTranslations.ptBR,
   ...onDeviceTranslations.ptBR,
-  ...onboardingTranslations.ptBR,
-  ...introTranslations.ptBR,
-  ...premiumTranslations.ptBR,
+  ...localSpeechTranslations.ptBR,
+  ...settingsTranslations.ptBR,
   ...transcriptEditTranslations.ptBR,
   ...workspaceTranslations.ptBR,
   ...sessionLockTranslations.ptBR,
-  ...autoSetupTranslations.ptBR,
   appName: "Sr. Brócolis",
   retry: "Tentar novamente",
   dismiss: "Fechar",
@@ -40,7 +36,6 @@ export const ptBR = {
   settings: "Configurações",
   settingsReleaseVersion: ({ version }) => `Versão ${version}`,
   all: "Todos",
-  firstRun: "Primeiro acesso",
   instructions: "Instruções",
   providers: "Provedores",
   webSearch: "Pesquisa na Web",
@@ -211,10 +206,10 @@ export const ptBR = {
   createApiKey: "Credenciais",
   apiKey: "Chave API",
   aboutThisProvider: "Sobre este provedor",
-  openRouterOnboardingTitle: "Uma chave, vários provedores",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Uma chave, vários provedores",
+  openRouterGatewayDescription:
     "Crie uma chave OpenRouter dedicada, cole-a abaixo e use modelos baseados em snapshots de vários provedores sem substituir qualquer conexão direta.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Caminho da solicitação: este dispositivo → OpenRouter → provedor upstream selecionado",
   openRouterKeys: "Chaves OpenRouter",
   providerStatusInvalid: "Inválido",

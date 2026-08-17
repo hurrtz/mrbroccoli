@@ -1,5 +1,4 @@
 import React from "react";
-import { Modal as NativeModal } from "react-native";
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import * as DocumentPicker from "expo-document-picker";
 import * as FileSystem from "expo-file-system/legacy";
@@ -61,8 +60,6 @@ function renderPage(
       typeof DataPrivacySettingsPage
     >["onRestoreAppDataBackup"];
     onUpdate?: React.ComponentProps<typeof DataPrivacySettingsPage>["onUpdate"];
-    isPremium?: boolean;
-    onOpenPremium?: () => void;
     onOpenArchivedConversations?: () => void;
     archivedConversationCount?: number;
     localModels?: LocalModelSettingsController;
@@ -84,11 +81,9 @@ function renderPage(
       <LocalizationProvider language="en">
         <DataPrivacySettingsPage
           archivedConversationCount={overrides.archivedConversationCount ?? 0}
-          isPremium={overrides.isPremium ?? true}
           localModels={localModels}
           settings={DEFAULT_SETTINGS}
           onUpdate={overrides.onUpdate ?? jest.fn()}
-          onOpenPremium={overrides.onOpenPremium ?? jest.fn()}
           onOpenArchivedConversations={
             overrides.onOpenArchivedConversations ?? jest.fn()
           }
@@ -243,40 +238,18 @@ describe("DataPrivacySettingsPage", () => {
     expect(chooseDirectory).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps Premium knowledge and archive routes visible but gated in Free", () => {
-    const onOpenPremium = jest.fn();
-    const screen = renderPage({ isPremium: false, onOpenPremium });
+  it("keeps knowledge and archive routes directly available", () => {
+    const screen = renderPage();
 
-    expect(
-      screen.getByLabelText("Use past conversation knowledge"),
-    ).toBeTruthy();
-    expect(
-      screen.queryByTestId("past-conversation-knowledge-switch"),
-    ).toBeNull();
-    fireEvent.press(screen.getByLabelText("Use past conversation knowledge"));
+    expect(screen.getByTestId("past-conversation-knowledge-switch")).toBeTruthy();
 
     openArchiveSheet(screen);
-    expect(
-      screen.queryByTestId("choose-conversation-archive-folder"),
-    ).toBeNull();
-    const archiveSheetModal = screen
-      .UNSAFE_getAllByType(NativeModal)
-      .find(
-        (modal) =>
-          modal.findAllByProps({ testID: "archive-settings-sheet" }).length > 0,
-      );
-    fireEvent.press(screen.getByTestId("unlock-conversation-archive"));
-    expect(onOpenPremium).toHaveBeenCalledTimes(1);
-    act(() => {
-      archiveSheetModal?.props.onDismiss();
-    });
-    expect(onOpenPremium).toHaveBeenCalledTimes(2);
+    expect(screen.getByTestId("choose-conversation-archive-folder")).toBeTruthy();
   });
 
-  it("still lets a Free user disconnect a previously configured archive", () => {
+  it("lets a user disconnect a previously configured archive", () => {
     const disconnect = jest.fn(async () => undefined);
     const screen = renderPage({
-      isPremium: false,
       conversationArchive: {
         chooseDirectory: jest.fn(async () => undefined),
         configured: true,
@@ -293,7 +266,7 @@ describe("DataPrivacySettingsPage", () => {
     openArchiveSheet(screen);
     fireEvent.press(screen.getByTestId("disconnect-conversation-archive"));
     expect(disconnect).toHaveBeenCalledTimes(1);
-    expect(screen.queryByTestId("sync-conversation-archive")).toBeNull();
+    expect(screen.getByTestId("sync-conversation-archive")).toBeTruthy();
   });
 
   it("opens archived conversations only after the archive sheet dismisses", () => {
@@ -325,9 +298,9 @@ describe("DataPrivacySettingsPage", () => {
       busy: { action: "download", modelId: "whisper-tiny" },
       cancelDownload,
       installs: {
-        "qwen3-0.6b-q8": {
+        "piper-en-us-kristin": {
           installed: true,
-          path: "/models/qwen3-0.6b-q8",
+          path: "/models/piper-en-us-kristin",
           verified: true,
         },
       },
@@ -337,13 +310,15 @@ describe("DataPrivacySettingsPage", () => {
     } as unknown as LocalModelSettingsController;
     const screen = renderPage({ localModels });
 
-    expect(screen.getByText("Qwen3 0.6B")).toBeTruthy();
+    expect(screen.getByText("Piper · Kristin")).toBeTruthy();
     expect(screen.getByText("Whisper Tiny")).toBeTruthy();
-    fireEvent.press(screen.getByTestId("model-storage-action-qwen3-0.6b-q8"));
+    fireEvent.press(
+      screen.getByTestId("model-storage-action-piper-en-us-kristin"),
+    );
     fireEvent.press(screen.getByTestId("model-storage-action-whisper-tiny"));
 
     expect(removeModel).toHaveBeenCalledWith(
-      expect.objectContaining({ id: "qwen3-0.6b-q8" }),
+      expect.objectContaining({ id: "piper-en-us-kristin" }),
     );
     expect(cancelDownload).toHaveBeenCalledTimes(1);
   });

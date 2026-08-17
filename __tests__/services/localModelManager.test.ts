@@ -68,11 +68,11 @@ jest.mock("../../src/services/phonemePacks", () => ({
 
 import {
   getLocalModel,
-  LOCAL_MODEL_CATALOG_VERSION,
 } from "../../src/constants/localModels";
 import {
   downloadLocalModel,
   getLocalModelInstallStatus,
+  removeRetiredLocalLlmArtifacts,
 } from "../../src/services/localModelManager";
 import { Platform } from "react-native";
 
@@ -96,68 +96,16 @@ describe("local model manager", () => {
     mockInstallPhonemePacks.mockResolvedValue(undefined);
   });
 
-  it("only trusts a local LLM when its pinned verification marker matches", async () => {
-    const model = getLocalModel("qwen3-0.6b-q8");
+  it("removes retired local response-model artifacts without touching speech", async () => {
     mockExists.mockResolvedValue(true);
-    mockReadFile.mockResolvedValue(model.sha256);
 
-    await expect(getLocalModelInstallStatus("qwen3-0.6b-q8")).resolves.toEqual({
-      installed: true,
-      path: "/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf",
-      verified: true,
-    });
+    await removeRetiredLocalLlmArtifacts();
 
-    mockReadFile.mockResolvedValueOnce("different-digest");
-    await expect(getLocalModelInstallStatus("qwen3-0.6b-q8")).resolves.toEqual({
-      installed: true,
-      path: "/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf",
-      verified: false,
-    });
-  });
-
-  it("hashes an LLM download before moving it into the verified path", async () => {
-    const model = getLocalModel("qwen3-0.6b-q8");
-    mockExists.mockResolvedValue(false);
-    mockHash.mockResolvedValue(model.sha256);
-    mockDownloadFile.mockImplementation(
-      (options: {
-        progress?: (event: {
-          bytesWritten: number;
-          contentLength: number;
-        }) => void;
-      }) => {
-        options.progress?.({
-          bytesWritten: model.downloadBytes,
-          contentLength: model.downloadBytes,
-        });
-        return {
-          jobId: 7,
-          promise: Promise.resolve({ statusCode: 200 }),
-        };
-      },
+    expect(mockExists).toHaveBeenCalledWith("/documents/local-models/llm");
+    expect(mockUnlink).toHaveBeenCalledWith("/documents/local-models/llm");
+    expect(mockUnlink).not.toHaveBeenCalledWith(
+      expect.stringContaining("sherpa"),
     );
-    const onProgress = jest.fn();
-
-    await expect(downloadLocalModel(model.id, { onProgress })).resolves.toBe(
-      "/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf",
-    );
-    expect(mockHash).toHaveBeenCalledWith(
-      expect.stringMatching(/\.partial$/),
-      "sha256",
-    );
-    expect(mockMoveFile).toHaveBeenCalledWith(
-      expect.stringMatching(/\.partial$/),
-      "/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf",
-    );
-    expect(mockWriteFile).toHaveBeenCalledWith(
-      `/documents/local-models/llm/Qwen3-0.6B-Q8_0.gguf.verified-${LOCAL_MODEL_CATALOG_VERSION}`,
-      model.sha256,
-      "utf8",
-    );
-    expect(onProgress).toHaveBeenLastCalledWith({
-      phase: "verifying",
-      progress: 1,
-    });
   });
 
   it("uses the direct pinned install when a registry checksum is stale", async () => {

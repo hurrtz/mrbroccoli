@@ -142,10 +142,7 @@ function InstructionsSheet({
 
 export function SpeakingSettingsPage({
   activePreview,
-  allTtsProviders,
-  isPremium,
   localModels,
-  onOpenPremium,
   onPreviewKokoroVoice,
   onPreviewNativeVoice,
   onPreviewProviderVoice,
@@ -158,10 +155,7 @@ export function SpeakingSettingsPage({
   settings,
 }: {
   activePreview: { id: string; phase: PreviewButtonPhase } | null;
-  allTtsProviders: Provider[];
-  isPremium: boolean;
   localModels: LocalModelSettingsController;
-  onOpenPremium: () => void;
   onPreviewKokoroVoice: (
     language: KokoroLanguage,
     voice?: string,
@@ -414,8 +408,6 @@ export function SpeakingSettingsPage({
         capability="tts"
         title={t("whoSpeaks")}
         footer={t("whoSpeaksFooter")}
-        freeProviderRoutes={allTtsProviders}
-        isPremium={isPremium}
         localModels={localModels}
         localSub={kokoroVoiceRow}
         nativeSub={
@@ -432,8 +424,6 @@ export function SpeakingSettingsPage({
             />
           ) : null
         }
-        onOpenPremium={onOpenPremium}
-        premiumCopy={t("premiumDescription")}
         settings={settings}
         providerRoutes={selectableTtsProviders.map((provider) => ({
           provider,
@@ -455,7 +445,7 @@ export function SpeakingSettingsPage({
       />
 
       <SettingsGroup
-        title={t("autoSetupFactStorage")}
+        title={t("localModelStorage")}
         footer={t("speechReplayCacheDescription")}
       >
         <SettingsRow

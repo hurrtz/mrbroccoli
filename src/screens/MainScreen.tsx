@@ -12,7 +12,6 @@ import { useKokoroModel } from "../hooks/useKokoroModel";
 import { getTtsFallbackRoutes } from "../constants/ttsFallback";
 import { getKokoroVoiceOptions } from "../constants/kokoro";
 import { getLocalModel } from "../constants/localModels";
-import type { LocalModelId } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
 import { resolveIpadLayout } from "../utils/ipadLayout";
@@ -22,8 +21,6 @@ import {
   getConversationTtsControlState,
   getMainScreenRouteConfiguration,
 } from "./main/mainScreenRouteConfiguration";
-import { useAutoSetupJob } from "./main/useAutoSetupJob";
-import { useIntroTestTurn } from "./main/useIntroTestTurn";
 import { useConversationActions } from "./main/useConversationActions";
 import { useConversationTitleGenerator } from "./main/useConversationTitleGenerator";
 import { useConversationSettings } from "./main/useConversationSettings";
@@ -49,10 +46,9 @@ import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
 import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachments";
 import { formatMessageForCopy } from "../utils/conversationExport";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
-import { useFreeOfflineMode } from "./main/useFreeOfflineMode";
 import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
-import { getLocalModelInstallStatus } from "../services/localModelManager";
+import { useNativeVoiceOptions } from "../features/settings-core/useNativeVoiceOptions";
 import {
   canUnlockSessionWithDeviceAuth,
   clearSessionLock,
@@ -60,21 +56,11 @@ import {
   unlockSessionWithDeviceAuth,
   verifySessionPassword,
 } from "../services/sessionLock";
-import {
-  getLocalModelBenchmarkResults,
-  localModelBenchmarkMatchesDevice,
-  probeLocalDeviceCapabilities,
-} from "../services/localDeviceCapabilities";
-import type { SettingsPage } from "../features/settings-core/types";
-import {
-  applyStorePromoAutoSetupJob,
-  applyStorePromoFreeOfflineController,
-  getStorePromoPipelinePhase,
-} from "../services/storePromoPresentation";
+import { getStorePromoPipelinePhase } from "../services/storePromoPresentation";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
-  const { language, t } = useLocalization();
+  const { isRtl, language, t } = useLocalization();
   const { height, width } = useWindowDimensions();
   const {
     settings,
@@ -94,154 +80,11 @@ export function MainScreen() {
   const storePromoPresentation = useStorePromoPresentation();
   const storePromoOrbPresentation = storePromoPresentation.orb;
   const storePromoScene = storePromoPresentation.scene;
-  const storePromoOnboardingActive =
-    storePromoScene === "onboarding" || storePromoScene === "onboarding-ready";
-  const baseFreeOffline = useFreeOfflineMode({
-    settings,
-    settingsLoaded: loaded && storePromoPresentation.loaded,
-    suspended: storePromoScene === "free" || storePromoOnboardingActive,
-    updateSettings,
-  });
-  const freeOffline = React.useMemo(
-    () =>
-      applyStorePromoFreeOfflineController(
-        baseFreeOffline,
-        settings,
-        storePromoScene,
-        Platform.OS === "ios" ? "ios" : "android",
-      ),
-    [baseFreeOffline, settings, storePromoScene],
-  );
-  const runtimeSettings = freeOffline.effectiveSettings;
-
-  // The introduction is an explicit secondary surface opened from its banner.
-  // A blocked turn points to the relevant settings page rather than hijacking
-  // a voice or text action into the information flow.
-  const [introVisible, setIntroVisible] = React.useState(false);
-  const [introSessionId, setIntroSessionId] = React.useState(0);
-  const [introHandoffPending, setIntroHandoffPending] = React.useState(false);
-  const [serializedSurfacePending, setSerializedSurfacePending] =
-    React.useState(false);
-  const pendingIntroDismissActionRef = React.useRef<null | (() => void)>(null);
-  const introReturnDestinationRef = React.useRef<"premium" | "settings" | null>(
-    null,
-  );
-  const openIntro = React.useCallback(() => {
-    pendingIntroDismissActionRef.current = null;
-    introReturnDestinationRef.current = null;
-    setIntroHandoffPending(false);
-    setIntroSessionId((sessionId) => sessionId + 1);
-    setIntroVisible(true);
-    updateSettings({ introOpened: true });
-  }, [updateSettings]);
-  const closeIntro = React.useCallback(() => setIntroVisible(false), []);
-  const runAfterIntroDismiss = React.useCallback(
-    (destination: "premium" | "settings", action: () => void) => {
-      introReturnDestinationRef.current = destination;
-      pendingIntroDismissActionRef.current = action;
-      setIntroHandoffPending(true);
-      setIntroVisible(false);
-    },
-    [],
-  );
-  const handleIntroDismiss = React.useCallback(() => {
-    const pendingAction = pendingIntroDismissActionRef.current;
-    pendingIntroDismissActionRef.current = null;
-    if (!pendingAction) {
-      return;
-    }
-    setIntroHandoffPending(false);
-    pendingAction();
-  }, []);
-  React.useEffect(() => {
-    if (introVisible || !pendingIntroDismissActionRef.current) {
-      return;
-    }
-    const timer = setTimeout(handleIntroDismiss, 350);
-    return () => clearTimeout(timer);
-  }, [handleIntroDismiss, introVisible]);
-  // Done on the last step is the completion that ends first-run integrity:
-  // afterwards the flow regains its close control and drops both gates.
-  const completeIntro = React.useCallback(() => {
-    pendingIntroDismissActionRef.current = null;
-    introReturnDestinationRef.current = null;
-    setIntroHandoffPending(false);
-    setIntroVisible(false);
-    updateSettings({ introCompleted: true });
-  }, [updateSettings]);
-  const dismissIntroBanner = React.useCallback(() => {
-    updateSettings({ introDismissed: true });
-  }, [updateSettings]);
-  const [premiumModalVisible, setPremiumModalVisible] = React.useState(false);
-  const [premiumSurfaceActive, setPremiumSurfaceActive] = React.useState(false);
-  const [resumeSettingsPageAfterPremium, setResumeSettingsPageAfterPremium] =
-    React.useState<SettingsPage | null>(null);
-  const premiumOriginRef = React.useRef<"intro" | "settings" | null>(null);
-  const premiumReturnSettingsPageRef = React.useRef<SettingsPage>("overview");
-  const openPremium = React.useCallback(
-    (origin: "intro" | "settings", returnPage: SettingsPage = "overview") => {
-      premiumOriginRef.current = origin;
-      premiumReturnSettingsPageRef.current = returnPage;
-      setPremiumSurfaceActive(true);
-      setPremiumModalVisible(true);
-    },
-    [],
-  );
-  const closePremium = React.useCallback(() => {
-    setPremiumModalVisible(false);
-  }, []);
-  const handlePremiumDismiss = React.useCallback(() => {
-    const origin = premiumOriginRef.current;
-    premiumOriginRef.current = null;
-    if (origin === "settings") {
-      // Keep the workspace suspended until the Settings destination becomes
-      // visible in the following effect.
-      setResumeSettingsPageAfterPremium(premiumReturnSettingsPageRef.current);
-      return;
-    }
-    setPremiumSurfaceActive(false);
-    if (origin === "intro" && introReturnDestinationRef.current === "premium") {
-      introReturnDestinationRef.current = null;
-      if (!settings.introCompleted) {
-        setIntroVisible(true);
-      }
-    }
-  }, [settings.introCompleted]);
-  React.useEffect(() => {
-    if (premiumModalVisible || !premiumSurfaceActive) {
-      return;
-    }
-    const timer = setTimeout(handlePremiumDismiss, 350);
-    return () => clearTimeout(timer);
-  }, [handlePremiumDismiss, premiumModalVisible, premiumSurfaceActive]);
-  // A purchase is the one outcome that ends the introduction on its own: the
-  // reader has decided, and the invitation has nothing left to invite. Closing
-  // the purchase sheet without buying leaves them where they were.
-  const wasPremiumRef = React.useRef<boolean | null>(null);
-  const isPremiumNow = freeOffline.entitlement.isPremium;
-  React.useEffect(() => {
-    const wasPremium = wasPremiumRef.current;
-    wasPremiumRef.current = isPremiumNow;
-    // Only while the sheet is open. Entitlement also resolves from false to
-    // premium during boot, and treating that as a purchase would dismiss the
-    // banner on every launch for someone who already owns Premium.
-    if (wasPremium === false && isPremiumNow && premiumModalVisible) {
-      // A purchase completes any Intro-originated journey, including the
-      // chained Intro -> Settings -> Premium route. Leaving this ref behind
-      // would reopen first-run Intro when Settings later closes.
-      introReturnDestinationRef.current = null;
-      if (premiumOriginRef.current === "intro") {
-        premiumOriginRef.current = null;
-      }
-      setPremiumModalVisible(false);
-      setIntroVisible(false);
-      updateSettings({ introDismissed: true });
-    }
-  }, [isPremiumNow, premiumModalVisible, updateSettings]);
+  const runtimeSettings = settings;
   const providerVoiceDirectories = useMainScreenVoiceDirectories({
     loaded,
     settings: runtimeSettings,
-    suspended: !storePromoPresentation.loaded || storePromoScene !== null,
+    suspended: !storePromoPresentation.loaded,
     updateProviderTtsVoice,
   });
   const {
@@ -299,7 +142,7 @@ export function MainScreen() {
     settings,
   });
   const conversationArchive = useConversationArchive({
-    enabled: freeOffline.entitlement.isPremium,
+    enabled: true,
     activeConversationId: activeConversation?.id ?? null,
     conversationMetas: conversations,
     conversationsLoaded,
@@ -320,8 +163,7 @@ export function MainScreen() {
     message: kokoroPromptBlockMessage,
   } = getKokoroPromptBlockState({
     kokoroModel,
-    verifiedByOfflineProfile:
-      freeOffline.entitlement.status === "free" && freeOffline.freeRuntimeReady,
+    verifiedByOfflineProfile: false,
     spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
     t,
     ttsMode: runtimeSettings.ttsMode,
@@ -362,32 +204,7 @@ export function MainScreen() {
     runAfterDrawerDismiss,
     handleDrawerDismiss,
   } = useMainScreenUiState();
-  React.useEffect(() => {
-    if (!resumeSettingsPageAfterPremium) {
-      return;
-    }
-    openSettings(undefined, undefined, resumeSettingsPageAfterPremium);
-    setResumeSettingsPageAfterPremium(null);
-    setPremiumSurfaceActive(false);
-  }, [openSettings, resumeSettingsPageAfterPremium]);
-  const handleCloseSettings = React.useCallback(() => {
-    if (introReturnDestinationRef.current !== "settings") {
-      closeSettings();
-      return;
-    }
-
-    setSerializedSurfacePending(true);
-    runAfterSettingsDismiss(() => {
-      setSerializedSurfacePending(false);
-      if (introReturnDestinationRef.current !== "settings") {
-        return;
-      }
-      introReturnDestinationRef.current = null;
-      if (!settings.introCompleted) {
-        setIntroVisible(true);
-      }
-    });
-  }, [closeSettings, runAfterSettingsDismiss, settings.introCompleted]);
+  const handleCloseSettings = closeSettings;
 
   const {
     activeResponseMode,
@@ -397,7 +214,6 @@ export function MainScreen() {
     globalSelectedTtsVoice,
     model,
     modelEffort,
-    localLlmModelId,
     provider,
     providerApiKey,
     providerLabel,
@@ -416,10 +232,7 @@ export function MainScreen() {
     webSearchProvider,
     webSearchReady,
   } = routeConfiguration;
-  const premiumStorePromoActive = storePromoScene === "premium";
-  const presentationAvailableResponseModes = premiumStorePromoActive
-    ? runtimeSettings.responseModes.map(({ id }) => id)
-    : availableResponseModes;
+  const presentationAvailableResponseModes = availableResponseModes;
   const ipadLayout = React.useMemo(
     () =>
       resolveIpadLayout({
@@ -506,6 +319,14 @@ export function MainScreen() {
     conversationTtsVoiceOptions,
     ttsInstructionsSupported,
   } = conversationTtsControlState;
+  const { nativeVoiceOptions } = useNativeVoiceOptions({
+    visible: loaded,
+    shouldLoad:
+      runtimeSettings.spokenRepliesEnabled &&
+      runtimeSettings.ttsMode === "native",
+    listenLanguages: runtimeSettings.ttsListenLanguages,
+    preferredVoiceId: runtimeSettings.nativeTtsVoiceId,
+  });
   const settingsSummaryVoice = React.useMemo(() => {
     if (!runtimeSettings.spokenRepliesEnabled) {
       return t("spokenRepliesOff");
@@ -513,7 +334,7 @@ export function MainScreen() {
 
     if (runtimeSettings.ttsMode === "native") {
       return (
-        freeOffline.nativeVoiceOptions.find(
+        nativeVoiceOptions.find(
           ({ value }) => value === runtimeSettings.nativeTtsVoiceId,
         )?.label ?? t("systemVoice")
       );
@@ -540,8 +361,8 @@ export function MainScreen() {
     );
   }, [
     conversationTtsVoiceOptions,
-    freeOffline.nativeVoiceOptions,
     language,
+    nativeVoiceOptions,
     runtimeSettings.kokoroVoices.en,
     runtimeSettings.localTtsModelId,
     runtimeSettings.nativeTtsVoiceId,
@@ -550,15 +371,6 @@ export function MainScreen() {
     selectedTtsVoice,
     t,
   ]);
-  const conversationSettingsSummary = React.useMemo(
-    () =>
-      t("conversationSettingsSummary", {
-        length: t(responseLength),
-        tone: t(responseTone),
-        voice: settingsSummaryVoice,
-      }),
-    [responseLength, responseTone, settingsSummaryVoice, t],
-  );
   const isRecording =
     runtimeSettings.sttMode === "native"
       ? nativeStt.isRecording
@@ -631,166 +443,13 @@ export function MainScreen() {
     [authenticateLockedSession, showToast, t, updateConversationLocked],
   );
   usePersistenceFailureAlert(showToast, t);
-  // Where the outcome is announced depends on where the user is: the card
-  // states it in full in the introduction and Settings, while the workspace
-  // uses the persistent task row. Long-running work never jumps surfaces into
-  // a transient toast.
-  const autoSetupSurfacesVisibleRef = React.useRef(false);
-  autoSetupSurfacesVisibleRef.current = introVisible || settingsVisible;
-  const [autoSetupDoneBarVisible, setAutoSetupDoneBarVisible] =
-    React.useState(false);
-  const autoSetup = useAutoSetupJob({
-    onOutcome: (outcome) => {
-      if (autoSetupSurfacesVisibleRef.current) {
-        return;
-      }
-      if (outcome === "done") {
-        setAutoSetupDoneBarVisible(true);
-      }
-    },
-    settings,
-    suspended: !storePromoPresentation.loaded || storePromoScene !== null,
-    t,
-    updateSettings,
-  });
-  const introAutoSetup = applyStorePromoAutoSetupJob(
-    autoSetup,
-    settings.language,
-    storePromoScene,
-    Platform.OS === "ios" ? "ios" : "android",
-    t,
-  );
-  const premiumLocalLlmModelIds = React.useMemo(
-    () =>
-      [
-        ...new Set(
-          runtimeSettings.responseModes.flatMap(({ route }) =>
-            route.runtime === "local" && route.localModelId
-              ? [route.localModelId]
-              : [],
-          ),
-        ),
-      ] as LocalModelId[],
-    [runtimeSettings.responseModes],
-  );
-  const premiumLocalLlmModelKey = premiumLocalLlmModelIds.join(":");
-  const [verifiedPremiumLocalLlmIds, setVerifiedPremiumLocalLlmIds] =
-    React.useState<ReadonlySet<LocalModelId>>(new Set());
-  const verifiedPremiumLocalLlmIdsRef = React.useRef<ReadonlySet<LocalModelId>>(
-    new Set(),
-  );
-  const replaceVerifiedPremiumLocalLlmIds = React.useCallback(
-    (next: ReadonlySet<LocalModelId>) => {
-      const current = verifiedPremiumLocalLlmIdsRef.current;
-      if (
-        current.size === next.size &&
-        [...next].every((modelId) => current.has(modelId))
-      ) {
-        return;
-      }
-      verifiedPremiumLocalLlmIdsRef.current = next;
-      setVerifiedPremiumLocalLlmIds(next);
-    },
-    [],
-  );
-  React.useEffect(() => {
-    let cancelled = false;
-    replaceVerifiedPremiumLocalLlmIds(new Set());
-    const modelIds = premiumLocalLlmModelKey
-      ? (premiumLocalLlmModelKey.split(":") as LocalModelId[])
-      : [];
-    if (freeOffline.entitlement.status !== "premium" || modelIds.length === 0) {
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    void Promise.all([
-      Promise.all(
-        modelIds.map(
-          async (modelId) =>
-            [modelId, await getLocalModelInstallStatus(modelId)] as const,
-        ),
-      ),
-      getLocalModelBenchmarkResults(),
-      probeLocalDeviceCapabilities(),
-    ])
-      .then(([entries, benchmarks, snapshot]) => {
-        if (cancelled) {
-          return;
-        }
-        const verifiedIds = new Set(
-          entries
-            .filter(([modelId, status]) => {
-              const benchmark = benchmarks[modelId];
-              return (
-                status.verified &&
-                Boolean(status.path) &&
-                benchmark?.status === "viable" &&
-                localModelBenchmarkMatchesDevice(benchmark, snapshot)
-              );
-            })
-            .map(([modelId]) => modelId),
-        );
-        replaceVerifiedPremiumLocalLlmIds(verifiedIds);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          replaceVerifiedPremiumLocalLlmIds(new Set());
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-    // Re-read after an automatic install or after returning from manual
-    // Settings: portable settings can name a model whose files are absent.
-  }, [
-    autoSetup.state,
-    freeOffline.entitlement.status,
-    premiumLocalLlmModelKey,
-    replaceVerifiedPremiumLocalLlmIds,
-    settingsVisible,
-  ]);
-  const premiumResponseModeSet = React.useMemo(
-    () => new Set(presentationAvailableResponseModes),
-    [presentationAvailableResponseModes],
-  );
-  const activePremiumReasoningRoute = React.useMemo(
-    () =>
-      runtimeSettings.responseModes.find(({ id }) => id === activeResponseMode)
-        ?.route ?? runtimeSettings.responseModes[0]?.route,
-    [activeResponseMode, runtimeSettings.responseModes],
-  );
-  const premiumReasoningReady = Boolean(
-    premiumResponseModeSet.has(activeResponseMode) &&
-    activePremiumReasoningRoute &&
-    (activePremiumReasoningRoute.runtime !== "local" ||
-      (activePremiumReasoningRoute.localModelId &&
-        verifiedPremiumLocalLlmIds.has(
-          activePremiumReasoningRoute.localModelId,
-        ))),
-  );
-  const introThinkingReady =
-    loaded &&
-    storePromoPresentation.loaded &&
-    (freeOffline.entitlement.status === "free"
-      ? freeOffline.freeRuntimeReady
-      : freeOffline.entitlement.status === "premium" && premiumReasoningReady);
-  React.useEffect(() => {
-    if (!autoSetupDoneBarVisible) {
-      return;
-    }
-    const timer = setTimeout(() => setAutoSetupDoneBarVisible(false), 8_000);
-    return () => clearTimeout(timer);
-  }, [autoSetupDoneBarVisible]);
   const showImageError = React.useCallback(
     (message: string) => showToast(message, undefined, "danger"),
     [showToast],
   );
 
   const pendingImages = useMainScreenImageAttachments({
-    disabled: voiceInputDisabled || !freeOffline.entitlement.isPremium,
+    disabled: voiceInputDisabled,
     onOpenSourcePicker: () => setImageSourceVisible(true),
     showError: showImageError,
     t,
@@ -826,7 +485,6 @@ export function MainScreen() {
     providerApiKey,
     model,
     modelEffort,
-    localLlmModelId,
     sttMode: runtimeSettings.sttMode,
     sttLanguage: runtimeSettings.sttLanguage,
     sttProvider,
@@ -868,48 +526,6 @@ export function MainScreen() {
 
   const isBusy = pipelinePhase !== "idle";
 
-  const introTestTurn = useIntroTestTurn({
-    active: introVisible && introThinkingReady,
-    getRouteParams: () => ({
-      assistantInstructions,
-      kokoroVoices: runtimeSettings.kokoroVoices,
-      language: runtimeSettings.language,
-      localLlmModelId,
-      localSttModelId: runtimeSettings.localSttModelId,
-      localTtsModelId: runtimeSettings.localTtsModelId,
-      model,
-      modelEffort,
-      nativeSttRequiresOnDevice: runtimeSettings.nativeSttRequiresOnDevice,
-      provider,
-      providerApiKey,
-      replyPlayback: runtimeSettings.replyPlayback,
-      responseLength,
-      responseTone,
-      spokenRepliesEnabled: runtimeSettings.spokenRepliesEnabled,
-      sttApiKey,
-      sttLanguage: runtimeSettings.sttLanguage,
-      sttMode: runtimeSettings.sttMode,
-      sttModel: selectedSttModel,
-      sttProvider,
-      ttsApiKey,
-      ttsInstructions: effectiveTtsInstructions,
-      ttsListenLanguages: runtimeSettings.ttsListenLanguages,
-      ttsFallbackRoutes: getTtsFallbackRoutes(
-        runtimeSettings.ttsFallbackPolicy,
-        runtimeSettings.ttsMode,
-      ),
-      ttsMode: runtimeSettings.ttsMode,
-      ttsModel: selectedTtsModel,
-      ttsProvider,
-      ttsVoice:
-        runtimeSettings.ttsMode === "kokoro"
-          ? runtimeSettings.kokoroVoices.en
-          : selectedTtsVoice,
-    }),
-    player,
-    t,
-  });
-
   const imageRoutes = React.useMemo(
     () => [
       { provider, model },
@@ -922,7 +538,7 @@ export function MainScreen() {
   );
   const imagePromptSubmission = useImagePromptSubmission({
     activeConversation,
-    imagesEnabled: freeOffline.entitlement.isPremium,
+    imagesEnabled: true,
     imageRoutes,
     onAddImage: pendingImages.handleAddImage,
     pendingAttachments: pendingImages.attachments,
@@ -931,23 +547,16 @@ export function MainScreen() {
     t,
     updateMessage,
   });
-  const secondarySurfaceTransitionVisible =
-    introHandoffPending ||
-    serializedSurfacePending ||
-    (premiumSurfaceActive && !premiumModalVisible);
+  const secondarySurfaceTransitionVisible = false;
   const mainSurfaceVisible = !(
     drawerModalVisible ||
     imageSourceVisible ||
     Boolean(imagePromptSubmission.consent) ||
-    introVisible ||
     Boolean(ulraMode.confirmation) ||
     routePickerVisible ||
     settingsVisible ||
     styleSheetVisible ||
-    transcriptModalVisible ||
-    freeOffline.setupVisible ||
-    premiumSurfaceActive ||
-    secondarySurfaceTransitionVisible
+    transcriptModalVisible
   );
   const promptSubmissionBlockMessage =
     kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
@@ -986,15 +595,12 @@ export function MainScreen() {
   });
 
   const {
-    driveAutoContinueEnabled,
-    driveSilenceCountdownSeconds,
-    driveVoiceActive,
-    handleContinueDriveSession,
+    handsFreeEnabled,
     handlePressIn,
     handlePressOut,
     handleStopPlayback,
     handleInterruptPlayback,
-    handleStopDriveSession,
+    handleToggleHandsFree,
     handleTogglePress,
     maxRecordingMs,
     resetVoiceSessionState,
@@ -1024,7 +630,7 @@ export function MainScreen() {
         role: "assistant",
         content: partialReply,
         model,
-        provider: localLlmModelId ? null : provider,
+        provider,
         metadata: {
           notices: [
             {
@@ -1052,6 +658,16 @@ export function MainScreen() {
     ttsProvider,
     stopReplay,
   });
+  const conversationSettingsSummary = React.useMemo(
+    () =>
+      t("conversationSettingsSummary", {
+        handsFree: handsFreeEnabled ? t("modelEffortEnabled") : "",
+        length: t(responseLength),
+        tone: t(responseTone),
+        voice: settingsSummaryVoice,
+      }),
+    [handsFreeEnabled, responseLength, responseTone, settingsSummaryVoice, t],
+  );
 
   const {
     handleCopyMessage,
@@ -1125,10 +741,7 @@ export function MainScreen() {
     model,
     modelEffort,
     provider,
-    providerReady:
-      freeOffline.entitlement.isPremium &&
-      !localLlmModelId &&
-      !voiceInputDisabled,
+    providerReady: !voiceInputDisabled,
     renameConversation,
     showToast,
     t,
@@ -1159,25 +772,20 @@ export function MainScreen() {
     storePromoScene,
     pipelinePhase,
   );
-  const {
-    isActive,
-    lastAssistantReply,
-    messages,
-    statusDisplay,
-    visualPhase,
-  } = getMainScreenViewModel({
-    activeConversation,
-    isRecording,
-    model,
-    pipelinePhase: presentationPipelinePhase,
-    player,
-    provider,
-    settings: runtimeSettings,
-    streamingText,
-    t,
-    ttsProvider,
-    visualPhaseOverride: storePromoOrbPresentation?.phase,
-  });
+  const { isActive, lastAssistantReply, messages, statusDisplay, visualPhase } =
+    getMainScreenViewModel({
+      activeConversation,
+      isRecording,
+      model,
+      pipelinePhase: presentationPipelinePhase,
+      player,
+      provider,
+      settings: runtimeSettings,
+      streamingText,
+      t,
+      ttsProvider,
+      visualPhaseOverride: storePromoOrbPresentation?.phase,
+    });
   const {
     handleAutoRenameConversation,
     handleCloseConversationSettings,
@@ -1310,34 +918,22 @@ export function MainScreen() {
     visualPhase,
   });
 
-  const voiceStageDisabled =
-    (!premiumStorePromoActive && voiceInputDisabled) ||
-    freeOffline.entitlement.status === "loading";
+  const voiceStageDisabled = voiceInputDisabled;
   const voiceStageActive = isActive && mainSurfaceVisible;
   // Hidden rather than disabled when the route cannot take an image at all;
   // disabled only for the moments it is briefly unavailable.
-  const imageAttachmentAvailable =
-    freeOffline.entitlement.isPremium && !voiceInputDisabled;
+  const imageAttachmentAvailable = !voiceInputDisabled;
   const imageAttachmentDisabled = voiceStageDisabled || voiceStageActive;
 
-  const freeRuntimeBlocked =
-    freeOffline.entitlement.status === "free" && !freeOffline.freeRuntimeReady;
   const providerRouteBlocked =
     loaded &&
-    freeOffline.entitlement.isPremium &&
     presentationAvailableResponseModes.length === 0 &&
     !kokoroPromptBlockMessage;
-  const promptBlockedActionEnabled = freeRuntimeBlocked
-    ? !freeOffline.checking && !freeOffline.preparing
-    : providerRouteBlocked || Boolean(kokoroPromptBlockMessage);
-  const promptBlockedMessage = freeRuntimeBlocked
-    ? t("freeOfflineIntro")
-    : providerRouteBlocked
-      ? t("configureCredentialsBeforeVoiceSession")
-      : kokoroPromptBlockMessage;
-  // Only when nothing else already owns the control: a Free runtime that is
-  // still downloading, or a missing Kokoro voice, are both about a step the
-  // user is mid-way through and outrank the general hint.
+  const promptBlockedActionEnabled =
+    providerRouteBlocked || Boolean(kokoroPromptBlockMessage);
+  const promptBlockedMessage = providerRouteBlocked
+    ? t("configureCredentialsBeforeVoiceSession")
+    : kokoroPromptBlockMessage;
   const voiceInputUnavailableMessage =
     speechInputUnavailable && !promptBlockedMessage
       ? t("speechInputUnavailableHint")
@@ -1379,47 +975,6 @@ export function MainScreen() {
         suspended: !mainSurfaceVisible,
         tone: toast?.tone,
       }}
-      intro={{
-        autoSetup: introAutoSetup,
-        firstRun: !settings.introCompleted,
-        language: settings.language,
-        modelStateReadsSuspended: storePromoOnboardingActive,
-        onClose: closeIntro,
-        onComplete: completeIntro,
-        // Provider keys are Premium, so a Free reader is sent to the purchase
-        // sheet rather than to a page that would only tell them no. Native
-        // sibling modals are serialized, then a cancellation resumes Setup.
-        onConnectProvider: () => {
-          if (!freeOffline.entitlement.isPremium) {
-            runAfterIntroDismiss("premium", () => openPremium("intro"));
-            return;
-          }
-          runAfterIntroDismiss("settings", () =>
-            openSettings(undefined, "providers", "connections"),
-          );
-        },
-        onInstallLocal: () => {
-          runAfterIntroDismiss("settings", () =>
-            openSettings(undefined, undefined, "thinking"),
-          );
-        },
-        onDismiss: handleIntroDismiss,
-        onOpenStt: () => {
-          runAfterIntroDismiss("settings", () =>
-            openSettings(undefined, "stt", "listening"),
-          );
-        },
-        onOpenTts: () => {
-          runAfterIntroDismiss("settings", () =>
-            openSettings(undefined, "tts", "speaking"),
-          );
-        },
-        sessionId: introSessionId,
-        t,
-        testTurn: introTestTurn,
-        thinkingReady: introThinkingReady,
-        visible: introVisible,
-      }}
       imageSource={{
         onChooseFromPhotos: () => void pendingImages.chooseFromPhotos(),
         onClose: () => setImageSourceVisible(false),
@@ -1428,64 +983,8 @@ export function MainScreen() {
         visible: imageSourceVisible,
       }}
       workspace={{
-        // The row reports work the user started somewhere else. A failed
-        // scan is not that: nothing was running, so nothing is reported.
-        backgroundTask:
-          autoSetup.state === "installing" ||
-          (autoSetup.state === "failed" && autoSetup.errorKind === "install") ||
-          (autoSetup.state === "done" && autoSetupDoneBarVisible)
-            ? {
-                accessibilityLabel: `${
-                  autoSetup.state === "done"
-                    ? t("autoSetupDoneTitle")
-                    : autoSetup.state === "failed"
-                      ? t("autoSetupBarFailed")
-                      : t("autoSetupBarInstalling")
-                }. ${t("autoSetupBarOpen")}`,
-                detail:
-                  autoSetup.state === "done"
-                    ? t("autoSetupInstalledNote")
-                    : autoSetup.state === "failed"
-                      ? t("autoSetupBarFailedDetail")
-                      : [
-                          autoSetup.reading?.stepLabel,
-                          autoSetup.reading?.remaining,
-                        ]
-                          .filter(Boolean)
-                          .join(" · "),
-                fraction: autoSetup.fraction,
-                onPress: () => {
-                  setAutoSetupDoneBarVisible(false);
-                  openSettings(undefined, undefined, "app");
-                },
-                title:
-                  autoSetup.state === "done"
-                    ? t("autoSetupDoneTitle")
-                    : autoSetup.state === "failed"
-                      ? t("autoSetupBarFailed")
-                      : t("autoSetupBarInstalling"),
-                tone:
-                  autoSetup.state === "done"
-                    ? "success"
-                    : autoSetup.state === "failed"
-                      ? "danger"
-                      : "progress",
-              }
-            : null,
+        backgroundTask: null,
         colors,
-        introBanner: {
-          onDismiss: dismissIntroBanner,
-          onOpen: openIntro,
-          showDismiss: runtimeSettings.introOpened,
-          t,
-          // Promo conversation scenes suppress this invitation. The isolated
-          // onboarding scene is the exception: its whole purpose is to capture
-          // the real first-run entry into the fixed recommendation.
-          visible:
-            loaded &&
-            !runtimeSettings.introDismissed &&
-            (!storePromoScene || storePromoOnboardingActive),
-        },
         isLandscape,
         ipadLayout,
         topBar: {
@@ -1519,34 +1018,21 @@ export function MainScreen() {
           visible: routePickerVisible,
         },
         satellites: {
-          councilActive: premiumStorePromoActive || ulraMode.active,
-          councilAvailable:
-            freeOffline.entitlement.isPremium &&
-            (premiumStorePromoActive || ulraMode.available),
+          attachments: pendingImages.attachments,
+          councilActive: ulraMode.active,
+          councilAvailable: ulraMode.available,
           disabled: voiceStageActive,
+          handsFreeActive: handsFreeEnabled,
           imageAvailable: imageAttachmentAvailable,
           imageDisabled: imageAttachmentDisabled,
-          driveRunning: driveAutoContinueEnabled,
-          driveSession: runtimeSettings.inputMode === "drive-session",
           onAddImage: imagePromptSubmission.handleAddImage,
-          onDriveResume: handleContinueDriveSession,
-          onDriveStop: handleStopDriveSession,
-          onRestart: () => void handleRepeatLastReply(),
-          onSeekBack: player.canSeekParagraph
-            ? () => void player.seekParagraph("back")
-            : undefined,
-          onSeekForward: player.canSeekParagraph
-            ? () => void player.seekParagraph("forward")
-            : undefined,
-          onStopPlayback: handleStopPlayback,
+          onRemoveImage: pendingImages.handleRemoveImage,
           onToggleCouncil: ulraMode.handleToggle,
+          onToggleHandsFree: handleToggleHandsFree,
           onToggleWeb: handleToggleWebSearch,
           t,
           webActive: webSearchActive,
-          webAvailable:
-            freeOffline.entitlement.isPremium &&
-            webSearchReady &&
-            Boolean(handleToggleWebSearch),
+          webAvailable: webSearchReady && Boolean(handleToggleWebSearch),
         },
         settingsSummary: {
           accessibilityLabel: t("openStyleSheet"),
@@ -1566,45 +1052,45 @@ export function MainScreen() {
         },
         visualPhase,
         voiceStage: {
-          attachments: pendingImages.attachments,
           disabled: voiceStageDisabled,
-          driveSilenceCountdownSeconds,
-          driveVoiceActive,
           initialInputSurface: inputSurfaceRef.current,
           initialTextInputFocused: textInputFocusedRef.current,
           initialTextMessage: textMessageDraftRef.current,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
           onInputSurfaceChange: handleInputSurfaceChange,
-          onRemoveImage: pendingImages.handleRemoveImage,
           onPress: handleTogglePress,
           onPressIn: handlePressIn,
           onPressOut: handlePressOut,
           onInterruptPlayback: handleInterruptPlayback,
+          onRestartReply: player.canRestartReply
+            ? () => void player.restartReply()
+            : undefined,
+          onSeekBack: player.canSeekParagraph
+            ? () => void player.seekParagraph("back")
+            : undefined,
+          onSeekForward: player.canSeekParagraph
+            ? () => void player.seekParagraph("forward")
+            : undefined,
           onStopPlayback: handleStopPlayback,
-          onResolvePromptBlock: freeRuntimeBlocked
-            ? () => openSettings(undefined, undefined, "app")
-            : providerRouteBlocked
-              ? handleOpenProviderSettings
-              : handleOpenSpeakingSettings,
+          onResolvePromptBlock: providerRouteBlocked
+            ? handleOpenProviderSettings
+            : handleOpenSpeakingSettings,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextInputFocusChange: handleTextInputFocusChange,
           onTextMessageChange: handleTextMessageChange,
           orbProgressOverride: storePromoOrbPresentation,
           playbackPaused: player.isPlaybackPaused,
           promptBlockedActionEnabled,
-          promptBlockedActionLabel: freeRuntimeBlocked
-            ? freeOffline.checking || freeOffline.preparing
-              ? t("onDeviceTestingDevice")
-              : t("freeOfflineDownloadAndTest")
-            : providerRouteBlocked
-              ? t("setupGuideConnectProviderTitle")
-              : kokoroPromptBlockActionLabel,
+          promptBlockedActionLabel: providerRouteBlocked
+            ? t("setupGuideConnectProviderTitle")
+            : kokoroPromptBlockActionLabel,
           promptBlockedMessage,
           readingProgress: player.readingProgress,
           readingProgressTiming: player.readingProgressTiming,
           recordingMaxMs: maxRecordingMs,
           recordingStartedAtMs,
+          rtl: isRtl,
           phaseTimingProgress:
             phaseProgress?.phase === visualPhase ? phaseProgress : null,
           speechStartProgress: phaseProgress?.speechStart ?? null,
@@ -1680,10 +1166,9 @@ export function MainScreen() {
       }}
       settingsModal={{
         archivedConversationCount,
-        autoSetup,
         focusPage: settingsFocusPage,
         visible: settingsVisible,
-        suspended: premiumSurfaceActive,
+        suspended: false,
         settings,
         kokoroModel,
         providerVoiceDirectories,
@@ -1701,30 +1186,12 @@ export function MainScreen() {
         onPreviewVoice: handlePreviewVoice,
         onStopPreviewVoice: stopPreviewVoice,
         onValidateProviderCapability: handleValidateProviderCapability,
-        isPremium: freeOffline.entitlement.isPremium,
-        developmentEntitlementMode:
-          freeOffline.entitlement.developmentEntitlementMode,
-        onSetDevelopmentEntitlementMode:
-          freeOffline.entitlement.setDevelopmentEntitlementMode,
-        onOpenPremium: (returnPage) => {
-          setSerializedSurfacePending(true);
-          runAfterSettingsDismiss(() => {
-            openPremium("settings", returnPage);
-            setSerializedSurfacePending(false);
-          });
-        },
         onOpenArchivedConversations: handleOpenArchivedConversations,
         onCreateAppDataBackup: handleCreateAppDataBackup,
         onRestoreAppDataBackup: handleRestoreAppDataBackup,
         conversationArchive,
-        storePromoLocalDevicePreview: premiumStorePromoActive,
         onClose: handleCloseSettings,
         onDismiss: handleSettingsDismiss,
-      }}
-      premiumUpgrade={{
-        visible: premiumModalVisible,
-        onClose: closePremium,
-        onDismiss: handlePremiumDismiss,
       }}
       conversationDrawer={{
         archivedRevealRequestId: drawerArchivedRevealRequestId,

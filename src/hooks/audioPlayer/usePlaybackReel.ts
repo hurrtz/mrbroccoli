@@ -338,7 +338,40 @@ export function usePlaybackReel({
     ],
   );
 
+  const restartReply = useCallback(async () => {
+    if (seekIntentRef.current || unitsRef.current.length === 0) {
+      return false;
+    }
+
+    seekIntentRef.current = true;
+    setSeeking(true);
+    try {
+      await restartPlayback();
+      generationRef.current = playbackGenerationRef.current;
+      const liveUnits = unitsRef.current;
+      if (liveUnits.length === 0) {
+        return false;
+      }
+      playingIndexRef.current = 0;
+      startedAtRef.current = Date.now();
+      floorRef.current = 0;
+      publishProgress(true);
+      liveUnits.forEach((unit, index) => play(unit, index));
+      return true;
+    } finally {
+      seekIntentRef.current = false;
+      setSeeking(false);
+    }
+  }, [
+    play,
+    playbackGenerationRef,
+    publishProgress,
+    restartPlayback,
+    seekIntentRef,
+  ]);
+
   return {
+    canRestartReply: paragraphCount > 0,
     canSeekParagraph: paragraphCount > 1,
     isSeeking,
     markDrained,
@@ -346,6 +379,7 @@ export function usePlaybackReel({
     readingProgressTiming,
     recordAudio,
     recordSpeech,
+    restartReply,
     seal,
     seekParagraph,
   };

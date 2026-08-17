@@ -58,8 +58,6 @@ function getModelCapabilityLabel(
   t: ReturnType<typeof useLocalization>["t"],
 ) {
   switch (model.capability) {
-    case "llm":
-      return t("settingsThinking");
     case "stt":
       return t("settingsListening");
     case "tts":
@@ -173,25 +171,21 @@ function getBackupFileName(encrypted: boolean) {
 export function DataPrivacySettingsPage({
   archivedConversationCount,
   conversationArchive,
-  isPremium,
   localModels,
   onCreateAppDataBackup,
   onOpenArchivedConversations,
-  onOpenPremium,
   onRestoreAppDataBackup,
   settings,
   onUpdate,
 }: {
   archivedConversationCount: number;
   conversationArchive: ConversationArchiveController;
-  isPremium: boolean;
   localModels: LocalModelSettingsController;
   onCreateAppDataBackup: () => Promise<AppDataBackupCreation>;
   onRestoreAppDataBackup: (
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
   onOpenArchivedConversations: () => void;
-  onOpenPremium: () => void;
   settings: Settings;
   onUpdate: (partial: Partial<Settings>) => void;
 }) {
@@ -581,8 +575,6 @@ export function DataPrivacySettingsPage({
   return (
     <View testID="data-privacy-settings-page" style={styles.sectionPageStack}>
       <ConversationKnowledgeGroup
-        isPremium={isPremium}
-        onOpenPremium={onOpenPremium}
         onUpdate={onUpdate}
         settings={settings}
       />
@@ -650,10 +642,8 @@ export function DataPrivacySettingsPage({
       <ArchiveSettingsSheet
         archivedConversationCount={archivedConversationCount}
         conversationArchive={conversationArchive}
-        isPremium={isPremium}
         onClose={() => setArchiveSheetVisible(false)}
         onOpenArchivedConversations={onOpenArchivedConversations}
-        onOpenPremium={onOpenPremium}
         visible={archiveSheetVisible}
       />
 

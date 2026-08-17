@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const ru = {
   ...conversationKnowledgeTranslations.ru,
   ...imagePromptTranslations.ru,
   ...onDeviceTranslations.ru,
-  ...onboardingTranslations.ru,
-  ...introTranslations.ru,
-  ...premiumTranslations.ru,
+  ...localSpeechTranslations.ru,
+  ...settingsTranslations.ru,
   ...transcriptEditTranslations.ru,
   ...workspaceTranslations.ru,
   ...sessionLockTranslations.ru,
-  ...autoSetupTranslations.ru,
   appName: "Мистер Брокколи",
   retry: "Повторить попытку",
   dismiss: "Закрыть",
@@ -40,7 +36,6 @@ export const ru = {
   settings: "Настройки",
   settingsReleaseVersion: ({ version }) => `Версия ${version}`,
   all: "Все",
-  firstRun: "Первый запуск",
   instructions: "Инструкции",
   providers: "Провайдеры",
   webSearch: "Веб-поиск",
@@ -212,10 +207,10 @@ export const ru = {
   createApiKey: "Учетные данные",
   apiKey: "Ключ API",
   aboutThisProvider: "Об этом провайдере",
-  openRouterOnboardingTitle: "Один ключ, несколько провайдеров",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Один ключ, несколько провайдеров",
+  openRouterGatewayDescription:
     "Создай отдельный ключ OpenRouter, вставь его ниже и используй закреплённые снапшот-версии моделей от нескольких провайдеров, не заменяя прямые подключения.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Путь запроса: это устройство → OpenRouter → выбранный вышестоящий провайдер",
   openRouterKeys: "Ключи OpenRouter",
   providerStatusInvalid: "Неверный",

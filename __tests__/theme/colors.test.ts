@@ -57,7 +57,7 @@ describe("theme colors", () => {
       phaseSpeaking: "#2E9E52",
       turnTrack: "#EFEEE9",
       turnInk: "#5D6B7A",
-      premium: "#8A6A12",
+      attention: "#8A6A12",
     });
   });
 
@@ -85,15 +85,15 @@ describe("theme colors", () => {
       phaseSpeaking: "#5DC17D",
       turnTrack: "#262B33",
       turnInk: "#8B97A8",
-      premium: "#C9A227",
+      attention: "#C9A227",
     });
   });
 
   it.each([
-    ["light gold dot on the canvas", lightColors.background, lightColors.premium],
-    ["light gold dot on a card", lightColors.surface, lightColors.premium],
-    ["dark gold dot on the canvas", darkColors.background, darkColors.premium],
-    ["dark gold dot on a card", darkColors.surface, darkColors.premium],
+    ["light attention ring on the canvas", lightColors.background, lightColors.attention],
+    ["light attention ring on a card", lightColors.surface, lightColors.attention],
+    ["dark attention ring on the canvas", darkColors.background, darkColors.attention],
+    ["dark attention ring on a card", darkColors.surface, darkColors.attention],
   ])(
     "keeps the %s above the 3:1 non-text floor",
     (_role, background, ink) => {

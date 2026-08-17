@@ -1,11 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import {
   Animated,
+  Modal as ReactNativeModal,
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
+import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { PhosphorIcon } from "../design-system/PhosphorIcon";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -16,7 +18,7 @@ import type { ToastTone } from "../types";
 interface ToastProps {
   message: string;
   visible: boolean;
-  /** Keep a pending workspace toast behind a focused sheet until it closes. */
+  /** @deprecated Toasts are always presented above focused native surfaces. */
   suspended?: boolean;
   onDismiss: () => void;
   onRetry?: () => void;
@@ -30,7 +32,6 @@ export function Toast({
   onDismiss,
   onRetry,
   duration = 4000,
-  suspended = false,
   tone = "info",
 }: ToastProps) {
   const { colors } = useTheme();
@@ -43,7 +44,7 @@ export function Toast({
     opacity.stopAnimation();
     translateY.stopAnimation();
 
-    const presented = visible && !suspended;
+    const presented = visible;
 
     if (presented) {
       Animated.parallel([
@@ -91,9 +92,9 @@ export function Toast({
       opacity.stopAnimation();
       translateY.stopAnimation();
     };
-  }, [duration, onDismiss, onRetry, opacity, suspended, translateY, visible]);
+  }, [duration, onDismiss, onRetry, opacity, translateY, visible]);
 
-  if (!visible || suspended) return null;
+  if (!visible) return null;
 
   const toneColor =
     tone === "danger"
@@ -109,77 +110,98 @@ export function Toast({
         : colors.accentSoft;
 
   return (
-    <Animated.View
-      testID="toast"
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.surfaceElevated,
-          borderColor: tone === "info" ? colors.border : toneColor,
-        },
-        { opacity, transform: [{ translateY }] },
-      ]}
+    <ReactNativeModal
+      animationType="none"
+      navigationBarTranslucent
+      onRequestClose={onDismiss}
+      statusBarTranslucent
+      supportedOrientations={APP_MODAL_ORIENTATIONS}
+      transparent
+      visible
     >
-      <View
-        testID="toast-icon"
-        style={[
-          styles.iconWrap,
-          { backgroundColor: toneBackground, borderColor: toneColor },
-        ]}
-      >
-        <PhosphorIcon
-          name={tone === "success" ? "check" : "exclamation-circle"}
-          size="compact"
-          color={toneColor}
-        />
-      </View>
-      <Text
-        accessibilityLiveRegion={tone === "danger" ? "assertive" : "polite"}
-        accessibilityRole="alert"
-        style={[styles.message, { color: colors.text }]}
-      >
-        {message}
-      </Text>
-      <View testID="toast-actions" style={styles.actions}>
-        {onRetry && (
-          <TouchableOpacity
+      <View pointerEvents="box-none" style={styles.overlay}>
+        <Animated.View
+          testID="toast"
+          style={[
+            styles.container,
+            {
+              backgroundColor: colors.surfaceElevated,
+              borderColor: tone === "info" ? colors.border : toneColor,
+            },
+            { opacity, transform: [{ translateY }] },
+          ]}
+        >
+          <View
+            testID="toast-icon"
             style={[
-              styles.retryButton,
+              styles.iconWrap,
               { backgroundColor: toneBackground, borderColor: toneColor },
             ]}
-            accessibilityRole="button"
-            accessibilityLabel={t("retry")}
-            onPress={() => {
-              onRetry();
-              onDismiss();
-            }}
           >
-            <Text style={[styles.retry, { color: toneColor }]}>
-              {t("retry")}
-            </Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          style={[
-            styles.dismissButton,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-          ]}
-          onPress={onDismiss}
-          accessibilityRole="button"
-          accessibilityLabel={t("dismiss")}
-        >
-          <PhosphorIcon
-            name="close"
-            size="compact"
-            color={colors.textSecondary}
-          />
-        </TouchableOpacity>
+            <PhosphorIcon
+              name={tone === "success" ? "check" : "exclamation-circle"}
+              size="compact"
+              color={toneColor}
+            />
+          </View>
+          <Text
+            accessibilityLiveRegion={
+              tone === "danger" ? "assertive" : "polite"
+            }
+            accessibilityRole="alert"
+            style={[styles.message, { color: colors.text }]}
+          >
+            {message}
+          </Text>
+          <View testID="toast-actions" style={styles.actions}>
+            {onRetry ? (
+              <TouchableOpacity
+                style={[
+                  styles.retryButton,
+                  { backgroundColor: toneBackground, borderColor: toneColor },
+                ]}
+                accessibilityRole="button"
+                accessibilityLabel={t("retry")}
+                onPress={() => {
+                  onRetry();
+                  onDismiss();
+                }}
+              >
+                <Text style={[styles.retry, { color: toneColor }]}>
+                  {t("retry")}
+                </Text>
+              </TouchableOpacity>
+            ) : null}
+            <TouchableOpacity
+              style={[
+                styles.dismissButton,
+                { backgroundColor: colors.surface, borderColor: colors.border },
+              ]}
+              onPress={onDismiss}
+              accessibilityRole="button"
+              accessibilityLabel={t("dismiss")}
+            >
+              <PhosphorIcon
+                name="close"
+                size="compact"
+                color={colors.textSecondary}
+              />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
       </View>
-    </Animated.View>
+    </ReactNativeModal>
   );
 }
 
 const styles = StyleSheet.create({
+  overlay: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
+  },
   container: {
     position: "absolute",
     top: 60,

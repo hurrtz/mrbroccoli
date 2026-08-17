@@ -1,7 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 import { renderHook, act, waitFor } from "@testing-library/react-native";
-import { MAX_RESPONSE_MODES } from "../../src/constants/providers/defaults";
 import { useSettings } from "../../src/hooks/useSettings";
 import {
   DEFAULT_SETTINGS,
@@ -54,7 +53,7 @@ describe("useSettings", () => {
     expect(result.current.settings).toEqual(DEFAULT_SETTINGS);
     expect(result.current.settings.showUsageStats).toBe(false);
     expect(result.current.settings.showDebugLogButton).toBe(false);
-    expect(result.current.settings.introDismissed).toBe(false);
+    expect(result.current.settings).not.toHaveProperty("introDismissed");
     expect(result.current.settings.ulraModeEnabled).toBe(true);
     expect(result.current.settings.ulraModeActive).toBe(false);
     expect(result.current.settings.ulraModeRounds).toBe(2);
@@ -89,7 +88,7 @@ describe("useSettings", () => {
     expect(result.current.settings.providerValidationResults).toEqual({});
   });
 
-  it("loads Drive Session and rejects unknown input modes", async () => {
+  it("migrates legacy Drive Session and rejects unknown input modes", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -99,7 +98,7 @@ describe("useSettings", () => {
     const driveSettings = renderHook(() => useSettings());
     await flushSettingsLoad();
     expect(driveSettings.result.current.settings.inputMode).toBe(
-      "drive-session",
+      "toggle-to-talk",
     );
     driveSettings.unmount();
 
@@ -217,7 +216,6 @@ describe("useSettings", () => {
 
   it("loads saved settings from AsyncStorage", async () => {
     const saved = { ...DEFAULT_SETTINGS, lastProvider: "anthropic" as const };
-    delete (saved as Partial<typeof saved>).introDismissed;
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify(saved),
     );
@@ -243,9 +241,7 @@ describe("useSettings", () => {
       gemini: "gemini-test-key",
       xai: "xai-test",
     });
-    // An install that already has provider keys has nothing to be introduced
-    // to, so the banner starts dismissed.
-    expect(result.current.settings.introDismissed).toBe(true);
+    expect(result.current.settings).not.toHaveProperty("introDismissed");
     expect(SecureStore.deleteItemAsync).toHaveBeenCalledWith(
       "mrbroccoli.provider_key.bytedance-doubao-seed",
     );
@@ -751,13 +747,6 @@ describe("useSettings", () => {
     ]);
   });
 
-  it("shows the intro banner on a brand-new install", async () => {
-    const { result } = renderHook(() => useSettings());
-    await flushSettingsLoad();
-
-    expect(result.current.settings.introDismissed).toBe(false);
-  });
-
   it.each(APP_LANGUAGES)(
     "persists registered app language %s with its registry defaults",
     async (language) => {
@@ -990,7 +979,7 @@ describe("useSettings", () => {
     });
   });
 
-  it("restores validated local model routes and speech selections", async () => {
+  it("migrates retired local response routes while preserving local speech selections", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -1017,12 +1006,15 @@ describe("useSettings", () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    expect(result.current.settings.responseModes[0].route).toEqual({
-      runtime: "local",
-      localModelId: "qwen3-0.6b-q8",
+    expect(result.current.settings.responseModes[0].route).toMatchObject({
       provider: "openai",
-      model: "Qwen3 0.6B",
     });
+    expect(result.current.settings.responseModes[0].route).not.toHaveProperty(
+      "runtime",
+    );
+    expect(result.current.settings.responseModes[0].route).not.toHaveProperty(
+      "localModelId",
+    );
     expect(result.current.settings.localLanguages).toEqual(["de"]);
     expect(result.current.settings.sttMode).toBe("local");
     expect(result.current.settings.localSttModelId).toBe("whisper-tiny");
@@ -1032,7 +1024,7 @@ describe("useSettings", () => {
     );
   });
 
-  it("restores validated Free onboarding preferences", async () => {
+  it("drops retired onboarding fields while preserving local speech preferences", async () => {
     (AsyncStorage.getItem as jest.Mock).mockResolvedValueOnce(
       JSON.stringify({
         ...DEFAULT_SETTINGS,
@@ -1052,20 +1044,19 @@ describe("useSettings", () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
 
-    expect(result.current.settings.freeOnboardingLanguageInitialized).toBe(
-      true,
-    );
-    expect(result.current.settings.freeOfflineSetupCompleted).toBe(true);
     expect(result.current.settings.nativeSttRequiresOnDevice).toBe(true);
     expect(result.current.settings.nativeTtsVoiceId).toBe(
       "com.apple.voice.samantha",
     );
-    expect(result.current.settings.freeOfflineProfileOverrides).toEqual({
-      quickLlmModelId: "qwen3-0.6b-q8",
-      thoroughLlmModelId: null,
-      sttModelId: null,
-      ttsModelId: "piper-de-de-thorsten",
-    });
+    expect(result.current.settings).not.toHaveProperty(
+      "freeOnboardingLanguageInitialized",
+    );
+    expect(result.current.settings).not.toHaveProperty(
+      "freeOfflineSetupCompleted",
+    );
+    expect(result.current.settings).not.toHaveProperty(
+      "freeOfflineProfileOverrides",
+    );
   });
 
   it("does not retain local STT mode without a valid downloaded-model selection", async () => {
@@ -1307,21 +1298,22 @@ describe("useSettings", () => {
     expect(result.current.settings.webSearchMode).toBe("off");
   });
 
-  it("adds response modes up to the shared limit and selects the new mode", async () => {
+  it("keeps adding response modes beyond the former four-route limit", async () => {
     const { result } = renderHook(() => useSettings());
     await flushSettingsLoad();
+    const initialCount = result.current.settings.responseModes.length;
 
-    for (let index = 0; index <= MAX_RESPONSE_MODES; index += 1) {
+    for (let index = 0; index < 6; index += 1) {
       await act(async () => {
         result.current.addResponseMode();
       });
     }
 
     expect(result.current.settings.responseModes).toHaveLength(
-      MAX_RESPONSE_MODES,
+      initialCount + 6,
     );
     const finalMode = result.current.settings.responseModes.at(-1);
-    expect(finalMode?.id).toBe(`mode-${MAX_RESPONSE_MODES}`);
+    expect(finalMode?.id).toBe(`mode-${initialCount + 6}`);
     expect(result.current.settings.activeResponseMode).toBe(finalMode?.id);
   });
 

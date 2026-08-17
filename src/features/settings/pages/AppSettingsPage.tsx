@@ -1,8 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { AutoSetupCard } from "../../../components/autoSetup/AutoSetupCard";
-import type { AutoSetupJobState } from "../../../components/autoSetup/types";
 import { getTtsListenLanguageLabel } from "../../../constants/localTts";
 import { PROVIDER_LABELS } from "../../../constants/models";
 import { Modal } from "../../../design-system/NativeControls";
@@ -10,7 +8,6 @@ import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import { useRuntimeCapabilityOverrides } from "../../../hooks/useRuntimeCapabilityOverrides";
 import { useLocalization } from "../../../i18n";
 import { APP_LANGUAGE_OPTIONS } from "../../../i18n/localeRegistry";
-import type { DevelopmentEntitlementMode } from "../../../services/developmentEntitlement";
 import { clearRuntimeCapabilityOverrides } from "../../../services/runtimeCapabilityOverrides";
 import {
   clearSpeechDiagnostics,
@@ -154,18 +151,10 @@ function SpeechDiagnosticRow({
 }
 
 export function AppSettingsPage({
-  autoSetup,
-  developmentEntitlementMode,
-  onSetDevelopmentEntitlementMode,
   onUpdate,
   settings,
   speechDiagnostics,
 }: {
-  autoSetup: AutoSetupJobState;
-  developmentEntitlementMode: DevelopmentEntitlementMode | null;
-  onSetDevelopmentEntitlementMode: (
-    mode: DevelopmentEntitlementMode,
-  ) => Promise<void>;
   onUpdate: (
     partial: Partial<Omit<Settings, "apiKeys" | "providerModels">>,
   ) => void;
@@ -192,21 +181,6 @@ export function AppSettingsPage({
       testID={`app-settings-page-${language}`}
       style={styles.sectionPageStack}
     >
-      <SettingsGroup
-        testID="automatic-setup-group"
-        title={t("automaticSetup")}
-        footer={t("autoSetupBody")}
-      >
-        <View style={pageStyles.autoSetupInset}>
-          <AutoSetupCard
-            job={autoSetup}
-            showHeader={false}
-            style={pageStyles.autoSetupCard}
-            t={t}
-          />
-        </View>
-      </SettingsGroup>
-
       <SettingsGroup title={t("appearance")}>
         <SettingsChoiceRow<ThemeMode>
           testID="app-theme"
@@ -228,18 +202,6 @@ export function AppSettingsPage({
       </SettingsGroup>
 
       <SettingsGroup title={t("homeScreen")}>
-        <SettingsRow
-          icon="info-circle"
-          label={t("introBannerSetting")}
-          control={
-            <Switch
-              testID="settings-intro-banner"
-              label={t("introBannerSetting")}
-              value={!settings.introDismissed}
-              onChange={(visible) => onUpdate({ introDismissed: !visible })}
-            />
-          }
-        />
         <SettingsRow
           icon="line-chart"
           label={t("usageStatsInTranscripts")}
@@ -290,22 +252,6 @@ export function AppSettingsPage({
           onPress={() => setRuntimeSheetVisible(true)}
         />
       </SettingsGroup>
-
-      {developmentEntitlementMode ? (
-        <SettingsGroup title={t("developmentEntitlement")}>
-          <SettingsChoiceRow<DevelopmentEntitlementMode>
-            testID="development-entitlement-mode"
-            label={t("developmentEntitlement")}
-            last
-            options={[
-              { value: "free", label: t("freeEdition") },
-              { value: "premium", label: t("premium") },
-            ]}
-            value={developmentEntitlementMode}
-            onChange={(mode) => void onSetDevelopmentEntitlementMode(mode)}
-          />
-        </SettingsGroup>
-      ) : null}
 
       <SettingsSheet
         testID="speech-diagnostics-sheet"
@@ -459,14 +405,6 @@ export function AppSettingsPage({
 }
 
 const pageStyles = StyleSheet.create({
-  autoSetupInset: {
-    paddingHorizontal: 12,
-    paddingVertical: 12,
-  },
-  autoSetupCard: {
-    padding: 6,
-    borderWidth: 0,
-  },
   diagnosticRow: {
     minHeight: 72,
     paddingHorizontal: 14,

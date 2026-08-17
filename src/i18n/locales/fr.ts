@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const fr = {
   ...conversationKnowledgeTranslations.fr,
   ...imagePromptTranslations.fr,
   ...onDeviceTranslations.fr,
-  ...onboardingTranslations.fr,
-  ...introTranslations.fr,
-  ...premiumTranslations.fr,
+  ...localSpeechTranslations.fr,
+  ...settingsTranslations.fr,
   ...transcriptEditTranslations.fr,
   ...workspaceTranslations.fr,
   ...sessionLockTranslations.fr,
-  ...autoSetupTranslations.fr,
   appName: "M. Brocoli",
   retry: "Réessayer",
   dismiss: "Fermer",
@@ -40,7 +36,6 @@ export const fr = {
   settings: "Paramètres",
   settingsReleaseVersion: ({ version }) => `Version ${version}`,
   all: "Tous",
-  firstRun: "Premier lancement",
   instructions: "Instructions",
   providers: "Fournisseurs",
   webSearch: "Recherche sur le Web",
@@ -211,10 +206,10 @@ export const fr = {
   createApiKey: "Informations d'identification",
   apiKey: "Clé API",
   aboutThisProvider: "À propos de ce fournisseur",
-  openRouterOnboardingTitle: "Une clé, plusieurs fournisseurs",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Une clé, plusieurs fournisseurs",
+  openRouterGatewayDescription:
     "Crée une clé OpenRouter dédiée, colle-la ci-dessous et utilise des modèles basés sur des instantanés de plusieurs fournisseurs sans remplacer aucune connexion directe.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Chemin de requête : cet appareil → OpenRouter → fournisseur en amont sélectionné",
   openRouterKeys: "Clés OpenRouter",
   providerStatusInvalid: "Invalide",

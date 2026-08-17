@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: On-device local thinking and listening baseline
+name: On-device speech recognition baseline
 tags:
   - runtime
   - on-device
@@ -11,37 +11,6 @@ tags:
       all: allow
 - tapOn:
     id: "main-settings-button"
-- scrollUntilVisible:
-    element:
-      id: "settings-overview-row-thinking"
-    direction: DOWN
-- tapOn:
-    id: "settings-overview-row-thinking"
-- assertVisible:
-    id: "settings-page-thinking"
-- tapOn:
-    id: "thinking-add-model"
-- assertVisible:
-    id: "thinking-add-sheet"
-- scrollUntilVisible:
-    element:
-      id: "local-model-download-qwen3-0.6b-q8"
-    direction: DOWN
-- tapOn:
-    id: "local-model-download-qwen3-0.6b-q8"
-- extendedWaitUntil:
-    visible:
-      id: "local-model-test-qwen3-0.6b-q8"
-    timeout: 240000
-- tapOn:
-    id: "local-model-test-qwen3-0.6b-q8"
-- extendedWaitUntil:
-    visible:
-      id: "local-model-viable-qwen3-0.6b-q8"
-    timeout: 180000
-- tapOn: "Dismiss"
-- tapOn:
-    id: "settings-back-button"
 - scrollUntilVisible:
     element:
       id: "settings-overview-row-listening"

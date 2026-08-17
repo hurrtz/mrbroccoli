@@ -13,7 +13,7 @@ describe("statusSelectors", () => {
           holdToSpeak: "Hold to speak",
           idle: "Idle",
           messageCount: `${params?.count} messages`,
-        }[key] ?? key),
+        })[key] ?? key,
       ttsProviderLabel: "OpenAI",
       visualPhase: "idle",
     });
@@ -37,7 +37,7 @@ describe("statusSelectors", () => {
           freshSession: "Fresh session",
           tapToSpeak: "Tap to speak",
           idle: "Idle",
-        }[key] ?? key),
+        })[key] ?? key,
       ttsProviderLabel: "OpenAI",
       visualPhase: "idle",
     });
@@ -56,7 +56,7 @@ describe("statusSelectors", () => {
           listening: "Listening",
           listeningToYourVoice: "Listening to your voice",
           tapAgainToSend: "Tap again to send",
-        }[key] ?? key),
+        })[key] ?? key,
       ttsProviderLabel: "OpenAI",
       visualPhase: "recording",
     });
@@ -76,7 +76,7 @@ describe("statusSelectors", () => {
           keepPressing: "Keep pressing",
           listening: "Listening",
           listeningToYourVoice: "Listening to your voice",
-        }[key] ?? key),
+        })[key] ?? key,
       ttsProviderLabel: "OpenAI",
       visualPhase: "recording",
     });
@@ -84,7 +84,7 @@ describe("statusSelectors", () => {
     expect(status.actionLabel).toBe("Keep pressing");
   });
 
-  it("uses the same simple pause and send actions in Drive Session", () => {
+  it("uses the same simple pause and send actions in tap-to-talk", () => {
     const t = (key: string) =>
       ({
         pause: "Pause",
@@ -93,7 +93,7 @@ describe("statusSelectors", () => {
 
     expect(
       getStatusDisplayData({
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         messageCount: 0,
         pipelinePhase: "speaking",
         providerLabel: "OpenAI",
@@ -105,7 +105,7 @@ describe("statusSelectors", () => {
 
     expect(
       getStatusDisplayData({
-        inputMode: "drive-session",
+        inputMode: "toggle-to-talk",
         messageCount: 0,
         pipelinePhase: "idle",
         providerLabel: "OpenAI",
@@ -137,5 +137,4 @@ describe("statusSelectors", () => {
     expect(status.statusTitle).toBe("Thinking");
     expect(status.statusDetail).toBe("Preparing your request");
   });
-
 });

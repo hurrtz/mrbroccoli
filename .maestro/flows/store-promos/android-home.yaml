@@ -1,0 +1,30 @@
+appId: ${APP_ID}
+name: Google Play voice conversation screenshots
+tags:
+  - store-promos
+  - android
+---
+- assertVisible:
+    id: store-promo-fixture-ready-conversation
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: voice-stage-thinking
+- assertVisible:
+    id: transcript-handle
+- takeScreenshot:
+    path: 01-voice-first-conversation
+- tapOn:
+    id: transcript-handle
+- assertVisible:
+    id: chat-transcript-list
+- assertVisible:
+    id: transcript-message-promo-user-1
+- assertVisible:
+    id: transcript-message-promo-assistant-2
+- takeScreenshot:
+    path: 02-complete-transcript
+- stopApp

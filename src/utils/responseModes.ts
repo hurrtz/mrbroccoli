@@ -5,7 +5,6 @@ import {
 } from "../constants/models";
 import {
   DEFAULT_RESPONSE_MODE_COUNT,
-  MAX_RESPONSE_MODES,
   createResponseModeId,
 } from "../constants/providers/defaults";
 import {
@@ -60,22 +59,17 @@ export function getResponseModeIds(
 
 export function getNextResponseModeId(modes: ResponseModeSelections) {
   const existingIds = new Set(getResponseModeIds(modes));
-
-  for (let index = 0; index < MAX_RESPONSE_MODES; index += 1) {
+  let index = 0;
+  while (true) {
     const id = createResponseModeId(index);
-
     if (!existingIds.has(id)) {
       return id;
     }
+    index += 1;
   }
-
-  return createResponseModeId(modes.length);
 }
 
 function getResponseModeRouteIdentity(route: ResponseModeRoute) {
-  if (route.runtime === "local" && route.localModelId) {
-    return `local\u0000${route.localModelId}`;
-  }
   return `${route.provider}\u0000${route.model}\u0000${route.effort ?? ""}`;
 }
 
@@ -183,13 +177,12 @@ export function isResponseModeReady(
   }
 
   return (
-    (route.runtime === "local" && Boolean(route.localModelId)) ||
-    (route.model.trim().length > 0 &&
-      hasProviderCredentialForCapability(
-        route.provider,
-        settings.apiKeys[route.provider],
-        "llm",
-      ))
+    route.model.trim().length > 0 &&
+    hasProviderCredentialForCapability(
+      route.provider,
+      settings.apiKeys[route.provider],
+      "llm",
+    )
   );
 }
 
@@ -243,20 +236,12 @@ export function getProviderValidationModel(
 
   const activeRoute = getResponseModeRoute(settings);
 
-  if (
-    activeRoute?.runtime !== "local" &&
-    activeRoute?.provider === provider &&
-    activeRoute.model.trim()
-  ) {
+  if (activeRoute?.provider === provider && activeRoute.model.trim()) {
     return activeRoute.model;
   }
 
   for (const { route } of settings.responseModes) {
-    if (
-      route.runtime !== "local" &&
-      route.provider === provider &&
-      route.model.trim()
-    ) {
+    if (route.provider === provider && route.model.trim()) {
       return route.model;
     }
   }

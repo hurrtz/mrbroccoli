@@ -11,7 +11,6 @@ import type { Provider, Settings } from "../../../types";
 import { formatBytes } from "../../../utils/formatBytes";
 
 import { IconAction } from "./IconAction";
-import { PremiumBand } from "./PremiumBand";
 import { RouteOptionRow } from "./RouteOptionRow";
 import { SettingsChoiceRow } from "./SettingsChoiceRow";
 import { SettingsGroup } from "./SettingsGroup";
@@ -143,33 +142,26 @@ export function isLocalModelViable(
 ) {
   return (
     localModels.installs[model.id]?.verified === true &&
-    localModels.benchmarks[model.id]?.status === "viable"
+    localModels.benchmarks[model.id]?.status !== "failed" &&
+    localModels.benchmarks[model.id] !== undefined
   );
 }
 
 export function LocalModelRouteGroup({
   capability,
   footer,
-  freeProviderRoutes,
-  isPremium,
   localSub,
   localModels,
   nativeSub,
-  onOpenPremium,
-  premiumCopy,
   providerRoutes,
   settings,
   title,
 }: {
   capability: Extract<LocalModelCapability, "stt" | "tts">;
   footer: string;
-  freeProviderRoutes: readonly Provider[];
-  isPremium: boolean;
   localSub?: (model: LocalModelDefinition) => React.ReactNode;
   localModels: LocalModelSettingsController;
   nativeSub?: React.ReactNode;
-  onOpenPremium: () => void;
-  premiumCopy: string;
   providerRoutes: readonly ProviderRouteOption[];
   settings: Settings;
   title: string;
@@ -185,70 +177,16 @@ export function LocalModelRouteGroup({
   const nativeDisabled =
     capability === "stt" &&
     localModels.nativeSpeechCapabilities?.nativeSttEligible !== true;
-  const visibleProviderRoutes: readonly ProviderRouteOption[] = isPremium
-    ? providerRoutes
-    : freeProviderRoutes.map((provider) => ({
-        model: "",
-        onSelect: () => undefined,
-        provider,
-        selected: false,
-      }));
-  const finalRowCount = 1 + models.length + visibleProviderRoutes.length;
+  const finalRowCount = 1 + models.length + providerRoutes.length;
   let rowIndex = 0;
 
   return (
     <SettingsGroup title={title} footer={footer}>
-      <RouteOptionRow
-        testID={`settings-${capability}-route-native`}
-        disabled={nativeDisabled}
-        label={capability === "stt" ? t("appNative") : t("systemVoice")}
-        description={
-          capability === "stt"
-            ? t("nativeSttDescription")
-            : t("nativeTtsDescription")
-        }
-        selected={nativeSelected}
-        onSelect={() => localModels.selectNativeRoute(capability)}
-        sub={nativeSelected ? nativeSub : null}
-        last={++rowIndex === finalRowCount && isPremium}
-      />
-      {models.map((model) => {
-        const install = localModels.installs[model.id];
-        const viable = isLocalModelViable(model, localModels);
-        const modelBusy = localModels.busy?.modelId === model.id;
-        return (
-          <RouteOptionRow
-            key={model.id}
-            testID={`settings-${capability}-route-${model.id}`}
-            action={
-              <LocalModelAction localModels={localModels} model={model} />
-            }
-            disabled={!viable || modelBusy}
-            error={Boolean(localModels.errors?.[model.id])}
-            label={model.name}
-            meta={getLocalModelMeta(model, localModels, t)}
-            metaTestID={
-              viable ? `local-model-viable-${model.id}` : undefined
-            }
-            selected={localModels.isModelSelected(model)}
-            onRemove={
-              install?.verified && !modelBusy
-                ? () => void localModels.removeModel(model)
-                : undefined
-            }
-            onSelect={() => localModels.selectModel(model)}
-            removeLabel={`${t("remove")}: ${model.name}`}
-            sub={localModels.isModelSelected(model) ? localSub?.(model) : null}
-            last={++rowIndex === finalRowCount && isPremium}
-          />
-        );
-      })}
-      {visibleProviderRoutes.map((route) => (
+      {providerRoutes.map((route) => (
         <RouteOptionRow
           key={route.provider}
           testID={`settings-${capability}-route-provider-${route.provider}`}
           label={PROVIDER_LABELS[route.provider]}
-          locked={!isPremium}
           description={
             route.model
               ? undefined
@@ -285,17 +223,54 @@ export function LocalModelRouteGroup({
               </>
             ) : null
           }
-          last={++rowIndex === finalRowCount && isPremium}
+          last={++rowIndex === finalRowCount}
         />
       ))}
-      {!isPremium ? (
-        <PremiumBand
-          actionLabel={t("upgradeToPremium")}
-          copy={premiumCopy}
-          onPress={onOpenPremium}
-          premiumLabel={t("premium")}
-        />
-      ) : null}
+      <RouteOptionRow
+        testID={`settings-${capability}-route-native`}
+        disabled={nativeDisabled}
+        label={capability === "stt" ? t("appNative") : t("systemVoice")}
+        description={
+          capability === "stt"
+            ? t("nativeSttDescription")
+            : t("nativeTtsDescription")
+        }
+        selected={nativeSelected}
+        onSelect={() => localModels.selectNativeRoute(capability)}
+        sub={nativeSelected ? nativeSub : null}
+        last={++rowIndex === finalRowCount}
+      />
+      {models.map((model) => {
+        const install = localModels.installs[model.id];
+        const viable = isLocalModelViable(model, localModels);
+        const modelBusy = localModels.busy?.modelId === model.id;
+        return (
+          <RouteOptionRow
+            key={model.id}
+            testID={`settings-${capability}-route-${model.id}`}
+            action={
+              <LocalModelAction localModels={localModels} model={model} />
+            }
+            disabled={!viable || modelBusy}
+            error={Boolean(localModels.errors?.[model.id])}
+            label={model.name}
+            meta={getLocalModelMeta(model, localModels, t)}
+            metaTestID={
+              viable ? `local-model-viable-${model.id}` : undefined
+            }
+            selected={localModels.isModelSelected(model)}
+            onRemove={
+              install?.verified && !modelBusy
+                ? () => void localModels.removeModel(model)
+                : undefined
+            }
+            onSelect={() => localModels.selectModel(model)}
+            removeLabel={`${t("remove")}: ${model.name}`}
+            sub={localModels.isModelSelected(model) ? localSub?.(model) : null}
+            last={++rowIndex === finalRowCount}
+          />
+        );
+      })}
     </SettingsGroup>
   );
 }

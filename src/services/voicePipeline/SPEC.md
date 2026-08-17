@@ -58,7 +58,7 @@ during a long request affect the next turn, not the request already executing.
 4. Optionally retrieve source-labelled past-conversation excerpts.
 5. Decide and optionally perform web search.
 6. Optionally run Model Council private contributions and review rounds.
-7. Stream the final local or hosted response through the context-leak guard.
+7. Stream the final provider response through the context-leak guard.
 8. Queue complete paragraphs or the completed answer for optional speech.
 9. Persist the final assistant response, route metadata, usage, and turn
    receipt through callbacks.
@@ -84,10 +84,6 @@ is deleted.
 Active-conversation compaction starts when estimated content exceeds 2,400
 tokens or an existing summary is active. The recent window targets 1,400 tokens
 while retaining at least six and at most ten messages when available.
-
-Local LLM turns skip summary generation because it would require another hosted
-request and break the offline contract. They may use an existing summary and
-local past-conversation retrieval.
 
 Historical knowledge excludes the current conversation, explicit family IDs,
 locked sessions, and other caller-ineligible sources. It is kept separate from

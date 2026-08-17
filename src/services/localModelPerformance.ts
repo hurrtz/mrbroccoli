@@ -16,7 +16,7 @@ export type LocalModelPerformanceEvidence =
   "measured" | "calibrated" | "requirements";
 
 export interface LocalModelPerformanceEstimate {
-  kind: "tokens-per-second" | "realtime-factor";
+  kind: "realtime-factor";
   value: number;
   lowerBound?: number;
   upperBound?: number;
@@ -73,19 +73,7 @@ function measuredPerformance(
   model: LocalModelDefinition,
   benchmark: LocalModelBenchmarkResult,
 ): LocalModelPerformanceEstimate | undefined {
-  if (
-    model.capability === "llm" &&
-    typeof benchmark.tokensPerSecond === "number"
-  ) {
-    return {
-      kind: "tokens-per-second",
-      value: benchmark.tokensPerSecond,
-    };
-  }
-  if (
-    model.capability !== "llm" &&
-    typeof benchmark.realtimeFactor === "number"
-  ) {
+  if (typeof benchmark.realtimeFactor === "number") {
     return {
       kind: "realtime-factor",
       value: benchmark.realtimeFactor,
@@ -108,11 +96,7 @@ function comparableReference(
       ) {
         return false;
       }
-      if (
-        model.capability !== "llm" &&
-        candidate.capability !== "llm" &&
-        candidate.sherpaModelType !== model.sherpaModelType
-      ) {
+      if (candidate.sherpaModelType !== model.sherpaModelType) {
         return false;
       }
       const benchmark = benchmarks[candidate.id];
@@ -144,10 +128,7 @@ function calibratedPerformance(params: {
   const sizeRatio =
     params.reference.installedBytes / Math.max(1, params.model.installedBytes);
   const scale = Math.pow(sizeRatio, 0.7);
-  const value =
-    referencePerformance.kind === "tokens-per-second"
-      ? referencePerformance.value * scale
-      : referencePerformance.value / scale;
+  const value = referencePerformance.value / scale;
   return {
     kind: referencePerformance.kind,
     value,
@@ -168,19 +149,6 @@ function fitFromCalibratedPerformance(
   ) {
     return fallback;
   }
-  if (performance.kind === "tokens-per-second") {
-    const target = model.benchmark.minimumTokensPerSecond ?? 0;
-    if (performance.lowerBound >= target) {
-      return "strong" as const;
-    }
-    if (performance.value >= target) {
-      return "likely" as const;
-    }
-    return performance.upperBound >= target
-      ? ("close" as const)
-      : ("not-recommended" as const);
-  }
-
   const target = model.benchmark.maximumRealtimeFactor ?? Infinity;
   if (performance.upperBound <= target) {
     return "strong" as const;

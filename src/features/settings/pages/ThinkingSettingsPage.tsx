@@ -1,10 +1,7 @@
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import {
-  MAX_RESPONSE_MODES,
-  MIN_RESPONSE_MODES,
-} from "../../../constants/providers/defaults";
+import { MIN_RESPONSE_MODES } from "../../../constants/providers/defaults";
 import { PROVIDER_LABELS } from "../../../constants/models";
 import { Input } from "../../../design-system/NativeControls";
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
@@ -30,19 +27,12 @@ import {
   getDefaultModelForProvider,
   getProviderLlmModelOptions,
 } from "../../../utils/responseModes";
-import type { LocalModelSettingsController } from "../../settings-core/useLocalModelSettings";
 import type { TextInputFocusHandler } from "../../settings-core/types";
 import {
   getResponseLengthOptions,
   getResponseToneOptions,
 } from "../../settings-core/helpers";
 
-import {
-  LocalModelAction,
-  getLocalModelMeta,
-  isLocalModelViable,
-} from "../settings-primitives/LocalModelRouteGroup";
-import { PremiumBand } from "../settings-primitives/PremiumBand";
 import { RouteOptionRow } from "../settings-primitives/RouteOptionRow";
 import { SettingsGroup } from "../settings-primitives/SettingsGroup";
 import { SettingsChoiceRow } from "../settings-primitives/SettingsChoiceRow";
@@ -58,9 +48,6 @@ type ThinkingSheet =
   | { kind: "council" }
   | { kind: "prompt" }
   | null;
-type CompatibleLocalModel =
-  LocalModelSettingsController["compatibleModels"][number];
-type CompatibleLocalLlm = Extract<CompatibleLocalModel, { capability: "llm" }>;
 
 function modeLabel(mode: ResponseModeConfig) {
   return mode.route.model;
@@ -133,9 +120,6 @@ function EffortChips({
 }) {
   const { colors } = useTheme();
   const { language, t } = useLocalization();
-  if (mode.route.runtime === "local") {
-    return null;
-  }
   const options = getModelEffortOptions(mode.route.provider, mode.route.model);
   if (!options.length) {
     return null;
@@ -197,151 +181,48 @@ function EffortChips({
   );
 }
 
-function LocalLlmRows({
-  currentMode,
-  isPremium,
-  localModels,
-  onChoose,
-}: {
-  currentMode?: ResponseModeConfig;
-  isPremium: boolean;
-  localModels: LocalModelSettingsController;
-  onChoose: (model: CompatibleLocalLlm) => void;
-}) {
-  const { t } = useLocalization();
-  const candidates = localModels.compatibleModels.filter(
-    (model): model is CompatibleLocalLlm => {
-      if (model.capability !== "llm") {
-        return false;
-      }
-      if (
-        isPremium ||
-        !currentMode?.route.localModelId ||
-        currentMode.route.runtime !== "local"
-      ) {
-        return true;
-      }
-      const current = localModels.compatibleModels.find(
-        (candidate) => candidate.id === currentMode.route.localModelId,
-      );
-      return (
-        current?.capability === "llm" &&
-        current.responseProfile === model.responseProfile
-      );
-    },
-  );
-
-  return (
-    <SettingsGroup
-      testID="thinking-local-models"
-      title={t("onDeviceThinkingModels")}
-      footer={localModels.probeError ?? t("onDevicePerformanceCaution")}
-    >
-      {candidates.map((model, index) => {
-        const busy = localModels.busy?.modelId === model.id;
-        const installed = localModels.installs[model.id]?.verified === true;
-        return (
-          <RouteOptionRow
-            key={model.id}
-            testID={`thinking-local-model-${model.id}`}
-            action={
-              <LocalModelAction localModels={localModels} model={model} />
-            }
-            disabled={!isLocalModelViable(model, localModels) || busy}
-            error={Boolean(localModels.errors?.[model.id])}
-            label={model.name}
-            last={index === candidates.length - 1}
-            meta={getLocalModelMeta(model, localModels, t)}
-            metaTestID={
-              isLocalModelViable(model, localModels)
-                ? `local-model-viable-${model.id}`
-                : undefined
-            }
-            onRemove={
-              installed && !busy
-                ? () => void localModels.removeModel(model)
-                : undefined
-            }
-            onSelect={() => onChoose(model)}
-            removeLabel={`${t("remove")}: ${model.name}`}
-            selected={currentMode?.route.localModelId === model.id}
-          />
-        );
-      })}
-    </SettingsGroup>
-  );
-}
-
 function ProviderRows({
-  allProviders,
-  isPremium,
   onChoose,
-  onOpenPremium,
   selectableProviders,
   selectedProvider,
 }: {
-  allProviders: readonly Provider[];
-  isPremium: boolean;
   onChoose: (provider: Provider) => void;
-  onOpenPremium: () => void;
   selectableProviders: readonly Provider[];
   selectedProvider?: Provider;
 }) {
   const { t } = useLocalization();
-  const providers = isPremium ? selectableProviders : allProviders;
   return (
     <SettingsGroup
       testID="thinking-provider-routes"
       title={t("provider")}
-      footer={
-        isPremium
-          ? t("responseModesNoConfiguredProviders")
-          : t("premiumDescription")
-      }
+      footer={t("responseModesNoConfiguredProviders")}
     >
-      {providers.map((provider, index) => (
+      {selectableProviders.map((provider, index) => (
         <RouteOptionRow
           key={provider}
           testID={`thinking-provider-${provider}`}
           label={PROVIDER_LABELS[provider]}
-          locked={!isPremium}
-          last={index === providers.length - 1 && isPremium}
+          last={index === selectableProviders.length - 1}
           meta={t("provider")}
           onSelect={() => onChoose(provider)}
           selected={selectedProvider === provider}
         />
       ))}
-      {!isPremium ? (
-        <PremiumBand
-          actionLabel={t("upgradeToPremium")}
-          copy={t("premiumBenefitProviders")}
-          onPress={onOpenPremium}
-          premiumLabel={t("premium")}
-        />
-      ) : null}
     </SettingsGroup>
   );
 }
 
 export function ThinkingSettingsPage({
-  allLlmProviders,
-  isPremium,
   llmProviders,
-  localModels,
   onAddResponseMode,
-  onOpenPremium,
   onRemoveResponseMode,
   onTextInputFocus,
   onUpdate,
   onUpdateResponseModeRoute,
   settings,
 }: {
-  allLlmProviders: Provider[];
-  isPremium: boolean;
   llmProviders: Provider[];
-  localModels: LocalModelSettingsController;
   onAddResponseMode: () => void;
-  onOpenPremium: () => void;
   onRemoveResponseMode: (mode: ResponseMode) => void;
   onTextInputFocus?: TextInputFocusHandler;
   onUpdate: (
@@ -357,47 +238,16 @@ export function ThinkingSettingsPage({
   const { language, t } = useLocalization();
   useRuntimeCapabilityOverrides();
   const [sheet, setSheet] = React.useState<ThinkingSheet>(null);
-  const pendingPremiumAfterSheetRef = React.useRef(false);
-  const handleSheetDismiss = React.useCallback(() => {
-    if (!pendingPremiumAfterSheetRef.current) {
-      return;
-    }
-    pendingPremiumAfterSheetRef.current = false;
-    onOpenPremium();
-  }, [onOpenPremium]);
-  const openPremiumAfterSheetDismiss = React.useCallback(() => {
-    pendingPremiumAfterSheetRef.current = true;
-    setSheet(null);
-  }, []);
-  React.useEffect(() => {
-    if (sheet !== null || !pendingPremiumAfterSheetRef.current) {
-      return;
-    }
-    // SettingsSheet.onDismiss is iOS-only in React Native. Android gets the
-    // same consumed-ref fallback before the parent Settings modal is closed.
-    const timer = setTimeout(handleSheetDismiss, 350);
-    return () => clearTimeout(timer);
-  }, [handleSheetDismiss, sheet]);
   const pendingProviderAdd = React.useRef<{
     ids: Set<ResponseMode>;
     route: ResponseModeRoute;
   } | null>(null);
-  const visibleModes = React.useMemo(
-    () =>
-      isPremium
-        ? settings.responseModes
-        : settings.responseModes.filter(
-            ({ route }) =>
-              route.runtime === "local" && Boolean(route.localModelId),
-          ),
-    [isPremium, settings.responseModes],
-  );
+  const visibleModes = settings.responseModes;
   const currentMode =
     sheet?.kind === "slot"
       ? settings.responseModes.find(({ id }) => id === sheet.modeId)
       : undefined;
   const readyModelCount = getAvailableResponseModes(settings).length;
-  const canAdd = visibleModes.length < MAX_RESPONSE_MODES;
   const canRemove = visibleModes.length > MIN_RESPONSE_MODES;
   const responseLengthOptions = React.useMemo(
     () =>
@@ -437,9 +287,6 @@ export function ThinkingSettingsPage({
   }, [currentMode, sheet]);
 
   const addProviderRoute = (provider: Provider) => {
-    if (settings.responseModes.length >= MAX_RESPONSE_MODES) {
-      return;
-    }
     pendingProviderAdd.current = {
       ids: new Set(settings.responseModes.map(({ id }) => id)),
       route: normalizeResponseModeRouteEffort({
@@ -450,29 +297,10 @@ export function ThinkingSettingsPage({
     onAddResponseMode();
   };
 
-  const chooseLocalModel = (model: CompatibleLocalLlm) => {
-    if (currentMode && isPremium) {
-      onUpdateResponseModeRoute(currentMode.id, {
-        runtime: "local",
-        localModelId: model.id,
-        provider: settings.lastProvider,
-        model: model.name,
-      });
-    } else {
-      localModels.selectModel(model);
-    }
-    setSheet(null);
-  };
-
   const slotMeta = (mode: ResponseModeConfig) => {
     const route = mode.route;
     const effort = getResponseModeRouteEffortLabel(route, language);
-    return [
-      route.runtime === "local"
-        ? t("settingsOnDevice")
-        : PROVIDER_LABELS[route.provider],
-      effort,
-    ]
+    return [PROVIDER_LABELS[route.provider], effort]
       .filter(Boolean)
       .join(" · ");
   };
@@ -495,7 +323,7 @@ export function ThinkingSettingsPage({
           <AnsweringModelRow
             key={mode.id}
             index={index + 1}
-            last={!canAdd && index === visibleModes.length - 1}
+            last={false}
             meta={slotMeta(mode)}
             mode={mode}
             onPress={() =>
@@ -503,17 +331,15 @@ export function ThinkingSettingsPage({
             }
           />
         ))}
-        {canAdd ? (
-          <SettingsRow
-            testID="thinking-add-model"
-            accent
-            control={null}
-            icon="plus"
-            label={t("addResponseMode")}
-            last
-            onPress={() => setSheet({ kind: "add" })}
-          />
-        ) : null}
+        <SettingsRow
+          testID="thinking-add-model"
+          accent
+          control={null}
+          icon="plus"
+          label={t("addResponseMode")}
+          last
+          onPress={() => setSheet({ kind: "add" })}
+        />
       </SettingsGroup>
 
       <SettingsGroup
@@ -545,68 +371,29 @@ export function ThinkingSettingsPage({
       >
         <SettingsRow
           testID="thinking-council-row"
-          control={
-            !isPremium ? (
-              <PhosphorIcon
-                name="lock"
-                size="compact"
-                color={colors.textMuted}
-              />
-            ) : undefined
-          }
           icon="council"
           label={t("ulraMode")}
-          last={isPremium}
-          onPress={
-            isPremium ? () => setSheet({ kind: "council" }) : onOpenPremium
-          }
+          last
+          onPress={() => setSheet({ kind: "council" })}
           value={
             settings.ulraModeEnabled
               ? t("settingsReadinessReady")
               : t("settingsReadinessOff")
           }
         />
-        {!isPremium ? (
-          <PremiumBand
-            actionLabel={t("upgradeToPremium")}
-            copy={t("premiumCouncilBandCopy")}
-            onPress={onOpenPremium}
-            premiumLabel={t("premium")}
-          />
-        ) : null}
       </SettingsGroup>
 
       <SettingsGroup title={t("systemPrompt")}>
         <SettingsRow
           testID="thinking-system-prompt-row"
-          control={
-            !isPremium ? (
-              <PhosphorIcon
-                name="lock"
-                size="compact"
-                color={colors.textMuted}
-              />
-            ) : undefined
-          }
           icon="file-text"
           label={t("systemPrompt")}
-          last={isPremium}
-          onPress={
-            isPremium ? () => setSheet({ kind: "prompt" }) : onOpenPremium
-          }
+          last
+          onPress={() => setSheet({ kind: "prompt" })}
         />
-        {!isPremium ? (
-          <PremiumBand
-            actionLabel={t("upgradeToPremium")}
-            copy={t("premiumPromptBandCopy")}
-            onPress={onOpenPremium}
-            premiumLabel={t("premium")}
-          />
-        ) : null}
       </SettingsGroup>
 
       <SettingsSheet
-        onDismiss={handleSheetDismiss}
         testID="thinking-slot-sheet"
         title={slotTitle}
         visible={sheet?.kind === "slot"}
@@ -622,9 +409,7 @@ export function ThinkingSettingsPage({
                 testID="thinking-slot-provider"
                 label={t("provider")}
                 value={
-                  currentMode.route.runtime === "local"
-                    ? t("settingsOnDevice")
-                    : PROVIDER_LABELS[currentMode.route.provider]
+                  PROVIDER_LABELS[currentMode.route.provider]
                 }
                 onPress={() => setSheet({ ...sheet, view: "provider" })}
               />
@@ -668,18 +453,7 @@ export function ThinkingSettingsPage({
               control={null}
               onPress={() => setSheet({ ...sheet, view: "slot" })}
             />
-            <SettingsGroup title={t("onDeviceThinkingModels")}>
-              <RouteOptionRow
-                label={t("settingsOnDevice")}
-                last
-                meta={t("onDevicePerformanceMeasured")}
-                onSelect={() => setSheet({ ...sheet, view: "model" })}
-                selected={currentMode.route.runtime === "local"}
-              />
-            </SettingsGroup>
             <ProviderRows
-              allProviders={allLlmProviders}
-              isPremium={isPremium}
               onChoose={(provider) => {
                 onUpdateResponseModeRoute(
                   currentMode.id,
@@ -690,13 +464,8 @@ export function ThinkingSettingsPage({
                 );
                 setSheet({ ...sheet, view: "slot" });
               }}
-              onOpenPremium={openPremiumAfterSheetDismiss}
               selectableProviders={llmProviders}
-              selectedProvider={
-                currentMode.route.runtime === "local"
-                  ? undefined
-                  : currentMode.route.provider
-              }
+              selectedProvider={currentMode.route.provider}
             />
           </>
         ) : null}
@@ -708,17 +477,9 @@ export function ThinkingSettingsPage({
               control={null}
               onPress={() => setSheet({ ...sheet, view: "slot" })}
             />
-            {currentMode.route.runtime === "local" ? (
-              <LocalLlmRows
-                currentMode={currentMode}
-                isPremium={isPremium}
-                localModels={localModels}
-                onChoose={chooseLocalModel}
-              />
-            ) : (
-              <SettingsGroup
-                title={PROVIDER_LABELS[currentMode.route.provider]}
-              >
+            <SettingsGroup
+              title={PROVIDER_LABELS[currentMode.route.provider]}
+            >
                 {getProviderLlmModelOptions(currentMode.route.provider).map(
                   (model, index, models) => (
                     <RouteOptionRow
@@ -739,35 +500,24 @@ export function ThinkingSettingsPage({
                     />
                   ),
                 )}
-              </SettingsGroup>
-            )}
+            </SettingsGroup>
           </>
         ) : null}
       </SettingsSheet>
 
       <SettingsSheet
-        onDismiss={handleSheetDismiss}
         testID="thinking-add-sheet"
         title={t("addResponseMode")}
         visible={sheet?.kind === "add"}
         onClose={() => setSheet(null)}
       >
-        <LocalLlmRows
-          isPremium={isPremium}
-          localModels={localModels}
-          onChoose={chooseLocalModel}
-        />
         <ProviderRows
-          allProviders={allLlmProviders}
-          isPremium={isPremium}
           onChoose={addProviderRoute}
-          onOpenPremium={openPremiumAfterSheetDismiss}
           selectableProviders={llmProviders}
         />
       </SettingsSheet>
 
       <SettingsSheet
-        onDismiss={handleSheetDismiss}
         testID="thinking-council-sheet"
         title={t("ulraMode")}
         visible={sheet?.kind === "council"}
@@ -859,7 +609,6 @@ export function ThinkingSettingsPage({
       </SettingsSheet>
 
       <SettingsSheet
-        onDismiss={handleSheetDismiss}
         testID="thinking-system-prompt-sheet"
         title={t("systemPrompt")}
         visible={sheet?.kind === "prompt"}

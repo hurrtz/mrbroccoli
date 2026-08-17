@@ -25,7 +25,7 @@ conversation behavior, persistence, provider routing, or presentation policy.
 ## Routes
 
 - `_layout.tsx` initializes diagnostics, gesture handling, shared settings,
-  localization, Premium entitlement, theme, typography, and the router stack.
+  localization, theme, typography, and the router stack.
 - `index.tsx` is the production entry and renders `MainScreen`.
 - `store-promos.tsx` is the isolated deterministic screenshot entry used only
   by the exact `com.tobiaswinkler.app.mrbroccoli.maestro` application identity.
@@ -37,9 +37,8 @@ unambiguous composition path.
 ## Provider Order
 
 Settings must load before localization and theme can consume them. Localization
-must wrap Premium and the screen tree so store and entitlement copy uses the
-selected language. Premium wraps the workspace so Free/Premium policy is
-available before feature controllers are created.
+wraps the screen tree so the selected language is available before feature
+controllers are created.
 
 ## Store-Promo Isolation
 
@@ -50,16 +49,11 @@ fixture/presentation services is the authority; the existence of a route alone
 must never enable fixtures. Every orb fraction is validated within zero and one
 before it can replace the live presentation clock.
 
-The route owns four scene values: `premium`, `free`, `onboarding`, and
-`onboarding-ready`.
-`onboarding` seeds the requested locale, a Free entitlement, and an incomplete
-first-run introduction. It may present only a deterministic recommendation
-derived from the checked-in device snapshot; it must not probe the simulator,
-download or benchmark a model, or call a provider.
-`onboarding-ready` projects that same profile as installed so the final Try
-step can be captured without starting a download, microphone, or provider
-request. Every scene accepts only an explicit light or dark fixture theme; the
-device chrome is set to the same scheme by the capture runner.
+The route owns one `conversation` scene. It seeds the requested locale,
+provider response modes, branched conversation fixtures, and deterministic
+presentation state without reading credentials or calling a provider. The
+scene accepts only an explicit light or dark fixture theme; the device chrome
+is set to the same scheme by the capture runner.
 
 Evidence:
 

@@ -8,7 +8,6 @@ import {
   type AssistantResponseLength,
   type AssistantResponseTone,
   type InputMode,
-  type FreeOfflineProfileOverrides,
   type Provider,
   type ReplyPlayback,
   type Settings,
@@ -30,8 +29,6 @@ import {
   getLocalModel,
   isLocalModelId,
   type LocalSttModelId,
-  type LocalLlmModelId,
-  type LocalTtsCatalogModelId,
   type LocalTtsModelId,
 } from "../../constants/localModels";
 
@@ -53,7 +50,6 @@ function getAllowedValue<T extends string>(
 const INPUT_MODES = [
   "push-to-talk",
   "toggle-to-talk",
-  "drive-session",
 ] as const satisfies readonly InputMode[];
 const REPLY_PLAYBACK_OPTIONS = [
   "stream",
@@ -79,46 +75,6 @@ const RESPONSE_TONES = [
 ] as const satisfies readonly AssistantResponseTone[];
 function getStoredBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
-}
-
-function getStoredFreeOfflineProfileOverrides(
-  value: unknown,
-): FreeOfflineProfileOverrides {
-  if (!value || typeof value !== "object" || Array.isArray(value)) {
-    return {};
-  }
-
-  const stored = value as Record<string, unknown>;
-  const result: FreeOfflineProfileOverrides = {};
-  const quick = stored.quickLlmModelId;
-  if (isLocalModelId(quick)) {
-    const model = getLocalModel(quick);
-    if (model.capability === "llm" && model.responseProfile === "quick") {
-      result.quickLlmModelId = quick as LocalLlmModelId;
-    }
-  }
-  const thorough = stored.thoroughLlmModelId;
-  if (thorough === null) {
-    result.thoroughLlmModelId = null;
-  } else if (isLocalModelId(thorough)) {
-    const model = getLocalModel(thorough);
-    if (model.capability === "llm" && model.responseProfile === "thorough") {
-      result.thoroughLlmModelId = thorough as LocalLlmModelId;
-    }
-  }
-  const stt = stored.sttModelId;
-  if (stt === null) {
-    result.sttModelId = null;
-  } else if (isLocalModelId(stt) && getLocalModel(stt).capability === "stt") {
-    result.sttModelId = stt as LocalSttModelId;
-  }
-  const tts = stored.ttsModelId;
-  if (tts === null) {
-    result.ttsModelId = null;
-  } else if (isLocalModelId(tts) && getLocalModel(tts).capability === "tts") {
-    result.ttsModelId = tts as LocalTtsCatalogModelId;
-  }
-  return result;
 }
 
 function getStoredPositiveInteger(value: unknown, fallback: number) {
@@ -177,7 +133,7 @@ function getStoredLocalModelId<T extends "stt" | "tts">(
 
 export function normalizeStoredScalarSettings(
   storedSettings: LegacyStoredSettings | undefined,
-  hasConfiguredKeys: boolean,
+  _hasConfiguredKeys: boolean,
 ): Pick<
   Settings,
   | "inputMode"
@@ -195,12 +151,6 @@ export function normalizeStoredScalarSettings(
   | "localLanguages"
   | "localSttModelId"
   | "localTtsModelId"
-  | "introDismissed"
-  | "introOpened"
-  | "introCompleted"
-  | "freeOnboardingLanguageInitialized"
-  | "freeOfflineSetupCompleted"
-  | "freeOfflineProfileOverrides"
   | "nativeSttRequiresOnDevice"
   | "nativeTtsVoiceId"
   | "showUsageStats"
@@ -238,11 +188,14 @@ export function normalizeStoredScalarSettings(
   );
 
   return {
-    inputMode: getAllowedValue(
-      storedSettings?.inputMode,
-      INPUT_MODES,
-      DEFAULT_SETTINGS.inputMode,
-    ),
+    inputMode:
+      storedSettings?.inputMode === "drive-session"
+        ? "toggle-to-talk"
+        : getAllowedValue(
+            storedSettings?.inputMode,
+            INPUT_MODES,
+            DEFAULT_SETTINGS.inputMode,
+          ),
     ttsMode:
       storedSettings?.ttsMode === "provider"
         ? "provider"
@@ -308,31 +261,6 @@ export function normalizeStoredScalarSettings(
     localTtsModelId: getStoredLocalModelId(
       storedSettings?.localTtsModelId,
       "tts",
-    ),
-    introDismissed: getStoredBoolean(
-      storedSettings?.introDismissed,
-      hasConfiguredKeys,
-    ),
-    // An install that arrives with keys has effectively been through setup, so
-    // it may dismiss the banner without first being asked to read it.
-    introOpened: getStoredBoolean(
-      storedSettings?.introOpened,
-      hasConfiguredKeys,
-    ),
-    introCompleted: getStoredBoolean(
-      storedSettings?.introCompleted,
-      hasConfiguredKeys,
-    ),
-    freeOnboardingLanguageInitialized: getStoredBoolean(
-      storedSettings?.freeOnboardingLanguageInitialized,
-      DEFAULT_SETTINGS.freeOnboardingLanguageInitialized,
-    ),
-    freeOfflineSetupCompleted: getStoredBoolean(
-      storedSettings?.freeOfflineSetupCompleted,
-      DEFAULT_SETTINGS.freeOfflineSetupCompleted,
-    ),
-    freeOfflineProfileOverrides: getStoredFreeOfflineProfileOverrides(
-      storedSettings?.freeOfflineProfileOverrides,
     ),
     nativeSttRequiresOnDevice: getStoredBoolean(
       storedSettings?.nativeSttRequiresOnDevice,

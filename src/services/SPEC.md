@@ -21,8 +21,8 @@ last_validated_sha: 7db5c94
 ## Ownership
 
 `src/services/` owns runtime work that is independent of a particular React
-render: provider requests, local inference, voice-turn orchestration, speech,
-web search, persistence formats, backups, diagnostics, native bridges, runtime
+render: provider requests, local speech inference, voice-turn orchestration,
+speech, web search, persistence formats, backups, diagnostics, native bridges, runtime
 resilience, and on-device capability management.
 
 Services may emit typed results, events, or errors. They must not own screen
@@ -33,7 +33,6 @@ navigation or render UI.
 ### Intelligence and provider integration
 
 - `llm.ts` and `llm/` route hosted text generation and internal model tasks.
-- `localLlm.ts` runs downloaded local response models.
 - `webSearch.ts` and `webSearch/` decide provider requests and normalize cited
   search context.
 - `providerResilience.ts`, `providerModelCandidates.ts`, and
@@ -61,66 +60,27 @@ downloaded Sherpa file recognizer requires a wave-readable input, so the native
 recorder must not return AAC data under either an M4A or WAV name. Provider STT
 receives the same valid capture through the shared pipeline.
 
-### Local capability catalogue
+### Local speech capability catalogue
 
-`localDeviceCapabilities.ts`, `localModelManager.ts`,
-`localModelPerformance.ts`, `offlineProfile.ts`, and
-`offlineProfileManager.ts` jointly own local model eligibility and Free setup.
+`localDeviceCapabilities.ts`, `localModelManager.ts`, and
+`localModelPerformance.ts` own optional downloaded STT/TTS eligibility,
+installation, verification, and current-device benchmarking. The catalogue has
+no response-generation artifacts; upgrades remove the retired `local-models/llm`
+directory without touching speech installs.
 
-**Decision:** Selection is evidence-first:
+**Decision:** A speech artifact becomes selectable only after its pinned
+SHA-256 is verified and its current-device benchmark is viable. Transient low
+power, memory, or thermal pressure is recorded and may prevent a durable
+non-viable verdict, but never creates an automatic response profile.
 
-1. hard-filter definite platform, architecture, OS, language, memory, storage,
-   and runtime incompatibilities;
-2. download the exact pinned artifact and verify its SHA-256;
-3. load and benchmark that artifact on the current device; and
-4. assemble a coherent complete profile.
+On iOS, Sherpa accepts only empty, `.`, or `./` archive roots plus relative
+regular files and directories without traversal or links. The native data
+writer treats libarchive's non-negative status as success and resolves the
+system `/var` alias before secure destination checks.
 
-Preparation never blocks on transient device pressure; the OS owns thermal and
-power management. **Decision:** pressure (low power mode, low memory, serious
-thermal state) is captured with each benchmark, and a non-viable verdict
-measured under pressure is reported to the user but never persisted, so a
-throttled or battery-saver run cannot durably label this device too slow. The
-earlier design paused preparation in a cooling loop instead, which left setup
-permanently stuck whenever battery saver was enabled. A below-target benchmark
-is distinct from a failed model and may remain available as an advanced
-override.
-
-Local LLM contexts use Metal Flash Attention with quantized KV caches on iOS.
-The Android route is CPU-only and uses F16 KV caches: llama.cpp requires Flash
-Attention for a quantized V cache and otherwise rejects the context before the
-first token can be generated.
-
-Local prompts omit the hosted-route provenance-marker instruction because the
-local history path carries plain visible message content. Echoed marker-shaped
-output is stripped from both the stream and completed reply as a defensive
-boundary; it must never become the visible assistant answer.
-
-Kokoro's Android TTS callback crosses a JNI signature boundary that expects a
-boxed `Integer`. The Release R8 rules retain the wrapper's anonymous callback
-classes so optimization cannot rewrite the `invoke(FloatArray)` method and
-abort ART during local speech generation.
-
-**Decision:** One-tap Android setup does not select Kokoro automatically. A
-compact Piper voice is used when the language has one, otherwise setup keeps
-the phone's language-aware system voice. Kokoro remains an explicit advanced
-choice on Android and the quality-first automatic choice on iOS. This is a
-platform selection policy, not a runtime prohibition: explicit Kokoro remains
-supported on Android.
-
-Kokoro and Piper/VITS synthesis use Sherpa's streaming engine even though the
-service still returns one completed WAV. Sherpa's one-shot entry point runs
-neural generation on the calling thread; the streaming entry point dispatches
-the same work on both native platforms, keeps React responsive, and provides a
-real cancellation boundary. Abort signals cancel an active TTS stream and no
-cancelled benchmark may persist a verdict. Sherpa file STT has no matching
-native cancel API, so its abort contract is cooperative before and after the
-single file-transcription call; orchestration discards the result and stops
-before any later model step.
-
-Installed models and benchmark state are device-local, excluded from backup,
-and invalidated by catalogue, artifact, runtime, OS, app, or relevant device
-changes. Updating any checked-in artifact pin increments the catalogue version,
-so a previous artifact can never retain a benchmark verdict after replacement.
+Kokoro and Piper/VITS use Sherpa's streaming engine as a responsive generation
+and cancellation boundary even though the service returns a completed WAV.
+Android R8 retains the boxed callback signature needed across JNI.
 
 ### Conversation context and knowledge
 
@@ -252,20 +212,13 @@ and non-app stack frames are removed or fingerprinted.
 not payload content. Adding a new debug field requires an adversarial redaction
 test when it could contain user or provider data.
 
-### Premium and test fixtures
+### Test fixtures
 
-`premiumEntitlement.ts` caches only an exact verified non-consumable ownership
-record. `developmentEntitlement.ts` permits simulation only under `.dev` and
-`.maestro` runtime identities. Store-promo fixtures are deterministic,
-localized, network-free, and independently restricted to the exact
-`com.tobiaswinkler.app.mrbroccoli.maestro` identity. Their
-optional voice-orb presentation state is validated and stored separately from
-runtime voice state; production phase and progress remain pipeline-derived.
-The dedicated onboarding scene seeds an incomplete Free first run and derives
-its proposal from the fixed promotional device snapshot through the production
-offline-profile selector. Its controls are no-ops, and the live automatic-setup
-job is suspended, so the capture performs no device scan, model operation, or
-provider request.
+Store-promo fixtures are deterministic, localized, network-free, and restricted
+to the exact `com.tobiaswinkler.app.mrbroccoli.maestro` identity. The single
+`conversation` scene seeds provider routes, conversations, branches, and
+validated presentation state without credentials, model work, or provider
+requests. Production phase and progress remain pipeline-derived.
 
 ## Failure Rules
 

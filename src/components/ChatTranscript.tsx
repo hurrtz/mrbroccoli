@@ -72,7 +72,7 @@ export function ChatTranscript({
   contentContainerStyle,
   scrollEnabled = true,
   onCopyMessage,
-  onEditMessage: _onEditMessage,
+  onEditMessage,
   onBranchMessage,
   branchChildrenByMessageId,
   branchOrigin,
@@ -80,7 +80,7 @@ export function ChatTranscript({
   onOpenBranches,
   onOpenBranchSource,
   onShareMessage,
-  onReportMessage: _onReportMessage,
+  onReportMessage,
   onRepeatMessage,
   onRetryMessage,
   onRemoveMessage,
@@ -419,11 +419,13 @@ export function ChatTranscript({
               : undefined
           }
           onCopy={onCopyMessage}
+          onEdit={onEditMessage}
           onBranch={onBranchMessage}
           onOpenBranches={onOpenBranches}
           onOpenBranchSource={onOpenBranchSource}
           onShare={onShareMessage}
           onRepeat={onRepeatMessage}
+          onReport={onReportMessage}
           onRetry={onRetryMessage}
           onRemove={onRemoveMessage}
           onOpenSpeakingSettings={onOpenSpeakingSettings}

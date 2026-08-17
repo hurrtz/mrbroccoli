@@ -6,11 +6,9 @@ import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
-import { onboardingTranslations } from "../onboardingTranslations";
-import { introTranslations } from "../introTranslations";
-import { premiumTranslations } from "../premiumTranslations";
+import { localSpeechTranslations } from "../localSpeechTranslations";
+import { settingsTranslations } from "../settingsTranslations";
 import { transcriptEditTranslations } from "../transcriptEditTranslations";
-import { autoSetupTranslations } from "../autoSetupTranslations";
 import { workspaceTranslations } from "../workspaceTranslations";
 import { sessionLockTranslations } from "../sessionLockTranslations";
 
@@ -22,13 +20,11 @@ export const tr = {
   ...conversationKnowledgeTranslations.tr,
   ...imagePromptTranslations.tr,
   ...onDeviceTranslations.tr,
-  ...onboardingTranslations.tr,
-  ...introTranslations.tr,
-  ...premiumTranslations.tr,
+  ...localSpeechTranslations.tr,
+  ...settingsTranslations.tr,
   ...transcriptEditTranslations.tr,
   ...workspaceTranslations.tr,
   ...sessionLockTranslations.tr,
-  ...autoSetupTranslations.tr,
   appName: "Bay Brokoli",
   retry: "Yeniden dene",
   dismiss: "Kapat",
@@ -40,7 +36,6 @@ export const tr = {
   settings: "Ayarlar",
   settingsReleaseVersion: ({ version }) => `Sürüm ${version}`,
   all: "Hepsi",
-  firstRun: "İlk Çalıştırma",
   instructions: "Talimatlar",
   providers: "Sağlayıcılar",
   webSearch: "Web Araması",
@@ -209,10 +204,10 @@ export const tr = {
   createApiKey: "Kimlik bilgileri",
   apiKey: "API anahtarı",
   aboutThisProvider: "Bu sağlayıcı hakkında",
-  openRouterOnboardingTitle: "Tek anahtar, birden fazla sağlayıcı",
-  openRouterOnboardingDescription:
+  openRouterGatewayTitle: "Tek anahtar, birden fazla sağlayıcı",
+  openRouterGatewayDescription:
     "Özel bir OpenRouter anahtarı oluştur, aşağıya yapıştır ve herhangi bir doğrudan bağlantıyı değiştirmeden çeşitli sağlayıcıların anlık görüntü destekli modellerini kullan.",
-  openRouterOnboardingRoute:
+  openRouterGatewayRoute:
     "Talep yolu: bu cihaz → OpenRouter → seçilen yukarı akış sağlayıcısı",
   openRouterKeys: "OpenRouter anahtarları",
   providerStatusInvalid: "Geçersiz",

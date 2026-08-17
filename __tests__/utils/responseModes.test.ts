@@ -13,7 +13,7 @@ describe("response mode selectors", () => {
     expect(getAvailableResponseModes(DEFAULT_SETTINGS)).toEqual([]);
   });
 
-  it("treats an on-device response route as ready without a provider key", () => {
+  it("does not treat a retired local response route as ready", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       responseModes: [
@@ -29,7 +29,7 @@ describe("response mode selectors", () => {
       ],
     };
 
-    expect(getAvailableResponseModes(settings)).toEqual(["mode-1"]);
+    expect(getAvailableResponseModes(settings)).toEqual([]);
   });
 
   it("returns only response modes backed by configured provider keys", () => {

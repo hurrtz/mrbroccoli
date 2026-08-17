@@ -9,17 +9,14 @@ export type DriveSessionEvent =
   | { type: "arm-requested" }
   | { type: "disengage" }
   | { type: "engage" }
-  | { type: "mode-entered" }
   | { type: "pause" }
   | { type: "resume" }
   | { type: "suspend" };
 
-export function createDriveSessionState(
-  inputMode: string,
-): DriveSessionState {
+export function createDriveSessionState(): DriveSessionState {
   return {
     armRequested: false,
-    autoContinueEnabled: inputMode === "drive-session",
+    autoContinueEnabled: false,
     engaged: false,
   };
 }
@@ -34,20 +31,22 @@ export function transitionDriveSessionState(
     case "arm-requested":
       return { ...state, armRequested: true };
     case "disengage":
-      return { ...state, engaged: false };
-    case "engage":
-      return { ...state, engaged: true };
-    case "mode-entered":
       return {
         armRequested: false,
-        autoContinueEnabled: true,
+        autoContinueEnabled: false,
         engaged: false,
+      };
+    case "engage":
+      return {
+        ...state,
+        armRequested: state.autoContinueEnabled,
+        engaged: state.autoContinueEnabled,
       };
     case "pause":
       return {
-        ...state,
         armRequested: false,
         autoContinueEnabled: false,
+        engaged: false,
       };
     case "resume":
       return {

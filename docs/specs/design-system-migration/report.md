@@ -2,8 +2,9 @@
 
 > Historical implementation record. It describes the migration-time design
 > and code snapshot, not the current approved design contract. Use
-> `design-system/_ds_manifest.json`, the living specs, and
-> `docs/specs/design-system-reconciliation/` for current parity.
+> `design-system/_ds_manifest.json` and the living specs for current product
+> intent. The former reconciliation work spec was retired after its product
+> surfaces were deliberately removed.
 
 Working report for the migration described in `design-system/migration-goal.md`.
 Grows with each phase; §5 of the goal defines the final shape. Spend the words

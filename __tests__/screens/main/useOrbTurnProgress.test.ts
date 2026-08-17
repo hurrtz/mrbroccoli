@@ -25,7 +25,7 @@ describe("useOrbTurnProgress", () => {
     });
   });
 
-  it("fills the inner ring from the actual recording start", () => {
+  it("fills the recording ring from the actual recording start", () => {
     jest.spyOn(Date, "now").mockReturnValue(20_000);
 
     const { result } = renderHook(() =>
@@ -76,7 +76,7 @@ describe("useOrbTurnProgress", () => {
     expect(result.current.turnProgress).toBeCloseTo(0.5);
     expect(result.current.overtime).toBe(0);
     expect(result.current.phaseProgress).toBeCloseTo(0.5);
-    expect(result.current.phaseProgressTiming).toEqual({ durationMs: 2_000 });
+    expect(result.current.phaseProgressTiming).toEqual({ durationMs: 5_000 });
     expect(result.current.turnProgressTiming).toEqual({ durationMs: 5_000 });
     expect(result.current.overtimeTiming).toEqual({
       delayMs: 5_000,

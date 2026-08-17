@@ -339,7 +339,7 @@ SOFTWARE.
 ```
 
 ### @expo/cli@57.0.15
-Packages (48): @expo/cli@57.0.15, @expo/config-plugins@57.0.8, @expo/config@57.0.7, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.7, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.5, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.6, @expo/log-box@57.0.2, @expo/metro-config@57.0.8, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.10, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.12, @expo/router-server@57.0.6, babel-preset-expo@57.0.7, expo-asset@57.0.11, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.11, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.4, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.10, expo-image-picker@57.0.10, expo-keep-awake@57.0.1, expo-linear-gradient@57.0.1, expo-linking@57.0.6, expo-modules-autolinking@57.0.10, expo-modules-core@57.0.11, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.3, expo-sharing@57.0.12, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.2, expo@57.0.13
+Packages (47): @expo/cli@57.0.15, @expo/config-plugins@57.0.8, @expo/config@57.0.7, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.7, @expo/image-utils@0.11.4, @expo/inline-modules@0.1.5, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.6, @expo/log-box@57.0.2, @expo/metro-config@57.0.8, @expo/metro-file-map@57.0.1, @expo/metro-runtime@57.0.10, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.12, @expo/router-server@57.0.6, babel-preset-expo@57.0.7, expo-asset@57.0.11, expo-audio@57.0.3, expo-clipboard@57.0.1, expo-constants@57.0.11, expo-crypto@57.0.1, expo-document-picker@57.0.1, expo-file-system@57.0.4, expo-font@57.0.1, expo-glass-effect@57.0.1, expo-image-loader@57.0.1, expo-image-manipulator@57.0.10, expo-image-picker@57.0.10, expo-keep-awake@57.0.1, expo-linking@57.0.6, expo-modules-autolinking@57.0.10, expo-modules-core@57.0.11, expo-modules-jsi@57.0.4, expo-network@57.0.1, expo-secure-store@57.0.1, expo-server@57.0.3, expo-sharing@57.0.12, expo-speech@57.0.1, expo-sqlite@57.0.1, expo-status-bar@57.0.1, expo-symbols@57.0.2, expo@57.0.13
 
 License: MIT
 
@@ -4698,33 +4698,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### expo-iap@5.0.0
-License: MIT
-
-```text
-MIT License
-
-Copyright (c) 2025 hyochan
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ### expo-speech-recognition@56.0.1
 License: MIT
 
@@ -6707,32 +6680,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-```
-
-### llama.rn@0.12.8
-License: MIT
-
-```text
-MIT License
-
-Copyright (c) 2023 Jhen-Jie Hong
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 ```
 
 ### lodash.debounce@4.0.8
@@ -11035,31 +10982,4 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
 ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-```
-### llama.cpp
-
-License: MIT
-
-```text
-MIT License
-
-Copyright (c) 2023-2024 The ggml authors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 ```

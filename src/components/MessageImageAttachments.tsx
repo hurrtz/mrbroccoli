@@ -16,12 +16,14 @@ export function MessageImageAttachments({
   attachments,
   onRemove,
   compact = false,
+  layout = "strip",
   colors,
   t,
 }: {
   attachments: MessageImageAttachment[];
   onRemove?: (attachmentId: string) => void;
   compact?: boolean;
+  layout?: "strip" | "grid";
   colors: Colors;
   t: TranslateFn;
 }) {
@@ -29,18 +31,10 @@ export function MessageImageAttachments({
     return null;
   }
 
-  return (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.row}
-      accessibilityRole="list"
-    >
+  const content = (
+    <>
       {attachments.map((attachment, index) => (
-        <View
-          key={attachment.id}
-          style={styles.item}
-        >
+        <View key={attachment.id} style={styles.item}>
           <Image
             accessibilityLabel={t("attachedImageLabel", {
               index: index + 1,
@@ -79,12 +73,42 @@ export function MessageImageAttachments({
           ) : null}
         </View>
       ))}
+    </>
+  );
+
+  if (layout === "grid") {
+    return (
+      <View
+        accessibilityRole="list"
+        style={styles.grid}
+        testID="message-image-grid"
+      >
+        {content}
+      </View>
+    );
+  }
+
+  return (
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      contentContainerStyle={styles.row}
+      accessibilityRole="list"
+      testID="message-image-strip"
+    >
+      {content}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
+    gap: 8,
+    paddingVertical: 4,
+  },
+  grid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 8,
     paddingVertical: 4,
   },

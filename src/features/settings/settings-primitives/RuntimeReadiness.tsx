@@ -33,7 +33,7 @@ function getInk(state: SettingsReadinessState, colors: Colors): string {
     case "ready":
       return colors.success;
     case "attention":
-      return colors.premium;
+      return colors.attention;
     case "broken":
       return colors.danger;
     default:
