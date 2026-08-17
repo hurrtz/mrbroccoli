@@ -282,9 +282,14 @@ has a Council configuration, typed `CouncilProgress` instead keeps the block
 full-strength and replaces its contents with the active participant plus
 model/round progress; synthesis reports the final route explicitly. The
 Council satellite opens an anchored transparent `CouncilPopover`; selected
-membership is session-local, while its one-to-five total-round control adapts
-the persisted review-round count by adding or subtracting the initial answer
-round. Landscape and
+membership is session-local, while its one-to-five total-round control claims
+the responder at touch-down and adapts the persisted review-round count by
+adding or subtracting the initial answer round. It shares the Image popup's
+leading-edge anchor for a visually centred panel and replaces call arithmetic
+with the two-model requirement until Council can actually run. Image Add first
+dismisses its attachment popup, then the app-owned source sheet uses the same
+native-dismissal handoff before camera or library presentation; this prevents
+sibling native modal controllers from competing. Landscape and
 regular iPad retain the byline plus compact conversation-settings control.
 
 When the native font scale reaches the accessibility-large range, the portrait

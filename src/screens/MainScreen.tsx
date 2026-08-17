@@ -1118,6 +1118,7 @@ export function MainScreen() {
             models: council.selectedModeIds.length,
             rounds: council.totalRounds,
           }),
+          councilMinimumModelsSummary: t("councilMinimumModels"),
           councilModels,
           councilRounds: council.totalRounds,
           councilRoundsLabel: t("councilRounds"),

@@ -2,6 +2,7 @@ import React from "react";
 import {
   Image,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -54,12 +55,44 @@ export function AttachmentPopover({
   const [panelHeight, setPanelHeight] = React.useState(
     attachments.length > 0 ? 132 : 106,
   );
+  const pendingAddRef = React.useRef(false);
+  const fallbackTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const drainPendingAdd = React.useCallback(() => {
+    if (fallbackTimerRef.current) {
+      clearTimeout(fallbackTimerRef.current);
+      fallbackTimerRef.current = null;
+    }
+    if (!pendingAddRef.current) {
+      return;
+    }
+    pendingAddRef.current = false;
+    onAdd();
+  }, [onAdd]);
+  const closeThenAdd = React.useCallback(() => {
+    pendingAddRef.current = true;
+    onClose();
+    if (Platform.OS !== "ios") {
+      fallbackTimerRef.current = setTimeout(drainPendingAdd, 250);
+    }
+  }, [drainPendingAdd, onClose]);
 
   React.useEffect(() => {
     setPanelHeight(attachments.length > 0 ? 132 : 106);
   }, [attachments.length]);
 
-  if (!visible || !anchor) {
+  React.useEffect(
+    () => () => {
+      if (fallbackTimerRef.current) {
+        clearTimeout(fallbackTimerRef.current);
+      }
+      pendingAddRef.current = false;
+    },
+    [],
+  );
+
+  if (!anchor) {
     return null;
   }
 
@@ -79,10 +112,11 @@ export function AttachmentPopover({
   return (
     <Modal
       animationType="fade"
+      onDismiss={drainPendingAdd}
       onRequestClose={onClose}
       statusBarTranslucent
       transparent
-      visible
+      visible={visible}
     >
       <View style={styles.overlay} testID="attachment-popover-overlay">
         <Pressable
@@ -166,7 +200,7 @@ export function AttachmentPopover({
           <Pressable
             accessibilityLabel={addLabel}
             accessibilityRole="button"
-            onPress={onAdd}
+            onPress={closeThenAdd}
             style={({ pressed }) => [
               styles.add,
               pressed ? { backgroundColor: colors.accentSoft } : null,

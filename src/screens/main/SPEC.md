@@ -111,8 +111,9 @@ receive already-derived state and callbacks.
   orbit reserves its full footprint even at idle, but its keys render only
   during a turn, so the orb never jumps when work begins. Stop is live through
   every turn phase; the three seek controls become live only while speaking.
-  Transport verbs tint glyph and label only, and the silence countdown remains
-  spoken rather than drawn.
+  Transport verbs tint glyph and label only, and their measured portrait
+  footprint contains both possible label lines so Restart and Stop never clip.
+  The silence countdown remains spoken rather than drawn.
 - Restart rewinds the active playback reel to the response's first word without
   requiring the voice session to stop first, and is live only while he speaks.
 - Back and Forward move between the reply's paragraphs. Back means the start of
@@ -202,16 +203,20 @@ receive already-derived state and callbacks.
   transcript gallery so four or more attachments remain reachable through
   normal transcript scrolling.
 - Adding an image opens an app-owned source sheet. Camera or photo-library
-  presentation waits until that sheet has completed native dismissal on iOS
-  and uses a bounded Android fallback, so native pickers never compete with an
-  existing modal controller. A fresh image-provider recipient still requires
-  explicit app-owned disclosure before the turn continues.
+  presentation first waits until the attachment popover has completed native
+  dismissal, then waits again for the source sheet to dismiss on iOS; both
+  handoffs use bounded Android fallbacks. Native pickers therefore never
+  compete with an existing modal controller. A fresh image-provider recipient
+  still requires explicit app-owned disclosure before the turn continues.
 - The Council satellite opens a 252pt anchored, undimmed popover aligned to the
-  composing row's trailing edge. It scrolls every ready home model
-  horizontally, selects membership directly, exposes one to five total rounds,
-  and permanently states the resulting sequential answer count and provider
-  billing consequence. Fewer than two selected models means Council is off;
-  no first-use or high-call confirmation interrupts this builder.
+  same leading edge as the image popup, which visually centres both panels over
+  the composing row. It scrolls every ready home model horizontally, selects
+  membership directly, and exposes one to five total rounds through a slider
+  that claims and tracks the gesture from touch-down. Its permanent caption
+  states the resulting sequential answer count and provider billing consequence
+  once two models are selected; below two it explains that Council requires at
+  least two models. Fewer than two selected models means Council is off; no
+  first-use or high-call confirmation interrupts this builder.
 - Toast feedback is presented above the active native surface, including the
   transcript drawer, settings sheets, and receipt modal; it is never queued
   invisibly behind them.

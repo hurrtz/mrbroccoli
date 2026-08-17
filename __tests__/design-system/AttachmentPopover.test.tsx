@@ -1,6 +1,6 @@
 import React from "react";
-import { StyleSheet } from "react-native";
-import { fireEvent, render } from "@testing-library/react-native";
+import { Modal as ReactNativeModal, StyleSheet } from "react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 
 import { AttachmentPopover } from "../../src/design-system/AttachmentPopover";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
@@ -68,11 +68,10 @@ describe("AttachmentPopover", () => {
     expect(screen.getByLabelText("Attached image 2 of 2")).toBeTruthy();
   });
 
-  it("removes, adds, and dismisses without a dimming backdrop", () => {
+  it("removes and dismisses without a dimming backdrop", () => {
     const { onAdd, onClose, onRemove, screen } = renderPopover();
 
     fireEvent.press(screen.getByTestId("attachment-popover-remove-one"));
-    fireEvent.press(screen.getByTestId("attachment-popover-add"));
     fireEvent.press(
       screen.getByTestId("attachment-popover-dismiss", {
         includeHiddenElements: true,
@@ -80,13 +79,27 @@ describe("AttachmentPopover", () => {
     );
 
     expect(onRemove).toHaveBeenCalledWith("one");
-    expect(onAdd).toHaveBeenCalledTimes(1);
+    expect(onAdd).not.toHaveBeenCalled();
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(
       StyleSheet.flatten(
         screen.getByTestId("attachment-popover-overlay").props.style,
       ),
     ).toEqual(expect.objectContaining({ flex: 1 }));
+  });
+
+  it("dismisses before handing off to the app-owned image source sheet", () => {
+    const { onAdd, onClose, screen } = renderPopover();
+
+    fireEvent.press(screen.getByTestId("attachment-popover-add"));
+
+    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onAdd).not.toHaveBeenCalled();
+
+    act(() => {
+      screen.UNSAFE_getByType(ReactNativeModal).props.onDismiss();
+    });
+    expect(onAdd).toHaveBeenCalledTimes(1);
   });
 
   it("uses the approved empty copy", () => {

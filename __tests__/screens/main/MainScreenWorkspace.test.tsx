@@ -131,6 +131,8 @@ function createWorkspaceProps(t: jest.Mock) {
       councilAvailable: true,
       councilCostSummary:
         "Every round asks every model. 1 × 3 = 3 answers, one after another — minutes, and each provider bills you.",
+      councilMinimumModelsSummary:
+        "Council requires at least two models. Select one more model to turn it on.",
       councilModels: [
         {
           id: activeResponseMode,

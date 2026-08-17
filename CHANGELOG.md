@@ -64,6 +64,13 @@ the complete Play Store translations are kept in a dedicated file under
   the former first-use and large-run confirmations are gone. Current UI,
   prompts, audit components, types, and localized feature names consistently
   call the feature Model Council.
+- The Council builder now sits visually centred like the image popup, explains
+  that at least two models are required when only one is selected, and tracks
+  round-slider drags reliably with a correctly centred handle.
+- Adding an image now dismisses the attachment popup before opening the source
+  sheet and native picker, avoiding a modal collision that could freeze the
+  app. Restart and Stop labels around the voice orb also reserve enough space
+  to remain fully visible.
 - Encrypted backups now attach reliably in iOS mail clients by using JSON file
   and share metadata, and restoring an archived backup no longer creates
   duplicate sessions because of an obsolete pinned-state bit.

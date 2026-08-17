@@ -189,10 +189,10 @@ describe("MainScreenVoiceStage composer", () => {
         screen.getByTestId("voice-text-input-viewport").props.style,
       ),
     ).toMatchObject({
-      flexBasis: 227,
+      flexBasis: 242,
       flexGrow: 0,
       flexShrink: 1,
-      maxHeight: 227,
+      maxHeight: 242,
     });
     expect(
       StyleSheet.flatten(

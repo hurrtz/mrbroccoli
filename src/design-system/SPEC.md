@@ -38,11 +38,17 @@ framework or hiding platform behavior behind excessive abstraction.
   presentation-only: every string arrives translated from the caller, and the
   orb's diameter is passed in by the screen that measured its space.
   `OrbTransport` permanently reserves the orb plus four-key orbit footprint so
-  phase changes cannot move the primary action. `AttachmentPopover` is an
-  anchored, transparent, horizontally scrolling image-management surface.
+  phase changes cannot move the primary action; its measured portrait tail
+  includes both possible label lines so translated diagonal controls cannot
+  be clipped by the pager viewport. `AttachmentPopover` is an anchored,
+  transparent, horizontally scrolling image-management surface that dismisses
+  before handing Add to the next native modal.
   `CouncilPopover` is the matching undimmed, anchored Council builder with
   horizontally scrolling model membership, an accessible one-to-five-round
-  control, and permanent call arithmetic. `WorkspaceHeader` combines portrait
+  control that owns the drag from touch-down, and permanent contextual copy:
+  the two-model requirement below two selections, otherwise call arithmetic.
+  It uses the same leading-edge anchor as the image popup so the panel is
+  visually centred over the composing row. `WorkspaceHeader` combines portrait
   route selection and the full-row conversation-settings target, dims and
   locks both rows during an ordinary submitted turn, and reuses the same
   full-strength geometry for live Council participant and round progress.
@@ -83,7 +89,9 @@ framework or hiding platform behavior behind excessive abstraction.
   speaking phase and ring position while its glyph reverses to play.
 - `OrbTransport` shows no keys at idle but always owns the same measured box.
   Stop remains active throughout a turn; Restart, Back, and Forward are enabled
-  only during spoken playback. `OrbSatellite` has no persistent container;
+  only during spoken playback. That box must include the complete visible
+  label footprint instead of relying on overflow beyond its measured height.
+  `OrbSatellite` has no persistent container;
   active toggles use filled accent glyphs plus matching labels, disabled
   controls rest at 38%, and its Image form may replace the glyph with up to
   three thumbnail layers without changing the row geometry.

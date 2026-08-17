@@ -56,16 +56,16 @@ function renderTransport(
 }
 
 describe("OrbTransport", () => {
-  it("keeps the approved 328 by 227 footprint at rest without showing keys", () => {
+  it("reserves the complete 328 by 242 labelled footprint at rest", () => {
     const { screen } = renderTransport("idle");
     const layout = getOrbTransportLayout(196, true);
 
     expect(layout).toEqual(
-      expect.objectContaining({ height: 227, width: 328 }),
+      expect.objectContaining({ height: 242, width: 328 }),
     );
     expect(
       StyleSheet.flatten(screen.getByTestId("orb-transport").props.style),
-    ).toEqual(expect.objectContaining({ height: 227, width: 328 }));
+    ).toEqual(expect.objectContaining({ height: 242, width: 328 }));
     expect(screen.queryByTestId("orb-transport-stop")).toBeNull();
   });
 

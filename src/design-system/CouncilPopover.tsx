@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Modal,
-  PanResponder,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -51,20 +50,6 @@ function CouncilRoundsSlider({
     },
     [onChange, trackWidth],
   );
-  const responder = React.useMemo(
-    () =>
-      PanResponder.create({
-        onMoveShouldSetPanResponder: (_event, gesture) =>
-          Math.abs(gesture.dx) > 2,
-        onPanResponderGrant: (event) =>
-          updateFromX(event.nativeEvent.locationX),
-        onPanResponderMove: (event) =>
-          updateFromX(event.nativeEvent.locationX),
-        onPanResponderRelease: (event) =>
-          updateFromX(event.nativeEvent.locationX),
-      }),
-    [updateFromX],
-  );
   const ratio = (rounds - MIN_ROUNDS) / (MAX_ROUNDS - MIN_ROUNDS);
 
   return (
@@ -77,7 +62,7 @@ function CouncilRoundsSlider({
           {rounds}
         </Text>
       </View>
-      <Pressable
+      <View
         accessibilityActions={[{ name: "decrement" }, { name: "increment" }]}
         accessibilityLabel={accessibilityLabel}
         accessibilityRole="adjustable"
@@ -97,10 +82,20 @@ function CouncilRoundsSlider({
         onLayout={(event) =>
           setTrackWidth(Math.round(event.nativeEvent.layout.width))
         }
-        onPress={(event) => updateFromX(event.nativeEvent.locationX)}
+        onMoveShouldSetResponder={() => true}
+        onResponderGrant={(event) =>
+          updateFromX(event.nativeEvent.locationX)
+        }
+        onResponderMove={(event) => updateFromX(event.nativeEvent.locationX)}
+        onResponderRelease={(event) =>
+          updateFromX(event.nativeEvent.locationX)
+        }
+        onResponderTerminate={(event) =>
+          updateFromX(event.nativeEvent.locationX)
+        }
+        onStartShouldSetResponder={() => true}
         style={styles.sliderTarget}
         testID="council-rounds-slider"
-        {...responder.panHandlers}
       >
         <View
           style={[styles.sliderTrack, { backgroundColor: colors.turnTrack }]}
@@ -120,9 +115,10 @@ function CouncilRoundsSlider({
                 left: `${ratio * 100}%`,
               },
             ]}
+            testID="council-rounds-slider-thumb"
           />
         </View>
-      </Pressable>
+      </View>
     </View>
   );
 }
@@ -130,6 +126,7 @@ function CouncilRoundsSlider({
 export function CouncilPopover({
   anchor,
   costSummary,
+  minimumModelsSummary,
   models,
   onChangeRounds,
   onClose,
@@ -140,6 +137,7 @@ export function CouncilPopover({
 }: {
   anchor: AttachmentPopoverAnchor | null;
   costSummary: string;
+  minimumModelsSummary: string;
   models: CouncilPopoverModel[];
   onChangeRounds: (rounds: number) => void;
   onClose: () => void;
@@ -156,12 +154,10 @@ export function CouncilPopover({
     return null;
   }
 
+  const selectedModelCount = models.filter((model) => model.selected).length;
   const left = Math.max(
     SCREEN_MARGIN,
-    Math.min(
-      anchor.x + anchor.width - POPOVER_WIDTH,
-      windowWidth - POPOVER_WIDTH - SCREEN_MARGIN,
-    ),
+    Math.min(anchor.x, windowWidth - POPOVER_WIDTH - SCREEN_MARGIN),
   );
   const preferredTop = anchor.y - panelHeight - 10;
   const top =
@@ -262,8 +258,10 @@ export function CouncilPopover({
               size="compact"
               style={styles.infoIcon}
             />
-            <Text style={[styles.costText, { color: colors.textSecondary }]}>
-              {costSummary}
+            <Text
+              style={[styles.costText, { color: colors.textSecondary }]}
+            >
+              {selectedModelCount < 2 ? minimumModelsSummary : costSummary}
             </Text>
           </View>
         </View>
@@ -350,7 +348,7 @@ const styles = StyleSheet.create({
     borderWidth: StyleSheet.hairlineWidth,
     height: 18,
     marginLeft: -9,
-    marginTop: -7,
+    marginTop: -9,
     position: "absolute",
     top: "50%",
     width: 18,

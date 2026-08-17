@@ -7,6 +7,11 @@ import { VoiceOrb } from "./VoiceOrb";
 
 const ORBIT_REACH = 34;
 const DIAGONAL = Math.sin(Math.PI / 4);
+// The diagonal control starts 22pt above its orbit centre, then needs the
+// 44pt target, 5pt label gap, and up to two 12pt label lines. Reserving the
+// complete 51pt tail keeps translated Restart and Stop labels inside the
+// pager viewport instead of relying on overflow past the measured footprint.
+const LABELLED_VERTICAL_ALLOWANCE = 51;
 
 export interface OrbTransportLayout {
   centreX: number;
@@ -22,7 +27,7 @@ export function getOrbTransportLayout(
 ): OrbTransportLayout {
   const radius = orbSize / 2 + ORBIT_REACH;
   const horizontalAllowance = labels ? 32 : 22;
-  const verticalAllowance = labels ? 36 : 22;
+  const verticalAllowance = labels ? LABELLED_VERTICAL_ALLOWANCE : 22;
   const width = Math.round(2 * (radius + horizontalAllowance));
   const height = Math.round(
     orbSize / 2 + Math.max(orbSize / 2, DIAGONAL * radius + verticalAllowance),

@@ -36,6 +36,7 @@ interface WorkspaceSatellitesProps {
   councilActive: boolean;
   councilAvailable: boolean;
   councilCostSummary: string;
+  councilMinimumModelsSummary: string;
   councilModels: CouncilPopoverModel[];
   councilRounds: number;
   councilRoundsLabel: string;
@@ -66,6 +67,7 @@ function WorkspaceSatellites({
   councilActive,
   councilAvailable,
   councilCostSummary,
+  councilMinimumModelsSummary,
   councilModels,
   councilRounds,
   councilRoundsLabel,
@@ -205,6 +207,7 @@ function WorkspaceSatellites({
       <CouncilPopover
         anchor={councilPopoverAnchor}
         costSummary={councilCostSummary}
+        minimumModelsSummary={councilMinimumModelsSummary}
         models={councilModels}
         onChangeRounds={onChangeCouncilRounds}
         onClose={() => setCouncilPopoverVisible(false)}
@@ -298,6 +301,7 @@ export function MainScreenWorkspace({
     councilActive,
     councilAvailable,
     councilCostSummary,
+    councilMinimumModelsSummary,
     councilModels,
     councilRounds,
     councilRoundsLabel,
@@ -323,6 +327,7 @@ export function MainScreenWorkspace({
         councilActive={councilActive}
         councilAvailable={councilAvailable}
         councilCostSummary={councilCostSummary}
+        councilMinimumModelsSummary={councilMinimumModelsSummary}
         councilModels={councilModels}
         councilRounds={councilRounds}
         councilRoundsLabel={councilRoundsLabel}
@@ -347,6 +352,7 @@ export function MainScreenWorkspace({
       councilActive,
       councilAvailable,
       councilCostSummary,
+      councilMinimumModelsSummary,
       councilModels,
       councilRounds,
       councilRoundsLabel,
