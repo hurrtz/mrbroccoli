@@ -69,7 +69,9 @@ not merely as picker metadata.
 
 `contextLeakGuard.ts` inspects streaming output and final text for serialized
 internal context. A suspected leak fails the reply rather than displaying or
-speaking protected material.
+speaking protected material. Protected text is indexed once and matched with a
+rolling stream window; the guard must never rescan the complete response and
+private context after every chunk.
 
 ## Message Provenance
 
@@ -108,6 +110,10 @@ including thinking-only phases; an abort signal ends parsing and downstream
 callbacks.
 Chunks may render immediately and feed paragraph TTS, while only the completed
 guarded response is persisted.
+
+Callers may impose a provider-independent visible-character ceiling on a
+stream. Crossing it aborts the transport and reports an incomplete reply rather
+than allowing runaway output to monopolize the JavaScript runtime.
 
 **Decision:** Every exit path cancels the transport. The stream reader is
 cancelled when an event handler throws, and the request abort controller is

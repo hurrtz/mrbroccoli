@@ -143,8 +143,10 @@ boundary.
 - Curated local Qwen models are normal response routes, not disguised hosted
   providers.
 - Model Council runs independent model contributions, adversarial review
-  rounds, and final synthesis. Its internal `ulra` identifiers are retained
-  for data and import stability.
+  rounds, and final synthesis. The visible synthesis is independently bounded
+  so a provider cannot stream an effectively unbounded answer into the mobile
+  UI or speech queue. Its internal `ulra` identifiers are retained for data and
+  import stability.
 
   **Decision:** The English feature name is “Model Council.” The previous
   “Uber Mode” name collided with a well-known third-party trademark and was

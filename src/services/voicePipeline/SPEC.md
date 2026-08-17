@@ -115,7 +115,10 @@ the configured review depth.
 Each private participant has a ten-minute absolute deadline. Terminally failed
 participants are retired from later rounds; successful participants continue.
 The final synthesis retains every participant's latest successful position and
-as much earlier reasoning as fits the 24,000-token estimate.
+as much earlier reasoning as fits the 24,000-token estimate. Its visible
+completion has a separate 32,000-character ceiling at the shared streaming
+boundary; this limit is independent of provider token settings and prevents a
+runaway synthesis from overwhelming rendering, leak inspection, or speech.
 
 **Decision:** The round barrier is deliberate. Every reviewer sees the same
 snapshot, preventing completion order from changing the deliberation.

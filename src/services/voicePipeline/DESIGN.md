@@ -108,15 +108,17 @@ sequenceDiagram
       end
       P->>P: retire terminal failures and test convergence
     end
-    P->>S: evidence-led retained history
-    S-->>P: normal streamed final response
+    P->>S: evidence-led retained history plus output ceiling
+    S-->>P: bounded streamed final response
 ```
 
 Participant completions are logged as they settle, but round progression waits
 for all active calls. Terminal failure retirement avoids repeatedly paying for
 an unusable route. If the requested synthesis provider has an open failure
 circuit, the pipeline may select a successful participant route and records the
-fallback.
+fallback. The final visible stream also carries an app-owned character ceiling,
+so transport-specific token defaults cannot turn unusually long synthesis into
+unbounded JavaScript, rendering, or TTS work.
 
 ## TTS Queue
 
@@ -157,6 +159,7 @@ their timers and release listeners or abort-linking functions in their own
 | Web search fails | continue without search and persist an inline assistant notice |
 | Some Uber participants fail | continue with successful routes; report degraded/retired outcome |
 | All Uber participants fail | final synthesis cannot proceed normally |
+| Final synthesis exceeds its output ceiling | abort the provider stream and report an incomplete reply |
 | Primary LLM route fails | bounded candidate fallback or user-visible error |
 | TTS route fails | follow explicit fallback order or keep readable text reply, with an inline assistant notice |
 | Abort occurs | stop downstream publication and clean up |

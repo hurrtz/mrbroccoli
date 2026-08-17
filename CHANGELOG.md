@@ -10,6 +10,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Long Model Council syntheses no longer freeze the app during streamed
+  readback: private-context leak checks now stay incremental, and runaway final
+  answers stop at a provider-independent safety ceiling.
+
 ## 4.0.0 - 2026-08-16
 
 - The introduction's opening conversation now recedes into the heading as one
