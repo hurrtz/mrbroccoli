@@ -5,7 +5,7 @@ code_paths:
 dependencies:
   - Expo and React Native Android runtime
   - Android Gradle Plugin
-  - Play Billing and Google Play signing
+  - Google Play distribution and signing
 validations:
   - npm run config:verify
   - make android-unit-test
@@ -26,8 +26,10 @@ the shared layer; Kotlin modules expose narrow native capabilities.
 
 ## Identity and Configuration
 
-- Production application ID and namespace are
-  `com.tobiaswinkler.app.mrbroccoli`.
+- **Decision:** The Google Play application ID is
+  `com.tobiaswinkler.app.android.mrbroccoli`. The Kotlin/Gradle namespace stays
+  `com.tobiaswinkler.app.mrbroccoli` so the store identity migration does not
+  churn native source packages or class names.
 - Debug builds append `.dev`; Maestro Release builds append `.maestro` through
   an explicit build property. Both can coexist with production.
 - Entitlement simulation is permitted only for identities ending in `.dev` or
@@ -44,6 +46,8 @@ the shared layer; Kotlin modules expose narrow native capabilities.
   provide microphone/file signal levels and native rendering behavior.
 - `MrBroccoliVoiceTurnService` owns the foreground-service lifetime required
   for background voice-turn continuation and notification controls.
+- Native service intent actions derive from `BuildConfig.APPLICATION_ID` so
+  production, debug, and Maestro installations cannot collide.
 - `MrBroccoliModelDownloadService` and its module keep the process running
   while an on-device model downloads. It is a separate `dataSync` service
   rather than a mode of the voice-turn service: the two have unrelated

@@ -31,8 +31,8 @@ import androidx.core.content.ContextCompat
  */
 class MrBroccoliModelDownloadService : Service() {
   companion object {
-    const val ACTION_START = "com.tobiaswinkler.app.mrbroccoli.DOWNLOAD_START"
-    const val ACTION_STOP = "com.tobiaswinkler.app.mrbroccoli.DOWNLOAD_STOP"
+    val ACTION_START = "${BuildConfig.APPLICATION_ID}.DOWNLOAD_START"
+    val ACTION_STOP = "${BuildConfig.APPLICATION_ID}.DOWNLOAD_STOP"
     const val EXTRA_TITLE = "title"
     const val EXTRA_BODY = "body"
 

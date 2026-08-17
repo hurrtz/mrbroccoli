@@ -18,7 +18,7 @@
     "prerelease:live": "node scripts/run-live-provider-matrix.mjs",
     "prerelease:live:test": "node --test scripts/run-live-provider-matrix.test.mjs",
     "maestro:verify": "node scripts/verify-maestro-suite.mjs",
-    "maestro:test": "node --test scripts/verify-maestro-suite.test.mjs",
+    "maestro:test": "node --test scripts/application-identifiers.test.mjs scripts/verify-maestro-suite.test.mjs",
     "maestro:prerelease": "node scripts/run-maestro-prerelease.mjs",
     "maestro:prerelease:test": "node --test scripts/run-maestro-prerelease.test.mjs scripts/run-screen-reader-check.test.mjs scripts/verify-maestro-artifacts.test.mjs",
     "maestro:screen-reader": "node scripts/run-screen-reader-check.mjs",

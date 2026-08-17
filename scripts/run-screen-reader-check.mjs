@@ -9,15 +9,15 @@ import {
 } from "./screen-reader/hierarchy.mjs";
 import { runIosScreenReaderCheck } from "./screen-reader/ios.mjs";
 import {
-  DEFAULT_APP_ID,
   executeCommand,
 } from "./screen-reader/runtime.mjs";
+import { applicationIdentifierFor } from "./application-identifiers.mjs";
 
 export { flattenHierarchy, validateScreenReaderHierarchy };
 
 function parseArguments(argv) {
   const options = {
-    appId: DEFAULT_APP_ID,
+    appId: null,
     outputDirectory: "artifacts/maestro/screen-reader",
     platform: "",
     udid: "",
@@ -50,12 +50,13 @@ function parseArguments(argv) {
   if (!options.udid) {
     throw new Error("--udid is required");
   }
+  options.appId ??= applicationIdentifierFor(options.platform);
 
   return options;
 }
 
 export function runScreenReaderCheck({
-  appId = DEFAULT_APP_ID,
+  appId,
   cwd = process.cwd(),
   execute = executeCommand,
   outputDirectory,
@@ -63,19 +64,20 @@ export function runScreenReaderCheck({
   stdout = process.stdout,
   udid,
 }) {
+  const resolvedAppId = appId ?? applicationIdentifierFor(platform);
   const platformOutput = path.resolve(cwd, outputDirectory, platform);
   fs.mkdirSync(platformOutput, { recursive: true });
   const result =
     platform === "android"
       ? runAndroidScreenReaderCheck({
-          appId,
+          appId: resolvedAppId,
           cwd,
           execute,
           outputDirectory: platformOutput,
           udid,
         })
       : runIosScreenReaderCheck({
-          appId,
+          appId: resolvedAppId,
           cwd,
           execute,
           outputDirectory: platformOutput,

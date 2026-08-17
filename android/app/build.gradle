@@ -100,7 +100,7 @@ android {
     namespace 'com.tobiaswinkler.app.mrbroccoli'
 
     defaultConfig {
-        applicationId 'com.tobiaswinkler.app.mrbroccoli'
+        applicationId 'com.tobiaswinkler.app.android.mrbroccoli'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 30

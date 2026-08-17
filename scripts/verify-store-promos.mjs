@@ -272,7 +272,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
   }
   if (
     !runner.includes('"android.intent.action.VIEW"') ||
-    !runner.includes('"-p",\n              STORE_PROMO_APP_ID')
+    !runner.includes('"-p",\n              applicationId')
   ) {
     errors.push(
       "Android fixture deep link is not targeted to the isolated application ID",

@@ -20,8 +20,16 @@ import {
 } from "./run-store-promos.mjs";
 import {
   STORE_PROMO_ANDROID_FLOW_SCENES,
+  STORE_PROMO_APP_IDS,
   STORE_PROMO_FLOWS,
 } from "./store-promo-config.mjs";
+
+test("store promo builds target each platform's isolated identity", () => {
+  assert.deepEqual(STORE_PROMO_APP_IDS, {
+    android: "com.tobiaswinkler.app.android.mrbroccoli.maestro",
+    ios: "com.tobiaswinkler.app.mrbroccoli.maestro",
+  });
+});
 
 test("Android maps its split flows to deterministic fixture scenes", () => {
   assert.deepEqual(STORE_PROMO_ANDROID_FLOW_SCENES, [

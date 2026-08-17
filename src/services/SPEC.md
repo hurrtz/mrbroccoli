@@ -218,7 +218,9 @@ test when it could contain user or provider data.
 ### Test fixtures
 
 Store-promo fixtures are deterministic, localized, network-free, and restricted
-to the exact `com.tobiaswinkler.app.mrbroccoli.maestro` identity. The single
+to the exact Maestro identity for the current platform:
+`com.tobiaswinkler.app.mrbroccoli.maestro` on iOS and
+`com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. The single
 `conversation` scene seeds provider routes, conversations, branches, and
 validated presentation state without credentials, model work, or provider
 requests. Production phase and progress remain pipeline-derived.

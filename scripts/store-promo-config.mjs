@@ -1,4 +1,9 @@
-export const STORE_PROMO_APP_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
+import { APPLICATION_IDENTIFIERS } from "./application-identifiers.mjs";
+
+export const STORE_PROMO_APP_IDS = Object.freeze({
+  android: APPLICATION_IDENTIFIERS.android.maestro,
+  ios: APPLICATION_IDENTIFIERS.ios.maestro,
+});
 export const STORE_PROMO_FLOW = ".maestro/flows/store-promos/ios.yaml";
 export const STORE_PROMO_FLOWS = Object.freeze({
   android: Object.freeze([

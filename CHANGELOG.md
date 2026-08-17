@@ -10,6 +10,11 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Android now uses the dedicated Google Play application ID
+  `com.tobiaswinkler.app.android.mrbroccoli` for the new paid listing while iOS
+  retains its existing identity. Android debug and screenshot builds use the
+  corresponding isolated suffixes.
+
 ## 4.1.0 - 2026-08-18
 
 - Mr Broccoli is now one paid-upfront BYOK product from first launch. The app

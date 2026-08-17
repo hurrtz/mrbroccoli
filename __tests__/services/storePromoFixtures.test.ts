@@ -65,12 +65,16 @@ describe("store promo fixtures", () => {
     getApplicationId.mockResolvedValue("com.tobiaswinkler.app.mrbroccoli");
 
     await expect(seedStorePromoFixture("de")).resolves.toBe(false);
+    getApplicationId.mockResolvedValue(
+      "com.tobiaswinkler.app.android.mrbroccoli",
+    );
+    await expect(seedStorePromoFixture("de")).resolves.toBe(false);
     await expect(AsyncStorage.getAllKeys()).resolves.toEqual([]);
   });
 
   it("seeds only the isolated identity without provider keys", async () => {
     getApplicationId.mockResolvedValue(
-      "com.tobiaswinkler.app.mrbroccoli.maestro",
+      "com.tobiaswinkler.app.android.mrbroccoli.maestro",
     );
 
     await expect(seedStorePromoFixture("de")).resolves.toBe(true);
@@ -121,7 +125,7 @@ describe("store promo fixtures", () => {
 
   it("seeds and loads deterministic orb progress", async () => {
     getApplicationId.mockResolvedValue(
-      "com.tobiaswinkler.app.mrbroccoli.maestro",
+      "com.tobiaswinkler.app.android.mrbroccoli.maestro",
     );
     const orb = {
       phase: "thinking" as const,
@@ -157,14 +161,27 @@ describe("store promo fixtures", () => {
     ).toBe(false);
   });
 
-  it("requires the exact isolated application identity", () => {
+  it("requires either exact platform-specific isolated application identity", () => {
+    expect(
+      isStorePromoApplicationId(
+        "com.tobiaswinkler.app.android.mrbroccoli.maestro",
+      ),
+    ).toBe(true);
     expect(
       isStorePromoApplicationId("com.tobiaswinkler.app.mrbroccoli.maestro"),
     ).toBe(true);
     expect(
       isStorePromoApplicationId(
+        "com.tobiaswinkler.app.android.mrbroccoli.maestrotools",
+      ),
+    ).toBe(false);
+    expect(
+      isStorePromoApplicationId(
         "com.tobiaswinkler.app.mrbroccoli.maestrotools",
       ),
+    ).toBe(false);
+    expect(
+      isStorePromoApplicationId("com.tobiaswinkler.app.android.mrbroccoli"),
     ).toBe(false);
     expect(isStorePromoApplicationId(null)).toBe(false);
   });

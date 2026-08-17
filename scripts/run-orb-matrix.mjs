@@ -3,7 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
+import { applicationIdentifierFor } from "./application-identifiers.mjs";
+
 const FLOW = ".maestro/flows/runtime/orb-phase-progress.yaml";
 
 /** @type {readonly (readonly [string, string, number, number, number])[]} */
@@ -26,7 +27,7 @@ function usage() {
 
 export function parseOrbMatrixArguments(argv) {
   const options = {
-    appId: DEFAULT_APP_ID,
+    appId: null,
     outputDirectory: null,
     platform: null,
     udid: null,
@@ -55,6 +56,7 @@ export function parseOrbMatrixArguments(argv) {
   if (!options.udid || !["android", "ios"].includes(options.platform)) {
     throw new Error(usage());
   }
+  options.appId ??= applicationIdentifierFor(options.platform, "maestro");
 
   return options;
 }

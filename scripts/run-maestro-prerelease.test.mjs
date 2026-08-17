@@ -141,11 +141,12 @@ emulator-5554 device product:sdk model:Pixel transport_id:1
       screenReaderChecks.map(({ args }) => args[4]),
       ["android", "ios"],
     );
-    assert.equal(
-      screenReaderChecks.every(({ args }) =>
-        args.includes("com.tobiaswinkler.app.mrbroccoli.maestro"),
-      ),
-      true,
+    assert.deepEqual(
+      screenReaderChecks.map(({ args }) => args[2]),
+      [
+        "com.tobiaswinkler.app.android.mrbroccoli.maestro",
+        "com.tobiaswinkler.app.mrbroccoli.maestro",
+      ],
     );
     assert.ok(androidBuild.args.includes("-PmrBroccoliMaestroVariant=true"));
     assert.ok(iosBuild.args.includes("MR_BROCCOLI_LOCAL_BUNDLE_SUFFIX=.maestro"));

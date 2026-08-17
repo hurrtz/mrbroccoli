@@ -1,5 +1,5 @@
 app_identifier("com.tobiaswinkler.app.mrbroccoli")
-package_name("com.tobiaswinkler.app.mrbroccoli")
+package_name("com.tobiaswinkler.app.android.mrbroccoli")
 
 # Credentials live in fastlane/.env, which fastlane loads automatically and
 # .gitignore excludes. Copy fastlane/.env.example to get started, then run

@@ -3,6 +3,11 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import parsePng from "parse-png";
 
+import {
+  ANDROID_NATIVE_NAMESPACE,
+  APPLICATION_IDENTIFIERS,
+} from "./application-identifiers.mjs";
+
 const root = process.cwd();
 const readText = (path) => readFileSync(resolve(root, path), "utf8");
 const readBytes = (path) => readFileSync(resolve(root, path));
@@ -10,6 +15,7 @@ const appConfig = JSON.parse(readText("app.json")).expo;
 const packageJson = JSON.parse(readText("package.json"));
 const packageLock = JSON.parse(readText("package-lock.json"));
 const easConfig = JSON.parse(readText("eas.json"));
+const fastlaneAppfile = readText("fastlane/Appfile");
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
 const iosPodfile = readText("ios/Podfile");
 const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
@@ -116,7 +122,6 @@ const iosBundleIdentifier = appConfig.ios?.bundleIdentifier;
 const iosDevelopmentBundleIdentifier = `${iosBundleIdentifier}.dev`;
 const iosDeploymentTarget = appConfig.ios?.deploymentTarget;
 const androidPackage = appConfig.android?.package;
-const androidDevelopmentPackage = `${androidPackage}.dev`;
 const scheme = appConfig.scheme;
 const iconPath = appConfig.icon?.replace(/^\.\//, "");
 const iosIconPath = appConfig.ios?.icon?.replace(/^\.\//, "");
@@ -206,6 +211,26 @@ assertEqual(
   JSON.stringify(["ios", "android"]),
 );
 assertEqual("Expo iOS tablet support", appConfig.ios?.supportsTablet, true);
+assertEqual(
+  "Expo iOS production bundle identifier",
+  iosBundleIdentifier,
+  APPLICATION_IDENTIFIERS.ios.production,
+);
+assertEqual(
+  "Expo Android production application ID",
+  androidPackage,
+  APPLICATION_IDENTIFIERS.android.production,
+);
+assertIncludes(
+  "Fastlane iOS bundle identifier",
+  fastlaneAppfile,
+  `app_identifier("${APPLICATION_IDENTIFIERS.ios.production}")`,
+);
+assertIncludes(
+  "Fastlane Android application ID",
+  fastlaneAppfile,
+  `package_name("${APPLICATION_IDENTIFIERS.android.production}")`,
+);
 assertEqual(
   "Expo iOS full-screen requirement",
   appConfig.ios?.requireFullScreen,
@@ -374,7 +399,7 @@ assertAllEqual(
 assertIncludes(
   "Android namespace",
   androidBuild,
-  `namespace '${androidPackage}'`,
+  `namespace '${ANDROID_NATIVE_NAMESPACE}'`,
 );
 assertIncludes(
   "Android application ID",
@@ -384,7 +409,7 @@ assertIncludes(
 assertIncludes(
   "Android instrumentation application ID",
   androidInstrumentation,
-  `const APP_PACKAGE = "${androidDevelopmentPackage}";`,
+  "const APP_PACKAGE = APPLICATION_IDENTIFIERS.android.debug;",
 );
 assertExcludes(
   "Android Play Billing permission is absent",

@@ -28,7 +28,9 @@ conversation behavior, persistence, provider routing, or presentation policy.
   localization, theme, typography, and the router stack.
 - `index.tsx` is the production entry and renders `MainScreen`.
 - `store-promos.tsx` is the isolated deterministic screenshot entry used only
-  by the exact `com.tobiaswinkler.app.mrbroccoli.maestro` application identity.
+  by the exact Maestro application identity for its platform:
+  `com.tobiaswinkler.app.mrbroccoli.maestro` on iOS and
+  `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android.
 
 **Decision:** Expo Router is the only JavaScript entry mechanism. Historical
 template `App.tsx` and bare `index.ts` stubs remain absent so there is one

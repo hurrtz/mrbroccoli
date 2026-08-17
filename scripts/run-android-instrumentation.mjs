@@ -1,8 +1,10 @@
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
+import { APPLICATION_IDENTIFIERS } from "./application-identifiers.mjs";
+
 const EMULATOR_SERIAL_ENV = "MR_BROCCOLI_ANDROID_EMULATOR_SERIAL";
-const APP_PACKAGE = "com.tobiaswinkler.app.mrbroccoli.dev";
+const APP_PACKAGE = APPLICATION_IDENTIFIERS.android.debug;
 const TEST_PACKAGE = `${APP_PACKAGE}.test`;
 const TEST_RUNNER = `${TEST_PACKAGE}/androidx.test.runner.AndroidJUnitRunner`;
 

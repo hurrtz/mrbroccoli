@@ -118,14 +118,14 @@ internal class MrBroccoliVoiceTurnStartupState {
 
 class MrBroccoliVoiceTurnService : Service() {
   companion object {
-    private const val ACTION_START_PENDING =
-      "com.tobiaswinkler.app.mrbroccoli.action.START_VOICE_TURN"
-    private const val ACTION_SET_STATE =
-      "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_STATE"
-    private const val ACTION_SET_CONTROLS =
-      "com.tobiaswinkler.app.mrbroccoli.action.SET_VOICE_TURN_CONTROLS"
-    private const val ACTION_REMOTE_ACTION =
-      "com.tobiaswinkler.app.mrbroccoli.action.VOICE_REMOTE_ACTION"
+    private val ACTION_START_PENDING =
+      "${BuildConfig.APPLICATION_ID}.action.START_VOICE_TURN"
+    private val ACTION_SET_STATE =
+      "${BuildConfig.APPLICATION_ID}.action.SET_VOICE_TURN_STATE"
+    private val ACTION_SET_CONTROLS =
+      "${BuildConfig.APPLICATION_ID}.action.SET_VOICE_TURN_CONTROLS"
+    private val ACTION_REMOTE_ACTION =
+      "${BuildConfig.APPLICATION_ID}.action.VOICE_REMOTE_ACTION"
     private const val EXTRA_PHASE = "phase"
     private const val EXTRA_EXPECTED_SPEECH_AT_MS = "expectedSpeechAtMs"
     private const val EXTRA_PHASE_LABEL = "phaseLabel"

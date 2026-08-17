@@ -4,7 +4,10 @@ import type { PipelinePhase } from "../hooks/useVoicePipeline";
 import type { VoiceVisualPhase } from "../types";
 import { getApplicationId } from "./debugRuntimeContext";
 
-const STORE_PROMO_APPLICATION_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
+const STORE_PROMO_APPLICATION_IDS = new Set([
+  "com.tobiaswinkler.app.android.mrbroccoli.maestro",
+  "com.tobiaswinkler.app.mrbroccoli.maestro",
+]);
 
 export const STORE_PROMO_SCENE_STORAGE_KEY = "@mrbroccoli/store-promo-scene";
 export const STORE_PROMO_ORB_STORAGE_KEY = "@mrbroccoli/store-promo-orb";
@@ -31,7 +34,7 @@ const STORE_PROMO_ORB_PHASES: readonly VoiceVisualPhase[] = [
 ];
 
 export function isStorePromoApplicationId(applicationId: string | null) {
-  return applicationId === STORE_PROMO_APPLICATION_ID;
+  return applicationId !== null && STORE_PROMO_APPLICATION_IDS.has(applicationId);
 }
 
 export function isStorePromoScene(value: unknown): value is StorePromoScene {

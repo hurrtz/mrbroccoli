@@ -3,7 +3,12 @@ import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { pathToFileURL } from "node:url";
 
-const APP_ID = "com.tobiaswinkler.app.mrbroccoli.maestro";
+import { APPLICATION_IDENTIFIERS } from "./application-identifiers.mjs";
+
+const APP_IDS = Object.freeze({
+  android: APPLICATION_IDENTIFIERS.android.maestro,
+  ios: APPLICATION_IDENTIFIERS.ios.maestro,
+});
 
 export function parseAdbDevices(output) {
   return output
@@ -138,12 +143,12 @@ function runMaestroSuite({
 function uninstallExistingAndroidApp({ captureCommand, cwd, run, udid }) {
   const installedPath = captureCommand(
     "adb",
-    ["-s", udid, "shell", "pm", "path", APP_ID],
+    ["-s", udid, "shell", "pm", "path", APP_IDS.android],
     { capture: true, cwd },
   ).trim();
 
   if (installedPath) {
-    run("adb", ["-s", udid, "uninstall", APP_ID], { cwd });
+    run("adb", ["-s", udid, "uninstall", APP_IDS.android], { cwd });
   }
 }
 
@@ -225,7 +230,7 @@ export function runMaestroPrerelease({
     // fail with INSTALL_FAILED_UPDATE_INCOMPATIBLE.
     uninstallExistingAndroidApp({ captureCommand, cwd, run, udid });
     run("adb", ["-s", udid, "install", releaseApk], { cwd });
-    run("adb", ["-s", udid, "shell", "pm", "path", APP_ID], { cwd });
+    run("adb", ["-s", udid, "shell", "pm", "path", APP_IDS.android], { cwd });
   }
 
   const derivedData = path.join(
@@ -271,7 +276,7 @@ export function runMaestroPrerelease({
   run("xcrun", ["simctl", "install", iosSimulator, iosApp], { cwd });
   run(
     "xcrun",
-    ["simctl", "get_app_container", iosSimulator, APP_ID, "app"],
+    ["simctl", "get_app_container", iosSimulator, APP_IDS.ios, "app"],
     { cwd },
   );
 
@@ -286,7 +291,7 @@ export function runMaestroPrerelease({
   );
 
   runMaestroSuite({
-    appId: APP_ID,
+    appId: APP_IDS.android,
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "android",
@@ -295,7 +300,7 @@ export function runMaestroPrerelease({
     udid: androidEmulator,
   });
   runMaestroSuite({
-    appId: APP_ID,
+    appId: APP_IDS.ios,
     cwd,
     outputDirectory: "artifacts/maestro/release",
     platform: "ios",
@@ -312,7 +317,7 @@ export function runMaestroPrerelease({
       [
         "scripts/run-screen-reader-check.mjs",
         "--app-id",
-        APP_ID,
+        APP_IDS[platform],
         "--platform",
         platform,
         "--udid",
@@ -324,7 +329,7 @@ export function runMaestroPrerelease({
     );
   }
   runMaestroSuite({
-    appId: APP_ID,
+    appId: APP_IDS.android,
     cwd,
     outputDirectory: "artifacts/maestro/release-physical",
     platform: "android",

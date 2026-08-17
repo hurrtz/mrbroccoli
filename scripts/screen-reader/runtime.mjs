@@ -1,7 +1,6 @@
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 
-export const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli";
 const PREP_FLOW = ".maestro/flows/accessibility/screen-reader-home.yaml";
 
 export function wait(milliseconds) {

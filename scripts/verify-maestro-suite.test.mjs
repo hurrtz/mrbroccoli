@@ -61,19 +61,17 @@ test("counts only explicit screenshot commands", () => {
 });
 
 test("visual suites default to both color schemes", () => {
-  assert.equal(
-    parseMaestroArguments([
+  const ios = parseMaestroArguments([
       "--platform",
       "ios",
       "--suite",
       "locales",
       "--udid",
       "IOS-UDID",
-    ]).colorScheme,
-    "both",
-  );
-  assert.equal(
-    parseMaestroArguments([
+    ]);
+  assert.equal(ios.colorScheme, "both");
+  assert.equal(ios.appId, "com.tobiaswinkler.app.mrbroccoli");
+  const android = parseMaestroArguments([
       "--platform",
       "android",
       "--suite",
@@ -82,8 +80,11 @@ test("visual suites default to both color schemes", () => {
       "emulator-5554",
       "--color-scheme",
       "dark",
-    ]).colorScheme,
-    "dark",
+    ]);
+  assert.equal(android.colorScheme, "dark");
+  assert.equal(
+    android.appId,
+    "com.tobiaswinkler.app.android.mrbroccoli",
   );
 });
 
@@ -363,6 +364,15 @@ test("requires a supported platform and explicit orb target", () => {
       platform: "ios",
       udid: "IOS-UDID",
     },
+  );
+  assert.equal(
+    parseOrbMatrixArguments([
+      "--platform",
+      "android",
+      "--udid",
+      "emulator-5554",
+    ]).appId,
+    "com.tobiaswinkler.app.android.mrbroccoli.maestro",
   );
   assert.throws(() => parseOrbMatrixArguments(["--platform", "web"]), /Usage/);
 });

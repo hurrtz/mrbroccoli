@@ -123,6 +123,10 @@ the architectural answer for the author.
   absence cannot be exercised by the Debug instrumentation build. On iOS it
   also locks Expo tablet support, dynamic resizing, all four orientations, and
   the six app/test/Live-Activity target-family settings to universal `1,2`.
+- `application-identifiers.mjs` is the automation source of truth for the
+  intentionally distinct Android and iOS production, debug, and Maestro
+  identities. Cross-platform runners must select by platform rather than reuse
+  one shared package value.
 - Non-zero exit means the requested evidence was not produced. Missing tools,
   devices, credentials, symbols, mappings, or reports are failures when the
   target promises them.

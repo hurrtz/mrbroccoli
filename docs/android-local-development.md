@@ -33,11 +33,11 @@ For emulator sessions where you install with Gradle directly, start Metro in dev
 npx expo start --dev-client --host lan
 adb reverse tcp:8081 tcp:8081
 cd android && ./gradlew installDebug
-adb shell am start -n com.tobiaswinkler.app.mrbroccoli.dev/com.tobiaswinkler.app.mrbroccoli.MainActivity
+adb shell am start -n com.tobiaswinkler.app.android.mrbroccoli.dev/com.tobiaswinkler.app.mrbroccoli.MainActivity
 ```
 
 Debug builds install as `Mr Broccoli Dev` with application ID
-`com.tobiaswinkler.app.mrbroccoli.dev`, so they can coexist with the Play Store
+`com.tobiaswinkler.app.android.mrbroccoli.dev`, so they can coexist with the Play Store
 app. Release builds keep the production application ID.
 
 Avoid `npx expo start --localhost` for this path: on macOS it can bind Metro only to loopback, while Android probes the host at `10.0.2.2:8081`.

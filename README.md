@@ -227,8 +227,9 @@ __tests__/              Focused hook and service tests
 - Sherpa/ONNX runtime changes require a native rebuild; adding only an OTA
   update is not sufficient.
 - Release builds use `com.tobiaswinkler.app.mrbroccoli` as the iOS bundle
-  identifier and Android application ID. Debug builds append `.dev` so local
-  installs can coexist with the App Store or Play Store app.
+  identifier and `com.tobiaswinkler.app.android.mrbroccoli` as the Android
+  application ID. Debug builds append `.dev` so local installs can coexist
+  with the App Store or Play Store app.
 - `npm run ios:standalone` combines the iOS Release runtime with the `.dev`
   identity for offline physical-device testing; normal Release and App Store
   builds retain the production identifier.

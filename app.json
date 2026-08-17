@@ -62,7 +62,7 @@
         "backgroundImage": "./assets/appIcon/android-background.png",
         "monochromeImage": "./assets/appIcon/android-adaptive-monochrome.png"
       },
-      "package": "com.tobiaswinkler.app.mrbroccoli"
+      "package": "com.tobiaswinkler.app.android.mrbroccoli"
     },
     "extra": {
       "router": {},

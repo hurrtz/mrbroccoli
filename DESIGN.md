@@ -318,9 +318,10 @@ The stores sell the complete app up front. Runtime code contains no product
 lookup, purchase, restoration, cached entitlement, or development edition
 simulation.
 
-**Decision:** Store-promo fixtures remain restricted to the exact
-`com.tobiaswinkler.app.mrbroccoli.maestro` application ID. They cannot activate
-in the production or `.dev` package.
+**Decision:** Store-promo fixtures remain restricted to the exact platform
+Maestro identities: `com.tobiaswinkler.app.mrbroccoli.maestro` on iOS and
+`com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. They cannot
+activate in either production or `.dev` package.
 
 ## Native Boundaries
 

@@ -8,9 +8,10 @@ broader Maestro release QA gallery.
 
 The fixture route writes deterministic sample conversations and presentation
 state only when the installed application identifier is exactly
-`com.tobiaswinkler.app.mrbroccoli.maestro`. Production, `.dev`, and every other
-application identity fail closed. The fixture contains no credentials,
-provider requests, user data, or downloaded models.
+`com.tobiaswinkler.app.mrbroccoli.maestro` on iOS or
+`com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. Production,
+`.dev`, and every other application identity fail closed. The fixture contains
+no credentials, provider requests, user data, or downloaded models.
 All assistant replies and the non-idle CTA phase are fixed. The single
 `conversation` scene seeds the requested locale, provider routes, a branched
 conversation, and presentation state without a provider call. It never writes
@@ -181,7 +182,7 @@ download at all — neither fits the lane DSL:
 ```sh
 bundle exec fastlane deliver download_metadata --metadata_path fastlane/.backup/apple
 bundle exec fastlane supply init --json_key "$SUPPLY_JSON_KEY" \
-  --package_name com.tobiaswinkler.app.mrbroccoli --metadata_path fastlane/.backup/play
+  --package_name com.tobiaswinkler.app.android.mrbroccoli --metadata_path fastlane/.backup/play
 ```
 
 Point both at `.backup/`, never at the default path: downloading over the

@@ -16,12 +16,11 @@ import {
   readAppLocaleOptions,
   validateMaestroSuite,
 } from "./verify-maestro-suite.mjs";
-
-const DEFAULT_APP_ID = "com.tobiaswinkler.app.mrbroccoli";
+import { applicationIdentifierFor } from "./application-identifiers.mjs";
 
 export function parseMaestroArguments(argv) {
   const options = {
-    appId: DEFAULT_APP_ID,
+    appId: null,
     colorScheme: "both",
     outputDirectory: "artifacts/maestro",
     platform: null,
@@ -84,6 +83,7 @@ export function parseMaestroArguments(argv) {
   ) {
     throw new Error("--locale can only be used with all or locales");
   }
+  options.appId ??= applicationIdentifierFor(options.platform);
 
   return options;
 }

@@ -10,7 +10,7 @@ import parsePng from "parse-png";
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
   STORE_PROMO_ANDROID_FLOW_SCENES,
-  STORE_PROMO_APP_ID,
+  STORE_PROMO_APP_IDS,
   STORE_PROMO_FLOWS,
   STORE_PROMO_IOS_DISPLAYS,
   STORE_PROMO_SCREENSHOT_COUNTS,
@@ -728,6 +728,7 @@ function captureMaestroFlow({
   platform,
   udid,
 }) {
+  const applicationId = STORE_PROMO_APP_IDS[platform];
   const configuredLocales = readAppLocaleOptions(cwd);
   const localeIndex = configuredLocales.findIndex(
     ({ value }) => value === locale,
@@ -747,7 +748,7 @@ function captureMaestroFlow({
       if (platform === "android") {
         runCommand(
           "adb",
-          ["-s", udid, "shell", "pm", "clear", STORE_PROMO_APP_ID],
+          ["-s", udid, "shell", "pm", "clear", applicationId],
           { cwd },
         );
       }
@@ -775,7 +776,7 @@ function captureMaestroFlow({
                 `mrbroccoli://store-promos?locale=${locale}&scene=${scene}&colorScheme=${colorScheme}`,
               ),
               "-p",
-              STORE_PROMO_APP_ID,
+              applicationId,
             ],
             { cwd },
           );
@@ -790,7 +791,7 @@ function captureMaestroFlow({
             "--config",
             ".maestro/config.yaml",
             "-e",
-            `APP_ID=${STORE_PROMO_APP_ID}`,
+            `APP_ID=${applicationId}`,
             "-e",
             `COLOR_SCHEME=${colorScheme}`,
             "-e",
@@ -944,7 +945,7 @@ async function collectScreenshots({
   const manifest = {
     schemaVersion: 3,
     platform,
-    applicationId: STORE_PROMO_APP_ID,
+    applicationId: STORE_PROMO_APP_IDS[platform],
     version: readArtifactVersion({ artifactPath, cwd, platform }),
     ...sourceProvenance,
     artifact: {
@@ -1052,16 +1053,16 @@ function buildIsolatedAndroidApp({ cwd, target }) {
 function installAndroidApp({ cwd, target, udid }) {
   const installed = runCommand(
     "adb",
-    ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_ID],
+    ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_IDS.android],
     { allowFailure: true, capture: true, cwd },
   ).trim();
   if (installed) {
-    runCommand("adb", ["-s", udid, "uninstall", STORE_PROMO_APP_ID], {
+    runCommand("adb", ["-s", udid, "uninstall", STORE_PROMO_APP_IDS.android], {
       cwd,
     });
   }
   runCommand("adb", ["-s", udid, "install", target], { cwd });
-  runCommand("adb", ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_ID], {
+  runCommand("adb", ["-s", udid, "shell", "pm", "path", STORE_PROMO_APP_IDS.android], {
     cwd,
   });
 }
@@ -1140,7 +1141,7 @@ export async function runStorePromos({
         "simctl",
         "get_app_container",
         simulator.udid,
-        STORE_PROMO_APP_ID,
+        STORE_PROMO_APP_IDS.ios,
         "app",
       ],
       { cwd },

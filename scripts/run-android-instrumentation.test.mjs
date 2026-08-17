@@ -65,13 +65,13 @@ test("resets only the emulator app before running instrumentation", () => {
         "-s",
         "emulator-5554",
         "uninstall",
-        "com.tobiaswinkler.app.mrbroccoli.dev.test",
+        "com.tobiaswinkler.app.android.mrbroccoli.dev.test",
       ],
       [
         "-s",
         "emulator-5554",
         "uninstall",
-        "com.tobiaswinkler.app.mrbroccoli.dev",
+        "com.tobiaswinkler.app.android.mrbroccoli.dev",
       ],
     ],
   );

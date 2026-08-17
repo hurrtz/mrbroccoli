@@ -224,10 +224,12 @@ offline conversation mode.
   windows expose persistent navigation and wider information layouts while
   preserving the active conversation and configured routes through rotation,
   Split View, and Stage Manager resizing.
-- The same production identifiers remain
-  `com.tobiaswinkler.app.mrbroccoli`; `.dev` and `.maestro` identities are
-  isolated test installations and must not weaken production fixture
-  boundaries.
+- **Decision:** iOS retains `com.tobiaswinkler.app.mrbroccoli`, while Android
+  uses the independent Play identity
+  `com.tobiaswinkler.app.android.mrbroccoli`. This deliberate split supports
+  the new paid Android listing without changing the approved Apple identity.
+  Each platform appends `.dev` and `.maestro` for isolated test installations;
+  those variants must not weaken production fixture boundaries.
 
 ## Core Terms
 
