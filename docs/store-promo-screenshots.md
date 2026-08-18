@@ -130,6 +130,10 @@ Output is one folder per store listing, so uploads are drag-and-drop, plus a
 artifacts/store-gallery/<profile>/<lang>/<scheme>/01..07-<slug>.png
 ```
 
+Rendering replaces existing PNGs in each selected output folder before it
+writes the current seven-panel story, preventing obsolete campaign filenames
+from entering the generated Fastlane tree.
+
 **Decision:** Python and Pillow rather than a Node renderer. Nothing in
 `node_modules` can composite images, and adding `sharp` or `playwright` would
 churn the Knip and license gates for a tool that never ships. Pillow is built

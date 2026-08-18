@@ -593,6 +593,7 @@ def render(
                 target_dir = out_root / profile / lang / scheme
                 if not dry_run:
                     target_dir.mkdir(parents=True, exist_ok=True)
+                    clear_rendered_panels(target_dir)
 
                 for index, slug in enumerate(PANELS):
                     shot_path = source / f"{slug}.png"
@@ -729,6 +730,12 @@ def render(
             } for name, geo in geometries.items()
         },
     }
+
+
+def clear_rendered_panels(target_dir: Path) -> None:
+    """Remove panels from an older story before writing the current one."""
+    for panel in target_dir.glob("*.png"):
+        panel.unlink()
 
 
 def main() -> int:

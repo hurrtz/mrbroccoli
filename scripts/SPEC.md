@@ -149,6 +149,9 @@ the architectural answer for the author.
   and failure.
 - Generated evidence belongs under ignored `artifacts/`; checked-in source
   files remain the configuration authority.
+- Store-gallery rendering replaces every PNG in the selected
+  profile/language/scheme output directory before writing the current story,
+  so retired campaign filenames cannot leak into a later Fastlane export.
 - The iOS store-promo build targets the arm64 Simulator architecture used by
   the local Apple-silicon capture host; one secret-scanned app is reusable
   across every configured iPhone and iPad simulator.

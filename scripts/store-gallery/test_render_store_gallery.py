@@ -8,6 +8,7 @@ Stdlib unittest so the repository gains no test dependency.
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -21,6 +22,7 @@ from render_store_gallery import (  # noqa: E402
     PANELS,
     PROFILES,
     Headline,
+    clear_rendered_panels,
     compute_geometry,
     is_complex_script,
 )
@@ -147,6 +149,21 @@ class WrappingTests(unittest.TestCase):
         lines = head.wrap("x" * 400, 300, False)
         self.assertGreater(len(lines), 1)
         self.assertTrue(all(line for line in lines))
+
+
+class OutputTests(unittest.TestCase):
+    def test_old_story_panels_are_removed_before_rendering(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            target = Path(temporary)
+            stale = target / "01-premium-active-conversation.png"
+            keep = target / "review-notes.txt"
+            stale.write_bytes(b"old")
+            keep.write_text("keep", encoding="utf-8")
+
+            clear_rendered_panels(target)
+
+            self.assertFalse(stale.exists())
+            self.assertTrue(keep.exists())
 
 
 if __name__ == "__main__":
