@@ -880,6 +880,7 @@ export function MainScreen() {
   const presentationPipelinePhase = getStorePromoPipelinePhase(
     storePromoScene,
     pipelinePhase,
+    storePromoOrbPresentation,
   );
   const { isActive, lastAssistantReply, messages, statusDisplay, visualPhase } =
     getMainScreenViewModel({

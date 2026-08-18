@@ -93,6 +93,9 @@ frames that imply missing content.
 Store promos use one identity-guarded `conversation` scene and capture a
 seven-image BYOK story: voice conversation, transcript, branches, provider
 settings, exact response route, voice selection, and per-conversation settings.
+The story restarts the native surface after the transcript and reseeds the same
+scene with an idle presentation before its final frame, because active-turn
+controls deliberately replace the conversation-settings control on home.
 The automation identity never contacts a platform store or provider. The
 supported capture matrix includes the five requested iPhone display classes, a
 regular-width iPad, and Android phone and tablet profiles.

@@ -59,6 +59,10 @@ tags:
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
+- stopApp
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
+- assertVisible:
+    id: voice-stage-idle
 - assertVisible:
     id: conversation-settings-summary-control
 - tapOn:

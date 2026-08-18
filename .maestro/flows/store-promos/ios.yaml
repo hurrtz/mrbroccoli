@@ -37,9 +37,10 @@ tags:
     id: transcript-message-promo-assistant-2
 - takeScreenshot:
     path: 02-complete-transcript
-- tapOn:
-    id: transcript-sheet-header-close
-- waitForAnimationToEnd
+- stopApp
+- launchApp
+- assertVisible:
+    id: transcript-handle
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -130,6 +131,13 @@ tags:
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
+- stopApp
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: voice-stage-idle
 - assertVisible:
     id: conversation-settings-summary-control
 - tapOn:

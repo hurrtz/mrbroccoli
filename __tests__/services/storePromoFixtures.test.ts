@@ -120,6 +120,14 @@ describe("store promo fixtures", () => {
     expect(getStorePromoPipelinePhase("conversation", "idle")).toBe(
       "thinking",
     );
+    expect(
+      getStorePromoPipelinePhase("conversation", "thinking", {
+        phase: "idle",
+        phaseProgress: 0,
+        turnProgress: 0,
+        overtime: 0,
+      }),
+    ).toBe("idle");
     expect(getStorePromoPipelinePhase(null, "searching")).toBe("searching");
   });
 

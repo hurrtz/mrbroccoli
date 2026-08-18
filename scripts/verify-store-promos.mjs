@@ -239,6 +239,19 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         "iOS store screenshot flow must open the transcript before using message actions",
       );
     }
+    if (combinedFlow.includes("transcript-sheet-header-close")) {
+      errors.push(
+        `${platform} store screenshot flow still uses the removed transcript close control`,
+      );
+    }
+    if (
+      !combinedFlow.includes("phase=idle") ||
+      !combinedFlow.includes("voice-stage-idle")
+    ) {
+      errors.push(
+        `${platform} store screenshot flow must restore the idle workspace before opening conversation settings`,
+      );
+    }
   }
   if (
     !route.includes("seedStorePromoFixture") ||

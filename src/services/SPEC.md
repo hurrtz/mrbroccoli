@@ -223,7 +223,9 @@ to the exact Maestro identity for the current platform:
 `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. The single
 `conversation` scene seeds provider routes, conversations, branches, and
 validated presentation state without credentials, model work, or provider
-requests. Production phase and progress remain pipeline-derived.
+requests. Its optional idle presentation restores the real idle home controls
+for the final per-conversation-settings frame; production phase and progress
+remain pipeline-derived.
 
 ## Failure Rules
 

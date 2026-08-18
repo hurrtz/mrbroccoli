@@ -78,6 +78,15 @@ test("iOS scene changes require a stopped native surface", () => {
   );
 });
 
+test("store captures follow the current transcript and idle-settings contracts", () => {
+  for (const platform of ["android", "ios"]) {
+    const combined = readFlows(platform).join("\n");
+    assert.doesNotMatch(combined, /transcript-sheet-header-close/, platform);
+    assert.match(combined, /phase=idle/, platform);
+    assert.match(combined, /voice-stage-idle/, platform);
+  }
+});
+
 test("captures wait for the conversation drawer before opening Settings", () => {
   for (const platform of ["android", "ios"]) {
     const flows = readFlows(platform);

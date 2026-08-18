@@ -97,6 +97,14 @@ export async function loadStorePromoOrbPresentation(): Promise<StorePromoOrbPres
 export function getStorePromoPipelinePhase(
   scene: StorePromoScene | null,
   pipelinePhase: PipelinePhase,
+  orb: StorePromoOrbPresentation | null = null,
 ): PipelinePhase {
-  return scene === "conversation" ? "thinking" : pipelinePhase;
+  if (scene !== "conversation") {
+    return pipelinePhase;
+  }
+
+  // The promo story starts with a deterministic in-flight turn, but its final
+  // frame needs the real idle home controls so per-conversation settings can
+  // be opened after active-turn controls deliberately hide them.
+  return orb?.phase === "idle" ? "idle" : "thinking";
 }
