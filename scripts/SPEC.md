@@ -91,13 +91,13 @@ It navigates to stable bottom selectors instead of blindly repeating swipes,
 because a page that already fits on a tall phone must not produce duplicate
 frames that imply missing content.
 Store promos use one identity-guarded `conversation` scene and capture a
-seven-image BYOK story: voice conversation, transcript, branches, provider
-settings, exact response route, voice selection, and per-conversation settings.
-The story restarts the native surface after the transcript and reseeds the same
-scene with an idle presentation before its final frame, because active-turn
-controls deliberately replace the conversation-settings control on home.
-Android gives that frame its own split flow so the runner can package-target
-the fixture deep link without exposing a system app chooser.
+seven-image BYOK story: idle home, opened latest transcript reply, organized
+sessions, Connections, Thinking, the Council builder, and per-conversation
+settings. The fixture contains two pinned and eight earlier sessions, including
+two forks and one locked row, plus four collapsed archived sessions. Every flow
+uses the idle presentation so the real home controls remain reachable. Android
+keeps split flows so the runner can package-target the fixture deep link without
+exposing a system app chooser.
 The automation identity never contacts a platform store or provider. The
 supported capture matrix includes the five requested iPhone display classes, a
 regular-width iPad, and Android phone and tablet profiles.
@@ -185,6 +185,8 @@ the architectural answer for the author.
 - Store-promo capture uses the `.maestro` identity and deterministic fixture
   state. Its outputs are marketing artifacts, not runtime test fixtures for
   production.
+- Capture supports either color scheme, while the 4.1.0 store campaign exports
+  and uploads light galleries only.
 
 ## Change Checklist
 

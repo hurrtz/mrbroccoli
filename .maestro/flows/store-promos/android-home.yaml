@@ -12,11 +12,11 @@ tags:
 - assertVisible:
     id: ^app-locale-${LOCALE}$
 - assertVisible:
-    id: voice-stage-thinking
+    id: voice-stage-idle
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
-    path: 01-voice-first-conversation
+    path: 01-home-idle
 - tapOn:
     id: transcript-handle
 - assertVisible:
@@ -25,6 +25,9 @@ tags:
     id: transcript-message-promo-user-1
 - assertVisible:
     id: transcript-message-promo-assistant-2
+- tapOn:
+    id: transcript-toggle-promo-assistant-2
+- waitForAnimationToEnd
 - takeScreenshot:
-    path: 02-complete-transcript
+    path: 02-transcript-last-response
 - stopApp

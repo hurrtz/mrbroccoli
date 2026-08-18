@@ -46,15 +46,24 @@ describe("store promo fixtures", () => {
     NativeModules.MrBroccoliDiagnostics = { getApplicationId };
   });
 
-  it("provides a populated BYOK branch fixture for every registered locale", () => {
+  it("provides the complete BYOK gallery fixture for every registered locale", () => {
     for (const language of APP_LANGUAGES) {
       const conversations = buildStorePromoConversations(language);
-      expect(conversations).toHaveLength(3);
+      const everyday = conversations.filter(({ archived }) => !archived);
+      const archived = conversations.filter(({ archived }) => archived);
+
+      expect(conversations).toHaveLength(14);
+      expect(everyday).toHaveLength(10);
+      expect(archived).toHaveLength(4);
+      expect(conversations.filter(({ branch }) => branch)).toHaveLength(2);
+      expect(conversations.filter(({ isLocked }) => isLocked)).toHaveLength(1);
       expect(conversations[0].messages).toHaveLength(4);
       expect(
         conversations[0].messages.at(-1)?.metadata?.ulraMode,
       ).toBeDefined();
-      expect(conversations[1].branch).toMatchObject({
+      expect(
+        conversations.find(({ id }) => id === "promo-branch")?.branch,
+      ).toMatchObject({
         rootConversationId: "promo-root",
         parentConversationId: "promo-root",
         branchMessageId: "promo-branch-user",
@@ -86,7 +95,12 @@ describe("store promo fixtures", () => {
     expect(storedSettings.language).toBe("de");
     expect(storedSettings).not.toHaveProperty("apiKeys");
     expect(storedSettings).not.toHaveProperty("introCompleted");
-    expect(await readStoredConversationMetas()).toHaveLength(3);
+    const storedMetas = await readStoredConversationMetas();
+    expect(storedMetas).toHaveLength(14);
+    expect(storedMetas.filter(({ pinned }) => pinned)).toHaveLength(2);
+    expect(storedMetas.filter(({ archived }) => archived)).toHaveLength(4);
+    expect(storedMetas.filter(({ branch }) => branch)).toHaveLength(2);
+    expect(storedMetas.filter(({ isLocked }) => isLocked)).toHaveLength(1);
     await expect(readActiveConversationId()).resolves.toBe("promo-root");
     await expect(readConversation("promo-root")).resolves.not.toBeNull();
     await expect(
@@ -118,9 +132,7 @@ describe("store promo fixtures", () => {
     expect(isStorePromoScene("free")).toBe(false);
     expect(isStorePromoScene("premium")).toBe(false);
     expect(isStorePromoScene("onboarding")).toBe(false);
-    expect(getStorePromoPipelinePhase("conversation", "idle")).toBe(
-      "thinking",
-    );
+    expect(getStorePromoPipelinePhase("conversation", "idle")).toBe("thinking");
     expect(
       getStorePromoPipelinePhase("conversation", "thinking", {
         phase: "idle",
@@ -135,7 +147,10 @@ describe("store promo fixtures", () => {
         "conversation",
         [
           { id: "mode-1", route: { provider: "openai", model: "gpt-5.6-sol" } },
-          { id: "mode-2", route: { provider: "anthropic", model: "claude-sonnet-5" } },
+          {
+            id: "mode-2",
+            route: { provider: "anthropic", model: "claude-sonnet-5" },
+          },
         ],
         [],
       ),

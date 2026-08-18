@@ -13,7 +13,7 @@ tags:
 - tapOn:
     text: Cancel
     optional: true
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}"
+- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
 - tapOn:
     text: Open
     optional: true
@@ -24,19 +24,22 @@ tags:
 - assertVisible:
     id: ^app-locale-${LOCALE}$
 - assertVisible:
-    id: voice-stage-thinking
+    id: voice-stage-idle
 - assertVisible:
     id: transcript-handle
 - takeScreenshot:
-    path: 01-voice-first-conversation
+    path: 01-home-idle
 - tapOn:
     id: transcript-handle
 - assertVisible:
     id: chat-transcript-list
 - assertVisible:
     id: transcript-message-promo-assistant-2
+- tapOn:
+    id: transcript-toggle-promo-assistant-2
+- waitForAnimationToEnd
 - takeScreenshot:
-    path: 02-complete-transcript
+    path: 02-transcript-last-response
 - stopApp
 - launchApp
 - assertVisible:
@@ -57,8 +60,12 @@ tags:
     id: conversation-drawer-item-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
+- assertVisible:
+    id: conversation-section-pinned
+- assertVisible:
+    id: conversation-section-earlier
 - takeScreenshot:
-    path: 03-conversation-branches
+    path: 03-conversations
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
@@ -72,6 +79,12 @@ tags:
           id: main-settings-button
       - assertVisible:
           id: settings-page-overview
+      - scrollUntilVisible:
+          element:
+            id: settings-overview-row-connections
+          direction: DOWN
+      - tapOn:
+          id: settings-overview-row-connections
 - runFlow:
     when:
       true: ${DEVICE_CLASS == 'ipad'}
@@ -82,12 +95,16 @@ tags:
           id: settings-ipad-category-nav
       - assertVisible:
           id: settings-page-connections
+- assertVisible:
+    id: settings-page-connections
 - takeScreenshot:
-    path: 04-byok-settings
+    path: 04-settings-connections
 - runFlow:
     when:
       true: ${DEVICE_CLASS != 'ipad'}
     commands:
+      - tapOn:
+          id: settings-back-button
       - scrollUntilVisible:
           element:
             id: settings-overview-row-thinking
@@ -103,45 +120,23 @@ tags:
 - assertVisible:
     id: settings-page-thinking
 - takeScreenshot:
-    path: 05-choose-exact-model
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS != 'ipad'}
-    commands:
-      - tapOn:
-          id: settings-back-button
-      - scrollUntilVisible:
-          element:
-            id: settings-overview-row-speaking
-          direction: DOWN
-      - tapOn:
-          id: settings-overview-row-speaking
-- runFlow:
-    when:
-      true: ${DEVICE_CLASS == 'ipad'}
-    commands:
-      - tapOn:
-          id: settings-ipad-category-row-speaking
-- assertVisible:
-    id: settings-page-speaking
-- takeScreenshot:
-    path: 06-choose-your-voice
+    path: 05-settings-thinking
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
-- stopApp
-- openLink: "mrbroccoli://store-promos?locale=${LOCALE}&scene=conversation&colorScheme=${COLOR_SCHEME}&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
-- tapOn:
-    text: Open
-    optional: true
-- assertVisible:
-    text: ^ready$
-- stopApp
-- launchApp
 - assertVisible:
     id: voice-stage-idle
+- tapOn:
+    id: satellite-council
+- assertVisible:
+    id: council-popover
+- takeScreenshot:
+    path: 06-council
+- stopApp
+- launchApp:
+    appId: ${APP_ID}
 - assertVisible:
     id: workspace-header-settings
 - tapOn:

@@ -12,15 +12,19 @@ tags:
 - assertVisible:
     id: ^app-locale-${LOCALE}$
 - assertVisible:
-    id: voice-stage-thinking
+    id: voice-stage-idle
 - tapOn:
     id: main-conversations-button
 - assertVisible:
     id: conversation-drawer-item-promo-root
 - assertVisible:
     id: conversation-drawer-item-promo-branch
+- assertVisible:
+    id: conversation-section-pinned
+- assertVisible:
+    id: conversation-section-earlier
 - takeScreenshot:
-    path: 03-conversation-branches
+    path: 03-conversations
 - tapOn:
     id: conversation-drawer-close
 - waitForAnimationToEnd
@@ -30,8 +34,18 @@ tags:
     id: main-settings-button
 - assertVisible:
     id: settings-page-overview
+- scrollUntilVisible:
+    element:
+      id: settings-overview-row-connections
+    direction: DOWN
+- tapOn:
+    id: settings-overview-row-connections
+- assertVisible:
+    id: settings-page-connections
 - takeScreenshot:
-    path: 04-byok-settings
+    path: 04-settings-connections
+- tapOn:
+    id: settings-back-button
 - scrollUntilVisible:
     element:
       id: settings-overview-row-thinking
@@ -41,22 +55,18 @@ tags:
 - assertVisible:
     id: settings-page-thinking
 - takeScreenshot:
-    path: 05-choose-exact-model
-- tapOn:
-    id: settings-back-button
-- scrollUntilVisible:
-    element:
-      id: settings-overview-row-speaking
-    direction: DOWN
-- tapOn:
-    id: settings-overview-row-speaking
-- assertVisible:
-    id: settings-page-speaking
-- takeScreenshot:
-    path: 06-choose-your-voice
+    path: 05-settings-thinking
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
+- assertVisible:
+    id: voice-stage-idle
+- tapOn:
+    id: satellite-council
+- assertVisible:
+    id: council-popover
+- takeScreenshot:
+    path: 06-council
 - stopApp

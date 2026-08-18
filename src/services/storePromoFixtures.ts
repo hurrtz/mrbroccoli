@@ -31,8 +31,7 @@ export const STORE_PROMO_FIXTURE_MARKER_KEY =
   "@mrbroccoli/store-promo-fixture-locale";
 
 export const STORE_PROMO_COLOR_SCHEMES = ["light", "dark"] as const;
-export type StorePromoColorScheme =
-  (typeof STORE_PROMO_COLOR_SCHEMES)[number];
+export type StorePromoColorScheme = (typeof STORE_PROMO_COLOR_SCHEMES)[number];
 
 type StorePromoCopy = {
   rootTitle: string;
@@ -599,7 +598,140 @@ export function buildStorePromoConversations(
     ],
   };
 
-  return [root, branch, recent] as const;
+  const compactConversation = ({
+    archived = false,
+    id,
+    isLocked = false,
+    minutesAgo,
+    model,
+    provider,
+    title,
+  }: {
+    archived?: boolean;
+    id: string;
+    isLocked?: boolean;
+    minutesAgo: number;
+    model: string;
+    provider: "anthropic" | "gemini" | "openai";
+    title: string;
+  }): Conversation => ({
+    id,
+    title,
+    createdAt: new Date(nowMs - (minutesAgo + 8) * minute).toISOString(),
+    updatedAt: new Date(nowMs - minutesAgo * minute).toISOString(),
+    messages: [
+      message({
+        id: `${id}-user`,
+        role: "user",
+        content: copy.recentPrompt,
+        model: null,
+        provider: null,
+        timestampMs: nowMs - (minutesAgo + 2) * minute,
+      }),
+      message({
+        id: `${id}-assistant`,
+        role: "assistant",
+        content: copy.recentReply,
+        model,
+        provider,
+        usage: usage(92, 43),
+        timestampMs: nowMs - minutesAgo * minute,
+      }),
+    ],
+    ...(archived ? { archived: true } : {}),
+    ...(isLocked ? { isLocked: true } : {}),
+  });
+  const secondBranch: Conversation = {
+    ...branch,
+    id: "promo-branch-2",
+    title: `${copy.branchTitle} · 2`,
+    createdAt: new Date(nowMs - 14 * minute).toISOString(),
+    updatedAt: new Date(nowMs - 12 * minute).toISOString(),
+    messages: branch.messages.map((entry, index) => ({
+      ...entry,
+      id: `promo-branch-2-${index + 1}`,
+    })),
+    branch: {
+      ...branch.branch!,
+      branchMessageId: "promo-branch-2-3",
+      createdAt: new Date(nowMs - 14 * minute).toISOString(),
+    },
+  };
+  const pinned = compactConversation({
+    id: "promo-pinned",
+    minutesAgo: 9,
+    model: "claude-sonnet-5",
+    provider: "anthropic",
+    title: copy.recentTitle,
+  });
+  const locked = compactConversation({
+    id: "promo-locked",
+    isLocked: true,
+    minutesAgo: 10,
+    model: "gemini-3.6-flash",
+    provider: "gemini",
+    title: `${copy.rootTitle} · 2`,
+  });
+  const earlier = [
+    compactConversation({
+      id: "promo-earlier-1",
+      minutesAgo: 50,
+      model: "gpt-5.6-sol",
+      provider: "openai",
+      title: `${copy.recentTitle} · 2`,
+    }),
+    compactConversation({
+      id: "promo-earlier-2",
+      minutesAgo: 65,
+      model: "claude-sonnet-5",
+      provider: "anthropic",
+      title: `${copy.branchTitle} · 3`,
+    }),
+    compactConversation({
+      id: "promo-earlier-3",
+      minutesAgo: 80,
+      model: "gemini-3.6-flash",
+      provider: "gemini",
+      title: `${copy.rootTitle} · 3`,
+    }),
+    compactConversation({
+      id: "promo-earlier-4",
+      minutesAgo: 95,
+      model: "gpt-5.6-sol",
+      provider: "openai",
+      title: `${copy.recentTitle} · 3`,
+    }),
+  ];
+  const archived = Array.from({ length: 4 }, (_, index) =>
+    compactConversation({
+      archived: true,
+      id: `promo-archived-${index + 1}`,
+      minutesAgo: 180 + index * 20,
+      model:
+        index % 3 === 0
+          ? "gpt-5.6-sol"
+          : index % 3 === 1
+            ? "claude-sonnet-5"
+            : "gemini-3.6-flash",
+      provider:
+        index % 3 === 0 ? "openai" : index % 3 === 1 ? "anthropic" : "gemini",
+      title: `${copy.recentTitle} · ${index + 4}`,
+    }),
+  );
+
+  // The sessions frame tells a complete organization story: two pinned rows,
+  // eight everyday rows (including two forks and one locked session), plus a
+  // collapsed archive containing four more rows.
+  return [
+    root,
+    pinned,
+    locked,
+    branch,
+    secondBranch,
+    recent,
+    ...earlier,
+    ...archived,
+  ];
 }
 
 export async function seedStorePromoFixture(
@@ -655,7 +787,9 @@ export async function seedStorePromoFixture(
     conversations.map((conversation) =>
       buildConversationMetaFromConversation(conversation, {
         ...buildConversationMetaFromConversation(conversation),
-        pinned: conversation.id === "promo-root",
+        pinned:
+          conversation.id === "promo-root" ||
+          conversation.id === "promo-pinned",
       }),
     ),
   );

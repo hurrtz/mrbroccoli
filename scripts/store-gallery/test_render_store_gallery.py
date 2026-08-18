@@ -102,10 +102,16 @@ class GeometryTests(unittest.TestCase):
                 self.assertEqual(geo.constraint, "height")
                 self.assertEqual(geo.frame_h, geo.available_height)
 
-    def test_seven_panels_and_no_excluded_screenshot(self):
-        self.assertEqual(len(PANELS), 7)
-        excluded = {"03", "04", "05", "07", "09", "12"}
-        self.assertFalse({slug[:2] for slug in PANELS} & excluded)
+    def test_seven_panels_follow_the_approved_story(self):
+        self.assertEqual(PANELS, [
+            "01-home-idle",
+            "02-transcript-last-response",
+            "03-conversations",
+            "04-settings-connections",
+            "05-settings-thinking",
+            "06-council",
+            "07-conversation-settings",
+        ])
 
 
 class WrappingTests(unittest.TestCase):
@@ -115,13 +121,13 @@ class WrappingTests(unittest.TestCase):
 
     def test_lines_stay_within_the_band(self):
         head = self.headline()
-        text = "Explore another direction without losing the thread."
+        text = "Let your best models challenge each other."
         for line in head.wrap(text, 1070, False):
             self.assertLessEqual(head.measure(line, False), 1070)
 
     def test_wrapping_preserves_every_word(self):
         head = self.headline()
-        text = "Ask out loud. Hear an answer worth listening to."
+        text = "Keep every conversation organized on your device."
         self.assertEqual(" ".join(head.wrap(text, 1070, False)).split(), text.split())
 
     def test_closing_punctuation_never_starts_a_line(self):

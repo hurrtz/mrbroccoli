@@ -9,6 +9,8 @@
 # Metadata lanes are the everyday ones. The release lanes are deliberately
 # separate so uploading corrected copy can never submit a build by accident.
 
+require "json"
+
 default_platform(:ios)
 
 # fastlane's working directory depends on how it was invoked — from the repo
@@ -45,6 +47,13 @@ def require_exported_tree
     "Run `npm run listing:export` first — deliver can clear a live listing " \
     "field whose file is missing.",
   )
+end
+
+def repository_app_version
+  app_json = File.expand_path("../app.json", FASTLANE_DIR)
+  version = JSON.parse(File.read(app_json)).dig("expo", "version").to_s.strip
+  UI.user_error!("Could not read expo.version from #{app_json}") if version.empty?
+  version
 end
 
 # Credentials come from fastlane/.env, which fastlane loads automatically and
@@ -116,14 +125,19 @@ platform :ios do
   # the listing, and with no IPA it fails inside verify_binary. The real safety
   # net is deliver's own HTML preview: without force:true it writes
   # fastlane/Preview.html and asks before uploading anything.
-  desc "Upload App Store listing text and screenshots. No binary, no submission."
+  desc "Create or update the repository App Store version with listing text and screenshots."
+  desc "No binary upload and no submission. Pass version:x.y.z to override the repository version."
   desc "Shows an HTML preview and asks first; force:true skips that prompt."
   lane :metadata do |options|
     require_exported_tree
+    version = options[:version].to_s.strip
+    version = repository_app_version if version.empty?
+    UI.message("App Store metadata targets version #{version}.")
     deliver(
       api_key: APP_STORE_KEY.call,
+      app_version: version,
       skip_binary_upload: true,
-      skip_app_version_update: true,
+      skip_app_version_update: false,
       submit_for_review: false,
       overwrite_screenshots: true,
       # Leave the HTML preview confirmation on unless explicitly waived: it is

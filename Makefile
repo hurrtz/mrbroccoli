@@ -50,7 +50,7 @@ help:
 		'make pre-release       Run every local release gate in quota-safe order' \
 		'make release-aab       Build, verify, and archive the signed Android release artifacts' \
 		'make maestro-verify      Verify the E2E locale and screenshot contract' \
-		'make store-promos-verify Verify the localized light/dark 13-image iOS and Android store screenshot contracts' \
+		'make store-promos-verify Verify the localized seven-image iOS and Android store screenshot contracts' \
 		'make store-promos-ios LOCALE=de DISPLAY=6.9 Build and capture one localized iOS store set' \
 		'make store-promos-android LOCALE=de DISPLAY=phone Build and capture one localized Android store set' \
 		'make android-debug      Build a debug APK' \

@@ -55,7 +55,9 @@ The route owns one `conversation` scene. It seeds the requested locale,
 provider response modes, branched conversation fixtures, and deterministic
 presentation state without reading credentials or calling a provider. The
 scene accepts only an explicit light or dark fixture theme; the device chrome
-is set to the same scheme by the capture runner.
+is set to the same scheme by the capture runner. Its campaign phase may be idle
+so Maestro can open the real transcript, Council, and conversation-settings
+surfaces without synthesizing a turn.
 
 Evidence:
 

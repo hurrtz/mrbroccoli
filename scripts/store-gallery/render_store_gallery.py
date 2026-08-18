@@ -61,13 +61,13 @@ MAX_LINES = 3
 
 # The seven approved BYOK panels, in story order.
 PANELS = [
-    "01-voice-first-conversation",
-    "05-choose-exact-model",
-    "04-byok-settings",
+    "01-home-idle",
+    "02-transcript-last-response",
+    "03-conversations",
+    "04-settings-connections",
+    "05-settings-thinking",
+    "06-council",
     "07-conversation-settings",
-    "06-choose-your-voice",
-    "02-complete-transcript",
-    "03-conversation-branches",
 ]
 
 # `panel` is the store's required export size; `capture` is the size the

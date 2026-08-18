@@ -221,12 +221,13 @@ Store-promo fixtures are deterministic, localized, network-free, and restricted
 to the exact Maestro identity for the current platform:
 `com.tobiaswinkler.app.mrbroccoli.maestro` on iOS and
 `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. The single
-`conversation` scene seeds provider routes, conversations, branches, and
-validated presentation state without credentials, model work, or provider
-requests. Its optional idle presentation restores the real idle home controls
-for the final per-conversation-settings frame, and its seeded response modes are
-presented as available without storing credentials. Production readiness,
-phase, and progress remain pipeline-derived.
+`conversation` scene seeds provider routes, fourteen organized conversations,
+two branches, one locked row, and validated presentation state without
+credentials, model work, or provider requests. Its idle presentation keeps the
+real home controls reachable for the home, Council, and per-conversation
+settings frames, and its seeded response modes are presented as available
+without storing credentials. Production readiness, phase, and progress remain
+pipeline-derived.
 
 ## Failure Rules
 

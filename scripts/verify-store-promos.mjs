@@ -132,9 +132,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         ? STORE_PROMO_ANDROID_FLOW_SCENES
         : ["conversation"];
     const sceneReadiness = [
-      ...combinedFlow.matchAll(
-        /store-promo-fixture-ready-(conversation)/g,
-      ),
+      ...combinedFlow.matchAll(/store-promo-fixture-ready-(conversation)/g),
     ];
     const actualScenes = sceneReadiness.map((match) => match[1]);
     const localeMarkers = [
@@ -208,13 +206,18 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       });
     }
     for (const selector of [
-      "voice-stage-thinking",
+      "voice-stage-idle",
       "store-promo-fixture-ready-conversation",
       "transcript-handle",
       "conversation-drawer-item-promo-branch",
+      "conversation-section-pinned",
+      "conversation-section-earlier",
+      "settings-page-connections",
       "settings-page-thinking",
       "settings-modal-title",
       "settings-close-button",
+      "satellite-council",
+      "council-popover",
       "workspace-header-settings",
       "conversation-settings-drawer",
     ]) {
@@ -227,9 +230,11 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     if (
       !combinedFlow.includes("chat-transcript-list") ||
       !combinedFlow.includes("transcript-message-promo-assistant-2") ||
-      !combinedFlow.includes("settings-page-speaking")
+      !combinedFlow.includes("transcript-toggle-promo-assistant-2")
     ) {
-      errors.push(`${platform} store screenshot flow is missing a BYOK story surface`);
+      errors.push(
+        `${platform} store screenshot flow is missing a BYOK story surface`,
+      );
     }
     if (
       platform === "ios" &&
@@ -278,7 +283,9 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     errors.push("Store screenshot fixture copy is not exhaustive by locale");
   }
   if (!presentation.includes('STORE_PROMO_SCENES = ["conversation"]')) {
-    errors.push("Store screenshot presentation is not guarded to the BYOK scene");
+    errors.push(
+      "Store screenshot presentation is not guarded to the BYOK scene",
+    );
   }
   if (
     !runner.includes('artifacts", "store-promos", platform') ||
@@ -289,8 +296,14 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "Store screenshot runner does not use platform and color-scheme-specific output",
     );
   }
-  if (!fs.readFileSync(path.join(cwd, STORE_PROMO_FLOWS.ios[0]), "utf8").includes("COLOR_SCHEME")) {
-    errors.push("iOS store screenshot flow does not seed the requested color scheme");
+  if (
+    !fs
+      .readFileSync(path.join(cwd, STORE_PROMO_FLOWS.ios[0]), "utf8")
+      .includes("COLOR_SCHEME")
+  ) {
+    errors.push(
+      "iOS store screenshot flow does not seed the requested color scheme",
+    );
   }
   if (
     !runner.includes('"android.intent.action.VIEW"') ||
@@ -309,8 +322,8 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       STORE_PROMO_FLOWS.android.length ||
     JSON.stringify(STORE_PROMO_ANDROID_FLOW_ORB_QUERIES) !==
       JSON.stringify([
-        "",
-        "",
+        "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
+        "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
         "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
       ])
   ) {

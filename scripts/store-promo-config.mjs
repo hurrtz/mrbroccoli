@@ -19,28 +19,28 @@ export const STORE_PROMO_ANDROID_FLOW_SCENES = Object.freeze([
   "conversation",
 ]);
 export const STORE_PROMO_ANDROID_FLOW_ORB_QUERIES = Object.freeze([
-  "",
-  "",
+  "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
+  "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
   "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
 ]);
 
 export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
   android: Object.freeze([
-    "01-voice-first-conversation",
-    "02-complete-transcript",
-    "03-conversation-branches",
-    "04-byok-settings",
-    "05-choose-exact-model",
-    "06-choose-your-voice",
+    "01-home-idle",
+    "02-transcript-last-response",
+    "03-conversations",
+    "04-settings-connections",
+    "05-settings-thinking",
+    "06-council",
     "07-conversation-settings",
   ]),
   ios: Object.freeze([
-    "01-voice-first-conversation",
-    "02-complete-transcript",
-    "03-conversation-branches",
-    "04-byok-settings",
-    "05-choose-exact-model",
-    "06-choose-your-voice",
+    "01-home-idle",
+    "02-transcript-last-response",
+    "03-conversations",
+    "04-settings-connections",
+    "05-settings-thinking",
+    "06-council",
     "07-conversation-settings",
   ]),
 });
@@ -109,7 +109,8 @@ export const STORE_PROMO_IOS_DISPLAYS = Object.freeze({
     appleDisplayClass: "13-inch iPad",
     deviceClass: "ipad",
     deviceName: "iPad Pro 13-inch (M5) (12GB)",
-    deviceType: "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB",
+    deviceType:
+      "com.apple.CoreSimulator.SimDeviceType.iPad-Pro-13-inch-M5-12GB",
     acceptedPortraitDimensions: [[2064, 2752]],
   },
 });

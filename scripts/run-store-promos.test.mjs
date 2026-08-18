@@ -39,8 +39,8 @@ test("Android maps its split flows to deterministic fixture scenes", () => {
     "conversation",
   ]);
   assert.deepEqual(STORE_PROMO_ANDROID_FLOW_ORB_QUERIES, [
-    "",
-    "",
+    "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
+    "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
     "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
   ]);
   assert.equal(
@@ -235,15 +235,7 @@ test("store promo device chrome follows the captured color scheme", () => {
     },
     {
       command: "adb",
-      args: [
-        "-s",
-        "emulator-5554",
-        "shell",
-        "cmd",
-        "uimode",
-        "night",
-        "no",
-      ],
+      args: ["-s", "emulator-5554", "shell", "cmd", "uimode", "night", "no"],
       options: { cwd: "/repo" },
     },
   ]);

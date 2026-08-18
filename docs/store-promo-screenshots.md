@@ -1,8 +1,10 @@
 # Localized store screenshots
 
-The store-promo suite captures seven ordered screenshots in both light and
-dark schemes on iOS and Android for every registered app locale. It is separate from the
-broader Maestro release QA gallery.
+The store-promo suite can capture seven ordered screenshots in light or dark
+schemes on iOS and Android for every registered app locale. It is separate from
+the broader Maestro release QA gallery. The 4.1.0 campaign is deliberately
+light-only; dark output remains available for a later campaign without being
+exported or uploaded now.
 
 ## Safety boundary
 
@@ -12,9 +14,11 @@ state only when the installed application identifier is exactly
 `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. Production,
 `.dev`, and every other application identity fail closed. The fixture contains
 no credentials, provider requests, user data, or downloaded models.
-All assistant replies and the non-idle CTA phase are fixed. The single
-`conversation` scene seeds the requested locale, provider routes, a branched
-conversation, and presentation state without a provider call. It never writes
+All assistant replies and the idle voice phase are fixed. The single
+`conversation` scene seeds the requested locale, provider routes, fourteen
+conversations, and presentation state without a provider call. Ten sessions
+appear across Pinned and Earlier, including two forks and one locked row; four
+more remain in the collapsed Archived group. It never writes
 credentials, downloads a model, benchmarks hardware, or invokes a store.
 
 ## Capture one locale
@@ -76,24 +80,14 @@ only one review set is needed.
 Android images use the same localized BYOK fixture story and the same
 conversation, transcript, branch, and Settings coverage as iOS.
 
-## iOS seven-image order
+## Seven-image order on both stores
 
-1. Voice-first conversation with a stable Thinking CTA
-2. Complete transcript with the localized exchange
-3. Conversation drawer with its branch hierarchy
-4. BYOK Settings overview or iPad master-detail start page
-5. Exact provider-model routes in Thinking Settings
-6. Voice selection in Speaking Settings
-7. Per-conversation Settings drawer
-
-## Android seven-image order
-
-1. Voice-first conversation with a stable Thinking CTA
-2. Complete transcript with the localized exchange
-3. Conversation drawer with its branch hierarchy
-4. BYOK Settings overview
-5. Exact provider-model routes in Thinking Settings
-6. Voice selection in Speaking Settings
+1. Home workspace in its idle voice phase
+2. Transcript with the latest response opened
+3. Conversations with two pinned, eight earlier, two forks, one locked, and four archived
+4. Settings / Connections
+5. Settings / Thinking
+6. Council builder open on the home workspace
 7. Per-conversation Settings drawer
 
 Review every image in `review-gallery.html` before upload. Automation verifies
@@ -167,13 +161,16 @@ npm run listing:verify     # character limits and forbidden claims
 npm run listing:export     # build the fastlane tree from docs/ and the gallery
 bundle exec fastlane android metadata validate:true   # Google checks, discards
 bundle exec fastlane android metadata
-bundle exec fastlane ios metadata                     # previews, then asks
+bundle exec fastlane ios metadata                     # targets app.json version, previews, asks
 ```
 
 There is no dry run for the App Store side. `deliver`'s `verify_only` validates
 a *binary*, not a listing, and fails in `verify_binary` when no IPA is present.
 The real check is deliver's own HTML preview, which it writes and asks about
 unless `force:true` is passed. Only Play has a true server-side validation.
+The iOS lane creates or updates the version declared in `app.json`; pass
+`version:x.y.z` only for an intentional override. It does not attach a build or
+submit the version for review.
 
 Snapshotting a live listing before overwriting it is a command rather than a
 lane, because `download_metadata` is a deliver subcommand and `supply` has no

@@ -386,6 +386,11 @@ symbols, signing identity, package/version metadata, and configured size
 budgets. The generated artifact archive is evidence, not a replacement for the
 source commit from which it was built.
 
+Store metadata follows the same repository version authority. The iOS metadata
+lane creates or updates the App Store version named by `app.json`, uploads only
+the generated listing text and screenshots, and never uploads a binary or
+submits the version for review.
+
 ## Boundary Rules
 
 - `app/` owns routing and global providers, not product workflows.

@@ -29,12 +29,12 @@ test("the checked-in store-promo setup tells one seven-screen BYOK story", () =>
   assert.deepEqual(result.screenshotNames, STORE_PROMO_SCREENSHOT_NAMES);
   for (const platform of ["android", "ios"]) {
     assert.deepEqual(result.screenshotNames[platform], [
-      "01-voice-first-conversation",
-      "02-complete-transcript",
-      "03-conversation-branches",
-      "04-byok-settings",
-      "05-choose-exact-model",
-      "06-choose-your-voice",
+      "01-home-idle",
+      "02-transcript-last-response",
+      "03-conversations",
+      "04-settings-connections",
+      "05-settings-thinking",
+      "06-council",
       "07-conversation-settings",
     ]);
   }
@@ -89,6 +89,9 @@ test("store captures follow the current transcript and idle-settings contracts",
       platform,
     );
     assert.match(combined, /workspace-header-settings/, platform);
+    assert.match(combined, /transcript-toggle-promo-assistant-2/, platform);
+    assert.match(combined, /settings-page-connections/, platform);
+    assert.match(combined, /council-popover/, platform);
     if (platform === "android") {
       assert.ok(
         STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.some((query) =>
