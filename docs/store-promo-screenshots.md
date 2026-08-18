@@ -83,6 +83,11 @@ only one review set is needed.
 
 Android images use the same localized BYOK fixture story and the same
 conversation, transcript, branch, and Settings coverage as iOS.
+On regular-width iPad, the final frame opens per-conversation Settings through
+the persistent workspace's compact sliders control rather than the phone-only
+header row. Its conversations frame selects the visible fixture fork so the
+persistent sidebar tells the same organization story without duplicating the
+idle-home image.
 
 ## Seven-image order on both stores
 

@@ -83,11 +83,20 @@ test("store captures follow the current transcript and idle-settings contracts",
   for (const platform of ["android", "ios"]) {
     const combined = readFlows(platform).join("\n");
     assert.doesNotMatch(combined, /transcript-sheet-header-close/, platform);
-    assert.doesNotMatch(
-      combined,
-      /conversation-settings-summary-control/,
-      platform,
-    );
+    if (platform === "ios") {
+      assert.match(combined, /conversation-settings-summary-control/, platform);
+      assert.match(
+        combined,
+        /DEVICE_CLASS == 'ipad'[\s\S]*?tapOn:\s*\n\s*id: conversation-drawer-item-promo-branch/,
+        platform,
+      );
+    } else {
+      assert.doesNotMatch(
+        combined,
+        /conversation-settings-summary-control/,
+        platform,
+      );
+    }
     assert.match(combined, /workspace-header-settings/, platform);
     assert.match(combined, /transcript-toggle-promo-assistant-2/, platform);
     assert.match(combined, /settings-page-connections/, platform);

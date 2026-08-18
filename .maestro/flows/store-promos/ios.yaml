@@ -56,6 +56,8 @@ tags:
     commands:
       - assertVisible:
           id: ipad-regular-shell
+      - tapOn:
+          id: conversation-drawer-item-promo-branch
 - assertVisible:
     id: conversation-drawer-item-promo-root
 - assertVisible:
@@ -147,10 +149,22 @@ tags:
 - stopApp
 - launchApp:
     appId: ${APP_ID}
-- assertVisible:
-    id: workspace-header-settings
-- tapOn:
-    id: workspace-header-settings
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS != 'ipad'}
+    commands:
+      - assertVisible:
+          id: workspace-header-settings
+      - tapOn:
+          id: workspace-header-settings
+- runFlow:
+    when:
+      true: ${DEVICE_CLASS == 'ipad'}
+    commands:
+      - assertVisible:
+          id: conversation-settings-summary-control
+      - tapOn:
+          id: conversation-settings-summary-control
 - assertVisible:
     id: conversation-settings-drawer
 - takeScreenshot:

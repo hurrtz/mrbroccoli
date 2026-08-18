@@ -260,9 +260,30 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         `${platform} store screenshot flow still uses the removed transcript close control`,
       );
     }
-    if (combinedFlow.includes("conversation-settings-summary-control")) {
+    if (
+      platform === "android" &&
+      combinedFlow.includes("conversation-settings-summary-control")
+    ) {
       errors.push(
         `${platform} store screenshot flow still uses the retired standalone conversation-settings control`,
+      );
+    }
+    if (
+      platform === "ios" &&
+      !combinedFlow.includes("conversation-settings-summary-control")
+    ) {
+      errors.push(
+        "iOS store screenshot flow is missing the regular-iPad conversation-settings control",
+      );
+    }
+    if (
+      platform === "ios" &&
+      !/DEVICE_CLASS == 'ipad'[\s\S]*?tapOn:\s*\n\s*id: conversation-drawer-item-promo-branch/.test(
+        combinedFlow,
+      )
+    ) {
+      errors.push(
+        "iOS store screenshot flow does not differentiate the persistent iPad conversations frame",
       );
     }
     const restoresIdleWorkspace =

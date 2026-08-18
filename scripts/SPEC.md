@@ -97,8 +97,13 @@ settings. The fixture contains two pinned and eight earlier sessions, including
 two forks and one locked row, plus four collapsed archived sessions. Every flow
 uses the idle presentation so the real home controls remain reachable, and both
 platform flows require all three fixture Council model tiles before capturing
-the builder. Android keeps split flows so the runner can package-target the
-fixture deep link without exposing a system app chooser.
+the builder. The iOS flow opens per-conversation settings through the compact
+workspace header on iPhone and through the regular-width conversation-settings
+summary control on iPad. Because regular iPad always shows its conversations
+sidebar, the sessions frame selects the visible fixture fork before capture so
+it remains a real navigation state rather than duplicating the idle-home frame.
+Android keeps split flows so the runner can package-target the fixture deep
+link without exposing a system app chooser.
 The three pictured providers also carry fixture-only successful capability
 results so Connections shows working routes rather than untested placeholders.
 The automation identity never contacts a platform store or provider. The
