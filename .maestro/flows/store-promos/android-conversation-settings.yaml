@@ -14,9 +14,9 @@ tags:
 - assertVisible:
     id: voice-stage-idle
 - assertVisible:
-    id: conversation-settings-summary-control
+    id: workspace-header-settings
 - tapOn:
-    id: conversation-settings-summary-control
+    id: workspace-header-settings
 - assertVisible:
     id: conversation-settings-drawer
 - takeScreenshot:

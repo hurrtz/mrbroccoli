@@ -215,7 +215,7 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "settings-page-thinking",
       "settings-modal-title",
       "settings-close-button",
-      "conversation-settings-summary-control",
+      "workspace-header-settings",
       "conversation-settings-drawer",
     ]) {
       if (!combinedFlow.includes(selector)) {
@@ -243,6 +243,11 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     if (combinedFlow.includes("transcript-sheet-header-close")) {
       errors.push(
         `${platform} store screenshot flow still uses the removed transcript close control`,
+      );
+    }
+    if (combinedFlow.includes("conversation-settings-summary-control")) {
+      errors.push(
+        `${platform} store screenshot flow still uses the retired standalone conversation-settings control`,
       );
     }
     const restoresIdleWorkspace =

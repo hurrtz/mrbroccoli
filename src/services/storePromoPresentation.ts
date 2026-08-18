@@ -1,7 +1,11 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import type { PipelinePhase } from "../hooks/useVoicePipeline";
-import type { VoiceVisualPhase } from "../types";
+import type {
+  ResponseMode,
+  ResponseModeSelections,
+  VoiceVisualPhase,
+} from "../types";
 import { getApplicationId } from "./debugRuntimeContext";
 
 const STORE_PROMO_APPLICATION_IDS = new Set([
@@ -107,4 +111,14 @@ export function getStorePromoPipelinePhase(
   // frame needs the real idle home controls so per-conversation settings can
   // be opened after active-turn controls deliberately hide them.
   return orb?.phase === "idle" ? "idle" : "thinking";
+}
+
+export function getStorePromoAvailableResponseModes(
+  scene: StorePromoScene | null,
+  configuredModes: ResponseModeSelections,
+  availableModes: ResponseMode[],
+): ResponseMode[] {
+  return scene === "conversation"
+    ? configuredModes.map(({ id }) => id)
+    : availableModes;
 }

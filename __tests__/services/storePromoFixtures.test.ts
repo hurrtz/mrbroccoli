@@ -10,6 +10,7 @@ import {
   STORE_PROMO_FIXTURE_MARKER_KEY,
 } from "../../src/services/storePromoFixtures";
 import {
+  getStorePromoAvailableResponseModes,
   getStorePromoPipelinePhase,
   isStorePromoApplicationId,
   isStorePromoOrbPresentation,
@@ -129,6 +130,19 @@ describe("store promo fixtures", () => {
       }),
     ).toBe("idle");
     expect(getStorePromoPipelinePhase(null, "searching")).toBe("searching");
+    expect(
+      getStorePromoAvailableResponseModes(
+        "conversation",
+        [
+          { id: "mode-1", route: { provider: "openai", model: "gpt-5.6-sol" } },
+          { id: "mode-2", route: { provider: "anthropic", model: "claude-sonnet-5" } },
+        ],
+        [],
+      ),
+    ).toEqual(["mode-1", "mode-2"]);
+    expect(
+      getStorePromoAvailableResponseModes(null, [], ["configured-mode"]),
+    ).toEqual(["configured-mode"]);
   });
 
   it("seeds and loads deterministic orb progress", async () => {

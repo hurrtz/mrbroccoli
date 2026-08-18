@@ -83,6 +83,12 @@ test("store captures follow the current transcript and idle-settings contracts",
   for (const platform of ["android", "ios"]) {
     const combined = readFlows(platform).join("\n");
     assert.doesNotMatch(combined, /transcript-sheet-header-close/, platform);
+    assert.doesNotMatch(
+      combined,
+      /conversation-settings-summary-control/,
+      platform,
+    );
+    assert.match(combined, /workspace-header-settings/, platform);
     if (platform === "android") {
       assert.ok(
         STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.some((query) =>

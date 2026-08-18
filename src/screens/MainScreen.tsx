@@ -60,7 +60,10 @@ import {
   unlockSessionWithDeviceAuth,
   verifySessionPassword,
 } from "../services/sessionLock";
-import { getStorePromoPipelinePhase } from "../services/storePromoPresentation";
+import {
+  getStorePromoAvailableResponseModes,
+  getStorePromoPipelinePhase,
+} from "../services/storePromoPresentation";
 
 export function MainScreen() {
   const { colors, isDark } = useTheme();
@@ -236,7 +239,12 @@ export function MainScreen() {
     webSearchProvider,
     webSearchReady,
   } = routeConfiguration;
-  const presentationAvailableResponseModes = availableResponseModes;
+  const presentationAvailableResponseModes =
+    getStorePromoAvailableResponseModes(
+      storePromoScene,
+      runtimeSettings.responseModes,
+      availableResponseModes,
+    );
   const ipadLayout = React.useMemo(
     () =>
       resolveIpadLayout({
