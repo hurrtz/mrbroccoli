@@ -137,6 +137,10 @@ tags:
     text: Open
     optional: true
 - assertVisible:
+    text: ^ready$
+- stopApp
+- launchApp
+- assertVisible:
     id: voice-stage-idle
 - assertVisible:
     id: conversation-settings-summary-control

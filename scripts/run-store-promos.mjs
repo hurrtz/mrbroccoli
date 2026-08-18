@@ -9,6 +9,7 @@ import parsePng from "parse-png";
 
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
+  STORE_PROMO_ANDROID_FLOW_ORB_QUERIES,
   STORE_PROMO_ANDROID_FLOW_SCENES,
   STORE_PROMO_APP_IDS,
   STORE_PROMO_FLOWS,
@@ -755,8 +756,12 @@ function captureMaestroFlow({
       for (const [flowIndex, flow] of STORE_PROMO_FLOWS[platform].entries()) {
         if (platform === "android") {
           const scene = STORE_PROMO_ANDROID_FLOW_SCENES[flowIndex];
+          const orbQuery = STORE_PROMO_ANDROID_FLOW_ORB_QUERIES[flowIndex];
           if (!scene) {
             throw new Error(`Missing Android fixture scene for ${flow}`);
+          }
+          if (orbQuery === undefined) {
+            throw new Error(`Missing Android fixture presentation for ${flow}`);
           }
           runCommand(
             "adb",
@@ -773,7 +778,7 @@ function captureMaestroFlow({
               "android.intent.category.BROWSABLE",
               "-d",
               quoteAndroidShellArgument(
-                `mrbroccoli://store-promos?locale=${locale}&scene=${scene}&colorScheme=${colorScheme}`,
+                `mrbroccoli://store-promos?locale=${locale}&scene=${scene}&colorScheme=${colorScheme}${orbQuery}`,
               ),
               "-p",
               applicationId,

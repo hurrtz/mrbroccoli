@@ -19,6 +19,7 @@ import {
   setStorePromoColorScheme,
 } from "./run-store-promos.mjs";
 import {
+  STORE_PROMO_ANDROID_FLOW_ORB_QUERIES,
   STORE_PROMO_ANDROID_FLOW_SCENES,
   STORE_PROMO_APP_IDS,
   STORE_PROMO_FLOWS,
@@ -35,9 +36,19 @@ test("Android maps its split flows to deterministic fixture scenes", () => {
   assert.deepEqual(STORE_PROMO_ANDROID_FLOW_SCENES, [
     "conversation",
     "conversation",
+    "conversation",
+  ]);
+  assert.deepEqual(STORE_PROMO_ANDROID_FLOW_ORB_QUERIES, [
+    "",
+    "",
+    "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
   ]);
   assert.equal(
     STORE_PROMO_ANDROID_FLOW_SCENES.length,
+    STORE_PROMO_FLOWS.android.length,
+  );
+  assert.equal(
+    STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.length,
     STORE_PROMO_FLOWS.android.length,
   );
 });

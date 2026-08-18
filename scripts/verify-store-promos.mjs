@@ -8,6 +8,7 @@ import {
 } from "./verify-maestro-suite.mjs";
 import {
   STORE_PROMO_ANDROID_DISPLAYS,
+  STORE_PROMO_ANDROID_FLOW_ORB_QUERIES,
   STORE_PROMO_ANDROID_FLOW_SCENES,
   STORE_PROMO_FLOWS,
   STORE_PROMO_IOS_DISPLAYS,
@@ -244,10 +245,13 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
         `${platform} store screenshot flow still uses the removed transcript close control`,
       );
     }
-    if (
-      !combinedFlow.includes("phase=idle") ||
-      !combinedFlow.includes("voice-stage-idle")
-    ) {
+    const restoresIdleWorkspace =
+      platform === "android"
+        ? STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.some((query) =>
+            query.includes("phase=idle"),
+          )
+        : combinedFlow.includes("phase=idle");
+    if (!restoresIdleWorkspace || !combinedFlow.includes("voice-stage-idle")) {
       errors.push(
         `${platform} store screenshot flow must restore the idle workspace before opening conversation settings`,
       );
@@ -295,7 +299,15 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
     STORE_PROMO_ANDROID_FLOW_SCENES.length !==
       STORE_PROMO_FLOWS.android.length ||
     JSON.stringify(STORE_PROMO_ANDROID_FLOW_SCENES) !==
-      JSON.stringify(["conversation", "conversation"])
+      JSON.stringify(["conversation", "conversation", "conversation"]) ||
+    STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.length !==
+      STORE_PROMO_FLOWS.android.length ||
+    JSON.stringify(STORE_PROMO_ANDROID_FLOW_ORB_QUERIES) !==
+      JSON.stringify([
+        "",
+        "",
+        "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
+      ])
   ) {
     errors.push(
       "Android store screenshot flows do not have deterministic scenes",

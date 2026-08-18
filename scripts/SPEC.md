@@ -96,6 +96,8 @@ settings, exact response route, voice selection, and per-conversation settings.
 The story restarts the native surface after the transcript and reseeds the same
 scene with an idle presentation before its final frame, because active-turn
 controls deliberately replace the conversation-settings control on home.
+Android gives that frame its own split flow so the runner can package-target
+the fixture deep link without exposing a system app chooser.
 The automation identity never contacts a platform store or provider. The
 supported capture matrix includes the five requested iPhone display classes, a
 regular-width iPad, and Android phone and tablet profiles.

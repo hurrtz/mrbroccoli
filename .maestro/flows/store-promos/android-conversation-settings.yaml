@@ -1,0 +1,23 @@
+appId: ${APP_ID}
+name: Google Play per-conversation settings screenshot
+tags:
+  - store-promos
+  - android
+---
+- assertVisible:
+    id: store-promo-fixture-ready-conversation
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: ^app-locale-${LOCALE}$
+- assertVisible:
+    id: voice-stage-idle
+- assertVisible:
+    id: conversation-settings-summary-control
+- tapOn:
+    id: conversation-settings-summary-control
+- assertVisible:
+    id: conversation-settings-drawer
+- takeScreenshot:
+    path: 07-conversation-settings

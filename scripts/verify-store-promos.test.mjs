@@ -10,6 +10,7 @@ import {
   validateStorePromoSetup,
 } from "./verify-store-promos.mjs";
 import {
+  STORE_PROMO_ANDROID_FLOW_ORB_QUERIES,
   STORE_PROMO_FLOWS,
   STORE_PROMO_SCREENSHOT_NAMES,
 } from "./store-promo-config.mjs";
@@ -82,7 +83,16 @@ test("store captures follow the current transcript and idle-settings contracts",
   for (const platform of ["android", "ios"]) {
     const combined = readFlows(platform).join("\n");
     assert.doesNotMatch(combined, /transcript-sheet-header-close/, platform);
-    assert.match(combined, /phase=idle/, platform);
+    if (platform === "android") {
+      assert.ok(
+        STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.some((query) =>
+          query.includes("phase=idle"),
+        ),
+        platform,
+      );
+    } else {
+      assert.match(combined, /phase=idle/, platform);
+    }
     assert.match(combined, /voice-stage-idle/, platform);
   }
 });

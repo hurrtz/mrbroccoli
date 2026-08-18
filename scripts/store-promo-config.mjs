@@ -9,12 +9,19 @@ export const STORE_PROMO_FLOWS = Object.freeze({
   android: Object.freeze([
     ".maestro/flows/store-promos/android-home.yaml",
     ".maestro/flows/store-promos/android-settings.yaml",
+    ".maestro/flows/store-promos/android-conversation-settings.yaml",
   ]),
   ios: Object.freeze([STORE_PROMO_FLOW]),
 });
 export const STORE_PROMO_ANDROID_FLOW_SCENES = Object.freeze([
   "conversation",
   "conversation",
+  "conversation",
+]);
+export const STORE_PROMO_ANDROID_FLOW_ORB_QUERIES = Object.freeze([
+  "",
+  "",
+  "&phase=idle&phaseProgress=0&turnProgress=0&overtime=0",
 ]);
 
 export const STORE_PROMO_SCREENSHOT_NAMES = Object.freeze({
