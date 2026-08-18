@@ -204,6 +204,10 @@ that are already reviewed: the two listing translation documents, the newest
 `google-play-release-notes-<version>.md`, and the rendered gallery. Nothing is
 authored in `fastlane/`; it is generated output and gitignored apart from
 `Fastfile`, `Appfile` and `Gemfile`.
+After validating the complete plan, the exporter replaces the generated
+`metadata/` and `screenshots/` roots instead of merging into them. This keeps
+Fastlane configuration intact while preventing retired campaign panels,
+locales, or changelogs from leaking into a later upload.
 
 **Decision:** only the sizes a store cannot derive are exported — iPhone 6.9"
 and 13" iPad for Apple, phone for Play. Apple generates every other iPhone size

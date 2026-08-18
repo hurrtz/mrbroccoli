@@ -152,6 +152,10 @@ the architectural answer for the author.
 - Store-gallery rendering replaces every PNG in the selected
   profile/language/scheme output directory before writing the current story,
   so retired campaign filenames cannot leak into a later Fastlane export.
+- Fastlane listing export validates the complete planned tree first, then
+  replaces its generated `metadata/` and `screenshots/` roots. Fastlane
+  configuration remains untouched, while retired campaign images, locales,
+  release notes, and version-code changelogs cannot survive a later export.
 - The iOS store-promo build targets the arm64 Simulator architecture used by
   the local Apple-silicon capture host; one secret-scanned app is reusable
   across every configured iPhone and iPad simulator.

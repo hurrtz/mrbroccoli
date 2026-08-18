@@ -139,6 +139,16 @@ def panel_files(profile: str, lang_dir: str, scheme: str) -> list[Path]:
     return sorted(source.glob("0*.png")) if source.is_dir() else []
 
 
+def clear_generated_tree(out: Path) -> None:
+    """Remove only the generated Fastlane trees before replacing the export."""
+    for name in ("metadata", "screenshots"):
+        target = out / name
+        if target.is_symlink() or target.is_file():
+            target.unlink()
+        elif target.is_dir():
+            shutil.rmtree(target)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--out", type=Path, default=REPO_ROOT / "fastlane")
@@ -264,6 +274,11 @@ def main() -> int:
         for problem in problems:
             print(f"  - {problem}", file=sys.stderr)
         return 1
+
+    # Everything below these two roots is generated. Replace it only after the
+    # complete export has validated so retired campaign screenshots, locales,
+    # and version-code changelogs cannot survive beside the current listing.
+    clear_generated_tree(args.out)
 
     for destination, payload in planned:
         destination.parent.mkdir(parents=True, exist_ok=True)
