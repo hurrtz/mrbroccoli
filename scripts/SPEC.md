@@ -91,13 +91,16 @@ It navigates to stable bottom selectors instead of blindly repeating swipes,
 because a page that already fits on a tall phone must not produce duplicate
 frames that imply missing content.
 Store promos use one identity-guarded `conversation` scene and capture a
-seven-image BYOK story: idle home, opened latest transcript reply, organized
+seven-image BYOK story: idle home, collapsed transcript overview, organized
 sessions, Connections, Thinking, the Council builder, and per-conversation
 settings. The fixture contains two pinned and eight earlier sessions, including
 two forks and one locked row, plus four collapsed archived sessions. Every flow
-uses the idle presentation so the real home controls remain reachable. Android
-keeps split flows so the runner can package-target the fixture deep link without
-exposing a system app chooser.
+uses the idle presentation so the real home controls remain reachable, and both
+platform flows require all three fixture Council model tiles before capturing
+the builder. Android keeps split flows so the runner can package-target the
+fixture deep link without exposing a system app chooser.
+The three pictured providers also carry fixture-only successful capability
+results so Connections shows working routes rather than untested placeholders.
 The automation identity never contacts a platform store or provider. The
 supported capture matrix includes the five requested iPhone display classes, a
 regular-width iPad, and Android phone and tablet profiles.

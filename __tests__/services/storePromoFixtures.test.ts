@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from "expo-secure-store";
 import * as SQLite from "expo-sqlite";
 import { NativeModules } from "react-native";
 
@@ -27,6 +28,12 @@ import {
   resetConversationStorageForTests,
 } from "../../src/hooks/conversations/storage";
 import { STORAGE_KEY } from "../../src/hooks/settings/types";
+import { getProviderHealthState } from "../../src/features/settings-core/providerSupport";
+import {
+  DEFAULT_SETTINGS,
+  type Provider,
+  type Settings,
+} from "../../src/types";
 
 const sqliteMock = SQLite as unknown as { __reset: () => void };
 const getApplicationId = jest.fn<Promise<string | null>, []>();
@@ -80,9 +87,11 @@ describe("store promo fixtures", () => {
     );
     await expect(seedStorePromoFixture("de")).resolves.toBe(false);
     await expect(AsyncStorage.getAllKeys()).resolves.toEqual([]);
+    expect(SecureStore.setItemAsync).not.toHaveBeenCalled();
+    expect(SecureStore.deleteItemAsync).not.toHaveBeenCalled();
   });
 
-  it("seeds only the isolated identity without provider keys", async () => {
+  it("seeds nonsecret connected-provider placeholders only for the isolated identity", async () => {
     getApplicationId.mockResolvedValue(
       "com.tobiaswinkler.app.android.mrbroccoli.maestro",
     );
@@ -95,6 +104,38 @@ describe("store promo fixtures", () => {
     expect(storedSettings.language).toBe("de");
     expect(storedSettings).not.toHaveProperty("apiKeys");
     expect(storedSettings).not.toHaveProperty("introCompleted");
+    const picturedProviders: Provider[] = ["openai", "anthropic", "gemini"];
+    const hydratedSettings = {
+      ...DEFAULT_SETTINGS,
+      ...storedSettings,
+      apiKeys: {
+        ...DEFAULT_SETTINGS.apiKeys,
+        openai: "store-promo-placeholder",
+        anthropic: "store-promo-placeholder",
+        gemini: "store-promo-placeholder",
+      },
+    } as Settings;
+    for (const provider of picturedProviders) {
+      expect(
+        getProviderHealthState({
+          provider,
+          settings: hydratedSettings,
+          validationStateByProvider: hydratedSettings.providerValidationResults,
+        }),
+      ).toBe("healthy");
+    }
+    expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.openai",
+      "store-promo-placeholder",
+    );
+    expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.anthropic",
+      "store-promo-placeholder",
+    );
+    expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+      "mrbroccoli.provider_key.gemini",
+      "store-promo-placeholder",
+    );
     const storedMetas = await readStoredConversationMetas();
     expect(storedMetas).toHaveLength(14);
     expect(storedMetas.filter(({ pinned }) => pinned)).toHaveLength(2);

@@ -132,6 +132,16 @@ tags:
     id: satellite-council
 - assertVisible:
     id: council-popover
+- assertVisible:
+    id: council-model-mode-1
+- assertVisible:
+    id: council-model-mode-2
+- assertVisible:
+    id: council-model-mode-3
+- tapOn:
+    id: council-model-mode-2
+- tapOn:
+    id: council-model-mode-3
 - takeScreenshot:
     path: 06-council
 - stopApp

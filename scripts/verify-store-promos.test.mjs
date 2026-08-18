@@ -92,6 +92,11 @@ test("store captures follow the current transcript and idle-settings contracts",
     assert.match(combined, /transcript-toggle-promo-assistant-2/, platform);
     assert.match(combined, /settings-page-connections/, platform);
     assert.match(combined, /council-popover/, platform);
+    assert.match(combined, /council-model-mode-1/, platform);
+    assert.match(combined, /council-model-mode-2/, platform);
+    assert.match(combined, /council-model-mode-3/, platform);
+    assert.ok(combined.split("council-model-mode-2").length - 1 >= 2, platform);
+    assert.ok(combined.split("council-model-mode-3").length - 1 >= 2, platform);
     if (platform === "android") {
       assert.ok(
         STORE_PROMO_ANDROID_FLOW_ORB_QUERIES.some((query) =>

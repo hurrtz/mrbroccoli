@@ -218,12 +218,22 @@ export function validateStorePromoSetup(cwd = process.cwd()) {
       "settings-close-button",
       "satellite-council",
       "council-popover",
+      "council-model-mode-1",
+      "council-model-mode-2",
+      "council-model-mode-3",
       "workspace-header-settings",
       "conversation-settings-drawer",
     ]) {
       if (!combinedFlow.includes(selector)) {
         errors.push(
           `${platform} store screenshot flow is missing selector: ${selector}`,
+        );
+      }
+    }
+    for (const selector of ["council-model-mode-2", "council-model-mode-3"]) {
+      if (combinedFlow.split(selector).length - 1 < 2) {
+        errors.push(
+          `${platform} Council frame does not activate fixture member: ${selector}`,
         );
       }
     }

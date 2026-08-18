@@ -2,20 +2,33 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { APP_LANGUAGES, type AppLanguage } from "../i18n/localeRegistry";
 import {
+  PROVIDER_DEFAULT_TTS_MODELS,
+  PROVIDER_DEFAULT_TTS_VOICES,
+} from "../constants/models";
+import { RUNTIME_PROVIDER_IDS } from "../constants/providers/runtimeState";
+import {
+  getWebSearchProviderModel,
+  type WebSearchProvider,
+} from "../constants/webSearch";
+import {
   buildConversationMetaFromConversation,
   sortConversationMeta,
 } from "../hooks/conversations/meta";
 import { persistActiveConversationId } from "../hooks/conversations/storage";
 import { relativizeConversationImageAttachmentUris } from "./imageAttachmentFiles";
 import { replaceAllConversationRows } from "./conversationStore";
-import { toPublicSettings } from "../hooks/settings/storage";
+import { persistApiKey, toPublicSettings } from "../hooks/settings/storage";
 import { STORAGE_KEY } from "../hooks/settings/types";
 import {
   DEFAULT_SETTINGS,
   type Conversation,
   type Message,
+  type Provider,
+  type ProviderValidationResult,
+  type ProviderValidationResults,
   type Settings,
 } from "../types";
+import { getProviderValidationModel } from "../utils/responseModes";
 import { getApplicationId } from "./debugRuntimeContext";
 import {
   isStorePromoApplicationId,
@@ -26,6 +39,75 @@ import {
 } from "./storePromoPresentation";
 
 const STORE_PROMO_FIXTURE_NOW_MS = Date.parse("2026-08-05T06:09:00.000Z");
+const STORE_PROMO_CONNECTED_PROVIDERS = new Set<Provider>([
+  "openai",
+  "anthropic",
+  "gemini",
+]);
+const STORE_PROMO_PLACEHOLDER_CREDENTIAL = "store-promo-placeholder";
+
+function successfulValidation(
+  model: string,
+  configKey?: string,
+): ProviderValidationResult {
+  return {
+    status: "success",
+    model,
+    ...(configKey === undefined ? {} : { configKey }),
+  };
+}
+
+function storePromoSearchValidation(
+  settings: Settings,
+  provider: WebSearchProvider,
+) {
+  return successfulValidation(
+    getWebSearchProviderModel(provider),
+    JSON.stringify(settings.webSearchProviderSettings[provider]),
+  );
+}
+
+function storePromoTtsValidation(settings: Settings, provider: Provider) {
+  const model =
+    (provider === "gemini"
+      ? PROVIDER_DEFAULT_TTS_MODELS[provider]
+      : settings.providerTtsModels[provider]) ||
+    PROVIDER_DEFAULT_TTS_MODELS[provider] ||
+    "";
+  const voice =
+    (provider === "gemini"
+      ? PROVIDER_DEFAULT_TTS_VOICES[provider]
+      : settings.providerTtsVoices[provider]) ||
+    PROVIDER_DEFAULT_TTS_VOICES[provider] ||
+    "";
+
+  return successfulValidation(model, JSON.stringify({ voice }));
+}
+
+function buildStorePromoProviderValidationResults(
+  settings: Settings,
+): ProviderValidationResults {
+  return {
+    openai: {
+      llm: successfulValidation(getProviderValidationModel(settings, "openai")),
+      stt: successfulValidation(settings.providerSttModels.openai),
+      tts: storePromoTtsValidation(settings, "openai"),
+      search: storePromoSearchValidation(settings, "openai"),
+    },
+    anthropic: {
+      llm: successfulValidation(
+        getProviderValidationModel(settings, "anthropic"),
+      ),
+      search: storePromoSearchValidation(settings, "anthropic"),
+    },
+    gemini: {
+      llm: successfulValidation(getProviderValidationModel(settings, "gemini")),
+      stt: successfulValidation(settings.providerSttModels.gemini),
+      tts: storePromoTtsValidation(settings, "gemini"),
+      search: storePromoSearchValidation(settings, "gemini"),
+    },
+  };
+}
 
 export const STORE_PROMO_FIXTURE_MARKER_KEY =
   "@mrbroccoli/store-promo-fixture-locale";
@@ -778,6 +860,8 @@ export async function seedStorePromoFixture(
     ulraModeEnabled: true,
     ulraModeWarningAcknowledged: true,
   };
+  nextSettings.providerValidationResults =
+    buildStorePromoProviderValidationResults(nextSettings);
   const conversations = buildStorePromoConversations(
     language,
     STORE_PROMO_FIXTURE_NOW_MS,
@@ -804,6 +888,16 @@ export async function seedStorePromoFixture(
     [STORE_PROMO_ORB_STORAGE_KEY, JSON.stringify(orb)],
     [STORE_PROMO_SCENE_STORAGE_KEY, scene],
   ]);
+  await Promise.all(
+    RUNTIME_PROVIDER_IDS.map((provider) =>
+      persistApiKey(
+        provider,
+        STORE_PROMO_CONNECTED_PROVIDERS.has(provider)
+          ? STORE_PROMO_PLACEHOLDER_CREDENTIAL
+          : "",
+      ),
+    ),
+  );
   await replaceAllConversationRows(
     conversations.map((conversation) => ({
       conversation,

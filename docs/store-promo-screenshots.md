@@ -13,13 +13,17 @@ state only when the installed application identifier is exactly
 `com.tobiaswinkler.app.mrbroccoli.maestro` on iOS or
 `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. Production,
 `.dev`, and every other application identity fail closed. The fixture contains
-no credentials, provider requests, user data, or downloaded models.
+no real credentials, provider requests, user data, or downloaded models.
 All assistant replies and the idle voice phase are fixed. The single
 `conversation` scene seeds the requested locale, provider routes, fourteen
 conversations, and presentation state without a provider call. Ten sessions
 appear across Pinned and Earlier, including two forks and one locked row; four
-more remain in the collapsed Archived group. It never writes
-credentials, downloads a model, benchmarks hardware, or invokes a store.
+more remain in the collapsed Archived group. Three nonsecret placeholder
+values in the isolated Maestro SecureStore plus matching successful
+fixture-only capability results make the pictured OpenAI, Anthropic, and Gemini
+connections visibly working and their Council members available; all other
+fixture keys are cleared. It never reads user credentials, downloads a model,
+benchmarks hardware, invokes a store, or contacts a provider.
 
 ## Capture one locale
 
@@ -83,7 +87,7 @@ conversation, transcript, branch, and Settings coverage as iOS.
 ## Seven-image order on both stores
 
 1. Home workspace in its idle voice phase
-2. Transcript with the latest response opened
+2. Transcript overview with the latest response collapsed
 3. Conversations with two pinned, eight earlier, two forks, one locked, and four archived
 4. Settings / Connections
 5. Settings / Thinking
@@ -165,7 +169,7 @@ bundle exec fastlane ios metadata                     # targets app.json version
 ```
 
 There is no dry run for the App Store side. `deliver`'s `verify_only` validates
-a *binary*, not a listing, and fails in `verify_binary` when no IPA is present.
+a _binary_, not a listing, and fails in `verify_binary` when no IPA is present.
 The real check is deliver's own HTML preview, which it writes and asks about
 unless `force:true` is passed. Only Play has a true server-side validation.
 The iOS lane creates or updates the version declared in `app.json`; pass

@@ -53,11 +53,14 @@ before it can replace the live presentation clock.
 
 The route owns one `conversation` scene. It seeds the requested locale,
 provider response modes, branched conversation fixtures, and deterministic
-presentation state without reading credentials or calling a provider. The
-scene accepts only an explicit light or dark fixture theme; the device chrome
-is set to the same scheme by the capture runner. Its campaign phase may be idle
-so Maestro can open the real transcript, Council, and conversation-settings
-surfaces without synthesizing a turn.
+presentation state without reading user credentials or calling a provider.
+Nonsecret placeholder provider values are written only to the identity-isolated
+Maestro SecureStore. Matching successful capability results live only in the
+isolated public fixture so Connections renders working routes and the Council
+frame tells the same coherent BYOK story. The scene accepts only an explicit light or dark fixture theme; the
+device chrome is set to the same scheme by the capture runner. Its campaign
+phase may be idle so Maestro can open the real transcript, Council, and
+conversation-settings surfaces without synthesizing a turn.
 
 Evidence:
 

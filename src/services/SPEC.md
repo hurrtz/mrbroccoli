@@ -223,11 +223,15 @@ to the exact Maestro identity for the current platform:
 `com.tobiaswinkler.app.android.mrbroccoli.maestro` on Android. The single
 `conversation` scene seeds provider routes, fourteen organized conversations,
 two branches, one locked row, and validated presentation state without
-credentials, model work, or provider requests. Its idle presentation keeps the
-real home controls reachable for the home, Council, and per-conversation
-settings frames, and its seeded response modes are presented as available
-without storing credentials. Production readiness, phase, and progress remain
-pipeline-derived.
+real credentials, model work, or provider requests. It stores explicit
+nonsecret placeholder values for the three pictured providers only inside the
+isolated Maestro SecureStore and matching successful capability results in the
+isolated public fixture, so Connections renders those routes as working and
+Council renders coherent ready members; every other fixture-provider key is
+cleared. Its idle presentation
+keeps the real home controls reachable for the home, Council, and
+per-conversation settings frames. Production readiness, phase, and progress
+remain pipeline-derived.
 
 ## Failure Rules
 
