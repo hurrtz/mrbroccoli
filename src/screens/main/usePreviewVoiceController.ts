@@ -4,6 +4,7 @@ import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import type { SpeechDiagnosticsContext } from "../../services/speech/diagnostics";
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { synthesizeSpeech } from "../../services/tts";
+import type { PipelinePhase } from "../../hooks/useVoicePipeline";
 import { AppLanguage, Settings, VoicePreviewRequest } from "../../types";
 import { PROVIDER_DEFAULT_TTS_MODELS } from "../../constants/models";
 import { getTtsListenLanguageForKokoro } from "../../constants/kokoro";
@@ -13,6 +14,7 @@ import { ShowToastFn, TranslateFn } from "./shared";
 
 interface PreviewPlayer {
   enqueueAudio: (uri: string, diagnostics?: SpeechDiagnosticsContext) => void;
+  isPlaybackPaused: boolean;
   isPlaying: boolean;
   resetCancellation: () => void;
   speakText: (
@@ -28,22 +30,24 @@ interface PreviewPlayer {
 }
 
 interface UsePreviewVoiceControllerParams {
-  isBusy: boolean;
   isRecording: boolean;
   language: AppLanguage;
+  pipelinePhase: PipelinePhase;
   player: PreviewPlayer;
   settings: Pick<Settings, "apiKeys" | "providerTtsModels">;
   showToast: ShowToastFn;
+  stopVoiceSession: () => Promise<void>;
   t: TranslateFn;
 }
 
 export function usePreviewVoiceController({
-  isBusy,
   isRecording,
   language,
+  pipelinePhase,
   player,
   settings,
   showToast,
+  stopVoiceSession,
   t,
 }: UsePreviewVoiceControllerParams) {
   const previewSessionRef = useRef(0);
@@ -56,7 +60,15 @@ export function usePreviewVoiceController({
         onPlaybackStarted?: () => void;
       },
     ) => {
-      if (isRecording || isBusy) {
+      const replacesPausedVoiceSession =
+        !isRecording &&
+        pipelinePhase === "speaking" &&
+        player.isPlaybackPaused;
+
+      if (
+        isRecording ||
+        (pipelinePhase !== "idle" && !replacesPausedVoiceSession)
+      ) {
         showToast(t("stopSessionBeforePreview"));
         return;
       }
@@ -102,7 +114,12 @@ export function usePreviewVoiceController({
       };
 
       try {
-        if (player.isPlaying) {
+        if (replacesPausedVoiceSession) {
+          recordDebugLogEvent({
+            event: "voice-preview-replacing-paused-session",
+          });
+          await stopVoiceSession();
+        } else if (player.isPlaying) {
           await player.stopPlayback();
         }
 
@@ -261,13 +278,14 @@ export function usePreviewVoiceController({
       }
     },
     [
-      isBusy,
       isRecording,
       language,
+      pipelinePhase,
       player,
       settings.apiKeys,
       settings.providerTtsModels,
       showToast,
+      stopVoiceSession,
       t,
     ],
   );

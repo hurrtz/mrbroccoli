@@ -33,6 +33,7 @@ describe("usePreviewVoiceController", () => {
     const showToast = jest.fn();
     const player = {
       enqueueAudio: jest.fn(),
+      isPlaybackPaused: false,
       isPlaying: false,
       resetCancellation: jest.fn(),
       speakText: jest.fn(),
@@ -41,15 +42,16 @@ describe("usePreviewVoiceController", () => {
     };
     const { result } = renderHook(() =>
       usePreviewVoiceController({
-        isBusy: false,
         isRecording: false,
         language: "en",
+        pipelinePhase: "idle",
         player,
         settings: {
           apiKeys: { openai: "" } as never,
           providerTtsModels: { openai: "gpt-4o-mini-tts" } as never,
         },
         showToast,
+        stopVoiceSession: jest.fn(async () => undefined),
         t: (key) =>
           ({
             chooseTtsToPreviewVoices: "Choose TTS first",
@@ -75,6 +77,7 @@ describe("usePreviewVoiceController", () => {
     const onPlaybackStarted = jest.fn();
     const player = {
       enqueueAudio: jest.fn(),
+      isPlaybackPaused: false,
       isPlaying: false,
       resetCancellation: jest.fn(),
       speakText: jest.fn(),
@@ -83,15 +86,16 @@ describe("usePreviewVoiceController", () => {
     };
     const { result } = renderHook(() =>
       usePreviewVoiceController({
-        isBusy: false,
         isRecording: false,
         language: "en",
+        pipelinePhase: "idle",
         player,
         settings: {
           apiKeys: {} as never,
           providerTtsModels: {} as never,
         },
         showToast: jest.fn(),
+        stopVoiceSession: jest.fn(async () => undefined),
         t: (key) => key,
       }),
     );
@@ -137,6 +141,7 @@ describe("usePreviewVoiceController", () => {
     );
     const player = {
       enqueueAudio: jest.fn(),
+      isPlaybackPaused: false,
       isPlaying: false,
       resetCancellation: jest.fn(),
       speakText: jest.fn(),
@@ -146,15 +151,16 @@ describe("usePreviewVoiceController", () => {
     const showToast = jest.fn();
     const { result } = renderHook(() =>
       usePreviewVoiceController({
-        isBusy: false,
         isRecording: false,
         language: "en",
+        pipelinePhase: "idle",
         player,
         settings: {
           apiKeys: {} as never,
           providerTtsModels: {} as never,
         },
         showToast,
+        stopVoiceSession: jest.fn(async () => undefined),
         t: (key) => key,
       }),
     );
@@ -180,5 +186,99 @@ describe("usePreviewVoiceController", () => {
     expect(requestSignal?.aborted).toBe(true);
     expect(player.enqueueAudio).not.toHaveBeenCalled();
     expect(showToast).not.toHaveBeenCalled();
+  });
+
+  it("replaces a paused reply with a provider voice preview", async () => {
+    const stopVoiceSession = jest.fn(async () => undefined);
+    const showToast = jest.fn();
+    const player = {
+      enqueueAudio: jest.fn(),
+      isPlaybackPaused: true,
+      isPlaying: true,
+      resetCancellation: jest.fn(),
+      speakText: jest.fn(),
+      stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
+    };
+    const { result } = renderHook(() =>
+      usePreviewVoiceController({
+        isRecording: false,
+        language: "en",
+        pipelinePhase: "speaking",
+        player,
+        settings: {
+          apiKeys: { xai: "configured-key" } as never,
+          providerTtsModels: { xai: "text-to-speech" } as never,
+        },
+        showToast,
+        stopVoiceSession,
+        t: (key) => key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handlePreviewVoice({
+        mode: "provider",
+        previewLanguage: "en",
+        provider: "xai",
+        text: "Hello there",
+        voice: "eve",
+      });
+    });
+
+    expect(stopVoiceSession).toHaveBeenCalledTimes(1);
+    expect(mockSynthesizeSpeech).toHaveBeenCalledTimes(1);
+    expect(stopVoiceSession.mock.invocationCallOrder[0]).toBeLessThan(
+      mockSynthesizeSpeech.mock.invocationCallOrder[0],
+    );
+    expect(player.stopPlayback).not.toHaveBeenCalled();
+    expect(player.enqueueAudio).toHaveBeenCalledWith(
+      "file://preview.m4a",
+      expect.objectContaining({ mode: "provider", provider: "xai" }),
+    );
+    expect(showToast).not.toHaveBeenCalled();
+  });
+
+  it("still blocks previews while an unpaused reply is speaking", async () => {
+    const stopVoiceSession = jest.fn(async () => undefined);
+    const showToast = jest.fn();
+    const player = {
+      enqueueAudio: jest.fn(),
+      isPlaybackPaused: false,
+      isPlaying: true,
+      resetCancellation: jest.fn(),
+      speakText: jest.fn(),
+      stopPlayback: jest.fn(async () => undefined),
+      waitForDrain: jest.fn(async () => undefined),
+    };
+    const { result } = renderHook(() =>
+      usePreviewVoiceController({
+        isRecording: false,
+        language: "en",
+        pipelinePhase: "speaking",
+        player,
+        settings: {
+          apiKeys: { xai: "configured-key" } as never,
+          providerTtsModels: { xai: "text-to-speech" } as never,
+        },
+        showToast,
+        stopVoiceSession,
+        t: (key) => key,
+      }),
+    );
+
+    await act(async () => {
+      await result.current.handlePreviewVoice({
+        mode: "provider",
+        previewLanguage: "en",
+        provider: "xai",
+        text: "Hello there",
+        voice: "eve",
+      });
+    });
+
+    expect(showToast).toHaveBeenCalledWith("stopSessionBeforePreview");
+    expect(stopVoiceSession).not.toHaveBeenCalled();
+    expect(mockSynthesizeSpeech).not.toHaveBeenCalled();
   });
 });

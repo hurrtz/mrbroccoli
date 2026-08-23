@@ -873,12 +873,13 @@ export function MainScreen() {
   });
 
   const { handlePreviewVoice, stopPreviewVoice } = usePreviewVoiceController({
-    isBusy,
     isRecording,
     language,
+    pipelinePhase,
     player,
     settings: runtimeSettings,
     showToast,
+    stopVoiceSession: resetVoiceSessionState,
     t,
   });
 

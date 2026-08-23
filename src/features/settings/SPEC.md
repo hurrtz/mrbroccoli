@@ -138,9 +138,12 @@ capability healthy. The UI shows the capability that was actually tested.
   followed by one native/local/provider route group. A selected route exposes
   its model and voice as inset subrows; voice selection opens one searchable,
   focus-isolated sheet whose rows can preview the exact voice without first
-  changing the saved selection. Download, cancel, benchmark, selection, and
-  swipe-removal for local voices stay in this route group. Speech replay-cache
-  removal is the only Storage action on this page.
+  changing the saved selection. Starting a preview replaces a paused reply only
+  after the active voice session has been fully torn down; recording and
+  response-preparation phases remain protected from preview interruption.
+  Download, cancel, benchmark, selection, and swipe-removal for local voices
+  stay in this route group. Speech replay-cache removal is the only Storage
+  action on this page.
 - Search: one `Who searches` group with a Nobody route plus search-provider
   routes, with result count, depth, and provider-specific search mode shown
   only for the active route. Nobody

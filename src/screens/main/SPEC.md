@@ -155,7 +155,10 @@ receive already-derived state and callbacks.
   rendered speaking phase and the already-primed audio session through native
   clip teardown, so the workspace does not expose an idle frame and the next
   paragraph does not begin through a fresh audio-session fade-in. Explicit Stop
-  and natural drain retain the full teardown behavior.
+  and natural drain retain the full teardown behavior. Starting a Settings
+  voice preview while a reply is paused also performs that full teardown before
+  preview audio begins; an unpaused reply or any earlier turn phase remains
+  protected from preview interruption.
 - **Decision:** the workspace carries no status line and no session-details
   sheet. The orb states the phase visually and announces every phase change to
   assistive technology, the route byline names the response route, the

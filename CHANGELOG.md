@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Voice previews can now replace a paused spoken reply after safely ending its
+  active voice session, while recording and in-progress response phases remain
+  protected from interruption.
 - Android now uses the dedicated Google Play application ID
   `com.tobiaswinkler.app.android.mrbroccoli` for the new paid listing while iOS
   retains its existing identity. Android debug and screenshot builds use the
