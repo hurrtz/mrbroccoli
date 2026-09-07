@@ -63,6 +63,11 @@ initial default, but must not permanently couple those settings.
   script-specific punctuation over a literal rendering of English structure.
 - Provider and model brand names are not translated unless the brand supplies
   a localized name.
+- Thinking copy describes an open-ended list of hosted response routes and
+  selection from the home screen. It must not promise answer-model downloads
+  or credential connection inside that picker; optional downloads are speech
+  features, and provider credentials belong to Connections. Model storage
+  directs download, testing, and selection to Listening and Speaking only.
 - Runtime copy does not describe store purchasing. Paid-app pricing and
   ownership belong to App Store and Google Play metadata, not in-app strings.
 

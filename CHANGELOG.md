@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Thinking and model-storage guidance now correctly describe hosted answering
+  routes and speech-only downloads in every interface language.
+
 - On iOS, a competing recording or Hands free monitor start no longer stops
   the recording already in progress.
 

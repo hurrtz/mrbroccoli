@@ -13,6 +13,68 @@ import {
 } from "../../src/i18n/localeRegistry";
 
 describe("translations", () => {
+  it.each(APP_LANGUAGES)(
+    "%s does not promise downloading or connecting answer models in Thinking",
+    (language) => {
+      // Thinking adds routes from ready providers. Installation belongs only
+      // to speech settings; provider credentials belong to Connections.
+      const retiredPromises: Record<keyof typeof translations, RegExp> = {
+        en: /download|connect/i,
+        de: /heruntergeladen|verbunden/i,
+        uk: /завантаж|підключ/i,
+        hi: /डाउनलोड|कनेक्ट/,
+        es: /descarg|conect/i,
+        fr: /télécharg|connect/i,
+        it: /scaricat|collegat/i,
+        pt: /transferid|ligad/i,
+        "pt-BR": /baixad|conectad/i,
+        ru: /скачать|подключ/i,
+        "zh-CN": /下载|连接/,
+        ar: /يُنزّل|يُوصل/,
+        ja: /ダウンロード|接続/,
+        hu: /tölthető|kapcsolható/i,
+        cs: /stáhne|připojí/i,
+        pl: /pobrać|połączyć/i,
+        tr: /indirilir|bağlanır/i,
+        sv: /hämtas|ansluts/i,
+        ur: /ڈاؤن لوڈ|مربوط/,
+      };
+      expect(translations[language].answeringModelsFooter).not.toMatch(
+        retiredPromises[language],
+      );
+    },
+  );
+
+  it.each(APP_LANGUAGES)(
+    "%s does not send speech-model downloads to Thinking",
+    (language) => {
+      const retiredDestinations: Record<keyof typeof translations, RegExp> = {
+        en: /Thinking/,
+        de: /Denken/,
+        uk: /Мислення|Міркування/,
+        hi: /सोच/,
+        es: /Pensamiento/,
+        fr: /Réflexion|Pensée/,
+        it: /Pensiero/,
+        pt: /Pensar|Pensamento/,
+        "pt-BR": /Pensar|Pensamento/,
+        ru: /Мышление/,
+        "zh-CN": /思考/,
+        ar: /التفكير/,
+        ja: /思考/,
+        hu: /Gondolkodás/,
+        cs: /Myšlení|Přemýšlení/,
+        pl: /Myślenie/,
+        tr: /Düşünme/,
+        sv: /Tänkande/,
+        ur: /سوچ/,
+      };
+      expect(translations[language].modelStorageFooter).not.toMatch(
+        retiredDestinations[language],
+      );
+    },
+  );
+
   it("derives every public language collection from the locale registry", () => {
     expect(Object.keys(APP_LOCALES)).toEqual(APP_LANGUAGES);
     expect(Object.keys(translations)).toEqual(APP_LANGUAGES);

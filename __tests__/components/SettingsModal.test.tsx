@@ -1471,7 +1471,7 @@ describe("SettingsModal", () => {
       expect(screen.getByText("Answering models")).toBeTruthy();
       expect(
         screen.getByText(
-          "Add as many as you need; the home screen switches who answers the next turn. A model you don't have yet is downloaded or connected right here.",
+          "Add as many as you need. Choose who answers the next turn from the home screen.",
         ),
       ).toBeTruthy();
       expect(screen.getAllByText("System Prompt")).toHaveLength(2);
