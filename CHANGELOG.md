@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Saved conversation voices survive speech-model snapshot updates.
+
 - Gemini 3.5 Transcribe is available for recorded speech with verbatim transcription.
 
 - Grok 4.6 can handle search fallback with a bounded reasoning allowance.

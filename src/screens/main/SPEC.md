@@ -364,6 +364,10 @@ session overrides and can remove them as a group so the session resumes
 inheriting current and future defaults; the Thinking page owns the standard
 length and tone.
 
+Saved conversation voices compare canonical model identities, so pinning a
+provider alias to its snapshot preserves the selected voice. A different
+provider or speech model still falls back to the global voice.
+
 The sessions drawer is flat and recency-first. Pinned and Archived sessions
 live in collapsible groups around the everyday Earlier list; active state is a
 row fill, never a branch rail. Each row shows only title, pin/lock state,

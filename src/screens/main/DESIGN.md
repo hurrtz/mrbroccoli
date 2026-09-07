@@ -170,6 +170,9 @@ are likewise scoped to their modal presentations: entering persistent-sidebar
 or docked-transcript layout retires the obsolete modal flag so a later shrink
 cannot reopen a stale surface or suspend an active turn.
 
+`useConversationSettings` resolves both stored and active speech-model aliases
+before matching a voice override; it does not rewrite conversation history.
+
 ## Surface State
 
 Secondary surfaces are coordinated centrally so modal focus, dismissal, and

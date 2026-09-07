@@ -75,6 +75,15 @@ describe("useConversationSettings", () => {
     expect(result.current.effectiveTtsInstructions).toBe("Speak clearly.");
   });
 
+  it.each([
+    ["openai", "gpt-4o-mini-tts", "gpt-4o-mini-tts-2025-12-15", "marin"],
+    ["alibaba-qwen-dashscope", "qwen3-tts-instruct-flash", "qwen3-tts-instruct-flash-2026-01-26", "Cherry"],
+  ] as const)("preserves %s conversation voices across snapshot pinning", (provider, alias, snapshot, voice) => {
+    const props = { ...createProps(conversation("saved", { ttsVoice: { provider, model: alias, voice } })), ttsProvider: provider, ttsModel: snapshot };
+    const { result } = renderHook(() => useConversationSettings(props));
+    expect(result.current.selectedTtsVoice).toBe(voice);
+  });
+
   it("does not apply a voice override to a different TTS route", () => {
     const props = createProps(
       conversation("route-change", {

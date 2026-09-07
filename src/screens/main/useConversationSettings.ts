@@ -1,3 +1,5 @@
+import { migrateProviderModelAlias } from "../../utils/responseModes";
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type {
@@ -70,7 +72,8 @@ export function useConversationSettings({
   const selectedTtsVoice =
     overrides.ttsVoice &&
     overrides.ttsVoice.provider === ttsProvider &&
-    overrides.ttsVoice.model === ttsModel
+    migrateProviderModelAlias(overrides.ttsVoice.provider, overrides.ttsVoice.model) ===
+      migrateProviderModelAlias(overrides.ttsVoice.provider, ttsModel)
       ? overrides.ttsVoice.voice
       : globalTtsVoice;
 
