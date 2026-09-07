@@ -197,7 +197,8 @@ an authenticated SecureStore marker provides Face ID or fingerprint access
 where the device supports it. The conversation and metadata carry only the
 canonical `isLocked` flag. Locked records are not hydrated, content-searched,
 or indexed until the user authenticates, and foreground grants are discarded
-on launch or app backgrounding. This is an app access boundary rather than
+on launch or app backgrounding. Pending reads recheck the current grant before
+returning a record or selecting it. This is an app access boundary rather than
 database encryption.
 
 Branches copy messages only through a selected checkpoint, assign new message

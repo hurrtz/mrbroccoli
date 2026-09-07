@@ -266,7 +266,11 @@ export function useConversationMutations(params: {
       selectionRequestRef.current = requestId;
       const conversation = await readConversation(id);
 
-      if (conversation && selectionRequestRef.current === requestId) {
+      if (
+        conversation &&
+        selectionRequestRef.current === requestId &&
+        canAccessConversation(id)
+      ) {
         setActiveConversationValue(conversation);
       }
     },
@@ -282,7 +286,8 @@ export function useConversationMutations(params: {
         return activeConversationRef.current;
       }
 
-      return readConversation(id);
+      const conversation = await readConversation(id);
+      return canAccessConversation(id) ? conversation : null;
     },
     [activeConversationRef, canAccessConversation],
   );

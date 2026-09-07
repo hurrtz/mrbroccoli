@@ -41,12 +41,16 @@ export function useConversations({
   const handleHydrated = useCallback(() => {
     setLoaded(true);
   }, []);
+  const conversationMetasRef = useRef(conversations);
+  conversationMetasRef.current = conversations;
   const canAccessConversation = useCallback(
     (id: string) => {
-      const meta = conversations.find((conversation) => conversation.id === id);
+      const meta = conversationMetasRef.current.find(
+        (conversation) => conversation.id === id,
+      );
       return !meta?.isLocked || authorizedConversationIdsRef.current.has(id);
     },
-    [conversations],
+    [],
   );
 
   useConversationHydration({

@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Locked conversations stay inaccessible when an in-flight read finishes after
+  the app backgrounds and revokes authorization.
+
 - Conversation storage can recover from a temporary database initialization
   failure without restarting the app.
 

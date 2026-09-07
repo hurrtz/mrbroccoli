@@ -1730,6 +1730,49 @@ describe("useConversations", () => {
     ).resolves.toBeNull();
   });
 
+  it.each(["select", "read"] as const)(
+    "revokes a pending locked conversation %s when the app backgrounds",
+    async (operation) => {
+      let listener: ((state: string) => void) | undefined;
+      jest.spyOn(AppState, "addEventListener").mockImplementation(((_event, next) => {
+        listener = next;
+        return { remove: jest.fn() };
+      }) as typeof AppState.addEventListener);
+      const locked: Conversation = {
+        id: "pending-locked", title: "Locked", isLocked: true,
+        createdAt: "2026-09-07T08:00:00.000Z",
+        updatedAt: "2026-09-07T08:00:00.000Z", messages: [],
+      };
+      await saveConversation(locked);
+      const { result } = renderHook(() => useConversations());
+      await waitFor(() => expect(result.current.loaded).toBe(true));
+      act(() => result.current.grantConversationAccess(locked.id));
+      const database = await getConversationDatabase();
+      const readRow = jest.mocked(database.getFirstAsync);
+      const passThrough = readRow.getMockImplementation()!;
+      let entered = false;
+      let release = () => {};
+      const gate = new Promise<void>((resolve) => { release = resolve; });
+      readRow.mockImplementation(async (sql, ...params) => {
+        if (sql.includes("FROM conversations WHERE id = ?")) {
+          entered = true;
+          await gate;
+        }
+        return passThrough(sql, ...params);
+      });
+      const pending = operation === "select"
+        ? result.current.selectConversation(locked.id)
+        : result.current.getConversationById(locked.id);
+      await waitFor(() => expect(entered).toBe(true));
+      act(() => listener?.("background"));
+      let returned: unknown;
+      await act(async () => { release(); returned = await pending; });
+      readRow.mockImplementation(passThrough);
+      expect(result.current.activeConversation).toBeNull();
+      if (operation === "read") expect(returned).toBeNull();
+    },
+  );
+
   it("does not restore a locked active conversation after app launch", async () => {
     const lockedConversation: Conversation = {
       id: "locked-active-thread",

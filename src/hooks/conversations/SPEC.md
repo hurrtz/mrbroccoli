@@ -72,7 +72,9 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
   record cannot be selected, read by ID, content-searched, hydrated as active,
   or indexed until its ID receives a foreground-only authorization grant.
   Launch and every non-active app state clear grants; if the active session is
-  locked, it is removed from the workspace at the same boundary.
+  locked, it is removed from the workspace at the same boundary. Pending reads
+  and selections recheck current authorization after storage resolves; a grant
+  revoked during a read cannot publish a locked record afterward.
 - Archive state is canonical conversation data. Archiving removes a session
   from the everyday pinned section; pinning an archived session restores it to
   the active groups before applying the pin.
