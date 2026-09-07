@@ -33,6 +33,7 @@ describe("speech provider constants", () => {
 
   it("surfaces Gemini audio transcription and the Mistral STT model", () => {
     expect(getProviderSttModelOptions("gemini")).toEqual([
+      { id: "gemini-3.5-transcribe", name: "Gemini 3.5 Transcribe" },
       { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash" },
       { id: "gemini-3.7-flash", name: "Gemini 3.7 Flash" },
       { id: "gemini-3.6-flash", name: "Gemini 3.6 Flash" },
