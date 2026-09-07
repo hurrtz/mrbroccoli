@@ -51,7 +51,10 @@ internal class MrBroccoliAudioQueueCoordinator(
 
   fun start(): Boolean =
     synchronized(lock) {
-      startLocked()
+      val hadPendingItem = currentItem != null || queue.isNotEmpty()
+      val started = startLocked()
+      if (!started && hadPendingItem) emitDrainedLocked()
+      started
     }
 
   fun pause() {
@@ -71,50 +74,61 @@ internal class MrBroccoliAudioQueueCoordinator(
   private fun startLocked(): Boolean {
     val activePlayer = player
     if (activePlayer != null) {
-      activePlayer.start()
-      emitStartedForCurrentItemLocked()
-      return true
+      try {
+        activePlayer.start()
+        emitStartedForCurrentItemLocked()
+        return true
+      } catch (_: Exception) {
+        failCurrentPlayerLocked()
+      }
     }
 
-    val nextItem = queue.pollFirst() ?: return false
-    currentItem = nextItem
-    currentStarted = false
-
-    var nextPlayer: MrBroccoliAudioQueuePlayer? = null
-    val callbacks = MrBroccoliAudioQueuePlayerCallbacks(
-      onCompletion = {
-        synchronized(lock) {
-          if (player !== nextPlayer) {
-            return@synchronized
+    // Construction and start can fail synchronously, including when this runs
+    // from MediaPlayer's completion callback. Consume failed items iteratively
+    // so corrupt audio cannot escape onto the callback thread or wedge the queue.
+    while (true) {
+      val nextItem = queue.pollFirst() ?: return false
+      currentItem = nextItem
+      currentStarted = false
+      var nextPlayer: MrBroccoliAudioQueuePlayer? = null
+      val callbacks = MrBroccoliAudioQueuePlayerCallbacks(
+        onCompletion = {
+          synchronized(lock) {
+            if (nextPlayer == null || player !== nextPlayer) {
+              return@synchronized
+            }
+            currentItem?.let { emitItemEvent("finished", it) }
+            cleanupCurrentPlayerLocked()
+            if (!startLocked()) emitDrainedLocked()
           }
-
-          currentItem?.let { emitItemEvent("finished", it) }
-          cleanupCurrentPlayerLocked()
-          if (!startLocked()) {
-            emitDrainedLocked()
+        },
+        onError = { message ->
+          synchronized(lock) {
+            if (nextPlayer == null || player !== nextPlayer) {
+              return@synchronized
+            }
+            currentItem?.let { emitItemEvent("failed", it, message) }
+            cleanupCurrentPlayerLocked()
+            if (!startLocked()) emitDrainedLocked()
           }
-        }
-      },
-      onError = { message ->
-        synchronized(lock) {
-          if (player !== nextPlayer) {
-            return@synchronized
-          }
+        },
+      )
 
-          currentItem?.let { emitItemEvent("failed", it, message) }
-          cleanupCurrentPlayerLocked()
-          if (!startLocked()) {
-            emitDrainedLocked()
-          }
-        }
-      },
-    )
+      try {
+        nextPlayer = playerFactory(nextItem, callbacks)
+        player = nextPlayer
+        nextPlayer.start()
+        emitStartedForCurrentItemLocked()
+        return true
+      } catch (_: Exception) {
+        failCurrentPlayerLocked()
+      }
+    }
+  }
 
-    nextPlayer = playerFactory(nextItem, callbacks)
-    player = nextPlayer
-    nextPlayer.start()
-    emitStartedForCurrentItemLocked()
-    return true
+  private fun failCurrentPlayerLocked() {
+    currentItem?.let { emitItemEvent("failed", it, "Audio playback failed.") }
+    cleanupCurrentPlayerLocked()
   }
 
   private fun stopLocked(emitStopped: Boolean) {
@@ -139,10 +153,15 @@ internal class MrBroccoliAudioQueueCoordinator(
     currentStarted = false
 
     if (activePlayer != null) {
+      // Both operations must be attempted even after a failed start. Native
+      // cleanup failures must not prevent later items from playing.
       try {
         activePlayer.stop()
-      } finally {
+      } catch (_: Exception) {
+      }
+      try {
         activePlayer.release()
+      } catch (_: Exception) {
       }
     }
   }

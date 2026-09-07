@@ -14,21 +14,33 @@ internal class MrBroccoliAndroidAudioQueuePlayer(
   private val mediaPlayer = MediaPlayer()
 
   init {
-    mediaPlayer.setAudioAttributes(
-      AudioAttributes.Builder()
-        .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
-        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-        .build(),
-    )
-    mediaPlayer.setOnCompletionListener {
-      callbacks.onCompletion()
+    try {
+      mediaPlayer.setAudioAttributes(
+        AudioAttributes.Builder()
+          .setUsage(AudioAttributes.USAGE_ASSISTANCE_ACCESSIBILITY)
+          .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+          .build(),
+      )
+      mediaPlayer.setOnCompletionListener {
+        callbacks.onCompletion()
+      }
+      mediaPlayer.setOnErrorListener { _, _, _ ->
+        callbacks.onError("Audio playback failed.")
+        true
+      }
+      mediaPlayer.setDataSource(context, resolveUri(item.uri))
+      mediaPlayer.prepare()
+    } catch (error: Exception) {
+      // A constructor that fails never reaches the coordinator, so it must
+      // release its own native decoder allocation before propagating failure.
+      mediaPlayer.setOnCompletionListener(null)
+      mediaPlayer.setOnErrorListener(null)
+      try {
+        mediaPlayer.release()
+      } catch (_: Exception) {
+      }
+      throw error
     }
-    mediaPlayer.setOnErrorListener { _, _, _ ->
-      callbacks.onError("Audio playback failed.")
-      true
-    }
-    mediaPlayer.setDataSource(context, resolveUri(item.uri))
-    mediaPlayer.prepare()
   }
 
   override fun start() {
@@ -49,7 +61,6 @@ internal class MrBroccoliAndroidAudioQueuePlayer(
   override fun release() {
     mediaPlayer.setOnCompletionListener(null)
     mediaPlayer.setOnErrorListener(null)
-    mediaPlayer.reset()
     mediaPlayer.release()
   }
 

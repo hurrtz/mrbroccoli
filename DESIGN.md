@@ -272,7 +272,9 @@ language checks occur before execution.
   language, timeout, and validation behavior.
 - TTS transforms visual response text into speakable text before chunking.
 - Streaming playback queues completed paragraphs. Provider/local synthesis may
-  prefetch concurrently, but output is emitted in source order.
+  prefetch concurrently, but output is emitted in source order. Android queue
+  construction, start, and resume failures release the failed decoder and
+  advance through remaining items without escaping native callbacks.
 - “Wait” playback buffers non-native synthesis until the response is complete.
 - Explicit paragraph pauses provide stable cadence without relying on
   engine-specific whitespace behavior.

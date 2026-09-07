@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Android spoken replies recover from unreadable or corrupt queued audio
+  instead of crashing or stalling playback.
+
 - Model Council fallback replies now retain the provider and model that actually
   answered instead of being attributed to the originally selected route.
 

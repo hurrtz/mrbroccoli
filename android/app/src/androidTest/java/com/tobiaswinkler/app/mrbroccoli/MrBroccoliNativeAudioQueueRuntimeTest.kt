@@ -48,6 +48,45 @@ class MrBroccoliNativeAudioQueueRuntimeTest {
   }
 
   @Test
+  fun missingQueuedFileFailsWithoutCrashingCompletionAndLaterAudioStillPlays() {
+    val context = ApplicationProvider.getApplicationContext<android.content.Context>()
+    val firstFile = File(context.cacheDir, "queue-recovery-first.wav")
+    val lastFile = File(context.cacheDir, "queue-recovery-last.wav")
+    val missingFile = File(context.cacheDir, "queue-recovery-missing.wav")
+    missingFile.delete()
+    val events = Collections.synchronizedList(mutableListOf<MrBroccoliAudioQueueEvent>())
+    val drained = CountDownLatch(1)
+    val coordinator = MrBroccoliAudioQueueCoordinator(
+      playerFactory = { item, callbacks ->
+        MrBroccoliAndroidAudioQueuePlayer(context, item, callbacks)
+      },
+      eventSink = { event ->
+        events.add(event)
+        if (event.type == "drained") drained.countDown()
+      },
+    )
+    try {
+      coordinator.enqueue(item("first", writeToneFile(firstFile, 360.0)))
+      coordinator.enqueue(item("missing", Uri.fromFile(missingFile).toString()))
+      coordinator.enqueue(item("last", writeToneFile(lastFile, 520.0)))
+
+      assertTrue(coordinator.start())
+      assertTrue(drained.await(5, TimeUnit.SECONDS))
+
+      assertEquals(
+        listOf("started", "finished", "failed", "started", "finished", "drained"),
+        events.map { it.type },
+      )
+      assertEquals("missing", events[2].itemId)
+      assertEquals("last", events[4].itemId)
+    } finally {
+      coordinator.stop(emitStopped = false)
+      firstFile.delete()
+      lastFile.delete()
+    }
+  }
+
+  @Test
   fun outputWaveformPlaybackStateAdvancesAndStopsOnDeviceRuntime() {
     MrBroccoliWaveformStateCoordinator.clear("output")
 

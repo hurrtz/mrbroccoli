@@ -68,7 +68,10 @@ conversation policy.
 ## Audio and Lifecycle Invariants
 
 - Queue mutations are serialized; stop, clear, skip, interruption, and
-  completion cannot resurrect an obsolete item.
+  completion cannot resurrect an obsolete item. Synchronous decoder creation,
+  start, or resume failures emit a failed-item event, release native resources,
+  and advance to the next item; they must never escape a completion callback
+  or strand a drained queue.
 - Foreground-service state follows a real active voice turn and is torn down on
   cancellation, terminal failure, app-driven stop, or completion.
 - Notification actions are idempotent and use the same semantic commands as
