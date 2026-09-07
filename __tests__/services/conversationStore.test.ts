@@ -86,6 +86,20 @@ describe("conversation store", () => {
   });
 
   describe("persistence", () => {
+    it("retries opening the database after a transient initialization failure", async () => {
+      jest.mocked(SQLite.openDatabaseAsync).mockRejectedValueOnce(
+        new Error("Database temporarily unavailable"),
+      );
+
+      await expect(getConversationDatabase()).rejects.toThrow(
+        "Database temporarily unavailable",
+      );
+      const conversation = createConversation("after-retry");
+      await saveConversation(conversation);
+
+      await expect(readConversation(conversation.id)).resolves.toEqual(conversation);
+    });
+
     it("round-trips a conversation through SQLite", async () => {
       const conversation = createConversation("c1");
 

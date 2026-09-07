@@ -51,7 +51,11 @@ export function getConversationDatabase() {
       await database.execAsync(SCHEMA);
       return database;
     },
-  );
+  ).catch((error: unknown) => {
+    // A transient open/schema failure must not poison every later operation.
+    databasePromise = null;
+    throw error;
+  });
 
   return databasePromise;
 }

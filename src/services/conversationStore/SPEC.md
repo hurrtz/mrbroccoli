@@ -67,7 +67,9 @@ storage boundary for no query benefit.
 Every write runs through `runInConversationTransaction`, which queues behind any
 write already in flight. Mobile SQLite shares one connection and transactions
 cannot nest, so a second `BEGIN` while one is open throws. Reads call
-`settleConversationWrites` first so they never observe a stale row.
+`settleConversationWrites` first so they never observe a stale row. Failed
+database initialization clears its cached promise so a transient open or schema
+failure can recover on the next operation without restarting the app.
 
 Metadata absent from an update is left alone rather than deleted. Callers pass
 filtered in-memory lists, so treating omission as deletion would let a drawer

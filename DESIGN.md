@@ -170,6 +170,8 @@ generate the assistant response.
 Settings writes are serialized per storage key. Conversation writes run through
 one queued SQLite transaction boundary, and reads wait for pending writes. This
 prevents an older asynchronous write from overwriting a newer user action.
+Failed conversation-database initialization is retryable on the next operation;
+a rejected cached handle must not disable persistence for the rest of the session.
 
 **Decision:** Settings normalization is write-forward. Legacy, removed, or
 invalid fields are migrated into the current shape at load time and the

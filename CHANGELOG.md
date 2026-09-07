@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Conversation storage can recover from a temporary database initialization
+  failure without restarting the app.
+
 - Voice previews can now replace a paused spoken reply after safely ending its
   active voice session, while recording and in-progress response phases remain
   protected from interruption.
