@@ -1,5 +1,4 @@
-import { migrateProviderModelAlias } from "../../src/utils/responseModes";
-import {
+import { migrateProviderModelAlias ,
   deriveResponseModesForProvider,
   getAvailableResponseModes,
   getDefaultModelForProvider,
