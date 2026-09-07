@@ -68,6 +68,23 @@ tests, but they are withheld from the user-facing picker until the Realtime
 session protocol (`OpenAI-Beta: realtime=v1` and `session.update`) is
 implemented.
 
+### Astra and Fable routes
+
+The picker includes `gpt-6-astra` on OpenAI and `claude-fable-5-1` on
+Anthropic. OpenRouter uses the canonical snapshots
+`openai/gpt-6-astra-20260903` and `anthropic/claude-fable-5.1-20260831`.
+All four accept text and images and offer `low`, `medium`, `high`, `xhigh`,
+and `max` effort. Astra defaults to `medium`; Fable 5.1 defaults to `high`.
+Neither offers disabled reasoning. Astra's `max` is passed through unchanged;
+the existing GPT-5.6 Chat Completions downgrade to `xhigh` does not apply.
+
+These additions retain existing provider defaults, fallback lists, and saved
+routes. Model names use provider branding; effort labels reuse the registered
+translations. The current direct IDs have no distinct dated snapshots in the
+[OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra)
+or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
+OpenRouter snapshots are verified against its public Models and Endpoints APIs.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

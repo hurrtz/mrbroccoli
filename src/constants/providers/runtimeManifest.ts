@@ -357,6 +357,14 @@ const OPENAI_GPT_56_EFFORT = effortConfig("reasoning-effort", "medium", [
   "xhigh",
 ]);
 
+const OPENAI_GPT_6_ASTRA_EFFORT = effortConfig("reasoning-effort", "medium", [
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+]);
+
 const OPENAI_GPT_54_EFFORT = effortConfig("reasoning-effort", "none", [
   "none",
   "low",
@@ -532,6 +540,10 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       realtimeTransport: "openai-realtime",
       models: [
         withEffort(
+          namedModel("gpt-6-astra", "GPT-6 Astra"),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
           namedModel("gpt-5.6-sol", "GPT-5.6 Sol"),
           OPENAI_GPT_56_EFFORT,
         ),
@@ -673,6 +685,17 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       ],
       models: [
         withEffort(
+          namedModel("openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-fable-5.1-20260831",
+            "Anthropic · Claude Fable 5.1",
+          ),
+          OPENROUTER_HIGH_REASONING_EFFORT,
+        ),
+        withEffort(
           namedModel("openai/gpt-5.6-sol-20260709", "OpenAI · GPT-5.6 Sol"),
           OPENROUTER_FULL_REASONING_EFFORT,
         ),
@@ -767,6 +790,10 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "claude-sonnet-4-6",
       ],
       models: [
+        withEffort(
+          namedModel("claude-fable-5-1", "Claude Fable 5.1"),
+          ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
+        ),
         withEffort(
           namedModel("claude-sonnet-5", "Claude Sonnet 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,

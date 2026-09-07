@@ -60,9 +60,11 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 - LLM transport: OpenAI-compatible chat completions.
 - Web search: `gpt-5.6-sol` via the Responses web-search tool.
-- LLM picker: GPT-5.6 Sol/Terra/Luna, canonical snapshots for GPT-5.5,
-  GPT-5.4, GPT-5.4 mini/nano, GPT-4.1/mini, and GPT-Realtime 2.1/mini.
-- Effort: `reasoning_effort` on the supported GPT-5.x rows.
+- LLM picker: GPT-6 Astra, GPT-5.6 Sol/Terra/Luna, canonical snapshots for
+  GPT-5.5, GPT-5.4, GPT-5.4 mini/nano, and GPT-4.1/mini. Realtime rows remain
+  hidden until their session protocol is complete.
+- Effort: `reasoning_effort` on supported rows. Astra offers `low` through
+  `max`, defaults to `medium`, and does not offer `none`.
 - STT picker: catalog-backed OpenAI transcription models.
 - TTS picker: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`.
 
@@ -79,6 +81,8 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
   `https://openrouter.ai/api/v1/chat/completions`.
 - LLM picker: a curated canonical-snapshot selection spanning OpenAI,
   Anthropic, Google, xAI, DeepSeek, Moonshot, Mistral, and Qwen.
+  Astra uses `openai/gpt-6-astra-20260903`; Fable 5.1 uses
+  `anthropic/claude-fable-5.1-20260831`.
 - Routing: requests deny data-collection routes and require upstream parameter
   support whenever reasoning effort is selected.
 - Transparency: final-stream router metadata records the selected upstream,
@@ -90,9 +94,11 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 - LLM transport: Anthropic Messages.
 - Web search: Claude Messages with `web_search_20260318`.
-- LLM picker: Claude 5 and current Claude 4.x rows supported by the Messages
-  integration.
+- LLM picker: Claude Fable 5.1, Claude 5, and current Claude 4.x rows supported
+  by the Messages integration.
 - Effort: output effort metadata is exposed only on supported Claude rows.
+  Fable 5.1 uses `claude-fable-5-1` with always-on adaptive thinking and
+  `low` through `max` effort, defaulting to `high`.
 - STT/TTS: not runtime-exposed.
 
 ### Alibaba / Qwen (`alibaba-qwen-dashscope`)

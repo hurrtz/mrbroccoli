@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Added GPT-6 Astra and Claude Fable 5.1 to response-model choices, both through
+  their direct providers and OpenRouter, with supported reasoning-effort controls.
+
 - Android now uses the dedicated Google Play application ID
   `com.tobiaswinkler.app.android.mrbroccoli` for the new paid listing while iOS
   retains its existing identity. Android debug and screenshot builds use the

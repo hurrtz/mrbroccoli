@@ -8,7 +8,11 @@ import {
   PROVIDER_TTS_MODEL_OPTIONS,
 } from "../../../src/constants/models";
 import { WEB_SEARCH_PROVIDER_IDS } from "../../../src/constants/webSearch";
-import { deriveResponseModesForProvider } from "../../../src/utils/responseModes";
+import {
+  deriveResponseModesForProvider,
+  isValidModelForProvider,
+} from "../../../src/utils/responseModes";
+import { modelSupportsImageInput } from "../../../src/utils/imageInputCapabilities";
 import type { Provider } from "../../../src/types";
 
 function providerModelIds(provider: Provider) {
@@ -16,6 +20,30 @@ function providerModelIds(provider: Provider) {
 }
 
 describe("provider model accuracy", () => {
+  it.each<[Provider, string, string]>([
+    ["openai", "gpt-6-astra", "GPT-6 Astra"],
+    ["anthropic", "claude-fable-5-1", "Claude Fable 5.1"],
+    ["openrouter", "openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"],
+    [
+      "openrouter",
+      "anthropic/claude-fable-5.1-20260831",
+      "Anthropic · Claude Fable 5.1",
+    ],
+  ])("offers %s %s as a named, valid image-capable route", (provider, model, name) => {
+    expect(PROVIDER_MODELS[provider]).toContainEqual(
+      expect.objectContaining({ id: model, name }),
+    );
+    expect(isValidModelForProvider(provider, model)).toBe(true);
+    expect(modelSupportsImageInput(provider, model)).toBe(true);
+  });
+
+  it("keeps Astra and Fable OpenRouter aliases out of the snapshot picker", () => {
+    expect(providerModelIds("openrouter")).not.toContain("openai/gpt-6-astra");
+    expect(providerModelIds("openrouter")).not.toContain(
+      "anthropic/claude-fable-5.1",
+    );
+  });
+
   it("does not expose dedicated web-search providers as runtime providers", () => {
     expect(PROVIDER_ORDER).toEqual([
       "openai",

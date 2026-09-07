@@ -195,6 +195,13 @@ the architectural answer for the author.
   cost-ceiling contract before any paid request.
 - The paid provider matrix is run only for an explicit new-version request and
   derives its coverage from the runtime provider manifest.
+- Release cost reports pin standard token prices for new direct models when
+  the researched catalogue lacks pricing, including GPT-6 Astra and Claude
+  Fable 5.1. These estimates stay separate from provider-reported costs and
+  the pre-request reservation; model additions do not authorize live calls.
+  The current full matrix reserves USD 1.0195; an existing USD 1 configured
+  ceiling still aborts before provider requests. No stored cost ceiling is
+  increased by a catalogue update.
 - Android artifact verification checks the archive, signature, package,
   version, R8 mapping, native symbols, size budgets, hashes, and secret scan.
 - Store-promo capture uses the `.maestro` identity and deterministic fixture

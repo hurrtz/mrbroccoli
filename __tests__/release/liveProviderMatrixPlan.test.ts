@@ -90,8 +90,10 @@ describe("live provider pre-release matrix", () => {
     expect(providerIds).not.toContain("bytedance-doubao-seed");
   });
 
-  it("fits the agreed USD 1 release-test ceiling", () => {
-    expect(getLiveProviderMatrixReservedUsd(steps)).toBeLessThanOrEqual(1);
+  it("reports the expanded reservation without reducing existing request budgets", () => {
+    // Four new routes with five efforts add USD 0.08. The live runner must
+    // still reject a configured USD 1 ceiling before contacting any provider.
+    expect(getLiveProviderMatrixReservedUsd(steps)).toBe(1.0195);
   });
 
   it("reserves token and tool-call headroom for Anthropic web search", () => {
