@@ -3,5 +3,10 @@ set -eu
 
 repository_root=$(git rev-parse --show-toplevel)
 cd "$repository_root"
+# Resolve the caller first, then let validation's fixture repositories use
+# their own working directories instead of the hook's inherited Git state.
+for repository_git_variable in $(git rev-parse --local-env-vars); do
+  unset "$repository_git_variable"
+done
 "$repository_root/scripts/pre-push-spec-review.sh"
 exec make -C "$repository_root" pre-push

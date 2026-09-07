@@ -58,6 +58,13 @@ flowchart LR
 `make pre-push` is spend-free and non-interactive. Live provider calls and
 Maestro device work must never be hidden in the Git hook.
 
+The hook resolves and enters its repository before clearing the variables
+reported by `git rev-parse --local-env-vars`. Fixture Git commands must then
+discover their own repositories. Inherited linked-worktree Git paths must never
+redirect fixture initialization, commits, indexes, or local configuration into
+the calling checkout. `pre-push-hook.test.mjs` verifies this with a real local
+push from a disposable linked worktree.
+
 The cross-platform Maestro suite starts from cleared app state and verifies
 the current first-run contract: the paid BYOK app opens directly into the
 workspace. It must not wait for onboarding, edition selection, or local-model

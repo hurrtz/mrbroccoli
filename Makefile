@@ -143,6 +143,7 @@ pre-push:
 	@node --test scripts/makefile-contract.test.mjs
 	@node --test scripts/espeak-free-runtime-patch.test.mjs
 	@npm run spec-review:test
+	@node --test scripts/pre-push-hook.test.mjs
 	@npm run ios:standalone:test
 	@npm run prerelease:env:test
 	@npm run prerelease:live:test
