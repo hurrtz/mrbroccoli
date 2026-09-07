@@ -1910,7 +1910,7 @@ describe("SettingsModal", () => {
     fireEvent.press(
       screen.getByTestId("settings-tts-provider-elevenlabs-voice"),
     );
-    expect(screen.getAllByText("Rachel (built-in)").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Janet (built-in)").length).toBeGreaterThan(0);
     expect(screen.getByText(/Account voices could not be loaded/)).toBeTruthy();
     expect(
       screen.getByText(/Reason: Missing voices_read permission/),

@@ -100,13 +100,13 @@ describe("speech provider constants", () => {
     expect(getTtsVoiceLabel("openai", "alloy", "en")).toBe("Alloy");
     expect(
       getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "en"),
-    ).toBe("Rachel (built-in)");
+    ).toBe("Janet (built-in)");
     expect(
       getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "de"),
-    ).toBe("Rachel (integriert)");
+    ).toBe("Janet (integriert)");
     expect(
       getTtsVoiceLabel("elevenlabs", "21m00Tcm4TlvDq8ikWAM", "uk"),
-    ).toBe("Rachel (built-in)");
+    ).toBe("Janet (built-in)");
   });
 
   it("filters the official Qwen system voices to the selected TTS model", () => {

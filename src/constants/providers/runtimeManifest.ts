@@ -1139,7 +1139,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       ],
       languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "cs", "pl", "tr", "sv"],
       voiceOptions: [
-        voice("21m00Tcm4TlvDq8ikWAM", "Rachel (built-in)", { de: "Rachel (integriert)" }),
+        voice("21m00Tcm4TlvDq8ikWAM", "Janet (built-in)", { de: "Janet (integriert)" }),
       ],
       voiceDirectory: "elevenlabs",
       requiresVoice: true,

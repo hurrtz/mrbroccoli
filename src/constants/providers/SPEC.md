@@ -117,6 +117,10 @@ OpenAI mini-TTS is pinned to December 2025. Ballad, Cedar, Marin, and Verse
 are mini-TTS-only voices; legacy TTS exposes only its nine supported voices.
 Saved mini-TTS aliases migrate without changing voice identity.
 
+ElevenLabs keeps the legacy fallback voice ID because the provider redirects
+it to Janet. The displayed identity is Janet; no unverified replacement ID or
+new voice-directory permission requirement is introduced.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

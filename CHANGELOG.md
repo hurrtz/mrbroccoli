@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- ElevenLabs correctly identifies its redirected built-in fallback voice as Janet.
+
 - OpenAI speech pins mini-TTS and hides incompatible voices for legacy TTS models.
 
 - OpenAI GPT Transcribe is available and becomes the default for new speech
