@@ -393,10 +393,22 @@ export function ThinkingSettingsPage({
         />
       </SettingsGroup>
 
+      {/* Keep add-to-slot navigation inside one native modal. Presenting a
+          sibling while the add sheet animates closed can lock UIKit input. */}
       <SettingsSheet
-        testID="thinking-slot-sheet"
-        title={slotTitle}
-        visible={sheet?.kind === "slot"}
+        testID={
+          sheet?.kind === "prompt"
+            ? "thinking-system-prompt-sheet"
+            : `thinking-${sheet?.kind ?? "slot"}-sheet`
+        }
+        title={
+          sheet?.kind === "council"
+            ? t("ulraMode")
+            : sheet?.kind === "prompt"
+              ? t("systemPrompt")
+              : slotTitle
+        }
+        visible={sheet !== null}
         onClose={() => setSheet(null)}
       >
         {currentMode && sheet?.kind === "slot" && sheet.view === "slot" ? (
@@ -408,9 +420,7 @@ export function ThinkingSettingsPage({
               <SettingsRow
                 testID="thinking-slot-provider"
                 label={t("provider")}
-                value={
-                  PROVIDER_LABELS[currentMode.route.provider]
-                }
+                value={PROVIDER_LABELS[currentMode.route.provider]}
                 onPress={() => setSheet({ ...sheet, view: "provider" })}
               />
               <SettingsRow
@@ -477,158 +487,150 @@ export function ThinkingSettingsPage({
               control={null}
               onPress={() => setSheet({ ...sheet, view: "slot" })}
             />
-            <SettingsGroup
-              title={PROVIDER_LABELS[currentMode.route.provider]}
-            >
-                {getProviderLlmModelOptions(currentMode.route.provider).map(
-                  (model, index, models) => (
-                    <RouteOptionRow
-                      key={model.id}
-                      label={model.name}
-                      last={index === models.length - 1}
-                      onSelect={() => {
-                        onUpdateResponseModeRoute(
-                          currentMode.id,
-                          normalizeResponseModeRouteEffort({
-                            provider: currentMode.route.provider,
-                            model: model.id,
-                          }),
-                        );
-                        setSheet({ ...sheet, view: "slot" });
-                      }}
-                      selected={currentMode.route.model === model.id}
-                    />
-                  ),
-                )}
+            <SettingsGroup title={PROVIDER_LABELS[currentMode.route.provider]}>
+              {getProviderLlmModelOptions(currentMode.route.provider).map(
+                (model, index, models) => (
+                  <RouteOptionRow
+                    key={model.id}
+                    label={model.name}
+                    last={index === models.length - 1}
+                    onSelect={() => {
+                      onUpdateResponseModeRoute(
+                        currentMode.id,
+                        normalizeResponseModeRouteEffort({
+                          provider: currentMode.route.provider,
+                          model: model.id,
+                        }),
+                      );
+                      setSheet({ ...sheet, view: "slot" });
+                    }}
+                    selected={currentMode.route.model === model.id}
+                  />
+                ),
+              )}
             </SettingsGroup>
           </>
         ) : null}
-      </SettingsSheet>
-
-      <SettingsSheet
-        testID="thinking-add-sheet"
-        title={t("addResponseMode")}
-        visible={sheet?.kind === "add"}
-        onClose={() => setSheet(null)}
-      >
-        <ProviderRows
-          onChoose={addProviderRoute}
-          selectableProviders={llmProviders}
-        />
-      </SettingsSheet>
-
-      <SettingsSheet
-        testID="thinking-council-sheet"
-        title={t("ulraMode")}
-        visible={sheet?.kind === "council"}
-        onClose={() => setSheet(null)}
-      >
-        <Text style={[pageStyles.sheetHint, { color: colors.textMuted }]}>
-          {t("ulraModeInfo")}
-        </Text>
-        <SettingsGroup>
-          <SettingsRow
-            control={
-              <Switch
-                label={t("ulraModeHomeLabel")}
-                value={settings.ulraModeEnabled}
-                onChange={(value) =>
-                  onUpdate({
-                    ulraModeEnabled: value,
-                    ...(value ? {} : { ulraModeActive: false }),
-                  })
-                }
-              />
-            }
-            label={t("ulraModeHomeLabel")}
-            last
+        {sheet?.kind === "add" ? (
+          <ProviderRows
+            onChoose={addProviderRoute}
+            selectableProviders={llmProviders}
           />
-        </SettingsGroup>
-        {settings.ulraModeEnabled ? (
-          <View style={pageStyles.effortSection}>
-            <Text
-              style={[pageStyles.sheetCaption, { color: colors.textMuted }]}
-            >
-              {t("councilRounds")}
-            </Text>
-            <View accessibilityRole="radiogroup" style={pageStyles.chips}>
-              {[1, 2, 3, 4, 5].map((rounds) => {
-                const selected = settings.ulraModeRounds + 1 === rounds;
-                return (
-                  <Pressable
-                    key={rounds}
-                    testID={`thinking-council-rounds-${rounds}`}
-                    accessibilityLabel={`${t("councilRounds")}: ${rounds}`}
-                    accessibilityRole="radio"
-                    accessibilityState={{ checked: selected }}
-                    onPress={() => onUpdate({ ulraModeRounds: rounds - 1 })}
-                    style={({ pressed }) => [
-                      pageStyles.chipTarget,
-                      pressed ? pageStyles.pressed : null,
-                    ]}
-                  >
-                    <View
-                      style={[
-                        pageStyles.chip,
-                        {
-                          backgroundColor: selected
-                            ? colors.accentSoft
-                            : colors.surface,
-                          borderColor: selected ? colors.accent : colors.border,
-                        },
-                      ]}
-                    >
-                      <Text
-                        style={[pageStyles.chipText, { color: colors.text }]}
-                      >
-                        {rounds}
-                      </Text>
-                    </View>
-                  </Pressable>
-                );
-              })}
-            </View>
-            <Text
-              style={[pageStyles.sheetHint, { color: colors.textSecondary }]}
-            >
-              {t("ulraModeCallEstimate", {
-                count: readyModelCount * (settings.ulraModeRounds + 1) + 1,
-              })}
-            </Text>
-            {readyModelCount > 4 || settings.ulraModeRounds + 1 > 4 ? (
-              <Text
-                testID="ulra-mode-threshold-warning"
-                accessibilityRole="alert"
-                style={[pageStyles.warning, { color: colors.danger }]}
-              >
-                {t("ulraModeThresholdWarning")}
-              </Text>
-            ) : null}
-          </View>
         ) : null}
-      </SettingsSheet>
-
-      <SettingsSheet
-        testID="thinking-system-prompt-sheet"
-        title={t("systemPrompt")}
-        visible={sheet?.kind === "prompt"}
-        onClose={() => setSheet(null)}
-      >
-        <Text style={[pageStyles.sheetHint, { color: colors.textMuted }]}>
-          {t("assistantInstructionsIntro")}
-        </Text>
-        <Input.TextArea
-          testID="system-prompt-editor"
-          value={settings.assistantInstructions}
-          placeholder={t("assistantInstructionsPlaceholder")}
-          placeholderTextColor={colors.textMuted}
-          onFocus={onTextInputFocus}
-          onChangeText={(assistantInstructions) =>
-            onUpdate({ assistantInstructions })
-          }
-          rows={7}
-          styles={{ container: pageStyles.promptInput }}
-        />
+        {sheet?.kind === "council" ? (
+          <>
+            <Text style={[pageStyles.sheetHint, { color: colors.textMuted }]}>
+              {t("ulraModeInfo")}
+            </Text>
+            <SettingsGroup>
+              <SettingsRow
+                control={
+                  <Switch
+                    label={t("ulraModeHomeLabel")}
+                    value={settings.ulraModeEnabled}
+                    onChange={(value) =>
+                      onUpdate({
+                        ulraModeEnabled: value,
+                        ...(value ? {} : { ulraModeActive: false }),
+                      })
+                    }
+                  />
+                }
+                label={t("ulraModeHomeLabel")}
+                last
+              />
+            </SettingsGroup>
+            {settings.ulraModeEnabled ? (
+              <View style={pageStyles.effortSection}>
+                <Text
+                  style={[pageStyles.sheetCaption, { color: colors.textMuted }]}
+                >
+                  {t("councilRounds")}
+                </Text>
+                <View accessibilityRole="radiogroup" style={pageStyles.chips}>
+                  {[1, 2, 3, 4, 5].map((rounds) => {
+                    const selected = settings.ulraModeRounds + 1 === rounds;
+                    return (
+                      <Pressable
+                        key={rounds}
+                        testID={`thinking-council-rounds-${rounds}`}
+                        accessibilityLabel={`${t("councilRounds")}: ${rounds}`}
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: selected }}
+                        onPress={() => onUpdate({ ulraModeRounds: rounds - 1 })}
+                        style={({ pressed }) => [
+                          pageStyles.chipTarget,
+                          pressed ? pageStyles.pressed : null,
+                        ]}
+                      >
+                        <View
+                          style={[
+                            pageStyles.chip,
+                            {
+                              backgroundColor: selected
+                                ? colors.accentSoft
+                                : colors.surface,
+                              borderColor: selected
+                                ? colors.accent
+                                : colors.border,
+                            },
+                          ]}
+                        >
+                          <Text
+                            style={[
+                              pageStyles.chipText,
+                              { color: colors.text },
+                            ]}
+                          >
+                            {rounds}
+                          </Text>
+                        </View>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                <Text
+                  style={[
+                    pageStyles.sheetHint,
+                    { color: colors.textSecondary },
+                  ]}
+                >
+                  {t("ulraModeCallEstimate", {
+                    count: readyModelCount * (settings.ulraModeRounds + 1) + 1,
+                  })}
+                </Text>
+                {readyModelCount > 4 || settings.ulraModeRounds + 1 > 4 ? (
+                  <Text
+                    testID="ulra-mode-threshold-warning"
+                    accessibilityRole="alert"
+                    style={[pageStyles.warning, { color: colors.danger }]}
+                  >
+                    {t("ulraModeThresholdWarning")}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
+          </>
+        ) : null}
+        {sheet?.kind === "prompt" ? (
+          <>
+            <Text style={[pageStyles.sheetHint, { color: colors.textMuted }]}>
+              {t("assistantInstructionsIntro")}
+            </Text>
+            <Input.TextArea
+              testID="system-prompt-editor"
+              value={settings.assistantInstructions}
+              placeholder={t("assistantInstructionsPlaceholder")}
+              placeholderTextColor={colors.textMuted}
+              onFocus={onTextInputFocus}
+              onChangeText={(assistantInstructions) =>
+                onUpdate({ assistantInstructions })
+              }
+              rows={7}
+              styles={{ container: pageStyles.promptInput }}
+            />
+          </>
+        ) : null}
       </SettingsSheet>
     </View>
   );

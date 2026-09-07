@@ -93,6 +93,10 @@ parent in order, then drains the queue from the native dismissal callback; a
 bounded timer supplies the equivalent handoff on Android, where React Native
 does not deliver `Modal.onDismiss`.
 
+Thinking uses a single persistent nested sheet for adding and editing routes,
+provider/model pickers, Council, and prompt views. Its internal navigation swaps
+content without overlapping native modal dismissal and presentation.
+
 ## Voice-Turn Flow
 
 ```mermaid

@@ -1,10 +1,17 @@
 import React from "react";
-import { fireEvent, render } from "@testing-library/react-native";
+import { Modal as NativeModal } from "react-native";
+import { useSettingsActions } from "../../src/hooks/settings/useSettingsActions";
+import { fireEvent, render, within } from "@testing-library/react-native";
 
 import { ThinkingSettingsPage } from "../../src/features/settings/pages/ThinkingSettingsPage";
 import { LocalizationProvider } from "../../src/i18n";
 import { ThemeProvider } from "../../src/theme/ThemeContext";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
+
+jest.mock("../../src/hooks/settings/storage", () => ({
+  persistPublicSettings: jest.fn().mockResolvedValue(undefined),
+  persistApiKey: jest.fn().mockResolvedValue(undefined),
+}));
 
 function renderPage(
   settings: Settings,
@@ -32,6 +39,55 @@ function renderPage(
 }
 
 describe("ThinkingSettingsPage response modes", () => {
+  it("keeps the same native modal presented when adding and editing a model", () => {
+    function StatefulPage() {
+      const [settings, setSettings] =
+        React.useState<Settings>(DEFAULT_SETTINGS);
+      const actions = useSettingsActions({ setSettings });
+      return (
+        <ThemeProvider mode="light">
+          <LocalizationProvider language="en">
+            <ThinkingSettingsPage
+              llmProviders={["gemini", "openai"]}
+              settings={settings}
+              onUpdate={actions.updateSettings}
+              onUpdateResponseModeRoute={actions.updateResponseModeRoute}
+              onAddResponseMode={actions.addResponseMode}
+              onRemoveResponseMode={actions.removeResponseMode}
+            />
+          </LocalizationProvider>
+        </ThemeProvider>
+      );
+    }
+    const screen = render(<StatefulPage />);
+    const presentedModals = () =>
+      screen
+        .UNSAFE_getAllByType(NativeModal)
+        .filter(({ props }) => props.visible);
+
+    fireEvent.press(screen.getByTestId("thinking-add-model"));
+    expect(presentedModals()).toHaveLength(1);
+    const presentedModal = presentedModals()[0];
+    fireEvent.press(screen.getByRole("radio", { name: "Google" }));
+
+    expect(screen.getByTestId("thinking-slot-sheet")).toBeTruthy();
+    expect(
+      within(screen.getByTestId("thinking-slot-provider")).getByText("Google"),
+    ).toBeTruthy();
+    expect(presentedModals()).toHaveLength(1);
+    expect(presentedModals()[0]).toBe(presentedModal);
+
+    fireEvent.press(screen.getByTestId("thinking-slot-model"));
+    expect(presentedModals()[0]).toBe(presentedModal);
+    fireEvent.press(screen.getByRole("radio", { name: "Gemini 2.5 Flash-Lite" }));
+    expect(
+      within(screen.getByTestId("thinking-slot-model")).getByText(
+        "gemini-2.5-flash-lite",
+      ),
+    ).toBeTruthy();
+    expect(presentedModals()[0]).toBe(presentedModal);
+  });
+
   it("edits the defaults inherited by sessions without overrides", () => {
     const onUpdate = jest.fn();
     const screen = renderPage(

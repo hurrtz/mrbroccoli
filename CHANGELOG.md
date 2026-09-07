@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Fixed adding an answering model leaving Settings unresponsive by keeping
+  provider selection and model editing inside one native sheet.
+
 - Locked conversations stay inaccessible when an in-flight read finishes after
   the app backgrounds and revokes authorization.
 

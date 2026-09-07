@@ -158,6 +158,9 @@ capability healthy. The UI shows the capability that was actually tested.
 ## Interaction Rules
 
 - Picker sheets remain above their parent modal.
+- Thinking keeps add, slot, provider/model selection, Council, and prompt views
+  inside one persistent native sheet. Adding a model updates that sheet in
+  place; it must never present a sibling while the add view dismisses.
 - A Settings action that opens a sibling modal first dismisses every nested
   Settings sheet, then the Settings modal, and presents the destination only
   after native dismissal. Android drains both handoffs through bounded
