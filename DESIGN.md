@@ -248,8 +248,10 @@ invisible.
 STT and TTS selection are independent from the response model. Capability and
 language checks occur before execution.
 
-- Native recognition is preferred when it satisfies the selected on-device
-  policy.
+- System recognition is selectable whenever the operating system reports a
+  recognizer. Offline-recognition support and installed locale metadata apply
+  only when a route explicitly requires on-device processing; they do not
+  disable the general system route, which may use the OS speech service.
 - Downloaded speech models are selected from the curated local catalogue.
 - Speaking Settings renders System, compatible downloaded voices, and enabled
   providers as one radio group. Local downloads and benchmarks happen in that

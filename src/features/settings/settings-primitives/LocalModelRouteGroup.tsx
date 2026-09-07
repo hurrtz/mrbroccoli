@@ -174,9 +174,9 @@ export function LocalModelRouteGroup({
     capability === "stt"
       ? settings.sttMode === "native"
       : settings.ttsMode === "native";
-  const nativeDisabled =
+  const systemRouteDisabled =
     capability === "stt" &&
-    localModels.nativeSpeechCapabilities?.nativeSttEligible !== true;
+    localModels.nativeSpeechCapabilities?.recognitionAvailable !== true;
   const finalRowCount = 1 + models.length + providerRoutes.length;
   let rowIndex = 0;
 
@@ -228,7 +228,7 @@ export function LocalModelRouteGroup({
       ))}
       <RouteOptionRow
         testID={`settings-${capability}-route-native`}
-        disabled={nativeDisabled}
+        disabled={systemRouteDisabled}
         label={capability === "stt" ? t("appNative") : t("systemVoice")}
         description={
           capability === "stt"

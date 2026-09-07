@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- System Recognition can now be selected whenever the operating system's
+  recognizer is available, even when strict offline recognition is unavailable.
+
 - Web search now reserves room for a usable OpenAI search brief, validates
   actual search output, and cancels stalled response bodies. Anthropic search
   errors returned inside successful HTTP responses no longer count as evidence.

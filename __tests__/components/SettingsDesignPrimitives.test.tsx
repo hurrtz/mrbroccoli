@@ -206,6 +206,53 @@ describe("settings design primitives", () => {
     expect(onPreview).toHaveBeenCalledWith("vale");
   });
 
+  it("keeps system recognition selectable without offline recognition support", () => {
+    const selectNativeRoute = jest.fn();
+    const screen = wrap(
+      <LocalModelRouteGroup
+        capability="stt"
+        title="Who listens"
+        footer="Choose a recognition route."
+        localModels={
+          {
+            benchmarks: {},
+            busy: null,
+            cancelDownload: jest.fn(),
+            compatibleModels: [],
+            downloadModel: jest.fn(),
+            installs: {},
+            isModelSelected: jest.fn(() => false),
+            kokoroModel: { progress: 0 },
+            nativeSpeechCapabilities: {
+              recognitionAvailable: true,
+              onDeviceRecognitionAvailable: false,
+              targetLocaleInstalled: false,
+              nativeSttEligible: false,
+            },
+            progress: {},
+            removeModel: jest.fn(),
+            selectModel: jest.fn(),
+            selectNativeRoute,
+            testModel: jest.fn(),
+          } as unknown as LocalModelSettingsController
+        }
+        providerRoutes={[]}
+        settings={{
+          ...DEFAULT_SETTINGS,
+          sttMode: "provider",
+          sttProvider: "openai",
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByLabelText("System Recognition").props.accessibilityState
+        .disabled,
+    ).toBe(false);
+    fireEvent.press(screen.getByLabelText("System Recognition"));
+    expect(selectNativeRoute).toHaveBeenCalledWith("stt");
+  });
+
   it("keeps an installed local route unselectable until its device test passes", () => {
     const model = getLocalModel("whisper-tiny");
     const testModel = jest.fn();

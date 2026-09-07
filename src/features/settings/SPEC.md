@@ -126,6 +126,9 @@ capability healthy. The UI shows the capability that was actually tested.
   `toggle-to-talk`), conversation languages, and one `Who listens`
   system, local, or provider recognition route group. Downloaded local models
   cannot be selected until a successful device benchmark marks them viable.
+  System recognition remains selectable whenever the operating system reports
+  an available recognizer; lack of strict offline-recognition support must not
+  disable this route because its processing may use the OS speech service.
   Hands free is deliberately not a third persisted input mode: it is the
   session-scoped home-screen loop layered over either manual capture mode.
 - **Decision:** a below-target but functional speech benchmark remains
