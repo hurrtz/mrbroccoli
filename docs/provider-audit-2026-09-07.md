@@ -274,3 +274,44 @@ Source: `src/constants/providers/runtimeManifest.ts` and `src/constants/webSearc
 
 - STT: `scribe_v2`.
 - TTS: `eleven_flash_v2_5`, `eleven_multilingual_v2`, `eleven_v3`.
+
+
+## Implementation follow-through
+
+The user subsequently authorized implementation, individual commits, and a push.
+The inventory above is the pre-change audit baseline; the runtime manifest and
+[provider reference](provider-runtime-reference.md) describe the updated app.
+
+Implemented in focused commits:
+
+- Added direct Opus 5, Gemini 3.7/3.8 Flash, Qwen 3.8 Max/Flash and 3.7 Flash,
+  plus the new curated OpenRouter snapshots and canonical Grok 4.6 route.
+- Added DeepSeek low effort and the Qwen 3.8 reasoning/preserve-thinking contract.
+- Disabled optional Gemini/xAI search resource storage, updated Qwen search
+  reasoning controls, and removed deprecated Gemini transcription sampling.
+- Added Grok 4.6 search fallback with low effort and 4,096-token headroom,
+  including a larger spend reservation in the release-test plan.
+- Added OpenAI GPT Transcribe with its multipart language-array contract and
+  Gemini 3.5 Transcribe with inline Interactions audio, verbatim mode,
+  completed-output parsing, `store: false`, and a conservative 14 MB raw-file
+  ceiling. Gemini's inline audio schema and total 20 MB request limit are
+  documented in the [Interactions reference](https://ai.google.dev/api/interactions-api)
+  and [audio guide](https://ai.google.dev/gemini-api/docs/audio).
+- Pinned OpenAI mini speech and Qwen speech snapshots, retained saved speech
+  family and voice selections, restricted legacy OpenAI TTS voices, and corrected
+  ElevenLabs' built-in voice name to Janet.
+- Corrected the hidden Realtime adapter's documented prerequisite to GA; the
+  retired beta protocol is not a valid implementation target.
+
+Deliberately deferred: experimental DeepSeek vision and Mistral third-party
+preview routes, live transcription adapters, wholesale replacement of supported
+chat transports, and GPT-5.6 `max` until its previous endpoint rejection can be
+rechecked in an explicitly authorized live release matrix. The Alibaba October
+retirement batch still needs an accessible authoritative affected-model table.
+No model was removed based on that unresolved notice. Existing deprecated
+OpenAI transcription selections remain usable during their announced migration
+window, with GPT Transcribe as the new default.
+
+Validation uses request-contract, migration, picker, and spend-reservation tests
+plus the complete spend-free pre-push gate. No provider quota is spent by this
+maintenance batch; account access and live acceptance remain release checks.

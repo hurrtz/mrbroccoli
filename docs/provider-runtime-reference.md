@@ -1,6 +1,6 @@
 # Provider Runtime Reference
 
-Last updated: 2026-07-31
+Last updated: 2026-09-07
 
 This document tracks the providers that are present in Mr Broccoli's runtime
 manifest. The source of truth is `src/constants/providers/runtimeManifest.ts`;
@@ -10,8 +10,8 @@ this file is a human-readable reference for product and maintenance decisions.
 
 - Runtime providers must be useful for the voice-first conversation loop.
 - Dedicated web-search and web-data vendors are no longer runtime providers.
-- Model pickers are curated. They intentionally exclude deprecated,
-  alias-only, wrong-endpoint, coding-only, image/video-only, Chinese-only, and
+- Model pickers are curated. They intentionally exclude retired,
+  redundant alias, wrong-endpoint, coding-only, image/video-only, Chinese-only, and
   Mandarin-only rows.
 - When a provider explicitly confirms that a precise model or effort
   configuration is unavailable, Mr Broccoli records a device-local runtime
@@ -65,8 +65,11 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
   hidden until their session protocol is complete.
 - Effort: `reasoning_effort` on supported rows. Astra offers `low` through
   `max`, defaults to `medium`, and does not offer `none`.
-- STT picker: catalog-backed OpenAI transcription models.
-- TTS picker: `gpt-4o-mini-tts`, `tts-1`, `tts-1-hd`.
+- STT defaults to `gpt-transcribe` with multipart `languages[]` hints. Existing
+  transcription selections remain available during the announced migration
+  window ending February 26, 2027; mini transcription is pinned to December 15.
+- TTS picker: `gpt-4o-mini-tts-2025-12-15`, `tts-1`, `tts-1-hd`.
+  Legacy models expose only their nine supported voices.
 
 ### OpenRouter (`openrouter`)
 
@@ -82,7 +85,9 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - LLM picker: a curated canonical-snapshot selection spanning OpenAI,
   Anthropic, Google, xAI, DeepSeek, Moonshot, Mistral, and Qwen.
   Astra uses `openai/gpt-6-astra-20260903`; Fable 5.1 uses
-  `anthropic/claude-fable-5.1-20260831`.
+  `anthropic/claude-fable-5.1-20260831`. Additional canonical routes include
+  Opus 5 (July 23), Gemini 3.8 Flash and Qwen 3.8 Max (September 2),
+  DeepSeek V4 Pro (August 13), and Grok 4.6 (August 10).
 - Routing: requests deny data-collection routes and require upstream parameter
   support whenever reasoning effort is selected.
 - Transparency: final-stream router metadata records the selected upstream,
@@ -94,35 +99,44 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 - LLM transport: Anthropic Messages.
 - Web search: Claude Messages with `web_search_20260318`.
-- LLM picker: Claude Fable 5.1, Claude 5, and current Claude 4.x rows supported
+- LLM picker: Claude Fable 5.1, Claude Opus 5, Claude 5, and current Claude 4.x rows supported
   by the Messages integration.
 - Effort: output effort metadata is exposed only on supported Claude rows.
   Fable 5.1 uses `claude-fable-5-1` with always-on adaptive thinking and
-  `low` through `max` effort, defaulting to `high`.
+  `low` through `max` effort, defaulting to `high`; Opus 5 follows the same
+  effort range.
 - STT/TTS: not runtime-exposed.
 
 ### Alibaba / Qwen (`alibaba-qwen-dashscope`)
 
 - LLM transport: DashScope OpenAI-compatible chat completions.
-- LLM picker: canonical snapshots for curated Qwen 3.7, 3.6, 3.5, and
+- LLM picker: Qwen 3.8 Max (`qwen3.8-max-0902`) and Flash, plus
+  canonical snapshots for curated Qwen 3.7, 3.6, 3.5, and
   Qwen Plus/Flash rows; rolling aliases are intentionally hidden.
 - Web search: `qwen3.7-plus-2026-05-26` through the OpenAI-compatible Responses API with
   one required `web_search` tool call. Ungrounded responses are rejected.
-- Effort: `enable_thinking` toggle.
-- STT picker: `qwen3-asr-flash`.
-- TTS picker: `qwen3-tts-flash`, `qwen3-tts-instruct-flash`.
+- Effort: Qwen 3.8 uses `reasoning_effort` (`none`, `low`, `medium`,
+  `xhigh`) and `preserve_thinking: false`; earlier models retain the
+  `enable_thinking` toggle. Search uses `reasoning.effort: none`.
+- STT picker: `qwen3-asr-flash-2026-02-10`.
+- TTS picker: `qwen3-tts-flash-2025-11-27`,
+  `qwen3-tts-instruct-flash-2026-01-26`. Saved aliases migrate without losing
+  the selected speech family.
 
 ### Google / Gemini (`gemini`)
 
 - LLM transport: Gemini `models.generateContent`.
-- LLM picker: `gemini-3.6-flash`, `gemini-3.5-flash`,
+- LLM picker: `gemini-3.8-flash`, `gemini-3.7-flash`, `gemini-3.6-flash`, `gemini-3.5-flash`,
   `gemini-3.5-flash-lite`, `gemini-3.1-pro-preview`,
   `gemini-3.1-flash-lite`, `gemini-2.5-pro`, `gemini-2.5-flash`,
   `gemini-2.5-flash-lite`.
 - Effort: `generationConfig.thinkingConfig.thinkingLevel` for Gemini 3.x rows
-  that expose thinking levels.
-- Web search: Gemini Interactions API with `google_search` grounding.
-- STT picker: Gemini 3.6/3.5 Flash models transcribe recorded audio through
+  that expose thinking levels. Flash 3.7/3.8 offer low, medium, and high only.
+- Web search: Gemini Interactions API with `google_search` grounding and
+  `store: false`; the 3.6 default has 3.8/3.7 fallbacks.
+- STT picker: Gemini 3.5 Transcribe uses Interactions with inline audio,
+  `store: false`, verbatim mode, and a conservative 14 MB raw-file ceiling.
+  Gemini 3.8/3.7/3.6/3.5 Flash models transcribe recorded audio through
   `generateContent` with the same AI Studio API key used by the other Google
   capabilities.
 - TTS picker: Gemini TTS preview rows.
@@ -130,10 +144,11 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 ### xAI (`xai`)
 
 - LLM transport: OpenAI-compatible chat completions.
-- LLM picker: `grok-4.5`, `grok-4.3`.
+- LLM picker: `grok-4.6`, `grok-4.5`, `grok-4.3`.
 - Effort: model-specific `reasoning_effort` options.
 - Web search: xAI Responses API with `web_search`; search mode maps to
-  `max_turns`.
+  `max_turns`. Requests set `store: false`. Grok 4.6 search fallback uses low
+  effort and at least 4,096 output tokens for reasoning headroom.
 - STT picker: standalone xAI `grok-stt` route.
 - TTS picker: standalone xAI `text-to-speech` route, backed by the Grok TTS
   service catalog entry.
@@ -142,7 +157,8 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 
 - LLM transport: OpenAI-compatible chat completions.
 - LLM picker: `deepseek-v4-flash`, `deepseek-v4-pro`.
-- Effort: `thinking.type` plus `reasoning_effort` for supported rows.
+- Effort: disabled thinking, or `reasoning_effort` low/high/max with thinking
+  enabled.
 - STT/TTS/web search: not runtime-exposed.
 
 ### Mistral (`mistral`)
@@ -169,8 +185,9 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - TTS picker: `eleven_flash_v2_5`, `eleven_multilingual_v2`, and `eleven_v3`.
 - Voice directory: all account-visible voices are loaded from paginated
   `GET /v2/voices`, deduplicated, sorted, and selectable globally or per
-  conversation. Rachel remains available as a built-in premade fallback when a
-  restricted key does not include voice-read access.
+  conversation. Janet remains available as a built-in premade fallback when a
+  restricted key does not include voice-read access. Its retained voice ID
+  `21m00Tcm4TlvDq8ikWAM` is the provider redirect from legacy Rachel.
 - Speech transport: `POST /v1/text-to-speech/{voice_id}` with `xi-api-key`
   authentication and MP3 output.
 - Runtime behavior: voice discovery and speech requests are abortable and

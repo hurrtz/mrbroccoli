@@ -65,8 +65,8 @@ uses Messages; Gemini uses Generate Content. A model requiring a different API
 is excluded until its service path exists. OpenAI Realtime model IDs remain
 mapped to the incomplete WebSocket adapter for leftover stored routes and
 tests, but they are withheld from the user-facing picker until the Realtime
-session protocol (`OpenAI-Beta: realtime=v1` and `session.update`) is
-implemented.
+GA session protocol (including `session.update`) is implemented. The retired
+`OpenAI-Beta: realtime=v1` protocol must not be restored.
 
 Gemini offers `gemini-3.5-transcribe` through its manifest-owned Interactions
 endpoint. Other recorded-audio models retain GenerateContent and the existing
