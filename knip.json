@@ -22,5 +22,5 @@
     "artifacts/**",
     "coverage/**"
   ],
-  "ignoreDependencies": ["react-native-web", "react-dom"]
+  "ignoreDependencies": ["expo-updates", "react-native-web", "react-dom"]
 }
