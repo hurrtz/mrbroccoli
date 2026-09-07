@@ -61,6 +61,9 @@ for implementation detail. Focused controllers under `screens/main/`, hooks,
 and services exist so recording, requests, persistence, setup, and playback can
 be reasoned about and tested independently of the full render tree.
 
+Recorded transcription endpoints and protocol selection belong to services;
+the provider manifest owns their configuration, independently of chat routes.
+
 ## Cross-Cutting Change Rules
 
 Provider request adapters explicitly select current stateless API controls;

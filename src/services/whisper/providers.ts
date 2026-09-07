@@ -52,6 +52,17 @@ function extractGeminiTranscription(data: any) {
     .trim();
 }
 
+function extractGeminiInteractionTranscription(data: any): string {
+  if (data?.status !== "completed" || !Array.isArray(data?.steps)) return "";
+  return data.steps
+    .filter((step: any) => step?.type === "model_output" && Array.isArray(step.content))
+    .flatMap((step: any) => step.content)
+    .filter((part: any) => part?.type === "text" && typeof part.text === "string")
+    .map((part: any) => part.text)
+    .join("")
+    .trim();
+}
+
 export async function transcribeWithMultipartProvider(
   params: SharedProviderParams & {
     config: MultipartTranscriptionConfig;
@@ -255,6 +266,7 @@ export async function transcribeWithGoogleSpeechProvider(
   );
 
   const selectedModel = providerModel || config.defaultModel;
+  const usesInteractions = selectedModel === "gemini-3.5-transcribe";
   const audioData = await FileSystem.readAsStringAsync(fileUri, {
     encoding: "base64",
   });
@@ -263,7 +275,9 @@ export async function transcribeWithGoogleSpeechProvider(
 
   try {
     response = await fetchWithTimeout(
-      `${config.endpointBase.replace(/\/$/, "")}/${encodeURIComponent(
+      usesInteractions && config.interactionsEndpoint
+        ? config.interactionsEndpoint
+        : `${config.endpointBase.replace(/\/$/, "")}/${encodeURIComponent(
         selectedModel.replace(/^models\//, ""),
       )}:generateContent`,
       {
@@ -272,7 +286,19 @@ export async function transcribeWithGoogleSpeechProvider(
           "Content-Type": "application/json",
           "x-goog-api-key": aiStudioCredentials.apiKey,
         },
-        body: JSON.stringify({
+        body: JSON.stringify(usesInteractions ? {
+          model: selectedModel,
+          store: false,
+          input: [{ type: "audio", data: audioData, mime_type: mimeType }],
+          generation_config: {
+            transcription_config: {
+              mode: { type: "verbatim" },
+              ...(speechLanguage === "auto" ? {} : {
+                language_codes: [getSpeechLanguageDefinition(speechLanguage).nativeLocale],
+              }),
+            },
+          },
+        } : {
           contents: [
             {
               role: "user",
@@ -318,7 +344,10 @@ export async function transcribeWithGoogleSpeechProvider(
     });
   }
 
-  const text = extractGeminiTranscription(await response.json());
+  const data = await response.json();
+  const text = usesInteractions
+    ? extractGeminiInteractionTranscription(data)
+    : extractGeminiTranscription(data);
   return text || null;
 }
 

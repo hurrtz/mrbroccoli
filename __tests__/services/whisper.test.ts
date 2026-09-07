@@ -354,6 +354,27 @@ describe("transcribeAudio", () => {
     );
   });
 
+  it.each(["auto", "de"] as const)("uses Gemini Transcribe Interactions with %s language", async (speechLanguage) => {
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ status: "completed", steps: [
+      { type: "thought", content: [{ type: "text", text: "hidden" }] },
+      { type: "model_output", content: [{ type: "text", text: "Um, I, I agree." }] },
+    ] }) });
+    const result = await transcribeAudio({ fileUri: "/tmp/recording.m4a", mode: "provider", provider: "gemini", providerModel: "gemini-3.5-transcribe", apiKey: "test-key", language: "en", speechLanguage });
+    expect(result).toBe("Um, I, I agree.");
+    const [url, options] = (fetch as jest.Mock).mock.calls[0];
+    expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/interactions");
+    expect(options.headers["x-goog-api-key"]).toBe("test-key");
+    expect(JSON.parse(options.body)).toEqual({ model: "gemini-3.5-transcribe", store: false,
+      input: [{ type: "audio", data: "ZmFrZQ==", mime_type: "audio/m4a" }],
+      generation_config: { transcription_config: { mode: { type: "verbatim" }, ...(speechLanguage === "auto" ? {} : { language_codes: ["de-DE"] }) } },
+    });
+  });
+
+  it.each([{ status: "completed", steps: [] }, { status: "in_progress", steps: [{ type: "model_output", content: [{ type: "text", text: "partial" }] }] }])("does not surface missing or incomplete Gemini Transcribe output", async (payload) => {
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => payload });
+    expect(await transcribeAudio({ fileUri: "/tmp/recording.m4a", mode: "provider", provider: "gemini", providerModel: "gemini-3.5-transcribe", apiKey: "test-key", language: "en" })).toBeNull();
+  });
+
   it("retries an overloaded Gemini STT model and falls back to another audio-capable model", async () => {
     const overloadedResponse = {
       ok: false,
@@ -542,6 +563,12 @@ describe("transcribeAudio", () => {
       name: "AbortError",
     });
 
+    expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects Gemini Transcribe audio before base64 can exceed the request ceiling", async () => {
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({ exists: true, size: 14_000_001 });
+    await expect(transcribeAudio({ fileUri: "/tmp/recording.m4a", mode: "provider", provider: "gemini", providerModel: "gemini-3.5-transcribe", apiKey: "test", language: "en" })).rejects.toThrow();
     expect(fetch).not.toHaveBeenCalled();
   });
 

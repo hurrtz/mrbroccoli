@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Gemini 3.5 Transcribe is available for recorded speech with verbatim transcription.
+
 - Grok 4.6 can handle search fallback with a bounded reasoning allowance.
 
 - ElevenLabs correctly identifies its redirected built-in fallback voice as Janet.

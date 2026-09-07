@@ -18,6 +18,7 @@ export type OpenAiAudioInputTranscriptionConfig = {
 
 export type GoogleSpeechTranscriptionConfig = {
   kind: "google-speech";
+  interactionsEndpoint?: string;
   endpointBase: string;
   defaultModel: string;
 };
@@ -51,6 +52,7 @@ function buildConfigForTransport(params: {
   transport: RuntimeSttTransport;
   endpoint?: string;
   endpointBase?: string;
+  interactionsEndpoint?: string;
   defaultModel: string;
 }): ProviderSttConfig | null {
   switch (params.transport) {
@@ -66,6 +68,7 @@ function buildConfigForTransport(params: {
       return params.endpointBase
         ? {
             kind: "google-speech",
+            interactionsEndpoint: params.interactionsEndpoint,
             endpointBase: params.endpointBase,
             defaultModel: params.defaultModel,
           }
@@ -115,6 +118,7 @@ export function getProviderSttConfig(
     transport,
     endpoint,
     endpointBase,
+    interactionsEndpoint: manifest.stt.interactionsEndpoint,
     defaultModel,
   });
 }

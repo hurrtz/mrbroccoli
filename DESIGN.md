@@ -251,6 +251,10 @@ invisible.
 
 ## Speech Design
 
+Gemini dedicated recorded transcription uses inline Interactions audio with
+resource storage disabled; it creates no provider Files API resource. General
+Gemini audio models continue using GenerateContent.
+
 STT and TTS selection are independent from the response model. Capability and
 language checks occur before execution.
 

@@ -1,6 +1,21 @@
 import { providerContext } from "./provider";
 
 export const stt = providerContext.defineSttModels([
+  providerContext.stt({
+    modelId: "gemini-3.5-transcribe",
+    publicName: "Gemini 3.5 Transcribe",
+    aliases: [],
+    status: "Documented active/current",
+    pricingSummary: "See current official transcription pricing; no estimate pinned here.",
+    limitsSummary: "The app limits raw inline audio to 14 MB to keep base64 plus JSON below the 20 MB request ceiling.",
+    notes: "AI Studio Interactions recorded transcription; verbatim mode and optional BCP-47 language hints. No Files API resource is created.",
+    officialSources: ["https://ai.google.dev/gemini-api/docs/transcribe", "https://ai.google.dev/gemini-api/docs/audio", "https://ai.google.dev/api/interactions-api"],
+    supportsRealtime: false,
+    supportsBatch: false,
+    priceMeasurements: [],
+    constraints: [{ metric: "file_size_bytes", comparator: "<=", value: 14000000, unit: "bytes", scope: "file", sourceText: "App conservative raw-audio ceiling for Google's 20 MB total inline request limit including base64 and JSON." }],
+    languageSupport: null,
+  }),
   providerContext.stt(
     {
       "providerId": "google-vertex-ai-studio",

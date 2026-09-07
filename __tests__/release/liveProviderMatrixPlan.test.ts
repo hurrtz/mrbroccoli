@@ -93,7 +93,7 @@ describe("live provider pre-release matrix", () => {
   it("reports the expanded reservation without reducing existing request budgets", () => {
     // Every admitted model/effort keeps its reservation; catalog additions must
     // reject a USD 1 ceiling before contacting any provider.
-    expect(getLiveProviderMatrixReservedUsd(steps)).toBe(1.421);
+    expect(getLiveProviderMatrixReservedUsd(steps)).toBe(1.4235);
   });
 
   it("reserves reasoning headroom for every xAI search step", () => {

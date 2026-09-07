@@ -68,6 +68,10 @@ tests, but they are withheld from the user-facing picker until the Realtime
 session protocol (`OpenAI-Beta: realtime=v1` and `session.update`) is
 implemented.
 
+Gemini offers `gemini-3.5-transcribe` through its manifest-owned Interactions
+endpoint. Other recorded-audio models retain GenerateContent and the existing
+3.6 default.
+
 ### Astra and Fable routes
 
 The picker includes `gpt-6-astra` on OpenAI and `claude-fable-5-1` on

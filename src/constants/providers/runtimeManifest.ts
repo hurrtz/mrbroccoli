@@ -92,6 +92,7 @@ type RuntimeLlmManifest =
   RuntimeLlmProviderManifest | RuntimeLlmDisabledManifest;
 
 interface RuntimeSttManifest {
+  interactionsEndpoint?: string;
   support: "none" | "provider";
   transport: RuntimeSttTransport;
   endpoint?: string;
@@ -907,6 +908,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
     stt: {
       support: "provider",
       transport: "google-speech",
+      interactionsEndpoint: "https://generativelanguage.googleapis.com/v1beta/interactions",
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
       defaultModel: "gemini-3.6-flash",
       fallbackModelIds: [
@@ -915,6 +917,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "gemini-3.5-flash-lite",
       ],
       models: [
+        namedModel("gemini-3.5-transcribe", "Gemini 3.5 Transcribe"),
         namedModel("gemini-3.8-flash", "Gemini 3.8 Flash"),
         namedModel("gemini-3.7-flash", "Gemini 3.7 Flash"),
         namedModel("gemini-3.6-flash", "Gemini 3.6 Flash"),

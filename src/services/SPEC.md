@@ -53,6 +53,11 @@ evidence brief has reasoning headroom; the existing 4.3 default remains.
 
 ### Speech and voice turns
 
+Gemini 3.5 Transcribe sends inline audio to Interactions with `store: false`,
+verbatim mode, and optional BCP-47 hints. Only completed model-output text
+becomes a transcript; thought and partial output stay hidden. A conservative
+14 MB raw-file ceiling keeps base64 and JSON below the 20 MB request limit.
+
 OpenAI `gpt-transcribe` uses repeated multipart `languages[]` hints and never
 the legacy singular `language`; auto-detection omits hints. Legacy file
 transcribers keep their existing language and diarization contracts.

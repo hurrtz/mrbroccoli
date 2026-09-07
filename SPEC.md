@@ -174,8 +174,8 @@ offline conversation mode.
 
 ### Transparency and control
 
-One-shot search opts out of optional provider resource storage where the API
-supports it; this does not override the provider's operational retention terms.
+One-shot search and dedicated Gemini recorded transcription opt out of optional
+provider resource storage where the API supports it; this does not override the provider's operational retention terms.
 
 
 - The app records requested and actual model routes, fallbacks, context work,
