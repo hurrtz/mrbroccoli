@@ -14,7 +14,7 @@ validations:
 provenance:
   intent: owner-confirmed and history-backfilled
   validation: test-backed
-last_validated_sha: 7db5c94
+last_validated_sha: b33648e
 ---
 
 # Runtime Provider Manifest Specification
@@ -60,9 +60,30 @@ provider offers both for the same model. Keep an alias only when no distinct
 stable ID exists. This makes saved routes, diagnostics, and release evidence
 reproducible.
 
-OpenAI models currently use the implemented Chat Completions or Realtime shape;
-Anthropic uses Messages; Gemini uses Generate Content. A model requiring a
-different API is excluded until its service path exists.
+OpenAI models currently use the implemented Chat Completions shape; Anthropic
+uses Messages; Gemini uses Generate Content. A model requiring a different API
+is excluded until its service path exists. OpenAI Realtime model IDs remain
+mapped to the incomplete WebSocket adapter for leftover stored routes and
+tests, but they are withheld from the user-facing picker until the Realtime
+session protocol (`OpenAI-Beta: realtime=v1` and `session.update`) is
+implemented.
+
+### Astra and Fable routes
+
+The picker includes `gpt-6-astra` on OpenAI and `claude-fable-5-1` on
+Anthropic. OpenRouter uses the canonical snapshots
+`openai/gpt-6-astra-20260903` and `anthropic/claude-fable-5.1-20260831`.
+All four accept text and images and offer `low`, `medium`, `high`, `xhigh`,
+and `max` effort. Astra defaults to `medium`; Fable 5.1 defaults to `high`.
+Neither offers disabled reasoning. Astra's `max` is passed through unchanged;
+the existing GPT-5.6 Chat Completions downgrade to `xhigh` does not apply.
+
+These additions retain existing provider defaults, fallback lists, and saved
+routes. Model names use provider branding; effort labels reuse the registered
+translations. The current direct IDs have no distinct dated snapshots in the
+[OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra)
+or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
+OpenRouter snapshots are verified against its public Models and Endpoints APIs.
 
 ## Capability Boundaries
 

@@ -368,6 +368,11 @@ account or network state as a durable capability fact.
 
 ## Release Architecture
 
+The pre-push hook locates its repository, then clears Git's inherited local
+environment before spec review and validation. Git operations in disposable
+test repositories therefore cannot mutate the calling worktree's refs, index,
+or shared repository configuration.
+
 Repository metadata is the version authority. The version-bump script changes
 Expo/package versions and native counters together. Release validation is
 ordered to fail before cost:

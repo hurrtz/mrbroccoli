@@ -159,6 +159,10 @@ const PINNED_RELEASE_PRICING: Record<
     note?: string;
   }
 > = {
+  "openai:gpt-6-astra": {
+    rates: { million_input_tokens: 10, million_output_tokens: 50 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6-astra",
+  },
   "openai:gpt-5.6-sol": {
     rates: { million_input_tokens: 5, million_output_tokens: 30 },
     source: "https://developers.openai.com/api/docs/models",
@@ -186,6 +190,10 @@ const PINNED_RELEASE_PRICING: Record<
   "anthropic:claude-fable-5": {
     rates: { million_input_tokens: 10, million_output_tokens: 50 },
     source: "https://platform.claude.com/docs/en/about-claude/pricing",
+  },
+  "anthropic:claude-fable-5-1": {
+    rates: { million_input_tokens: 10, million_output_tokens: 50 },
+    source: "https://platform.claude.com/docs/en/models/fable-5-1/overview",
   },
   "gemini:gemini-3.6-flash": {
     rates: { million_input_tokens: 1.5, million_output_tokens: 7.5 },

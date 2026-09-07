@@ -13,6 +13,8 @@ the complete Play Store translations are kept in a dedicated file under
 - Voice previews can now replace a paused spoken reply after safely ending its
   active voice session, while recording and in-progress response phases remain
   protected from interruption.
+- Added GPT-6 Astra and Claude Fable 5.1 to response-model choices, both through
+  their direct providers and OpenRouter, with supported reasoning-effort controls.
 - Android now uses the dedicated Google Play application ID
   `com.tobiaswinkler.app.android.mrbroccoli` for the new paid listing while iOS
   retains its existing identity. Android debug and screenshot builds use the

@@ -13,7 +13,7 @@ validations:
 provenance:
   intent: history-backfilled
   validation: test-backed
-last_validated_sha: 7db5c94
+last_validated_sha: b33648e
 ---
 
 # LLM Service Specification
@@ -42,6 +42,14 @@ generators.
 Provider-specific headers, endpoints, request bodies, stream parsing, and
 response metadata stay inside `llm/providers/`. Qwen region selection occurs at
 the adapter boundary.
+
+GPT-6 Astra uses Chat Completions with `reasoning_effort`, including `max`.
+Claude Fable 5 and 5.1 use Messages with `output_config.effort`; their adaptive
+thinking is always on, so no explicit thinking configuration is needed. Both
+streaming and internal Fable requests reserve 65,536 output tokens at default
+or explicit `high` effort, as at `xhigh` and `max`, to leave reasoning headroom.
+Lower efforts retain the 16,384-token budget. Anthropic thinking blocks are
+not persisted or replayed as conversation messages.
 
 **Decision:** A model is unavailable when its manifest transport is not wired;
 the router must not guess an approximately compatible API.
@@ -108,7 +116,8 @@ transport that accepts a request but never returns data cannot hold a turn
 indefinitely. After activity begins, replies use a ten-minute inactivity
 timeout. Any stream activity resets that timer on every streaming transport,
 including thinking-only phases; an abort signal ends parsing and downstream
-callbacks.
+callbacks. A timeout always reports through `onError`; it must not lose the
+race to a null abort result and return silently.
 Chunks may render immediately and feed paragraph TTS, while only the completed
 guarded response is persisted.
 

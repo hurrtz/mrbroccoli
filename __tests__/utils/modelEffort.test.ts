@@ -7,8 +7,43 @@ import {
   normalizeResponseModeRouteEffort,
 } from "../../src/utils/modelEffort";
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
+import type { Provider } from "../../src/types";
 
 describe("model effort metadata", () => {
+  it.each<[Provider, string, string]>([
+    ["openai", "gpt-6-astra", "medium"],
+    ["openrouter", "openai/gpt-6-astra-20260903", "medium"],
+    ["anthropic", "claude-fable-5-1", "high"],
+    ["openrouter", "anthropic/claude-fable-5.1-20260831", "high"],
+  ])("preserves all supported efforts for %s %s", (provider, model, defaultEffort) => {
+    const efforts = ["low", "medium", "high", "xhigh", "max"];
+    expect(getModelEffortOptions(provider, model).map(({ id }) => id)).toEqual(
+      efforts,
+    );
+    expect(getDefaultModelEffort(provider, model)).toBe(defaultEffort);
+    expect(
+      normalizeResponseModeRouteEffort({ provider, model, effort: "none" }),
+    ).toEqual({
+      provider,
+      model,
+      effort: defaultEffort,
+    });
+    for (const effort of efforts) {
+      expect(
+        normalizeResponseModeRouteEffort({ provider, model, effort }),
+      ).toEqual({
+        provider,
+        model,
+        effort,
+      });
+      expect(getModelEffortRequestBody(provider, model, effort)).toEqual(
+        provider === "anthropic"
+          ? { output_config: { effort } }
+          : { reasoning_effort: effort },
+      );
+    }
+  });
+
   it("localizes effort labels for the Ukrainian interface", () => {
     expect(
       getModelEffortOptionLabel(

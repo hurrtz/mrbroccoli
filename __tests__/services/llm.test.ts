@@ -16,7 +16,8 @@ import {
   RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY,
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
-import { Message } from "../../src/types";
+import { Message, Provider } from "../../src/types";
+import { requestAnthropicChat } from "../../src/services/llm/providers/anthropic";
 
 jest.mock("expo-file-system/legacy", () => ({
   documentDirectory: "file:///documents/",
@@ -101,7 +102,12 @@ describe("streamChat", () => {
     resetProviderModelHealthForTests();
   });
 
-  it("calls OpenAI chat completions for openai provider", async () => {
+  it.each<[Provider, string, string | undefined]>([
+    ["openai", "gpt-4o", undefined],
+    ["openai", "gpt-6-astra", "max"],
+    ["openrouter", "openai/gpt-6-astra-20260903", "max"],
+    ["openrouter", "anthropic/claude-fable-5.1-20260831", "max"],
+  ])("streams %s %s through Chat Completions", async (provider, model, modelEffort) => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
@@ -116,8 +122,9 @@ describe("streamChat", () => {
     const chunks: string[] = [];
     await streamChat({
       messages: mockMessages,
-      model: "gpt-4o",
-      provider: "openai",
+      model,
+      provider,
+      modelEffort,
       apiKey: "sk-test-key",
       assistantInstructions: "",
       responseLength: "normal",
@@ -129,8 +136,17 @@ describe("streamChat", () => {
     });
     expect(chunks).toEqual(["Hi"]);
     expect((fetch as jest.Mock).mock.calls[0][0]).toBe(
-      "https://api.openai.com/v1/chat/completions",
+      provider === "openrouter"
+        ? "https://openrouter.ai/api/v1/chat/completions"
+        : "https://api.openai.com/v1/chat/completions",
     );
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.model).toBe(model);
+    if (modelEffort) {
+      expect(body.reasoning_effort).toBe(modelEffort);
+    }
+    expect(body.temperature).toBeUndefined();
+    expect(body.max_tokens).toBeUndefined();
   });
 
   it("sends the selected ELI5 style through the provider request boundary", async () => {
@@ -559,7 +575,13 @@ describe("streamChat", () => {
     );
   });
 
-  it("calls Anthropic messages API for anthropic provider", async () => {
+  it.each([
+    { model: "claude-opus-4-7", modelEffort: undefined, maxTokens: 16_384 },
+    { model: "claude-fable-5-1", modelEffort: undefined, maxTokens: 65_536 },
+    { model: "claude-fable-5-1", modelEffort: "low", maxTokens: 16_384 },
+    { model: "claude-fable-5-1", modelEffort: "high", maxTokens: 65_536 },
+    { model: "claude-fable-5-1", modelEffort: "max", maxTokens: 65_536 },
+  ])("streams $model with $modelEffort effort through Messages", async ({ model, modelEffort, maxTokens }) => {
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
       start(controller) {
@@ -580,7 +602,8 @@ describe("streamChat", () => {
     const chunks: string[] = [];
     await streamChat({
       messages: mockMessages,
-      model: "claude-opus-4-7",
+      model,
+      modelEffort,
       provider: "anthropic",
       apiKey: "sk-ant-test-key",
       assistantInstructions: "",
@@ -597,11 +620,37 @@ describe("streamChat", () => {
     );
     expect(
       JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).max_tokens,
-    ).toBe(16_384);
-    expect(
-      JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).thinking,
-    ).toEqual({
-      type: "adaptive",
+    ).toBe(maxTokens);
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.model).toBe(model);
+    expect(body.thinking).toEqual(
+      model === "claude-opus-4-7" ? { type: "adaptive" } : undefined,
+    );
+    expect(body.output_config).toEqual(
+      modelEffort ? { effort: modelEffort } : undefined,
+    );
+  });
+
+  it("reserves Fable 5.1 thinking headroom for non-streaming internal tasks", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        content: [{ type: "text", text: "Summary" }],
+        stop_reason: "end_turn",
+      }),
+    });
+    await expect(
+      requestAnthropicChat({
+        model: "claude-fable-5-1",
+        messages: [{ role: "user", content: "Hello" }],
+        apiKey: "sk-ant-test-key",
+        language: "en",
+        systemPrompt: "Summarize",
+      }),
+    ).resolves.toBe("Summary");
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).toMatchObject({
+      model: "claude-fable-5-1",
+      max_tokens: 65_536,
     });
   });
 
