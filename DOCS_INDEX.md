@@ -31,6 +31,13 @@ authoritative documents.
   local-response specimens until the next upstream re-import. The root living
   specs explicitly retire those surfaces; they are not implementation targets.
 
+## External Handover
+
+- [`docs/ai-agent-product-handover.md`](./docs/ai-agent-product-handover.md) is
+  the self-contained product, feature, goal, and intent brief for an AI agent
+  that cannot inspect this repository. It summarizes the living specs but does
+  not replace them as implementation authority.
+
 ## Stable Boundaries
 
 | Area | Path | Read First | Deeper Design |
