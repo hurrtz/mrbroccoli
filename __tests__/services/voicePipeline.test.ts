@@ -1,3 +1,5 @@
+import { createVoicePipelineTtsQueue } from "../../src/services/voicePipeline/ttsQueue";
+import { getInterParagraphPauseAudioUri } from "../../src/services/playbackCues";
 import { runVoicePipeline as runVoicePipelineImplementation } from "../../src/services/voicePipeline";
 import type { RunVoicePipelineParams } from "../../src/services/voicePipeline/types";
 import { splitIntoSentences, synthesizeSpeech } from "../../src/services/tts";
@@ -1168,6 +1170,7 @@ describe("runVoicePipeline", () => {
       onChunk: jest.fn(),
       onResponseDone: jest.fn(),
       onAudioReady: jest.fn(),
+      onAudioPauseReady: jest.fn(),
       onSpeechTextReady: jest.fn(),
       onError: jest.fn(),
     };
@@ -1204,8 +1207,65 @@ describe("runVoicePipeline", () => {
       expect.any(Object),
       { startsParagraph: true, text: "Paragraph two." },
     );
+    expect(callbacks.onAudioPauseReady).toHaveBeenCalledTimes(1);
+    expect(callbacks.onAudioPauseReady).toHaveBeenCalledWith(
+      "file:///tmp/paragraph-pause.wav",
+    );
+    expect(callbacks.onAudioReady.mock.invocationCallOrder[0]).toBeLessThan(
+      callbacks.onAudioPauseReady.mock.invocationCallOrder[0],
+    );
+    expect(
+      callbacks.onAudioPauseReady.mock.invocationCallOrder[0],
+    ).toBeLessThan(callbacks.onAudioReady.mock.invocationCallOrder[1]);
     expect(callbacks.onSpeechTextReady).not.toHaveBeenCalled();
   });
+
+  it.each(["wait", "stream"] as const)(
+    "does not enqueue late %s audio after cancellation during pause preparation",
+    async (replyPlayback) => {
+      const controller = new AbortController();
+      const callbacks = {
+        onTranscription: jest.fn(),
+        onChunk: jest.fn(),
+        onResponseDone: jest.fn(),
+        onAudioReady: jest.fn(),
+        onAudioPauseReady: jest.fn(),
+        onSpeechTextReady: jest.fn(),
+        onError: jest.fn(),
+      };
+      (synthesizeSpeech as jest.Mock)
+        .mockResolvedValueOnce("first.wav")
+        .mockResolvedValueOnce("second.wav");
+      (getInterParagraphPauseAudioUri as jest.Mock).mockImplementationOnce(
+        async () => {
+          controller.abort();
+          return "pause.wav";
+        },
+      );
+      const queue = createVoicePipelineTtsQueue({
+        abortSignal: controller.signal,
+        callbacks,
+        language: "en",
+        replyPlayback,
+        ttsMode: "provider",
+        ttsProvider: "openai",
+        ttsVoice: "alloy",
+        ttsApiKey: "test-key",
+      });
+      const text = "Paragraph one.\n\nParagraph two.";
+      if (replyPlayback === "stream") queue.handleStreamChunk(text);
+      await queue.handleResponseDone(text);
+      expect(controller.signal.aborted).toBe(true);
+      expect(callbacks.onAudioReady).toHaveBeenCalledTimes(1);
+      expect(callbacks.onAudioReady).toHaveBeenCalledWith(
+        "first.wav",
+        expect.anything(),
+        expect.anything(),
+      );
+      expect(callbacks.onAudioPauseReady).not.toHaveBeenCalled();
+      expect(callbacks.onError).not.toHaveBeenCalled();
+    },
+  );
 
   it("starts synthesizing each completed follow-up paragraph before the reply ends", async () => {
     (synthesizeSpeech as jest.Mock).mockResolvedValue("/tmp/tts.wav");
@@ -1811,7 +1871,7 @@ describe("runVoicePipeline", () => {
         onChunk: (text: string) => void;
         onDone: (text: string) => Promise<void>;
       }) => {
-        await onDone("A complete answer.");
+        await onDone("A complete answer.\n\nAnother paragraph.");
       },
     );
 
@@ -1825,6 +1885,7 @@ describe("runVoicePipeline", () => {
       onResponseDone: jest.fn(),
       onAudioReady: jest.fn(),
       onSpeechTextReady: jest.fn(),
+      onSpeechPauseReady: jest.fn(),
       onTtsFallback: jest.fn(),
       onError: jest.fn(),
     };
@@ -1864,6 +1925,14 @@ describe("runVoicePipeline", () => {
       }),
       false,
     );
+    expect(callbacks.onSpeechTextReady).toHaveBeenCalledTimes(2);
+    expect(callbacks.onSpeechPauseReady).toHaveBeenCalledWith(250);
+    expect(
+      callbacks.onSpeechTextReady.mock.invocationCallOrder[0],
+    ).toBeLessThan(callbacks.onSpeechPauseReady.mock.invocationCallOrder[0]);
+    expect(
+      callbacks.onSpeechPauseReady.mock.invocationCallOrder[0],
+    ).toBeLessThan(callbacks.onSpeechTextReady.mock.invocationCallOrder[1]);
     expect(callbacks.onAudioReady).not.toHaveBeenCalled();
     expect(callbacks.onError).not.toHaveBeenCalled();
   });

@@ -156,7 +156,10 @@ Repeat playback uses one synthesis slot to avoid overlapping a replay request.
 Native speech skips audio synthesis but retains the same paragraph and language
 selection semantics. Wait-mode completion and repeat both split the complete
 answer through the paragraph queue before synthesis, so provider audio and
-native speech callbacks carry identical seek metadata.
+native speech callbacks carry identical seek metadata. Buffered wait-mode results
+emit the same ordered inter-paragraph pauses as streaming results after every
+synthesis task is ready. Cancellation is checked again after asynchronous pause
+preparation so an interrupted reply cannot enqueue a late pause or clip.
 
 ## Abort and Cleanup
 

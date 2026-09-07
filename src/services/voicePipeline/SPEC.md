@@ -155,7 +155,9 @@ and the paragraph flag is where Back and Forward may land. The pipeline is the
 only place that still knows either, since a synthesized clip is a bare URI by
 the time playback sees it. Streaming paragraphs, a completed wait-mode answer,
 and transcript Restart all pass through this same paragraph queue; none may
-collapse a multi-paragraph reply into paragraph zero.
+collapse a multi-paragraph reply into paragraph zero. Wait-mode playback retains
+an explicit pause between paragraphs, including when synthesis falls back to
+native speech; seek metadata alone does not create an audible pause.
 
 Native recognizer stop, abort, and file transcription carry bounded watchdogs:
 a platform recognizer that drops its terminal event settles with the latest

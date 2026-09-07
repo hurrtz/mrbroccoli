@@ -118,12 +118,14 @@ export function createVoicePipelineTtsQueue(
   };
 
   const emitParagraphPause = async (result: TtsSynthesisResult) => {
+    if (abortSignal?.aborted) return;
     if (result.kind === "native") {
       callbacks.onSpeechPauseReady?.(INTER_PARAGRAPH_PAUSE_MS);
       return;
     }
 
-    callbacks.onAudioPauseReady?.(await getInterParagraphPauseAudioUri());
+    const pauseUri = await getInterParagraphPauseAudioUri();
+    if (!abortSignal?.aborted) callbacks.onAudioPauseReady?.(pauseUri);
   };
 
   const emitResult = (
@@ -206,7 +208,7 @@ export function createVoicePipelineTtsQueue(
       if (startsParagraph) {
         await emitParagraphPause(result);
       }
-      emitResult(trimmed, result, startsParagraph);
+      if (!abortSignal?.aborted) emitResult(trimmed, result, startsParagraph);
     });
 
     outputChain = task.catch(async (error) => {
@@ -299,9 +301,12 @@ export function createVoicePipelineTtsQueue(
       return;
     }
 
-    bufferedResults.forEach(({ startsParagraph, text, result }) => {
+    for (const { startsParagraph, text, result } of bufferedResults) {
+      if (abortSignal?.aborted) return;
+      if (startsParagraph) await emitParagraphPause(result);
+      if (abortSignal?.aborted) return;
       emitResult(text, result, startsParagraph);
-    });
+    }
   };
 
   return {

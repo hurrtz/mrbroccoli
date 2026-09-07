@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Wait-mode speech again pauses between paragraphs, including native fallback,
+  and cancellation during pause preparation prevents later audio from playing.
+
 - Android spoken replies recover from unreadable or corrupt queued audio
   instead of crashing or stalling playback.
 
