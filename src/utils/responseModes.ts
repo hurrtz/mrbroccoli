@@ -28,6 +28,7 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
     "x-ai/grok-4.6": "x-ai/grok-4.6-20260810",
   },
   openai: {
+    "gpt-4o-mini-tts": "gpt-4o-mini-tts-2025-12-15",
     "gpt-4o-mini-transcribe": "gpt-4o-mini-transcribe-2025-12-15",
     "gpt-5.5": "gpt-5.5-2026-04-23",
     "gpt-5.4": "gpt-5.4-2026-03-05",

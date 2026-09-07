@@ -113,6 +113,10 @@ Older transcription routes remain selectable until their announced February
 2027 retirement; mini-transcribe uses its December 2025 canonical snapshot.
 Existing saved choices are pinned, not silently switched to a different model.
 
+OpenAI mini-TTS is pinned to December 2025. Ballad, Cedar, Marin, and Verse
+are mini-TTS-only voices; legacy TTS exposes only its nine supported voices.
+Saved mini-TTS aliases migrate without changing voice identity.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

@@ -34,7 +34,7 @@ describe("validateTtsProviderConnection", () => {
       provider: "openai",
       apiKey: "sk-test",
       language: "en",
-      model: "gpt-4o-mini-tts",
+      model: "gpt-4o-mini-tts-2025-12-15",
       voice: "alloy",
     });
 
@@ -42,7 +42,7 @@ describe("validateTtsProviderConnection", () => {
       text: "OK",
       voice: "alloy",
       provider: "openai",
-      providerModel: "gpt-4o-mini-tts",
+      providerModel: "gpt-4o-mini-tts-2025-12-15",
       apiKey: "sk-test",
       language: "en",
       speechLanguage: "en",

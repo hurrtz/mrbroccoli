@@ -48,7 +48,7 @@ describe("usePreviewVoiceController", () => {
         player,
         settings: {
           apiKeys: { openai: "" } as never,
-          providerTtsModels: { openai: "gpt-4o-mini-tts" } as never,
+          providerTtsModels: { openai: "gpt-4o-mini-tts-2025-12-15" } as never,
         },
         showToast,
         stopVoiceSession: jest.fn(async () => undefined),

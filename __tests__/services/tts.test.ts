@@ -248,7 +248,7 @@ describe("synthesizeSpeech", () => {
     expect(url).toBe("https://api.openai.com/v1/audio/speech");
     expect(options.method).toBe("POST");
     const body = JSON.parse(options.body);
-    expect(body.model).toBe("gpt-4o-mini-tts");
+    expect(body.model).toBe("gpt-4o-mini-tts-2025-12-15");
     expect(body.voice).toBe("alloy");
     expect(body.input).toBe("Hello world");
   });
@@ -332,7 +332,7 @@ describe("synthesizeSpeech", () => {
       voice: "alloy",
       mode: "provider" as const,
       provider: "openai" as const,
-      providerModel: "gpt-4o-mini-tts",
+      providerModel: "gpt-4o-mini-tts-2025-12-15",
       apiKey: "sk-test",
       instructions: "Speak clearly.",
       language: "en" as const,
@@ -377,7 +377,7 @@ describe("synthesizeSpeech", () => {
       (fetch as jest.Mock).mock.calls.map(
         ([, options]) => JSON.parse(options.body).model,
       ),
-    ).toEqual(["tts-1-hd", "gpt-4o-mini-tts"]);
+    ).toEqual(["tts-1-hd", "gpt-4o-mini-tts-2025-12-15"]);
     expect(getRuntimeCapabilityOverrides()).toEqual([
       expect.objectContaining({
         capability: "tts",
@@ -399,7 +399,7 @@ describe("synthesizeSpeech", () => {
       voice: "alloy",
       mode: "provider",
       provider: "openai",
-      providerModel: "gpt-4o-mini-tts",
+      providerModel: "gpt-4o-mini-tts-2025-12-15",
       apiKey: "sk-test",
       instructions: "Speak warmly and with a relaxed pace.",
       language: "en",

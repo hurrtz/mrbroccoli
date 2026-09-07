@@ -931,7 +931,7 @@ describe("useConversations", () => {
         llmInstructions: "Focus on architecture trade-offs.",
         ttsVoice: {
           provider: "openai",
-          model: "gpt-4o-mini-tts",
+          model: "gpt-4o-mini-tts-2025-12-15",
           voice: "nova",
         },
       });
@@ -954,7 +954,7 @@ describe("useConversations", () => {
       llmInstructions: "Focus on architecture trade-offs.",
       ttsVoice: {
         provider: "openai",
-        model: "gpt-4o-mini-tts",
+        model: "gpt-4o-mini-tts-2025-12-15",
         voice: "nova",
       },
     });

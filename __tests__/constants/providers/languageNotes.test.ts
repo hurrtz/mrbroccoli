@@ -49,7 +49,7 @@ describe("provider language notes", () => {
 
   it("derives a TTS language note from exact catalog model metadata", () => {
     expect(
-      getProviderTtsLanguageNoteForModel("openai", "gpt-4o-mini-tts", "en"),
+      getProviderTtsLanguageNoteForModel("openai", "gpt-4o-mini-tts-2025-12-15", "en"),
     ).toBe("13 voices across 57 languages. Voices are optimized for English.");
   });
 

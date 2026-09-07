@@ -49,7 +49,7 @@ describe("getMainScreenViewModel", () => {
       ttsProvider: "openai",
       providerTtsModels: {
         ...DEFAULT_SETTINGS.providerTtsModels,
-        openai: "gpt-4o-mini-tts",
+        openai: "gpt-4o-mini-tts-2025-12-15",
       },
       providerTtsVoices: {
         ...DEFAULT_SETTINGS.providerTtsVoices,

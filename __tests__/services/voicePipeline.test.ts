@@ -2300,7 +2300,7 @@ describe("runVoicePipeline", () => {
       ttsMode: "kokoro",
       ttsProvider: "openai",
       ttsApiKey: "sk-test",
-      ttsModel: "gpt-4o-mini-tts",
+      ttsModel: "gpt-4o-mini-tts-2025-12-15",
       ttsVoice: "alloy",
       kokoroVoices: { en: "af_maple", zh: "zf_001" },
       ttsFallbackRoutes: ["provider", "native"],

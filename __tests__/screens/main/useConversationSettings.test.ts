@@ -25,7 +25,7 @@ function createProps(activeConversation: Conversation | null) {
     globalResponseTone: "professional" as const,
     globalTtsInstructions: "Speak clearly.",
     globalTtsVoice: "alloy",
-    ttsModel: "gpt-4o-mini-tts",
+    ttsModel: "gpt-4o-mini-tts-2025-12-15",
     ttsProvider: "openai" as const,
     clearConversationSettings: jest.fn(() => activeConversation),
     updateConversationSettings: jest.fn(() => activeConversation),
@@ -42,7 +42,7 @@ describe("useConversationSettings", () => {
         ttsInstructions: "Use a warm, optimistic delivery.",
         ttsVoice: {
           provider: "openai",
-          model: "gpt-4o-mini-tts",
+          model: "gpt-4o-mini-tts-2025-12-15",
           voice: "nova",
         },
       }),
@@ -113,7 +113,7 @@ describe("useConversationSettings", () => {
     expect(props.updateConversationSettings).toHaveBeenCalledWith({
       ttsVoice: {
         provider: "openai",
-        model: "gpt-4o-mini-tts",
+        model: "gpt-4o-mini-tts-2025-12-15",
         voice: "shimmer",
       },
     });
@@ -135,7 +135,7 @@ describe("useConversationSettings", () => {
       llmInstructions: "Answer as a travel planner.",
       ttsVoice: {
         provider: "openai",
-        model: "gpt-4o-mini-tts",
+        model: "gpt-4o-mini-tts-2025-12-15",
         voice: "nova",
       },
     });

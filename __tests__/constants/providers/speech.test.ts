@@ -65,7 +65,7 @@ describe("speech provider constants", () => {
   it("uses catalog labels for exact TTS model matches", () => {
     expect(
       getProviderTtsModelOptions("openai").find(
-        (option) => option.id === "gpt-4o-mini-tts",
+        (option) => option.id === "gpt-4o-mini-tts-2025-12-15",
       )?.name,
     ).toBe("GPT-4o mini TTS");
     expect(getProviderTtsModelOptions("alibaba-qwen-dashscope")).toEqual([
@@ -131,4 +131,10 @@ describe("speech provider constants", () => {
     );
     expect(instructVoices.map((voice) => voice.id)).not.toContain("Jennifer");
   });
+});
+
+it.each(["tts-1", "tts-1-hd"])("excludes mini-TTS-only voices from %s", (model) => {
+  const voices = getProviderTtsVoiceOptions("openai", "en", model).map(({ id }) => id);
+  for (const voice of ["ballad", "cedar", "marin", "verse"]) expect(voices).not.toContain(voice);
+  expect(voices).toEqual(["alloy", "ash", "coral", "echo", "fable", "onyx", "nova", "sage", "shimmer"]);
 });

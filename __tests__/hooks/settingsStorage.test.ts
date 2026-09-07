@@ -146,3 +146,9 @@ it("pins existing OpenAI transcription without overriding a user's selection", (
   expect(mergeSettings({ providerSttModels: { openai: "gpt-4o-mini-transcribe" } }).providerSttModels.openai).toBe("gpt-4o-mini-transcribe-2025-12-15");
   expect(mergeSettings({}).providerSttModels.openai).toBe("gpt-transcribe");
 });
+
+it("pins mini-TTS while preserving the saved voice", () => {
+  const settings = mergeSettings({ providerTtsModels: { openai: "gpt-4o-mini-tts" }, providerTtsVoices: { openai: "marin" } });
+  expect(settings.providerTtsModels.openai).toBe("gpt-4o-mini-tts-2025-12-15");
+  expect(settings.providerTtsVoices.openai).toBe("marin");
+});

@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- OpenAI speech pins mini-TTS and hides incompatible voices for legacy TTS models.
+
 - OpenAI GPT Transcribe is available and becomes the default for new speech
   selections. Existing mini-transcribe selections are pinned to a stable snapshot.
 

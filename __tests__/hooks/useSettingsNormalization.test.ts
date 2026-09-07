@@ -111,7 +111,7 @@ describe("useSettingsNormalization", () => {
         sttProvider: "openai",
         ttsProvider: "openai",
         providerTtsModels: expect.objectContaining({
-          openai: "gpt-4o-mini-tts",
+          openai: "gpt-4o-mini-tts-2025-12-15",
         }),
         providerTtsVoices: expect.objectContaining({
           openai: "alloy",
