@@ -42,5 +42,8 @@ tags:
     id: settings-back-button
 - tapOn:
     id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
 - assertVisible:
     id: main-screen
