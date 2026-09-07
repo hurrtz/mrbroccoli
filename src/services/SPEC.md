@@ -48,6 +48,9 @@ sampling parameters. Request-shape tests cover these provider boundaries.
   synthesis and emits typed per-round participant progress for React
   controllers without depending on presentation code.
 
+Grok 4.6 search reserves 4,096 output tokens with low effort so a short
+evidence brief has reasoning headroom; the existing 4.3 default remains.
+
 ### Speech and voice turns
 
 OpenAI `gpt-transcribe` uses repeated multipart `languages[]` hints and never

@@ -91,9 +91,15 @@ describe("live provider pre-release matrix", () => {
   });
 
   it("reports the expanded reservation without reducing existing request budgets", () => {
-    // Four new routes with five efforts add USD 0.08. The live runner must
-    // still reject a configured USD 1 ceiling before contacting any provider.
-    expect(getLiveProviderMatrixReservedUsd(steps)).toBe(1.0195);
+    // Every admitted model/effort keeps its reservation; catalog additions must
+    // reject a USD 1 ceiling before contacting any provider.
+    expect(getLiveProviderMatrixReservedUsd(steps)).toBe(1.421);
+  });
+
+  it("reserves reasoning headroom for every xAI search step", () => {
+    const searchSteps = steps.filter((step) => step.kind === "web-search" && step.provider === "xai");
+    expect(searchSteps.length).toBeGreaterThan(0);
+    for (const step of searchSteps) expect(step.reservedUsd).toBe(0.25);
   });
 
   it("reserves token and tool-call headroom for Anthropic web search", () => {

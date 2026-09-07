@@ -587,6 +587,13 @@ describe("webSearch", () => {
     );
   });
 
+  it("gives Grok 4.6 search reasoning headroom", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: false, status: 400, text: async () => JSON.stringify({ error: { message: "Model grok-4.3 is no longer available" } }) }).mockResolvedValueOnce({ ok: true, json: async () => ({ output_text: "Current evidence", output: [{ type: "web_search_call", status: "completed", action: { sources: [{ url: "https://example.com/evidence" }] } }] }) });
+    await searchWeb({ provider: "xai", apiKey: "test", language: "en", query: "Current evidence?", maxOutputTokens: 120 });
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[1][1].body);
+    expect(body).toMatchObject({ model: "grok-4.6", max_output_tokens: 4096, reasoning: { effort: "low" }, store: false });
+  });
+
   it("rejects a Gemini response that did not run Google Search", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,

@@ -30,6 +30,9 @@ and quota-consuming release work.
 The `Makefile` is the human entry point. Node scripts own portable orchestration
 and verification; platform build systems own compilation.
 
+The xAI search reservation includes the Grok 4.6 fallback's 4,096-token
+output allowance; this remains a conservative request guard, not an invoice.
+
 ## Validation Layers
 
 A spend-free cloud mirror of the local gate runs in GitHub Actions

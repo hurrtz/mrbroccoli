@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Grok 4.6 can handle search fallback with a bounded reasoning allowance.
+
 - ElevenLabs correctly identifies its redirected built-in fallback voice as Janet.
 
 - OpenAI speech pins mini-TTS and hides incompatible voices for legacy TTS models.

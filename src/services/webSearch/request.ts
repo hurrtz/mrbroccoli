@@ -436,7 +436,9 @@ function getXaiMaxTurns(params: WebSearchRequestParams) {
 
 async function searchWithXai(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
+  const maxOutputTokens = model === "grok-4.6"
+    ? Math.max(params.maxOutputTokens ?? 4096, 4096)
+    : params.maxOutputTokens ?? 420;
 
   const response = await fetchJsonWebSearch(params, {
     url: "https://api.x.ai/v1/responses",
@@ -455,6 +457,7 @@ async function searchWithXai(params: WebSearchRequestParams) {
       max_output_tokens: maxOutputTokens,
       max_turns: getXaiMaxTurns(params),
       store: false,
+      ...(model === "grok-4.6" ? { reasoning: { effort: "low" } } : {}),
     },
   });
 

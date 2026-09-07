@@ -84,6 +84,8 @@ const WEB_SEARCH_RESERVED_USD_BY_PROVIDER: Partial<
   // input tokens and answer tokens. Reserve against standard Sonnet pricing,
   // not the temporary introductory rate.
   anthropic: 0.06,
+  // Includes the expanded output allowance if search falls back to Grok 4.6.
+  xai: 0.25,
 };
 
 function stepId(parts: (string | undefined)[]) {
