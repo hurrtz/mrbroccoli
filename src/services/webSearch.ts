@@ -33,13 +33,12 @@ export async function validateWebSearchConnection(params: {
   options?: WebSearchProviderSettings;
   abortSignal?: AbortSignal;
 }) {
-  await requestWebSearch({
+  await searchWeb({
     provider: params.provider,
     apiKey: params.apiKey,
     language: params.language,
     query: getValidationQuery(params.language),
     options: params.options,
-    maxOutputTokens: 120,
     abortSignal: params.abortSignal,
   });
 }

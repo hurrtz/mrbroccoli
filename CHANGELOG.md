@@ -10,6 +10,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Web search now reserves room for a usable OpenAI search brief, validates
+  actual search output, and cancels stalled response bodies. Anthropic search
+  errors returned inside successful HTTP responses no longer count as evidence.
+
 - Fixed adding an answering model leaving Settings unresponsive by keeping
   provider selection and model editing inside one native sheet.
 

@@ -88,6 +88,13 @@ Only summaries carrying the current provenance marker are reused as generated
 summary state. Older unmarked memory may be displayed/edited but is not silently
 trusted as current compaction output.
 
+## Web Search Handoff
+
+The search service owns provider response validation and the full request/body
+deadline. A successful normalized brief becomes the same web-context input to
+Council and the final response. Tool completion without usable answer text and
+provider-embedded search errors remain search failures.
+
 ## Model Council Orchestration
 
 ```mermaid

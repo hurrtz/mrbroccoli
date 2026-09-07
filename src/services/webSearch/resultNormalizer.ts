@@ -237,7 +237,9 @@ export function hasAnthropicWebSearchResult(data: unknown) {
         part &&
         typeof part === "object" &&
         "type" in part &&
-        part.type === "web_search_tool_result",
+        part.type === "web_search_tool_result" &&
+        "content" in part &&
+        Array.isArray(part.content),
     )
   );
 }
@@ -363,8 +365,7 @@ export function hasGeminiGoogleSearchResult(data: unknown) {
   );
 
   return (
-    stepTypes.has("google_search_call") &&
-    stepTypes.has("google_search_result")
+    stepTypes.has("google_search_call") && stepTypes.has("google_search_result")
   );
 }
 

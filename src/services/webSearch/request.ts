@@ -22,10 +22,7 @@ import {
   hasGeminiGoogleSearchResult,
   hasSuccessfulWebSearchCall,
 } from "./resultNormalizer";
-import type {
-  RawWebSearchResponse,
-  WebSearchRequestParams,
-} from "./types";
+import type { RawWebSearchResponse, WebSearchRequestParams } from "./types";
 
 const ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS = 420;
 
@@ -65,18 +62,33 @@ function getRequestWebSearchModel(params: WebSearchRequestParams) {
   return params.model?.trim() || getWebSearchProviderModel(params.provider);
 }
 
-async function fetchWithTimeout(
+async function fetchWithTimeout<T>(
   input: RequestInfo | URL,
   init: RequestInit,
   timeoutMs: number,
   onTimeout: () => Error,
+  consume: (response: Response) => Promise<T>,
   abortSignal?: AbortSignal,
 ) {
+  if (abortSignal?.aborted) {
+    throw abortSignal.reason instanceof Error
+      ? abortSignal.reason
+      : new Error("Aborted");
+  }
   const controller = new AbortController();
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
   let timedOut = false;
+  let rejectAbort!: (reason: Error) => void;
+  const abortPromise = new Promise<never>((_, reject) => {
+    rejectAbort = reject;
+  });
   const handleAbort = () => {
     controller.abort(abortSignal?.reason);
+    rejectAbort(
+      abortSignal?.reason instanceof Error
+        ? abortSignal.reason
+        : new Error("Aborted"),
+    );
   };
   const timeoutPromise = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => {
@@ -86,47 +98,39 @@ async function fetchWithTimeout(
     }, timeoutMs);
   });
 
-  if (abortSignal?.aborted) {
-    throw abortSignal.reason instanceof Error
-      ? abortSignal.reason
-      : new Error(
-          typeof abortSignal.reason === "string"
-            ? abortSignal.reason
-            : "Aborted",
-        );
-  }
-
   abortSignal?.addEventListener("abort", handleAbort, { once: true });
 
   const fetchPromise = networkFetch(input, {
     ...init,
     signal: controller.signal,
-  }).catch((error) => {
-    if (
-      error instanceof Error &&
-      (error.name === "AbortError" ||
-        error.message.toLowerCase().includes("aborted"))
-    ) {
-      if (timedOut) {
-        throw onTimeout();
+  })
+    .then(consume)
+    .catch((error) => {
+      if (
+        error instanceof Error &&
+        (error.name === "AbortError" ||
+          error.message.toLowerCase().includes("aborted"))
+      ) {
+        if (timedOut) {
+          throw onTimeout();
+        }
+
+        if (abortSignal?.aborted) {
+          throw abortSignal.reason instanceof Error
+            ? abortSignal.reason
+            : new Error(
+                typeof abortSignal.reason === "string"
+                  ? abortSignal.reason
+                  : "Aborted",
+              );
+        }
       }
 
-      if (abortSignal?.aborted) {
-        throw abortSignal.reason instanceof Error
-          ? abortSignal.reason
-          : new Error(
-              typeof abortSignal.reason === "string"
-                ? abortSignal.reason
-                : "Aborted",
-            );
-      }
-    }
-
-    throw error;
-  });
+      throw error;
+    });
 
   try {
-    return await Promise.race([fetchPromise, timeoutPromise]);
+    return await Promise.race([fetchPromise, timeoutPromise, abortPromise]);
   } finally {
     abortSignal?.removeEventListener("abort", handleAbort);
     if (timeoutId) {
@@ -159,7 +163,7 @@ async function fetchJsonWebSearch(
     body: unknown;
   },
 ) {
-  const response = await fetchWithTimeout(
+  const data = await fetchWithTimeout(
     request.url,
     {
       method: "POST",
@@ -171,22 +175,25 @@ async function fetchJsonWebSearch(
     },
     WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER[params.provider],
     () => buildWebSearchTimeoutError(params.provider, params.language),
+    async (response) => {
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw buildProviderHttpError({
+          provider: params.provider,
+          language: params.language,
+          status: response.status,
+          errorText,
+          action: "web-search",
+        });
+      }
+
+      return response.json();
+    },
     params.abortSignal,
   );
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider: params.provider,
-      language: params.language,
-      status: response.status,
-      errorText,
-      action: "web-search",
-    });
-  }
-
   return {
-    data: await response.json(),
+    data,
     model: request.model,
     provider: params.provider,
   } satisfies RawWebSearchResponse;
@@ -220,7 +227,15 @@ function buildChatMessages(params: WebSearchRequestParams) {
 
 async function searchWithOpenAi(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
-  const maxOutputTokens = params.maxOutputTokens ?? 420;
+  const lowEffortOption = getModelEffortConfig("openai", model)?.options.find(
+    (option) => option.id === "low",
+  );
+  // Responses counts private reasoning against this same output budget.
+  // Keep the requested evidence brief compact without starving its generation.
+  const maxOutputTokens = Math.max(
+    params.maxOutputTokens ?? 420,
+    lowEffortOption ? 4096 : 420,
+  );
   const normalizedOptions = normalizeWebSearchProviderSettings(
     params.provider,
     params.options,
@@ -231,54 +246,37 @@ async function searchWithOpenAi(params: WebSearchRequestParams) {
       : normalizedOptions.searchMode === "deep"
         ? "high"
         : "medium";
-  const response = await fetchWithTimeout(
-    "https://api.openai.com/v1/responses",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${requireProviderKey(
-          params.provider,
-          params.apiKey,
-          params.language,
-        )}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model,
-        input: [
-          {
-            role: "user",
-            content: buildPromptForProvider(params),
-          },
-        ],
-        tools: [
-          {
-            type: "web_search",
-            search_context_size: searchContextSize,
-          },
-        ],
-        tool_choice: "required",
-        include: ["web_search_call.action.sources"],
-        max_output_tokens: maxOutputTokens,
-      }),
+  const response = await fetchJsonWebSearch(params, {
+    url: "https://api.openai.com/v1/responses",
+    model,
+    headers: buildBearerHeaders(params),
+    body: {
+      model,
+      input: [
+        {
+          role: "user",
+          content: buildPromptForProvider(params),
+        },
+      ],
+      tools: [
+        {
+          type: "web_search",
+          search_context_size: searchContextSize,
+        },
+      ],
+      tool_choice: "required",
+      include: ["web_search_call.action.sources"],
+      max_output_tokens: maxOutputTokens,
+      ...(lowEffortOption
+        ? {
+            reasoning: {
+              effort: lowEffortOption.transportValue ?? lowEffortOption.id,
+            },
+          }
+        : {}),
     },
-    WEB_SEARCH_TIMEOUT_MS_BY_PROVIDER[params.provider],
-    () => buildWebSearchTimeoutError(params.provider, params.language),
-    params.abortSignal,
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider: params.provider,
-      language: params.language,
-      status: response.status,
-      errorText,
-      action: "web-search",
-    });
-  }
-
-  const data = await response.json();
+  });
+  const data = response.data;
 
   if (!hasSuccessfulWebSearchCall(data)) {
     throw new Error(
@@ -301,9 +299,10 @@ async function searchWithAnthropic(params: WebSearchRequestParams) {
     params.maxOutputTokens ?? ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS,
     ANTHROPIC_WEB_SEARCH_MIN_OUTPUT_TOKENS,
   );
-  const lowEffortOption = getModelEffortConfig("anthropic", model)?.options.find(
-    (option) => option.id === "low",
-  );
+  const lowEffortOption = getModelEffortConfig(
+    "anthropic",
+    model,
+  )?.options.find((option) => option.id === "low");
   const lowEffort = lowEffortOption?.transportValue ?? lowEffortOption?.id;
 
   const response = await fetchJsonWebSearch(params, {

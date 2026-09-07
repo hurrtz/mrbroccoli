@@ -233,6 +233,15 @@ keeps the real home controls reachable for the home, Council, and
 per-conversation settings frames. Production readiness, phase, and progress
 remain pipeline-derived.
 
+### Search response integrity
+
+Web-search deadlines and caller cancellation include response-body consumption,
+including error bodies. Connection checks require the same usable evidence
+brief as a real turn. OpenAI search reserves output headroom for reasoning and a
+final brief and selects manifest-supported low effort. A completed tool call
+alone is not usable context, and Anthropic errors embedded in HTTP 200 responses
+cannot become live evidence.
+
 ## Failure Rules
 
 - Aborted work must stop downstream stages and avoid late state mutation.

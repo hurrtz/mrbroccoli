@@ -318,9 +318,9 @@ describe("webSearch", () => {
             type: "web_search_20260318",
           }),
         ]);
-        expect(
-          (body.tools as Record<string, unknown>[])[0],
-        ).not.toHaveProperty("response_inclusion");
+        expect((body.tools as Record<string, unknown>[])[0]).not.toHaveProperty(
+          "response_inclusion",
+        );
       },
       expectedSummary: "Anthropic web search found the current answer.",
       expectedSourceUrl: "https://example.com/claude-search",
@@ -619,33 +619,33 @@ describe("webSearch", () => {
     ["openai", "sk-test"],
     ["xai", "xai-test"],
   ] as const)("rejects an ungrounded %s response", async (provider, apiKey) => {
-      (fetch as jest.Mock).mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            output_text: "An answer from model memory.",
-            output: [
-              {
-                type: "message",
-                content: [
-                  {
-                    type: "output_text",
-                    text: "An answer from model memory.",
-                  },
-                ],
-              },
-            ],
-          }),
-      });
-
-      await expect(
-        searchWeb({
-          provider,
-          apiKey,
-          language: "en",
-          query: "What happened today?",
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          output_text: "An answer from model memory.",
+          output: [
+            {
+              type: "message",
+              content: [
+                {
+                  type: "output_text",
+                  text: "An answer from model memory.",
+                },
+              ],
+            },
+          ],
         }),
-      ).rejects.toThrow("returned a response without running web search");
+    });
+
+    await expect(
+      searchWeb({
+        provider,
+        apiKey,
+        language: "en",
+        query: "What happened today?",
+      }),
+    ).rejects.toThrow("returned a response without running web search");
   });
 
   it("validates Qwen only after a completed web search call", async () => {
@@ -697,6 +697,156 @@ describe("webSearch", () => {
       expect.objectContaining({ method: "POST" }),
     );
   });
-
 });
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+describe("web search result and cancellation boundaries", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    resetProviderModelHealthForTests();
+    resetRuntimeCapabilityOverridesForTests();
+  });
+
+  it("does not validate a completed search with no usable evidence brief", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        output: [{ type: "web_search_call", status: "completed" }],
+      }),
+    });
+    await expect(
+      validateWebSearchConnection({
+        provider: "openai",
+        apiKey: "test-key",
+        language: "en",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("reserves reasoning headroom before asking OpenAI for an evidence brief", async () => {
+    (fetch as jest.Mock).mockImplementation(async (_url, init) => {
+      const body = JSON.parse(init.body);
+      const budgetCanProduceBrief =
+        body.max_output_tokens >= 4096 && body.reasoning?.effort === "low";
+      return {
+        ok: true,
+        json: async () => ({
+          output: [{ type: "web_search_call", status: "completed" }],
+          output_text: budgetCanProduceBrief
+            ? "Current evidence from the completed search."
+            : "",
+        }),
+      };
+    });
+    await expect(
+      searchWeb({
+        provider: "openai",
+        apiKey: "test-key",
+        language: "en",
+        query: "News today",
+      }),
+    ).resolves.toEqual(
+      expect.objectContaining({
+        summary: "Current evidence from the completed search.",
+      }),
+    );
+  });
+
+  it.each([true, false])(
+    "bounds a stalled %s response body by the search deadline",
+    async (ok) => {
+      jest.useFakeTimers();
+      try {
+        const requestSignals: AbortSignal[] = [];
+        let bodyStarted!: () => void;
+        const started = new Promise<void>((resolve) => {
+          bodyStarted = resolve;
+        });
+        (fetch as jest.Mock).mockImplementation(async (_url, init) => {
+          requestSignals.push(init.signal);
+          const readBody = () => {
+            bodyStarted();
+            return new Promise(() => {});
+          };
+          return { ok, status: ok ? 200 : 503, json: readBody, text: readBody };
+        });
+        const request = searchWeb({
+          provider: "openai",
+          apiKey: "test-key",
+          language: "en",
+          query: "News today",
+        });
+        const rejection = expect(request).rejects.toMatchObject({
+          failureKind: "timeout",
+        });
+        await started;
+        await jest.runAllTimersAsync();
+        expect(requestSignals.length).toBeGreaterThan(0);
+        expect(requestSignals.every((signal) => signal.aborted)).toBe(true);
+        await rejection;
+      } finally {
+        jest.useRealTimers();
+      }
+    },
+  );
+
+  it("does not label an Anthropic tool failure as live web evidence", async () => {
+    (fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        content: [
+          {
+            type: "web_search_tool_result",
+            content: {
+              type: "web_search_tool_result_error",
+              error_code: "unavailable",
+            },
+          },
+          {
+            type: "text",
+            text: "I could not search; here is what I already know.",
+          },
+        ],
+      }),
+    });
+    await expect(
+      searchWeb({
+        provider: "anthropic",
+        apiKey: "test-key",
+        language: "en",
+        query: "News today",
+      }),
+    ).rejects.toThrow();
+  });
+
+  it("keeps cancellation connected while the response body is pending", async () => {
+    const controller = new AbortController();
+    let requestSignal: AbortSignal | undefined;
+    let bodyStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      bodyStarted = resolve;
+    });
+    (fetch as jest.Mock).mockImplementation(async (_url, init) => {
+      requestSignal = init.signal;
+      return {
+        ok: true,
+        json: () => {
+          bodyStarted();
+          return new Promise(() => {});
+        },
+      };
+    });
+    const request = searchWeb({
+      provider: "openai",
+      apiKey: "test-key",
+      language: "en",
+      query: "News today",
+      abortSignal: controller.signal,
+    });
+    const rejection = expect(request).rejects.toThrow("Stopped");
+    await started;
+    controller.abort(new Error("Stopped"));
+    expect(requestSignal?.aborted).toBe(true);
+    await rejection;
+  });
+});

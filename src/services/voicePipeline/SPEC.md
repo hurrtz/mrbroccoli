@@ -94,7 +94,10 @@ the current-session summary.
 Search is a decision stage, not an automatic property of a response-mode label.
 The heuristic receives mode, readiness, language, current query, and recent
 messages. When search is requested but the provider fails, the response may
-continue without search and records the fallback in the receipt.
+continue without search and records the fallback in the receipt. The search
+service returns only a usable evidence brief; its deadline covers both headers
+and response-body consumption. The resulting context is passed unchanged to
+Council and final-response preparation.
 
 Turn-owned degradation remains attached to the assistant reply. Web-search
 fallback and TTS fallback are persisted as `PipelineNotices` metadata and do
