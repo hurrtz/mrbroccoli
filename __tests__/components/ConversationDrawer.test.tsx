@@ -113,6 +113,7 @@ describe("ConversationDrawer", () => {
   });
 
   afterEach(() => {
+    jest.useRealTimers();
     jest.restoreAllMocks();
   });
 
@@ -704,6 +705,8 @@ describe("ConversationDrawer", () => {
   });
 
   it("keeps the overview open and does not load a locked session after failed authentication", async () => {
+    // waitFor advances the failed-unlock sheet's animated dismissal.
+    jest.useFakeTimers();
     const onClose = jest.fn();
     const onSelect = jest.fn(async () => undefined);
     const onUnlockSession = jest.fn(async () => false);

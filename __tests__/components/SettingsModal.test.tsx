@@ -242,6 +242,7 @@ describe("SettingsModal", () => {
   });
 
   afterEach(async () => {
+    jest.useRealTimers();
     await AsyncStorage.removeItem(RUNTIME_CAPABILITY_OVERRIDES_STORAGE_KEY);
     resetRuntimeCapabilityOverridesForTests();
     jest.mocked(useSpeechDiagnostics).mockReturnValue([]);
@@ -1444,7 +1445,7 @@ describe("SettingsModal", () => {
     });
   });
 
-  it("places Thinking, Search, and diagnostics controls in their drill-in pages", async () => {
+  it("places Thinking controls in their drill-in page", async () => {
     const screen = renderSettingsModal({
       settings: {
         ...DEFAULT_SETTINGS,
@@ -1511,6 +1512,25 @@ describe("SettingsModal", () => {
     fireEvent.press(screen.getAllByLabelText("Dismiss").at(-1)!);
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
+  });
+
+  it("places Search controls in their drill-in page", async () => {
+    const screen = renderSettingsModal({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          openai: "test-key",
+        },
+        webSearchMode: "on",
+        webSearchProvider: "openai",
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Settings")).toBeTruthy();
+    });
+
     fireEvent.press(screen.getByLabelText("Open Search"));
 
     await waitFor(() => {
@@ -1537,6 +1557,27 @@ describe("SettingsModal", () => {
     });
 
     fireEvent.press(screen.getByLabelText("Back to overview"));
+  });
+
+  it("places diagnostics controls in their drill-in page", async () => {
+    // Complete sheet animations before asserting dismissal, without polling.
+    jest.useFakeTimers();
+    const screen = renderSettingsModal({
+      settings: {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          openai: "test-key",
+        },
+        webSearchMode: "on",
+        webSearchProvider: "openai",
+      },
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Settings")).toBeTruthy();
+    });
+
     fireEvent.press(screen.getByLabelText("Open App & diagnostics"));
 
     await waitFor(() => {
@@ -1569,21 +1610,17 @@ describe("SettingsModal", () => {
     fireEvent.press(
       screen.getByTestId("app-language-picker-sheet-header-handle"),
     );
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
-      },
-      { timeout: 5_000 },
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
 
     fireEvent.press(languagePicker);
     fireEvent.press(screen.getByTestId("app-language-picker-option-en"));
-    await waitFor(
-      () => {
-        expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
-      },
-      { timeout: 5_000 },
-    );
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(screen.queryByTestId("app-language-picker-sheet")).toBeNull();
   });
 
   it("uses compact Input rows and the unified listening route picker", async () => {
