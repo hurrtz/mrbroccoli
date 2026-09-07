@@ -218,10 +218,10 @@ describe("conversation store", () => {
         return passThrough(sql, ...params);
       });
 
-      await saveConversationsAtomically([
+      await expect(saveConversationsAtomically([
         createConversation("c1"),
         createConversation("c2"),
-      ]);
+      ])).rejects.toThrow("disk full");
       writeRow.mockImplementation(passThrough);
 
       await expect(readStoredConversationMetas()).resolves.toEqual([]);

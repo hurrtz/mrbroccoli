@@ -178,6 +178,8 @@ export async function saveConversationsAtomically(
     });
   } catch (error) {
     reportStorageFailure("conversation", "save batch", error);
+    // Import/branch callers must not publish success after the transaction rolls back.
+    throw error;
   }
 }
 

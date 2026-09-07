@@ -42,7 +42,9 @@ hydrate only when needed. Derived metadata must be rebuildable from a complete
 conversation record.
 
 Writes are serialized and transactional, so an operation spanning several
-records is never half-applied. A missing or unreadable conversation does not
+records is never half-applied. Batch write failures propagate to branch and
+restore callers before active selection, metadata, settings import, or success
+counts are published. A missing or unreadable conversation does not
 crash hydration; it is reported through the persistence alert path and handled
 as unavailable state.
 

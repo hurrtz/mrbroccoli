@@ -500,6 +500,41 @@ describe("useConversations", () => {
     expect(result.current.activeConversation).not.toBeNull();
   });
 
+  it.each(["restore", "branch"] as const)(
+    "does not publish a successful %s after a batch write fails",
+    async (operation) => {
+      const { result } = renderHook(() => useConversations());
+      await waitFor(() => expect(result.current.loaded).toBe(true));
+      act(() => {
+        result.current.createConversation("Keep original");
+        result.current.addMessage({
+          role: "user", content: "Checkpoint", provider: null, model: null,
+        });
+      });
+      const original = result.current.activeConversation!;
+      await readStoredConversationMetas();
+      const database = await getConversationDatabase();
+      const writeRow = jest.mocked(database.runAsync);
+      const passThrough = writeRow.getMockImplementation()!;
+      writeRow.mockImplementation(async (sql, ...params) => {
+        if (sql.includes("INSERT INTO conversations")) throw new Error("disk full");
+        return passThrough(sql, ...params);
+      });
+      await act(async () => {
+        const pending = operation === "restore"
+          ? result.current.restoreConversationBackup([
+              { conversation: { ...original, id: "imported" }, pinned: false },
+            ], "imported")
+          : result.current.branchConversationAtMessage(original.messages[0].id);
+        await expect(pending).rejects.toThrow("disk full");
+      });
+      writeRow.mockImplementation(passThrough);
+      expect(result.current.activeConversation?.id).toBe(original.id);
+      expect(result.current.conversations.map(({ id }) => id)).toEqual([original.id]);
+      expect((await readStoredConversationMetas()).map(({ id }) => id)).toEqual([original.id]);
+    },
+  );
+
   it("restores conflicting backup conversations as copies without replacing local data", async () => {
     const stored = new Map<string, string>();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(

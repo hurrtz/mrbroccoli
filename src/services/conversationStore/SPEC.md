@@ -71,6 +71,9 @@ cannot nest, so a second `BEGIN` while one is open throws. Reads call
 database initialization clears its cached promise so a transient open or schema
 failure can recover on the next operation without restarting the app.
 
+Batch failures roll back and propagate through the hook storage adapter. A
+branch or restore must not appear successful after SQLite rejects its records.
+
 Metadata absent from an update is left alone rather than deleted. Callers pass
 filtered in-memory lists, so treating omission as deletion would let a drawer
 filter destroy conversations. Deleting a conversation removes its row, which

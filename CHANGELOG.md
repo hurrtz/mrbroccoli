@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Backup restores and conversation branches now report failed database writes
+  instead of claiming success or displaying records that were never saved.
+
 - The voice/text pager now holds its chevrons, voice orb, and text composer on
   one horizontal axis. Image and Hands free move to the outer content edges,
   Council and Web stay centred, and narrow screens separate the three control
