@@ -1,6 +1,21 @@
 import { providerContext } from "./provider";
 
 export const stt = providerContext.defineSttModels([
+  providerContext.stt({
+    modelId: "gpt-transcribe",
+    publicName: "GPT Transcribe",
+    aliases: [],
+    status: "Documented active/current",
+    pricingSummary: "See current official transcription pricing; no estimate pinned here.",
+    limitsSummary: "Recorded file uploads are limited to 25 MB.",
+    notes: "Recorded transcription uses multipart languages[] hints, not language. Auto-detection omits hints.",
+    officialSources: ["https://developers.openai.com/api/docs/guides/speech-to-text", "https://developers.openai.com/api/docs/deprecations"],
+    supportsRealtime: false,
+    supportsBatch: false,
+    priceMeasurements: [],
+    constraints: [{ metric: "file_size_bytes", comparator: "<=", value: 25000000, unit: "bytes", scope: "file", sourceText: "Recorded uploads are limited to 25 MB." }],
+    languageSupport: null,
+  }),
   providerContext.stt(
     {
       "providerId": "openai",

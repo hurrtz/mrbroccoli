@@ -50,6 +50,10 @@ sampling parameters. Request-shape tests cover these provider boundaries.
 
 ### Speech and voice turns
 
+OpenAI `gpt-transcribe` uses repeated multipart `languages[]` hints and never
+the legacy singular `language`; auto-detection omits hints. Legacy file
+transcribers keep their existing language and diarization contracts.
+
 - `voicePipeline.ts` and `voicePipeline/` coordinate the complete turn.
 - `whisper.ts` and `whisper/` route provider STT; native and downloaded STT
   adapters are separate.

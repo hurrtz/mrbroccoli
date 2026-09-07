@@ -80,7 +80,7 @@ export async function transcribeWithMultipartProvider(
   }
   if (speechLanguage !== "auto") {
     formData.append(
-      provider === "elevenlabs" ? "language_code" : "language",
+      provider === "elevenlabs" ? "language_code" : provider === "openai" && resolvedModel === "gpt-transcribe" ? "languages[]" : "language",
       getProviderSpeechLanguageCode(speechLanguage),
     );
   }

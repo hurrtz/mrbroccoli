@@ -12,7 +12,7 @@ import {
 
 describe("speech provider constants", () => {
   it("uses catalog labels for exact STT model matches", () => {
-    expect(getSttModelLabel("openai", "gpt-4o-mini-transcribe")).toBe(
+    expect(getSttModelLabel("openai", "gpt-4o-mini-transcribe-2025-12-15")).toBe(
       "GPT-4o mini Transcribe",
     );
   });

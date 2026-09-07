@@ -108,6 +108,11 @@ Qwen speech pins ASR to the February 2026 snapshot, standard TTS to November
 2025, and instruct TTS to January 2026. Voice filters and saved aliases follow
 those exact models; the US speech restriction remains in force.
 
+OpenAI defaults new recorded-transcription selections to `gpt-transcribe`.
+Older transcription routes remain selectable until their announced February
+2027 retirement; mini-transcribe uses its December 2025 canonical snapshot.
+Existing saved choices are pinned, not silently switched to a different model.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

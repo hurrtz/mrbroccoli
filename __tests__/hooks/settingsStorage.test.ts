@@ -141,3 +141,8 @@ it("pins legacy Qwen speech selections without losing instruct TTS", () => {
   expect(settings.providerSttModels["alibaba-qwen-dashscope"]).toBe("qwen3-asr-flash-2026-02-10");
   expect(settings.providerTtsModels["alibaba-qwen-dashscope"]).toBe("qwen3-tts-instruct-flash-2026-01-26");
 });
+
+it("pins existing OpenAI transcription without overriding a user's selection", () => {
+  expect(mergeSettings({ providerSttModels: { openai: "gpt-4o-mini-transcribe" } }).providerSttModels.openai).toBe("gpt-4o-mini-transcribe-2025-12-15");
+  expect(mergeSettings({}).providerSttModels.openai).toBe("gpt-transcribe");
+});

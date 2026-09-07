@@ -166,6 +166,15 @@ describe("transcribeAudio", () => {
     expect(onModelResolved).toHaveBeenCalledWith("whisper-tiny");
   });
 
+  it.each(["en", "auto"] as const)("uses the gpt-transcribe language-array contract for %s", async (speechLanguage) => {
+    (fetch as jest.Mock).mockResolvedValueOnce({ ok: true, json: async () => ({ text: "Verbatim transcript" }) });
+    await expect(transcribeAudio({ fileUri: "/tmp/recording.m4a", mode: "provider", provider: "openai", providerModel: "gpt-transcribe", apiKey: "sk-test", language: "en", speechLanguage })).resolves.toBe("Verbatim transcript");
+    const parts = Array.from(((fetch as jest.Mock).mock.calls[0][1].body as FormData).entries());
+    expect(parts).toContainEqual(["model", "gpt-transcribe"]);
+    expect(parts.some(([key]) => key === "language")).toBe(false);
+    expect(parts.filter(([key]) => key === "languages[]")).toEqual(speechLanguage === "auto" ? [] : [["languages[]", "en"]]);
+  });
+
   it("uses a shorter STT timeout budget for OpenAI than the generic provider default", () => {
     expect(getProviderSttTimeoutMs("openai")).toBe(45000);
     expect(getProviderSttTimeoutMs("mistral")).toBe(60000);

@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- OpenAI GPT Transcribe is available and becomes the default for new speech
+  selections. Existing mini-transcribe selections are pinned to a stable snapshot.
+
 - Qwen speech uses stable model snapshots, upgrades recorded transcription,
   and preserves existing instruction-capable voice selections during migration.
 

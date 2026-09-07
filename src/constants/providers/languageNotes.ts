@@ -321,67 +321,67 @@ const PROVIDER_STT_LANGUAGE_NOTES_BY_LANGUAGE: LocalizedResource<
   ) as Partial<Record<Provider, string>>,
   de: {
     openai:
-      `OpenAI bietet aktuell gpt-4o-transcribe, gpt-4o-mini-transcribe und whisper-1 für Speech-to-Text an. Der von OpenAI veröffentlichte Satz gut unterstützter Sprachen lautet: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI bietet aktuell gpt-4o-transcribe, gpt-transcribe und whisper-1 für Speech-to-Text an. Der von OpenAI veröffentlichte Satz gut unterstützter Sprachen lautet: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Die aktuelle Voxtral-Transkriptionsroute ist für Englisch, Spanisch, Französisch, Portugiesisch, Hindi, Deutsch, Niederländisch und Italienisch dokumentiert.",
   },
   uk: {
     openai:
-      `OpenAI зараз пропонує gpt-4o-transcribe, gpt-4o-mini-transcribe і whisper-1 для розпізнавання мовлення. Оприлюднений OpenAI перелік мов із належною підтримкою: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI зараз пропонує gpt-4o-transcribe, gpt-transcribe і whisper-1 для розпізнавання мовлення. Оприлюднений OpenAI перелік мов із належною підтримкою: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Поточний маршрут розпізнавання Voxtral документовано для англійської, іспанської, французької, португальської, гінді, німецької, нідерландської та італійської мов.",
   },
   hi: {
     openai:
-      `OpenAI अभी स्पीच-टू-टेक्स्ट के लिए gpt-4o-transcribe, gpt-4o-mini-transcribe और whisper-1 देता है। OpenAI की प्रकाशित अच्छी तरह समर्थित भाषाओं की सूची: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI अभी स्पीच-टू-टेक्स्ट के लिए gpt-4o-transcribe, gpt-transcribe और whisper-1 देता है। OpenAI की प्रकाशित अच्छी तरह समर्थित भाषाओं की सूची: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "मौजूदा Voxtral ट्रांसक्रिप्शन मार्ग अंग्रेज़ी, स्पेनिश, फ़्रेंच, पुर्तगाली, हिन्दी, जर्मन, डच और इतालवी के लिए प्रलेखित है।",
   },
   es: {
     openai:
-      `OpenAI ofrece actualmente gpt-4o-transcribe, gpt-4o-mini-transcribe y whisper-1 para convertir voz en texto. La lista publicada por OpenAI de idiomas con buena compatibilidad es: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI ofrece actualmente gpt-4o-transcribe, gpt-transcribe y whisper-1 para convertir voz en texto. La lista publicada por OpenAI de idiomas con buena compatibilidad es: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "La ruta de transcripción actual de Voxtral está documentada para inglés, español, francés, portugués, hindi, alemán, neerlandés e italiano.",
   },
   fr: {
     openai:
-      `OpenAI propose actuellement gpt-4o-transcribe, gpt-4o-mini-transcribe et whisper-1 pour la transcription vocale. La liste des langues bien prises en charge publiée par OpenAI est : ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI propose actuellement gpt-4o-transcribe, gpt-transcribe et whisper-1 pour la transcription vocale. La liste des langues bien prises en charge publiée par OpenAI est : ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "La route de transcription Voxtral actuelle est documentée pour l’anglais, l’espagnol, le français, le portugais, l’hindi, l’allemand, le néerlandais et l’italien.",
   },
   it: {
     openai:
-      `OpenAI offre attualmente gpt-4o-transcribe, gpt-4o-mini-transcribe e whisper-1 per la trascrizione vocale. L’elenco delle lingue ben supportate pubblicato da OpenAI è: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI offre attualmente gpt-4o-transcribe, gpt-transcribe e whisper-1 per la trascrizione vocale. L’elenco delle lingue ben supportate pubblicato da OpenAI è: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "L’attuale percorso di trascrizione Voxtral è documentato per inglese, spagnolo, francese, portoghese, hindi, tedesco, olandese e italiano.",
   },
   pt: {
     openai:
-      `A OpenAI disponibiliza atualmente gpt-4o-transcribe, gpt-4o-mini-transcribe e whisper-1 para conversão de voz em texto. A lista de idiomas bem suportados publicada pela OpenAI é: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `A OpenAI disponibiliza atualmente gpt-4o-transcribe, gpt-transcribe e whisper-1 para conversão de voz em texto. A lista de idiomas bem suportados publicada pela OpenAI é: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "A rota de transcrição Voxtral atual está documentada para inglês, espanhol, francês, português, hindi, alemão, neerlandês e italiano.",
   },
   "pt-BR": {
     openai:
-      `A OpenAI oferece atualmente gpt-4o-transcribe, gpt-4o-mini-transcribe e whisper-1 para conversão de fala em texto. A lista de idiomas com bom suporte publicada pela OpenAI é: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `A OpenAI oferece atualmente gpt-4o-transcribe, gpt-transcribe e whisper-1 para conversão de fala em texto. A lista de idiomas com bom suporte publicada pela OpenAI é: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "A rota atual de transcrição do Voxtral está documentada para inglês, espanhol, francês, português, hindi, alemão, holandês e italiano.",
   },
   ru: {
     openai:
-      `OpenAI сейчас предлагает gpt-4o-transcribe, gpt-4o-mini-transcribe и whisper-1 для распознавания речи. Опубликованный OpenAI список хорошо поддерживаемых языков: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI сейчас предлагает gpt-4o-transcribe, gpt-transcribe и whisper-1 для распознавания речи. Опубликованный OpenAI список хорошо поддерживаемых языков: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "Текущий маршрут транскрипции Voxtral документирован для английского, испанского, французского, португальского, хинди, немецкого, нидерландского и итальянского языков.",
   },
   "zh-CN": {
     openai:
-      `OpenAI 目前提供 gpt-4o-transcribe、gpt-4o-mini-transcribe 和 whisper-1 用于语音转文字。OpenAI 公布的良好支持语言列表为：${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `OpenAI 目前提供 gpt-4o-transcribe、gpt-transcribe 和 whisper-1 用于语音转文字。OpenAI 公布的良好支持语言列表为：${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "当前 Voxtral 转录路线已记录支持英语、西班牙语、法语、葡萄牙语、印地语、德语、荷兰语和意大利语。",
   },
   ar: {
     openai:
-      `تقدم OpenAI حاليًا gpt-4o-transcribe وgpt-4o-mini-transcribe وwhisper-1 لتحويل الكلام إلى نص. قائمة اللغات ذات الدعم الجيد التي نشرتها OpenAI هي: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      `تقدم OpenAI حاليًا gpt-4o-transcribe وgpt-transcribe وwhisper-1 لتحويل الكلام إلى نص. قائمة اللغات ذات الدعم الجيد التي نشرتها OpenAI هي: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     mistral:
       "مسار النسخ الحالي في Voxtral موثّق للإنجليزية والإسبانية والفرنسية والبرتغالية والهندية والألمانية والهولندية والإيطالية.",
   },

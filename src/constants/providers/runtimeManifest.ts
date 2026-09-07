@@ -580,13 +580,14 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "multipart",
       endpoint: "https://api.openai.com/v1/audio/transcriptions",
-      defaultModel: "gpt-4o-mini-transcribe",
+      defaultModel: "gpt-transcribe",
       fallbackModelIds: [
-        "gpt-4o-mini-transcribe",
+        "gpt-transcribe",
+        "gpt-4o-mini-transcribe-2025-12-15",
         "gpt-4o-transcribe",
         "whisper-1",
       ],
-      models: catalogModelSpecs("openai", "stt"),
+      models: [namedModel("gpt-transcribe", "GPT Transcribe"), namedModel("gpt-4o-mini-transcribe-2025-12-15", "GPT-4o mini Transcribe"), ...catalogModelSpecs("openai", "stt", ["gpt-transcribe", "gpt-4o-mini-transcribe"])],
       languages: [
         "en",
         "de",
@@ -608,7 +609,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "sv",
         "ur",
       ],
-      languageNote: `OpenAI currently exposes gpt-4o-transcribe, gpt-4o-mini-transcribe, and whisper-1 for speech-to-text. OpenAI's published well-supported language set is: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
+      languageNote: `OpenAI currently exposes gpt-transcribe, gpt-4o-transcribe, and whisper-1 for speech-to-text. OpenAI's published well-supported language set is: ${WHISPER_WELL_SUPPORTED_LANGUAGES}`,
     },
     tts: {
       support: "provider",
