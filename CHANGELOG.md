@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Claude Opus 5 is available as an answering model with all five reasoning efforts.
+
 - DeepSeek V4 models now offer low reasoning effort.
 
 - Search disables optional Gemini/xAI request storage and uses current Qwen

@@ -88,6 +88,10 @@ OpenRouter snapshots are verified against its public Models and Endpoints APIs.
 DeepSeek V4 Flash and Pro expose disabled, low, high, and max effort.
 Enabled thinking sends the selected `reasoning_effort`; high remains default.
 
+Claude Opus 5 uses the canonical direct `claude-opus-5` ID, high default,
+and low/medium/high/xhigh/max effort through Messages. Existing defaults stay
+unchanged when new answering choices are added.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

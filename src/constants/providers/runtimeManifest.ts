@@ -794,6 +794,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           namedModel("claude-fable-5-1", "Claude Fable 5.1"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
         ),
+        withEffort(namedModel("claude-opus-5", "Claude Opus 5"), ANTHROPIC_EXTENDED_OUTPUT_EFFORT),
         withEffort(
           namedModel("claude-sonnet-5", "Claude Sonnet 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,

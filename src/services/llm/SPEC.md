@@ -54,6 +54,9 @@ not persisted or replayed as conversation messages.
 **Decision:** A model is unavailable when its manifest transport is not wired;
 the router must not guess an approximately compatible API.
 
+Claude Opus 5 uses its default adaptive thinking through Messages and
+`output_config.effort`, reserving 65,536 output tokens at xhigh/max.
+
 ## Prompt Layers and Trust
 
 `buildSystemPrompt` combines only explicitly passed layers:

@@ -577,6 +577,8 @@ describe("streamChat", () => {
 
   it.each([
     { model: "claude-opus-4-7", modelEffort: undefined, maxTokens: 16_384 },
+    { model: "claude-opus-5", modelEffort: undefined, maxTokens: 16_384 },
+    { model: "claude-opus-5", modelEffort: "max", maxTokens: 65_536 },
     { model: "claude-fable-5-1", modelEffort: undefined, maxTokens: 65_536 },
     { model: "claude-fable-5-1", modelEffort: "low", maxTokens: 16_384 },
     { model: "claude-fable-5-1", modelEffort: "high", maxTokens: 65_536 },

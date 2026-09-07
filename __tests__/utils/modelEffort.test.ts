@@ -14,6 +14,7 @@ describe("model effort metadata", () => {
     ["openai", "gpt-6-astra", "medium"],
     ["openrouter", "openai/gpt-6-astra-20260903", "medium"],
     ["anthropic", "claude-fable-5-1", "high"],
+    ["anthropic", "claude-opus-5", "high"],
     ["openrouter", "anthropic/claude-fable-5.1-20260831", "high"],
   ])("preserves all supported efforts for %s %s", (provider, model, defaultEffort) => {
     const efforts = ["low", "medium", "high", "xhigh", "max"];
