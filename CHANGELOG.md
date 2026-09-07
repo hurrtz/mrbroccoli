@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Long system and on-device dictation now preserves every finalized recognition
+  segment instead of returning only the last sentence from a longer recording.
+
 - System Recognition can now be selected whenever the operating system's
   recognizer is available, even when strict offline recognition is unavailable.
 

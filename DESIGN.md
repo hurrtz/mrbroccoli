@@ -252,6 +252,10 @@ language checks occur before execution.
   recognizer. Offline-recognition support and installed locale metadata apply
   only when a route explicitly requires on-device processing; they do not
   disable the general system route, which may use the OS speech service.
+- Recognition adapters accumulate successive final segments from the same
+  capture while replacing only the current interim hypothesis. They also accept
+  recognizers that report the complete cumulative transcript, without
+  duplicating its already-committed prefix.
 - Downloaded speech models are selected from the curated local catalogue.
 - Speaking Settings renders System, compatible downloaded voices, and enabled
   providers as one radio group. Local downloads and benchmarks happen in that

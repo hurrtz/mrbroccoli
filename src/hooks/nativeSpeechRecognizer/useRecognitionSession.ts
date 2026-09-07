@@ -4,7 +4,7 @@ import type {
   ExpoSpeechRecognitionResultEvent,
 } from "expo-speech-recognition";
 import type { TranslationKey } from "../../i18n";
-import { buildErrorMessage } from "./shared";
+import { applyRecognitionResult, buildErrorMessage } from "./shared";
 
 type StopResolver = (value: string | null) => void;
 type StopRejecter = (error: Error) => void;
@@ -96,17 +96,7 @@ export function useRecognitionSession({
   );
 
   const handleResult = useCallback((event: ExpoSpeechRecognitionResultEvent) => {
-    const transcript = event.results[0]?.transcript?.trim() ?? "";
-
-    if (!transcript) {
-      return;
-    }
-
-    latestTranscriptRef.current = transcript;
-
-    if (event.isFinal) {
-      finalTranscriptRef.current = transcript;
-    }
+    applyRecognitionResult(event, finalTranscriptRef, latestTranscriptRef);
   }, []);
 
   const handleError = useCallback(

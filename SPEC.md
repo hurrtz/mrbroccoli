@@ -95,6 +95,9 @@ offline conversation mode.
   re-arming.
 - Speech recognition may use the system recognizer, a downloaded local model,
   or a capability-gated provider route.
+- A single capture may produce multiple final speech-recognition segments.
+  Every finalized segment remains in order while interim hypotheses replace
+  only the still-unfinalized tail.
 - Spoken replies may use system speech, downloaded Kokoro/Piper speech, or a
   capability-gated provider route.
 - Speaking Settings always keeps one speech route selected. Stored installs

@@ -1,4 +1,7 @@
-import type { ExpoSpeechRecognitionErrorEvent } from "expo-speech-recognition";
+import type {
+  ExpoSpeechRecognitionErrorEvent,
+  ExpoSpeechRecognitionResultEvent,
+} from "expo-speech-recognition";
 import type { useLocalization } from "../../i18n";
 import type { SttLanguage } from "../../types";
 import { getSpeechRecognitionLocale } from "../../utils/speechLanguage";
@@ -25,6 +28,48 @@ export function volumeToMetering(value: number) {
 
   const clamped = Math.max(0, Math.min(10, value));
   return -56 + (clamped / 10) * 56;
+}
+
+function isCumulativeTranscript(committed: string, candidate: string) {
+  if (!candidate.startsWith(committed)) {
+    return false;
+  }
+
+  const boundary = candidate.charAt(committed.length);
+  return !boundary || /[\s.,!?;:…，。！？；：]/.test(boundary);
+}
+
+/**
+ * Preserve every final speech-recognition segment while still replacing the
+ * current interim hypothesis. On iOS 18+, expo-speech-recognition deliberately
+ * prefixes results after a final result with whitespace so callers can append
+ * them; other recognizers may instead return the cumulative transcript.
+ */
+export function applyRecognitionResult(
+  event: ExpoSpeechRecognitionResultEvent,
+  finalTranscriptRef: { current: string },
+  latestTranscriptRef: { current: string },
+) {
+  const rawTranscript = event.results[0]?.transcript ?? "";
+  const candidate = rawTranscript.trim();
+  if (!candidate) {
+    return;
+  }
+
+  const committed = finalTranscriptRef.current.trim();
+  // Expo's iOS adapter marks a new segment with leading whitespace. Respect
+  // that before matching cumulative prefixes: a person may repeat words.
+  const isExplicitSegment = /^\s/.test(rawTranscript);
+  const transcript =
+    !committed ||
+    (!isExplicitSegment && isCumulativeTranscript(committed, candidate))
+      ? candidate
+      : `${committed} ${candidate}`;
+
+  latestTranscriptRef.current = transcript;
+  if (event.isFinal) {
+    finalTranscriptRef.current = transcript;
+  }
 }
 
 export function buildErrorMessage(

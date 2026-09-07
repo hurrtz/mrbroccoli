@@ -211,6 +211,95 @@ describe("useNativeSpeechRecognizer", () => {
     expect(result.current.isRecording).toBe(false);
   });
 
+  it("preserves every final segment from a long recorded-file transcription", async () => {
+    const { result } = renderHook(() => useNativeSpeechRecognizer("en", true), {
+      wrapper,
+    });
+
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+
+    dateNowSpy.mockReturnValue(62_000);
+
+    let transcriptPromise: Promise<string | null>;
+    await act(async () => {
+      transcriptPromise = result.current.stopRecognition();
+      await Promise.resolve();
+      await Promise.resolve();
+      emitSpeechEvent("result", {
+        results: [{ transcript: "The first part stays." }],
+        isFinal: true,
+      });
+      emitSpeechEvent("result", {
+        results: [{ transcript: " The middle is still being recognized" }],
+        isFinal: false,
+      });
+      emitSpeechEvent("result", {
+        results: [{ transcript: " The middle is complete." }],
+        isFinal: true,
+      });
+      emitSpeechEvent("result", {
+        results: [{ transcript: " The last sentence is here." }],
+        isFinal: true,
+      });
+      emitSpeechEvent("end", {});
+    });
+
+    await expect(transcriptPromise!).resolves.toBe(
+      "The first part stays. The middle is complete. The last sentence is here.",
+    );
+  });
+
+  describe.each([true, false])(
+    "usingNativeRecorder=%s",
+    (usingNativeRecorder) => {
+      it.each([
+        {
+          label: "preserves repeated words in explicitly segmented results",
+          events: [
+            { transcript: "Yes", isFinal: true },
+            { transcript: " Yes", isFinal: true },
+            { transcript: " Yes maybe", isFinal: false },
+            { transcript: " Yes absolutely", isFinal: true },
+          ],
+          expected: "Yes Yes Yes absolutely",
+        },
+        {
+          label: "does not duplicate cumulative recognition results",
+          events: [
+            { transcript: "Yes", isFinal: true },
+            { transcript: "Yes maybe", isFinal: false },
+            { transcript: "Yes absolutely", isFinal: true },
+          ],
+          expected: "Yes absolutely",
+        },
+      ])("$label", async ({ events, expected }) => {
+        (isNativeWaveformAvailable as jest.Mock).mockReturnValue(
+          usingNativeRecorder,
+        );
+        const { result } = renderHook(() => useNativeSpeechRecognizer("en"), {
+          wrapper,
+        });
+        await act(async () => {
+          await result.current.startRecognition();
+        });
+        dateNowSpy.mockReturnValue(62_000);
+        let transcriptPromise: Promise<string | null>;
+        await act(async () => {
+          transcriptPromise = result.current.stopRecognition();
+          await Promise.resolve();
+          await Promise.resolve();
+          for (const { transcript, isFinal } of events) {
+            emitSpeechEvent("result", { results: [{ transcript }], isFinal });
+          }
+          emitSpeechEvent("end", {});
+        });
+        await expect(transcriptPromise!).resolves.toBe(expected);
+      });
+    },
+  );
+
   it("aborts recorded-file recognition and removes its listeners and watchdog", async () => {
     jest.useFakeTimers({ doNotFake: ["Date"] });
     try {

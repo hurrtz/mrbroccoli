@@ -1,6 +1,7 @@
 import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 import type { TranslationKey } from "../../i18n";
 import {
+  applyRecognitionResult,
   buildErrorMessage,
   getRecognitionLocale,
   RECOGNIZED_FILE_TIMEOUT_MS,
@@ -106,15 +107,11 @@ export function transcribeRecordedFile({
     resultSubscription = ExpoSpeechRecognitionModule.addListener(
       "result",
       (event) => {
-        const transcript = event.results[0]?.transcript?.trim() ?? "";
-        if (!transcript) {
-          return;
-        }
-
-        latestTranscriptRef.current = transcript;
-        if (event.isFinal) {
-          finalTranscriptRef.current = transcript;
-        }
+        applyRecognitionResult(
+          event,
+          finalTranscriptRef,
+          latestTranscriptRef,
+        );
       },
     );
 
