@@ -35,6 +35,9 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
     "gpt-realtime-2.1-mini": "gpt-5.4-mini-2026-03-17",
   },
   "alibaba-qwen-dashscope": {
+    "qwen3.8-max": "qwen3.8-max-0902",
+    "qwen3.8-max-2026-09-02": "qwen3.8-max-0902",
+    "qwen3.7-flash": "qwen3.7-flash-2026-07-15",
     "qwen3.7-plus": "qwen3.7-plus-2026-05-26",
     "qwen3.7-max": "qwen3.7-max-2026-05-20",
     "qwen3.6-flash": "qwen3.6-flash-2026-04-16",

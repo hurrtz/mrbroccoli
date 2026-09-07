@@ -196,6 +196,13 @@ export function getModelEffortRequestBody(
     };
   }
 
+  if (transportParam === "qwen-reasoning-effort") {
+    return {
+      reasoning_effort: value ?? getDefaultModelEffort(provider, model),
+      preserve_thinking: false,
+    };
+  }
+
   if (!value) {
     return {};
   }

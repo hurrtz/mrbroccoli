@@ -95,6 +95,10 @@ unchanged when new answering choices are added.
 Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
 reasoning choices are low/medium/high only; minimal is never sent.
 
+Qwen 3.8 uses `reasoning_effort` with none/low/medium/xhigh. The max picker
+uses canonical `qwen3.8-max-0902`; Flash retains its undated canonical ID.
+Earlier routes keep their own toggle contract.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

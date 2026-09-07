@@ -45,6 +45,7 @@ export type RuntimeModelEffortTransportParam =
   | "gemini-thinking-level"
   | "deepseek-thinking-effort"
   | "qwen-enable-thinking"
+  | "qwen-reasoning-effort"
   | "reasoning-effort";
 
 export interface RuntimeModelEffortOption {
@@ -1155,6 +1156,9 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "qwen3.6-flash-2026-04-16",
       fallbackModelIds: ["qwen3.6-flash-2026-04-16", "qwen3.7-plus-2026-05-26", "qwen3.5-flash-2026-02-23"],
       models: [
+        withEffort(namedModel("qwen3.8-max-0902", "Qwen3.8-Max"), effortConfig("qwen-reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
+        withEffort(namedModel("qwen3.8-flash", "Qwen3.8-Flash"), effortConfig("qwen-reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
+        withEffort(namedModel("qwen3.7-flash-2026-07-15", "Qwen3.7-Flash"), QWEN_THINKING_EFFORT),
         withEffort(namedModel("qwen3.7-plus-2026-05-26", "Qwen3.7-Plus"), QWEN_THINKING_EFFORT),
         withEffort(namedModel("qwen3.7-max-2026-05-20", "Qwen3.7-Max"), QWEN_THINKING_EFFORT),
         withEffort(namedModel("qwen3.6-flash-2026-04-16", "Qwen3.6-Flash"), QWEN_THINKING_EFFORT),

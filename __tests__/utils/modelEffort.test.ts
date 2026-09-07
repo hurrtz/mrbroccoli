@@ -300,3 +300,10 @@ it.each(["gemini-3.8-flash", "gemini-3.7-flash"])("limits %s to its supported th
   expect(getModelEffortRequestBody("gemini", model, "low")).toEqual({generationConfig: {thinkingConfig: {thinkingLevel: "LOW"}}});
   expect(normalizeResponseModeRouteEffort({ provider: "gemini", model, effort: "minimal" }).effort).toBe("high");
 });
+
+it.each(["qwen3.8-max-0902", "qwen3.8-flash"])("sends explicit stateless reasoning for %s", (model) => {
+  expect(getModelEffortOptions("alibaba-qwen-dashscope", model).map(({ id }) => id)).toEqual(["none", "low", "medium", "xhigh"]);
+  for (const effort of [undefined, "none", "low", "medium", "xhigh"]) {
+    expect(getModelEffortRequestBody("alibaba-qwen-dashscope", model, effort)).toEqual({ reasoning_effort: effort ?? "xhigh", preserve_thinking: false });
+  }
+});

@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Qwen 3.8 Max, 3.8 Flash, and 3.7 Flash are available with model-specific
+  reasoning controls and explicit handling of private reasoning history.
+
 - Gemini 3.7 and 3.8 Flash are available for answers and recorded transcription,
   with their supported reasoning levels and search fallback routes.
 

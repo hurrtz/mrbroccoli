@@ -57,6 +57,10 @@ the router must not guess an approximately compatible API.
 Claude Opus 5 uses its default adaptive thinking through Messages and
 `output_config.effort`, reserving 65,536 output tokens at xhigh/max.
 
+**Decision:** Qwen 3.8 explicitly sends `preserve_thinking: false` because
+conversation history stores visible replies rather than private reasoning.
+Its effort field is independent of older Qwen enable-thinking toggles.
+
 ## Prompt Layers and Trust
 
 `buildSystemPrompt` combines only explicitly passed layers:
