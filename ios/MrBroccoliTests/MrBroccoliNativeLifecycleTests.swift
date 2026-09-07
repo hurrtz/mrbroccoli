@@ -35,6 +35,46 @@ final class MrBroccoliNativeLifecycleTests: XCTestCase {
     XCTAssertTrue(coordinator.samples(for: .output).allSatisfy { $0 == 0 })
   }
 
+  func testCompetingWaveformStartsDoNotStopTheActiveRecording() throws {
+    let module = MrBroccoliNativeWaveform()
+    let file = FileManager.default.temporaryDirectory.appendingPathComponent(
+      "waveform-owner-\(UUID().uuidString).wav"
+    )
+    defer {
+      module.invalidate()
+      try? FileManager.default.removeItem(at: file)
+    }
+    let started = expectation(description: "owner recording started")
+    module.startRecording("owner", outputUri: file.absoluteString, resolver: { _ in
+      started.fulfill()
+    }, rejecter: { _, message, _ in
+      XCTFail("Owner recording failed: \(message ?? "unknown")")
+      started.fulfill()
+    })
+    wait(for: [started], timeout: 5)
+
+    let rejected = expectation(description: "competing starts rejected")
+    rejected.expectedFulfillmentCount = 2
+    module.startRecording("competitor", outputUri: nil, resolver: { _ in
+      XCTFail("Competing recording must not start")
+      rejected.fulfill()
+    }, rejecter: { _, _, _ in rejected.fulfill() })
+    module.startAmbientMonitoring("competitor", resolver: { _ in
+      XCTFail("Competing ambient monitor must not start")
+      rejected.fulfill()
+    }, rejecter: { _, _, _ in rejected.fulfill() })
+    wait(for: [rejected], timeout: 5)
+
+    let stopped = expectation(description: "original owner remains stoppable")
+    module.stopRecording("owner", resolver: { _ in
+      stopped.fulfill()
+    }, rejecter: { _, message, _ in
+      XCTFail("Competing start destroyed owner: \(message ?? "unknown")")
+      stopped.fulfill()
+    })
+    wait(for: [stopped], timeout: 5)
+  }
+
   func testInterruptionPolicyDistinguishesPauseResumeAndTerminalEnd() {
     XCTAssertEqual(
       MrBroccoliWaveformInterruptionPolicy.action(

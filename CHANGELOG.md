@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- On iOS, a competing recording or Hands free monitor start no longer stops
+  the recording already in progress.
+
 - Wait-mode speech again pauses between paragraphs, including native fallback,
   and cancellation during pause preparation prevents later audio from playing.
 

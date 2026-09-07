@@ -52,7 +52,6 @@ final class MrBroccoliNativeWaveform: RCTEventEmitter {
         )
         resolve(["uri": recording.absoluteString])
       } catch {
-        self.recorder.cleanup()
         reject("native_waveform_record_error", error.localizedDescription, error)
       }
     }
@@ -112,7 +111,6 @@ final class MrBroccoliNativeWaveform: RCTEventEmitter {
         )
         resolve(["audioRoute": audioRoute])
       } catch {
-        self.recorder.cleanup()
         reject(
           "native_waveform_monitor_error",
           error.localizedDescription,

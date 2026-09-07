@@ -69,7 +69,10 @@ conversation, edition, provider, or fallback policy.
 
 - Audio-session activation and restoration are balanced across recording,
   synthesis playback, native/system speech, interruption, cancellation, and
-  route changes.
+  route changes. Recording and ambient monitoring have one native owner:
+  competing starts reject without tearing down that owner. A failed new start
+  rolls back only its own audio engine/session and partial output inside the
+  recorder; the bridge must not unconditionally clear an existing recorder.
 - Queue callbacks are generation-safe: completion from an obsolete item cannot
   advance or resurrect a cleared queue.
 - The Sherpa iOS TTS bridge checks both its optional TTS wrapper and its

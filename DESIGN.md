@@ -250,6 +250,9 @@ invisible.
 STT and TTS selection are independent from the response model. Capability and
 language checks occur before execution.
 
+- iOS recorder startup checks ownership before installing rollback. A rejected
+  competing recording or ambient-monitor request preserves the existing owner;
+  a failed new setup releases only its own partial resources.
 - System recognition is selectable whenever the operating system reports a
   recognizer. Offline-recognition support and installed locale metadata apply
   only when a route explicitly requires on-device processing; they do not

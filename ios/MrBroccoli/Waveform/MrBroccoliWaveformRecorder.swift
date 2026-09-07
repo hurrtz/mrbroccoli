@@ -42,6 +42,15 @@ final class MrBroccoliWaveformRecorder {
       withIntermediateDirectories: true
     )
 
+    // Ownership was checked before installing rollback. A rejected competing
+    // start must never clean up the recording or monitor that already owns it.
+    var started = false
+    defer {
+      if !started {
+        cleanupRecording(deleteOutput: true)
+      }
+    }
+
     try MrBroccoliWaveformAudioSession.activateRecordingSession()
 
     let engine = AVAudioEngine()
@@ -95,6 +104,11 @@ final class MrBroccoliWaveformRecorder {
       interleaved: true
     )
 
+    // Retain the output as soon as it exists so a later engine-start failure
+    // can close and remove this attempt's partial recording.
+    audioFile = file
+    self.outputURL = outputURL
+
     inputNode.installTap(
       onBus: 0,
       bufferSize: Self.inputTapBufferSize,
@@ -126,16 +140,14 @@ final class MrBroccoliWaveformRecorder {
       }
     }
 
-    engine.prepare()
-    try engine.start()
-
     audioEngine = engine
-    audioFile = file
     inputToFileConverter = converter
     self.fileFormat = fileFormat
     activeSessionId = sessionId
     meteringOnly = false
-    self.outputURL = outputURL
+    engine.prepare()
+    try engine.start()
+    started = true
     observeAudioSession(sessionId: sessionId)
     emitEvent([
       "type": "started",
@@ -159,6 +171,15 @@ final class MrBroccoliWaveformRecorder {
       )
     }
 
+    // Ownership was checked before installing rollback. A rejected competing
+    // start must never clean up the recording or monitor that already owns it.
+    var started = false
+    defer {
+      if !started {
+        cleanupRecording(deleteOutput: true)
+      }
+    }
+
     try MrBroccoliWaveformAudioSession.activateRecordingSession()
 
     let engine = AVAudioEngine()
@@ -166,7 +187,6 @@ final class MrBroccoliWaveformRecorder {
     let inputFormat = inputNode.inputFormat(forBus: 0)
 
     guard inputFormat.channelCount > 0 else {
-      MrBroccoliWaveformAudioSession.deactivate()
       throw NSError(
         domain: "MrBroccoliNativeWaveform",
         code: 104,
@@ -188,9 +208,6 @@ final class MrBroccoliWaveformRecorder {
       )
     }
 
-    engine.prepare()
-    try engine.start()
-
     audioEngine = engine
     audioFile = nil
     inputToFileConverter = nil
@@ -198,6 +215,9 @@ final class MrBroccoliWaveformRecorder {
     activeSessionId = sessionId
     meteringOnly = true
     outputURL = nil
+    engine.prepare()
+    try engine.start()
+    started = true
     observeAudioSession(sessionId: sessionId)
 
     let audioRoute =
