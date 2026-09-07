@@ -4,7 +4,6 @@ code_paths:
   - ios/**
 dependencies:
   - Expo and React Native iOS runtime
-  - StoreKit
   - ActivityKit
 validations:
   - npm run config:verify
@@ -20,7 +19,7 @@ last_validated_sha: 7db5c94
 ## Purpose
 
 The iOS project implements Apple-platform lifecycle, audio, ActivityKit,
-archive, cryptography, entitlement, and distribution behavior. Shared
+archive, cryptography, and distribution behavior. Shared
 TypeScript owns product policy; native modules expose focused capabilities.
 
 ## Identity and Configuration
@@ -38,8 +37,6 @@ TypeScript owns product policy; native modules expose focused capabilities.
   support, native configuration does not require full screen, and the shared
   four-orientation list applies to iPhone and iPad. Split View and Stage Manager
   therefore resize the same app rather than launching a tablet-specific target.
-- `MrBroccoli-StoreKit` uses the checked-in StoreKit configuration for local
-  purchase testing; it is not evidence of App Store product availability.
 
 ## Native Responsibilities
 
@@ -94,12 +91,12 @@ and the recording steps.
 - Waveform analysis emits bounded levels and never turns audio samples into
   debug-log payloads.
 
-## Premium and Distribution
+## Paid-App Distribution
 
-StoreKit is the authority for production Premium entitlement. The app may cache
-a locally verified entitlement for resilient startup, but production cannot
-activate Premium through a bundle flag or hidden settings control. Restoration
-is same-platform and does not imply an Mr Broccoli account service.
+The App Store sells the complete app up front. There is no in-app purchase,
+StoreKit entitlement cache, Premium state, or local purchase-testing scheme.
+The user supplies provider credentials; native code does not introduce a
+separate commercial gate.
 
 App Store distribution is performed from a reviewed Xcode Archive built from
 the intended pushed commit. Native dependency, icon, entitlement, privacy, and
