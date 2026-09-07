@@ -1,0 +1,46 @@
+appId: com.tobiaswinkler.app.mrbroccoli.maestro
+name: Thinking add model remains responsive
+tags:
+  - runtime
+  - ios
+---
+- launchApp:
+    clearState: true
+    clearKeychain: true
+    permissions:
+      all: allow
+- openLink: "mrbroccoli://store-promos?locale=en&scene=conversation&colorScheme=light&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
+- tapOn:
+    text: Open
+    optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-conversation
+- stopApp
+- launchApp
+- assertVisible:
+    id: main-screen
+- tapOn:
+    id: main-settings-button
+- tapOn:
+    id: settings-overview-row-thinking
+- assertVisible:
+    id: thinking-settings-page
+- tapOn:
+    id: thinking-add-model
+- tapOn: Google
+- assertVisible:
+    id: thinking-slot-model
+- tapOn:
+    id: thinking-slot-model
+- tapOn: Gemini 2.5 Flash-Lite
+- assertVisible:
+    id: thinking-slot-model
+- takeScreenshot: thinking-added
+- tapOn:
+    id: thinking-slot-sheet-header-handle
+- tapOn:
+    id: settings-back-button
+- tapOn:
+    id: settings-close-button
+- assertVisible:
+    id: main-screen
