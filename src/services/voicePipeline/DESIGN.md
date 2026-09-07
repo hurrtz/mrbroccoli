@@ -132,7 +132,11 @@ round. `useVoicePipeline` exposes the active value and clears it on new-turn
 startup and terminal cleanup so stale runs cannot remain visible. If the
 requested synthesis provider has an open failure
 circuit, the pipeline may select a successful participant route and records the
-fallback. The final visible stream also carries an app-owned character ceiling,
+fallback. Response completion initializes the actual route from the synthesis
+request, then applies gateway or model-failover details. The React event adapter
+uses that final receipt for the persisted message's provider/model identity;
+its original selection remains the latency-attribution route.
+The final visible stream also carries an app-owned character ceiling,
 so transport-specific token defaults cannot turn unusually long synthesis into
 unbounded JavaScript, rendering, or TTS work.
 

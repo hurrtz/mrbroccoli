@@ -2832,6 +2832,7 @@ describe("runVoicePipeline", () => {
       },
     );
 
+    const onResponseDone = jest.fn();
     await runVoicePipeline({
       transcriptionOverride: "Please answer.",
       messages: [],
@@ -2866,7 +2867,7 @@ describe("runVoicePipeline", () => {
       callbacks: {
         onTranscription: jest.fn(),
         onChunk: jest.fn(),
-        onResponseDone: jest.fn(),
+        onResponseDone,
         onAudioReady: jest.fn(),
         onSpeechTextReady: jest.fn(),
         onError: jest.fn(),
@@ -2878,6 +2879,22 @@ describe("runVoicePipeline", () => {
         apiKey: "anthropic-key",
         model: "claude-test",
         provider: "anthropic",
+      }),
+    );
+    expect(onResponseDone).toHaveBeenCalledWith(
+      "Fallback answer",
+      expect.anything(),
+      expect.objectContaining({
+        turnReceipt: expect.objectContaining({
+          requestedRoute: expect.objectContaining({
+            provider: "openai",
+            model: "gpt-test",
+          }),
+          actualRoute: expect.objectContaining({
+            provider: "anthropic",
+            model: "claude-test",
+          }),
+        }),
       }),
     );
   });

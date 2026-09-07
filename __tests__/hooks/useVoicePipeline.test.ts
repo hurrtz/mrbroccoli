@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+import { createTurnReceipt } from "../../src/services/turnReceipt";
 import { translate } from "../../src/i18n";
 import { useVoicePipeline } from "../../src/hooks/useVoicePipeline";
 import { DEFAULT_SETTINGS, type UsageEstimate } from "../../src/types";
@@ -1186,6 +1187,56 @@ describe("useVoicePipeline", () => {
       await pending;
     });
     expect(result.current.councilProgress).toBeNull();
+  });
+
+  it("persists the Council synthesis provider and model from the final receipt", async () => {
+    const params = createParams({ spokenRepliesEnabled: false });
+    const receipt = createTurnReceipt({
+      startedAtMs: 0,
+      inputSource: "text",
+      sttMode: "native",
+      provider: "openai",
+      model: "gpt-5.4",
+      language: "en",
+      spokenRepliesEnabled: false,
+      ttsMode: "native",
+      ttsVoice: "",
+      webSearchMode: "off",
+    });
+    receipt.actualRoute = {
+      provider: "anthropic",
+      model: "claude-sonnet-5",
+      runtime: "provider",
+    };
+    (runVoicePipeline as jest.Mock).mockImplementation(
+      async ({ callbacks }: any) => {
+        callbacks.onResponseDone("Council fallback reply", undefined, {
+          turnReceipt: receipt,
+        });
+        return "Please answer";
+      },
+    );
+    const { result } = renderHook(() => useVoicePipeline(params));
+    await act(async () => {
+      await result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Please answer",
+      });
+    });
+    expect(params.addMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        content: "Council fallback reply",
+        provider: "anthropic",
+        model: "claude-sonnet-5",
+        metadata: expect.objectContaining({
+          turnReceipt: expect.objectContaining({
+            requestedRoute: expect.objectContaining({
+              provider: "openai",
+              model: "gpt-5.4",
+            }),
+          }),
+        }),
+      }),
+    );
   });
 
   it("attributes fallback overhead to the selected latency route", async () => {

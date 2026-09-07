@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Model Council fallback replies now retain the provider and model that actually
+  answered instead of being attributed to the originally selected route.
+
 - Backup restores and conversation branches now report failed database writes
   instead of claiming success or displaying records that were never saved.
 

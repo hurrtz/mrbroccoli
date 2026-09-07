@@ -138,8 +138,17 @@ export async function runPipelineResponse({
       turnReceipt.timing.totalMs = completedAtMs - turnStartedAtMs;
     }
 
+    // Council may hand synthesis to a different provider before streamChat
+    // starts, so successful transport metadata can legitimately have no
+    // model-failover marker. Record the route that actually made this call.
+    turnReceipt.actualRoute = {
+      provider,
+      model,
+      runtime: "provider",
+    };
     if (llmMetadata?.router) {
       turnReceipt.actualRoute = {
+        ...turnReceipt.actualRoute,
         provider,
         model: llmMetadata.router.actualModel ?? model,
         gateway: llmMetadata.router.gateway,

@@ -284,11 +284,7 @@ export function createVoicePipelineEventAdapter({
             initialConversationSettings,
           );
         } else {
-          runConversationId = createConversation(
-            text,
-            model,
-            provider,
-          );
+          runConversationId = createConversation(text, model, provider);
         }
       }
       const userMessage = addMessage({
@@ -430,7 +426,10 @@ export function createVoicePipelineEventAdapter({
         return;
       }
 
+      const actualProvider =
+        metadata?.turnReceipt?.actualRoute.provider ?? provider;
       const actualModel =
+        metadata?.turnReceipt?.actualRoute.model ??
         metadata?.modelFailover?.actualModel ??
         metadata?.router?.actualModel ??
         model;
@@ -448,7 +447,7 @@ export function createVoicePipelineEventAdapter({
           requestedModel: model,
           textLength: fullText.trim().length,
           totalTokens: usage?.totalTokens ?? null,
-          usedFallback: actualModel !== model,
+          usedFallback: actualProvider !== provider || actualModel !== model,
         },
       });
       latency.finishLatencyProgress("thinking");
@@ -471,7 +470,7 @@ export function createVoicePipelineEventAdapter({
         role: "assistant",
         content: fullText,
         model: actualModel,
-        provider,
+        provider: actualProvider,
         usage,
         metadata: messageState.consumeAssistantMetadata(metadata),
       });

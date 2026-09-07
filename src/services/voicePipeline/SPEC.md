@@ -166,6 +166,11 @@ Fallback routes are normalized from the user's explicit policy. A failed
 primary route may move only through that order, and diagnostics retain every
 attempt.
 
+When Council selects a different synthesis route, the final receipt and the
+persisted assistant message both identify that actual provider and model. The
+requested route remains unchanged in the receipt, and transport-level model
+fallback further refines the actual model before persistence.
+
 ## Turn Receipt
 
 Every completed assistant turn records:
