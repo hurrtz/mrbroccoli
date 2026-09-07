@@ -16,6 +16,8 @@ jest.mock("expo-clipboard", () => ({
 }));
 
 jest.mock("expo-file-system/legacy", () => ({
+  cacheDirectory: "file:///cache/",
+  writeAsStringAsync: jest.fn(async () => undefined),
   deleteAsync: jest.fn(async () => undefined),
 }));
 
@@ -409,6 +411,10 @@ describe("useVoicePipeline", () => {
     );
     expect(params.player.enqueueAudio).toHaveBeenNthCalledWith(
       2,
+      expect.stringMatching(/^file:\/\/\/cache\/tts-.*\.wav$/),
+    );
+    expect(params.player.enqueueAudio).toHaveBeenNthCalledWith(
+      3,
       "file://reply-2.wav",
       expect.any(Object),
       undefined,
