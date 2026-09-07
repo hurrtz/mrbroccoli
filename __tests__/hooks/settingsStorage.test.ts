@@ -1,3 +1,5 @@
+import { DEFAULT_SETTINGS } from "../../src/types";
+
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as SecureStore from "expo-secure-store";
 
@@ -137,18 +139,18 @@ describe("settings storage", () => {
 });
 
 it("pins legacy Qwen speech selections without losing instruct TTS", () => {
-  const settings = mergeSettings({ providerSttModels: { "alibaba-qwen-dashscope": "qwen3-asr-flash" }, providerTtsModels: { "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash" } });
+  const settings = mergeSettings({ providerSttModels: { ...DEFAULT_SETTINGS.providerSttModels, "alibaba-qwen-dashscope": "qwen3-asr-flash" }, providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash" } });
   expect(settings.providerSttModels["alibaba-qwen-dashscope"]).toBe("qwen3-asr-flash-2026-02-10");
   expect(settings.providerTtsModels["alibaba-qwen-dashscope"]).toBe("qwen3-tts-instruct-flash-2026-01-26");
 });
 
 it("pins existing OpenAI transcription without overriding a user's selection", () => {
-  expect(mergeSettings({ providerSttModels: { openai: "gpt-4o-mini-transcribe" } }).providerSttModels.openai).toBe("gpt-4o-mini-transcribe-2025-12-15");
+  expect(mergeSettings({ providerSttModels: { ...DEFAULT_SETTINGS.providerSttModels, openai: "gpt-4o-mini-transcribe" } }).providerSttModels.openai).toBe("gpt-4o-mini-transcribe-2025-12-15");
   expect(mergeSettings({}).providerSttModels.openai).toBe("gpt-transcribe");
 });
 
 it("pins mini-TTS while preserving the saved voice", () => {
-  const settings = mergeSettings({ providerTtsModels: { openai: "gpt-4o-mini-tts" }, providerTtsVoices: { openai: "marin" } });
+  const settings = mergeSettings({ providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, openai: "gpt-4o-mini-tts" }, providerTtsVoices: { ...DEFAULT_SETTINGS.providerTtsVoices, openai: "marin" } });
   expect(settings.providerTtsModels.openai).toBe("gpt-4o-mini-tts-2025-12-15");
   expect(settings.providerTtsVoices.openai).toBe("marin");
 });

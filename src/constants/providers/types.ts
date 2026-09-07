@@ -21,6 +21,7 @@ export interface ModelEffortConfig {
     | "gemini-thinking-level"
     | "deepseek-thinking-effort"
     | "qwen-enable-thinking"
+    | "qwen-reasoning-effort"
     | "reasoning-effort";
 }
 
