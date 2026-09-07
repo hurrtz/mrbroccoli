@@ -297,7 +297,7 @@ describe("transcribeAudio", () => {
     );
   });
 
-  it("uses Gemini audio input for STT with an AI Studio key", async () => {
+  it.each(["gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.8-flash"])("uses %s audio input for STT with an AI Studio key", async (providerModel) => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -315,7 +315,7 @@ describe("transcribeAudio", () => {
       fileUri: "/tmp/recording.m4a",
       mode: "provider",
       provider: "gemini",
-      providerModel: "gemini-3.5-flash",
+      providerModel,
       apiKey: "gemini-test-key",
       language: "de",
     });
@@ -324,7 +324,7 @@ describe("transcribeAudio", () => {
     expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).not.toHaveProperty("generationConfig.temperature");
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
     expect(url).toBe(
-      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",
+      `https://generativelanguage.googleapis.com/v1beta/models/${providerModel}:generateContent`,
     );
     expect(options.headers["x-goog-api-key"]).toBe("gemini-test-key");
     expect(JSON.parse(options.body)).toEqual(

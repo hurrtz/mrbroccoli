@@ -184,8 +184,8 @@ describe("webSearch", () => {
       (fetch as jest.Mock).mock.calls.map(
         ([, options]) => JSON.parse(options.body).model,
       ),
-    ).toEqual(["gemini-3.6-flash", "gemini-3.5-flash"]);
-    expect(result?.model).toBe("gemini-3.5-flash");
+    ).toEqual(["gemini-3.6-flash", "gemini-3.8-flash"]);
+    expect(result?.model).toBe("gemini-3.8-flash");
   });
 
   it("tries another search-capable model after generic quota exhaustion", async () => {
@@ -242,8 +242,8 @@ describe("webSearch", () => {
       (fetch as jest.Mock).mock.calls.map(
         ([, options]) => JSON.parse(options.body).model,
       ),
-    ).toEqual(["gemini-3.6-flash", "gemini-3.5-flash"]);
-    expect(result?.model).toBe("gemini-3.5-flash");
+    ).toEqual(["gemini-3.6-flash", "gemini-3.8-flash"]);
+    expect(result?.model).toBe("gemini-3.8-flash");
   });
 
   it("uses a readable hostname when a provider only returns a citation URL", async () => {

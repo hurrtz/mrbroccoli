@@ -92,6 +92,9 @@ Claude Opus 5 uses the canonical direct `claude-opus-5` ID, high default,
 and low/medium/high/xhigh/max effort through Messages. Existing defaults stay
 unchanged when new answering choices are added.
 
+Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
+reasoning choices are low/medium/high only; minimal is never sent.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

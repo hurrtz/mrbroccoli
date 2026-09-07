@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Gemini 3.7 and 3.8 Flash are available for answers and recorded transcription,
+  with their supported reasoning levels and search fallback routes.
+
 - Claude Opus 5 is available as an answering model with all five reasoning efforts.
 
 - DeepSeek V4 models now offer low reasoning effort.

@@ -96,7 +96,7 @@ export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
     "qwen3.6-flash-2026-04-16",
     "qwen3.5-flash-2026-02-23",
   ],
-  gemini: ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"],
+  gemini: ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"],
   xai: ["grok-4.3", "grok-4.5"],
   mistral: ["mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512"],
 };

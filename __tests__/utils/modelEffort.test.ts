@@ -294,3 +294,9 @@ describe("model effort metadata", () => {
  it.each(["deepseek-v4-flash", "deepseek-v4-pro"])("sends low thinking effort for %s", (model) => {
   expect(getModelEffortRequestBody("deepseek", model, "low")).toEqual({ thinking: { type: "enabled" }, reasoning_effort: "low" });
 });
+
+it.each(["gemini-3.8-flash", "gemini-3.7-flash"])("limits %s to its supported thinking levels", (model) => {
+  expect(getModelEffortOptions("gemini", model).map(({ id }) => id)).toEqual(["low", "medium", "high"]);
+  expect(getModelEffortRequestBody("gemini", model, "low")).toEqual({generationConfig: {thinkingConfig: {thinkingLevel: "LOW"}}});
+  expect(normalizeResponseModeRouteEffort({ provider: "gemini", model, effort: "minimal" }).effort).toBe("high");
+});
