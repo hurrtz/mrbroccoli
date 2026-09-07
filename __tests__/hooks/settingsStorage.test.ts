@@ -135,3 +135,9 @@ describe("settings storage", () => {
     consoleError.mockRestore();
   });
 });
+
+it("pins legacy Qwen speech selections without losing instruct TTS", () => {
+  const settings = mergeSettings({ providerSttModels: { "alibaba-qwen-dashscope": "qwen3-asr-flash" }, providerTtsModels: { "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash" } });
+  expect(settings.providerSttModels["alibaba-qwen-dashscope"]).toBe("qwen3-asr-flash-2026-02-10");
+  expect(settings.providerTtsModels["alibaba-qwen-dashscope"]).toBe("qwen3-tts-instruct-flash-2026-01-26");
+});

@@ -78,6 +78,9 @@ the stored JSON.
 centralized at hydration rather than implemented as scattered null checks and
 fallbacks in screens and services.
 
+Speech model aliases migrate before availability/voice validation, preserving
+the selected speech family (including Qwen instruction-capable TTS).
+
 ## Runtime Capability Overrides
 
 When provider-confirmed incompatibility state changes, `useSettings`

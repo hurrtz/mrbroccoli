@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Qwen speech uses stable model snapshots, upgrades recorded transcription,
+  and preserves existing instruction-capable voice selections during migration.
+
 - OpenRouter adds current Opus 5, Gemini 3.8 Flash, Qwen 3.8 Max, and August
   DeepSeek V4 Pro snapshots; Grok 4.6 is pinned with its full effort range.
 

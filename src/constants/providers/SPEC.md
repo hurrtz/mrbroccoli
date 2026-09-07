@@ -104,6 +104,10 @@ DeepSeek V4 Pro routes. Grok 4.6 uses `x-ai/grok-4.6-20260810` and preserves
 the older saved alias through normalization. Per-model image and effort
 capabilities remain independent of the gateway provider.
 
+Qwen speech pins ASR to the February 2026 snapshot, standard TTS to November
+2025, and instruct TTS to January 2026. Voice filters and saved aliases follow
+those exact models; the US speech restriction remains in force.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

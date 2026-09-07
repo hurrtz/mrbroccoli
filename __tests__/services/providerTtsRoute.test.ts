@@ -60,7 +60,7 @@ describe("synthesizeProviderSpeech", () => {
       "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
     );
     const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-tts-flash");
+    expect(body.model).toBe("qwen3-tts-flash-2025-11-27");
     expect(body.input.voice).toBe("Cherry");
     expect(body.input.text).toBe("Hello world");
     expect(body.input.language_type).toBe("English");

@@ -33,6 +33,8 @@ describe("speech provider constants", () => {
 
   it("surfaces Gemini audio transcription and the Mistral STT model", () => {
     expect(getProviderSttModelOptions("gemini")).toEqual([
+      { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash" },
+      { id: "gemini-3.7-flash", name: "Gemini 3.7 Flash" },
       { id: "gemini-3.6-flash", name: "Gemini 3.6 Flash" },
       { id: "gemini-3.5-flash", name: "Gemini 3.5 Flash" },
       { id: "gemini-3.5-flash-lite", name: "Gemini 3.5 Flash Lite" },
@@ -49,7 +51,7 @@ describe("speech provider constants", () => {
 
   it("surfaces newly wired catalog-backed STT providers through the runtime manifest", () => {
     expect(getProviderSttModelOptions("alibaba-qwen-dashscope")).toEqual([
-      { id: "qwen3-asr-flash", name: "Qwen3-ASR-Flash" },
+      { id: "qwen3-asr-flash-2026-02-10", name: "Qwen3-ASR-Flash" },
     ]);
     expect(getProviderSttModelOptions("xai")).toEqual([
       {
@@ -67,8 +69,8 @@ describe("speech provider constants", () => {
       )?.name,
     ).toBe("GPT-4o mini TTS");
     expect(getProviderTtsModelOptions("alibaba-qwen-dashscope")).toEqual([
-      { id: "qwen3-tts-flash", name: "Qwen3-TTS-Flash" },
-      { id: "qwen3-tts-instruct-flash", name: "Qwen3-TTS-Instruct-Flash" },
+      { id: "qwen3-tts-flash-2025-11-27", name: "Qwen3-TTS-Flash" },
+      { id: "qwen3-tts-instruct-flash-2026-01-26", name: "Qwen3-TTS-Instruct-Flash" },
     ]);
     expect(
       getProviderTtsModelOptions("gemini").find(
@@ -111,12 +113,12 @@ describe("speech provider constants", () => {
     const flashVoices = getProviderTtsVoiceOptions(
       "alibaba-qwen-dashscope",
       "en",
-      "qwen3-tts-flash",
+      "qwen3-tts-flash-2025-11-27",
     );
     const instructVoices = getProviderTtsVoiceOptions(
       "alibaba-qwen-dashscope",
       "en",
-      "qwen3-tts-instruct-flash",
+      "qwen3-tts-instruct-flash-2026-01-26",
     );
 
     expect(flashVoices).toHaveLength(48);

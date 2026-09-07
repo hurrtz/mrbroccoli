@@ -491,7 +491,7 @@ describe("transcribeAudio", () => {
       "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
     );
     const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-asr-flash");
+    expect(body.model).toBe("qwen3-asr-flash-2026-02-10");
     expect(body.messages[0].content[0].type).toBe("input_audio");
     expect(body.messages[0].content[0].input_audio.data).toMatch(
       /^data:audio\/m4a;base64,/,

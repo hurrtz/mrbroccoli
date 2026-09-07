@@ -41,7 +41,7 @@ describe("provider language notes", () => {
     expect(
       getProviderSttLanguageNoteForModel(
         "alibaba-qwen-dashscope",
-        "qwen3-asr-flash",
+        "qwen3-asr-flash-2026-02-10",
         "en",
       ),
     ).toContain("DashScope STT is limited");

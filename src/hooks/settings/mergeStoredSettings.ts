@@ -511,6 +511,8 @@ export function mergeSettings(
       provider,
       mergedProviderModels[provider],
     );
+    mergedProviderSttModels[provider] = migrateProviderModelAlias(provider, mergedProviderSttModels[provider]);
+    mergedProviderTtsModels[provider] = migrateProviderModelAlias(provider, mergedProviderTtsModels[provider]);
     const supportedSttModels = getProviderSttModelOptions(provider);
 
     if (supportedSttModels.length > 0) {

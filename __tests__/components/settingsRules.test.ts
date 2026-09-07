@@ -183,7 +183,7 @@ describe("settingsRules", () => {
       ...DEFAULT_SETTINGS,
       providerTtsModels: {
         ...DEFAULT_SETTINGS.providerTtsModels,
-        "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash",
+        "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash-2026-01-26",
       },
       providerTtsVoices: {
         ...DEFAULT_SETTINGS.providerTtsVoices,

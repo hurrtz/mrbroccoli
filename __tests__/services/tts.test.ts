@@ -558,7 +558,7 @@ describe("synthesizeSpeech", () => {
       "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
     );
     const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-tts-flash");
+    expect(body.model).toBe("qwen3-tts-flash-2025-11-27");
     expect(body.input.voice).toBe("Cherry");
     expect(body.input.text).toBe("Hello world");
     expect(body.input.language_type).toBe("English");
@@ -590,7 +590,7 @@ describe("synthesizeSpeech", () => {
       voice: "Cherry",
       mode: "provider",
       provider: "alibaba-qwen-dashscope",
-      providerModel: "qwen3-tts-instruct-flash",
+      providerModel: "qwen3-tts-instruct-flash-2026-01-26",
       apiKey: "dashscope-test|beijing",
       instructions: "Sound optimistic and energetic.",
       language: "en",
