@@ -685,6 +685,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "anthropic/claude-sonnet-5-20260630",
       ],
       models: [
+        withEffort(namedModel("anthropic/claude-opus-5-20260723", "Anthropic · Claude Opus 5"), OPENROUTER_HIGH_REASONING_EFFORT),
+        withEffort(namedModel("google/gemini-3.8-flash-20260902", "Google · Gemini 3.8 Flash"), effortConfig("reasoning-effort", "high", ["low", "medium", "high"])),
+        withEffort(namedModel("qwen/qwen3.8-max-20260902", "Qwen · Qwen3.8 Max"), effortConfig("reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
+        withEffort({ ...namedModel("deepseek/deepseek-v4-pro-20260813", "DeepSeek · DeepSeek V4 Pro (August)"), supportsImageInput: false }, effortConfig("reasoning-effort", "high", ["low", "high", "xhigh"])),
+
         withEffort(
           namedModel("openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"),
           OPENAI_GPT_6_ASTRA_EFFORT,
@@ -729,8 +734,8 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           OPENROUTER_GEMINI_REASONING_EFFORT,
         ),
         withEffort(
-          namedModel("x-ai/grok-4.6", "xAI · Grok 4.6"),
-          OPENROUTER_GROK_REASONING_EFFORT,
+          namedModel("x-ai/grok-4.6-20260810", "xAI · Grok 4.6"),
+          XAI_GROK_46_EFFORT,
         ),
         withEffort(
           namedModel("x-ai/grok-4.5-20260708", "xAI · Grok 4.5"),

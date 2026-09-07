@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- OpenRouter adds current Opus 5, Gemini 3.8 Flash, Qwen 3.8 Max, and August
+  DeepSeek V4 Pro snapshots; Grok 4.6 is pinned with its full effort range.
+
 - Qwen 3.8 Max, 3.8 Flash, and 3.7 Flash are available with model-specific
   reasoning controls and explicit handling of private reasoning history.
 

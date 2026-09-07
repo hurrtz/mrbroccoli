@@ -24,6 +24,9 @@ export const LEGACY_RESPONSE_MODE_ORDER = ["quick", "normal", "deep"] as const;
 const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   Record<Provider, Record<string, string>>
 > = {
+  openrouter: {
+    "x-ai/grok-4.6": "x-ai/grok-4.6-20260810",
+  },
   openai: {
     "gpt-5.5": "gpt-5.5-2026-04-23",
     "gpt-5.4": "gpt-5.4-2026-03-05",

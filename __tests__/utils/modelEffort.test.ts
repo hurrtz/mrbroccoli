@@ -16,6 +16,7 @@ describe("model effort metadata", () => {
     ["anthropic", "claude-fable-5-1", "high"],
     ["anthropic", "claude-opus-5", "high"],
     ["openrouter", "anthropic/claude-fable-5.1-20260831", "high"],
+    ["openrouter", "anthropic/claude-opus-5-20260723", "high"],
   ])("preserves all supported efforts for %s %s", (provider, model, defaultEffort) => {
     const efforts = ["low", "medium", "high", "xhigh", "max"];
     expect(getModelEffortOptions(provider, model).map(({ id }) => id)).toEqual(

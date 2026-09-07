@@ -99,6 +99,11 @@ Qwen 3.8 uses `reasoning_effort` with none/low/medium/xhigh. The max picker
 uses canonical `qwen3.8-max-0902`; Flash retains its undated canonical ID.
 Earlier routes keep their own toggle contract.
 
+OpenRouter adds canonical Opus 5, Gemini 3.8 Flash, Qwen 3.8 Max, and August
+DeepSeek V4 Pro routes. Grok 4.6 uses `x-ai/grok-4.6-20260810` and preserves
+the older saved alias through normalization. Per-model image and effort
+capabilities remain independent of the gateway provider.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

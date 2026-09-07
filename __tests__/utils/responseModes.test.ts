@@ -1,3 +1,4 @@
+import { migrateProviderModelAlias } from "../../src/utils/responseModes";
 import {
   deriveResponseModesForProvider,
   getAvailableResponseModes,
@@ -242,4 +243,8 @@ describe("deriveResponseModesForProvider", () => {
       "grok-4.3",
     ]);
   });
+});
+
+it("pins the existing OpenRouter Grok alias", () => {
+  expect(migrateProviderModelAlias("openrouter", "x-ai/grok-4.6")).toBe("x-ai/grok-4.6-20260810");
 });
