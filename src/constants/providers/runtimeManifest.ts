@@ -409,7 +409,7 @@ const XAI_GROK_46_EFFORT = effortConfig("reasoning-effort", "high", [
 const DEEPSEEK_THINKING_EFFORT = effortConfig(
   "deepseek-thinking-effort",
   "high",
-  ["disabled", "high", "max"],
+  ["disabled", "low", "high", "max"],
   [THINKING_TOGGLE_OPTIONS[0], ...BASIC_REASONING_EFFORT_OPTIONS],
 );
 

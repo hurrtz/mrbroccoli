@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- DeepSeek V4 models now offer low reasoning effort.
+
 - Search disables optional Gemini/xAI request storage and uses current Qwen
   reasoning controls; Gemini transcription omits deprecated sampling settings.
 

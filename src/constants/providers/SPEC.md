@@ -85,6 +85,9 @@ translations. The current direct IDs have no distinct dated snapshots in the
 or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
 OpenRouter snapshots are verified against its public Models and Endpoints APIs.
 
+DeepSeek V4 Flash and Pro expose disabled, low, high, and max effort.
+Enabled thinking sends the selected `reasoning_effort`; high remains default.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

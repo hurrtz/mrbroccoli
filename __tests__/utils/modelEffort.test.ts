@@ -178,7 +178,7 @@ describe("model effort metadata", () => {
       getModelEffortOptions("deepseek", "deepseek-v4-pro").map(
         (option) => option.id,
       ),
-    ).toEqual(["disabled", "high", "max"]);
+    ).toEqual(["disabled", "low", "high", "max"]);
     expect(
       getModelEffortOptions("mistral", "mistral-medium-3-5").map(
         (option) => option.id,
@@ -288,4 +288,8 @@ describe("model effort metadata", () => {
       getModelEffortRequestBody("anthropic", "claude-sonnet-5", "high"),
     ).toEqual({ output_config: { effort: "high" } });
   });
+});
+
+ it.each(["deepseek-v4-flash", "deepseek-v4-pro"])("sends low thinking effort for %s", (model) => {
+  expect(getModelEffortRequestBody("deepseek", model, "low")).toEqual({ thinking: { type: "enabled" }, reasoning_effort: "low" });
 });
