@@ -292,9 +292,6 @@ export async function transcribeWithGoogleSpeechProvider(
               ],
             },
           ],
-          generationConfig: {
-            temperature: 0,
-          },
         }),
       },
       getProviderSttTimeoutMs(provider),

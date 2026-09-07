@@ -362,8 +362,8 @@ describe("webSearch", () => {
         expect(body.model).toBe("qwen3.7-plus-2026-05-26");
         expect(body.tools).toEqual([{ type: "web_search" }]);
         expect(body.tool_choice).toBe("required");
-        expect(body.enable_thinking).toBe(false);
-        expect(body).not.toHaveProperty("reasoning");
+        expect(body.reasoning).toEqual({ effort: "none" });
+        expect(body).not.toHaveProperty("enable_thinking");
         expect(body.input).toEqual(
           expect.stringContaining("What changed today?"),
         );
@@ -405,6 +405,7 @@ describe("webSearch", () => {
       assertBody: (body: Record<string, unknown>) => {
         expect(body.tools).toEqual([{ type: "google_search" }]);
         expect(body.model).toBe("gemini-3.6-flash");
+        expect(body.store).toBe(false);
       },
       expectedSummary: "Gemini web search found the current answer.",
       expectedSourceUrl: "https://example.com/gemini-search",
@@ -432,6 +433,7 @@ describe("webSearch", () => {
         expect(body.tools).toEqual([{ type: "web_search" }]);
         expect(body.tool_choice).toBe("required");
         expect(body.model).toBe("grok-4.3");
+        expect(body.store).toBe(false);
       },
       expectedSummary: "xAI web search found the current answer.",
       expectedSourceUrl: "https://example.com/xai-search",

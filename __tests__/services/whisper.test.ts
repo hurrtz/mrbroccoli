@@ -321,6 +321,7 @@ describe("transcribeAudio", () => {
     });
 
     expect(result).toBe("Hello from Gemini STT");
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).not.toHaveProperty("generationConfig.temperature");
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
     expect(url).toBe(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent",

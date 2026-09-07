@@ -32,6 +32,11 @@ navigation or render UI.
 
 ### Intelligence and provider integration
 
+Gemini and xAI search set `store: false`; Qwen Responses uses
+`reasoning.effort: none`. Gemini recorded-audio transcription omits deprecated
+sampling parameters. Request-shape tests cover these provider boundaries.
+
+
 - `llm.ts` and `llm/` route hosted text generation and internal model tasks.
 - `webSearch.ts` and `webSearch/` decide provider requests and normalize cited
   search context.

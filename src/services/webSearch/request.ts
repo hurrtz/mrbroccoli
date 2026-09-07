@@ -369,7 +369,7 @@ async function searchWithQwen(params: WebSearchRequestParams) {
       input: buildPromptForProvider(params),
       tools: [{ type: "web_search" }],
       tool_choice: "required",
-      enable_thinking: false,
+      reasoning: { effort: "none" },
       max_output_tokens: maxOutputTokens,
     },
   });
@@ -402,6 +402,7 @@ async function searchWithGemini(params: WebSearchRequestParams) {
       model,
       input: buildPromptForProvider(params),
       tools: [{ type: "google_search" }],
+      store: false,
     },
   });
 
@@ -453,6 +454,7 @@ async function searchWithXai(params: WebSearchRequestParams) {
       tool_choice: "required",
       max_output_tokens: maxOutputTokens,
       max_turns: getXaiMaxTurns(params),
+      store: false,
     },
   });
 

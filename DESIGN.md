@@ -22,6 +22,10 @@ last_validated_sha: 7db5c94
 
 ## Runtime Architecture
 
+One-shot Gemini and xAI search requests explicitly disable server-side resource
+storage; the local pipeline does not use provider continuation IDs.
+
+
 ```mermaid
 flowchart TB
     Entry[Expo Router app/] --> Providers[Root React providers]

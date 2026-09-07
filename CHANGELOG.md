@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Search disables optional Gemini/xAI request storage and uses current Qwen
+  reasoning controls; Gemini transcription omits deprecated sampling settings.
+
 - Thinking and model-storage guidance now correctly describe hosted answering
   routes and speech-only downloads in every interface language.
 

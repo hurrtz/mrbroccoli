@@ -174,6 +174,10 @@ offline conversation mode.
 
 ### Transparency and control
 
+One-shot search opts out of optional provider resource storage where the API
+supports it; this does not override the provider's operational retention terms.
+
+
 - The app records requested and actual model routes, fallbacks, context work,
   web-search decisions, speech routes, and timings in per-turn receipts.
 - Runtime provider failure may cause bounded retry or fallback, but durable

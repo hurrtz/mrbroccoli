@@ -63,6 +63,10 @@ be reasoned about and tested independently of the full render tree.
 
 ## Cross-Cutting Change Rules
 
+Provider request adapters explicitly select current stateless API controls;
+capability-specific contracts are regression-tested at the request boundary.
+
+
 - Changing `Settings` requires defaults, normalization/migration, persistence,
   affected UI, runtime consumers, backups, and tests to remain aligned.
 - Changing provider capabilities requires the runtime manifest, public helpers,
