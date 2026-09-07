@@ -12,6 +12,7 @@ import { InputMode } from "../../../types";
 import { TranslateFn } from "../shared";
 import { PAGE_GAP, voiceTextInputPagerStyles as styles } from "./styles";
 import { InputSurface } from "./types";
+import { resolveTextComposerLayout } from "../../../utils/inputSurfaceLayout";
 import type { useInputSurfaceGesture } from "./useInputSurfaceGesture";
 
 interface InputSurfacePagesProps {
@@ -32,6 +33,7 @@ interface InputSurfacePagesProps {
   onTextFocusChange: (focused: boolean) => void;
   onTextMessageChange: (text: string) => void;
   pageWidth: number;
+  viewportHeight: number;
   panGesture: GestureType;
   promptBlockedMessage: string | null;
   rtl: boolean;
@@ -183,6 +185,7 @@ function TextInputSurface({
   textInputRef,
   textMessage,
   textSubmitDisabled,
+  composerLayout,
 }: Pick<
   InputSurfacePagesProps,
   | "colors"
@@ -196,7 +199,7 @@ function TextInputSurface({
   | "textInputRef"
   | "textMessage"
   | "textSubmitDisabled"
->) {
+> & { composerLayout: ReturnType<typeof resolveTextComposerLayout> }) {
   const primaryActionDisabled = disabled || textSubmitDisabled;
 
   return (
@@ -206,6 +209,7 @@ function TextInputSurface({
         styles.textSurface,
         {
           backgroundColor: colors.surfaceElevated,
+          height: composerLayout.height,
           // Green at rest, not only on focus: this is the other half of the
           // primary action, and the voice control it pages between is green
           // whenever it can be used. A neutral outline left the composer
@@ -213,6 +217,7 @@ function TextInputSurface({
           // the composer that carries the workspace when voice cannot.
           borderColor: textFocused ? colors.activeControl : colors.accent,
           shadowColor: textFocused ? colors.glowStrong : colors.glow,
+          transform: [{ translateY: composerLayout.centreOffsetY }],
         },
       ]}
     >
@@ -282,8 +287,14 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
     props.stageSize,
     props.showTransportLabels,
   );
+  const orbCentreOffsetY = transportLayout.centreY - transportLayout.height / 2;
+  const composerLayout = resolveTextComposerLayout({
+    orbSize: props.stageSize,
+    viewportHeight: props.viewportHeight || transportLayout.height,
+    orbCentreOffsetY,
+  });
   const chevronCentreOffsetY =
-    transportLayout.centreY - transportLayout.height / 2;
+    activeSurface === "text" ? composerLayout.centreOffsetY : orbCentreOffsetY;
 
   return (
     <View style={styles.pagerShell} testID="voice-text-input-pager-shell">
@@ -323,7 +334,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
           >
             <View style={styles.inputSwitchRow}>
               <View style={styles.inputSwitchSurface}>
-                <TextInputSurface {...props} />
+                <TextInputSurface {...props} composerLayout={composerLayout} />
               </View>
             </View>
           </Animated.View>

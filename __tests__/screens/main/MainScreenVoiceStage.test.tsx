@@ -295,6 +295,16 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("pager-chevron-layer").props.style)
         .transform,
     ).toEqual([{ translateY: -23 }]);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("text-input-surface", hiddenIconQuery).props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        height: 196,
+        transform: [{ translateY: -23 }],
+      }),
+    );
 
     fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
       nativeEvent: { layout: { height: 148, width: 320 } },
@@ -304,7 +314,44 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("pager-chevron-layer").props.style)
         .transform,
     ).toEqual([{ translateY: -28.5 }]);
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("text-input-surface", hiddenIconQuery).props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({
+        height: 120,
+        transform: [{ translateY: -14 }],
+      }),
+    );
   });
+
+  it.each([96, 120, 148, 242])(
+    "keeps the complete text composer visible in a %ipt viewport",
+    (viewportHeight) => {
+      const screen = renderStage(<MainScreenVoiceStage {...createProps()} />);
+      fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+        nativeEvent: { layout: { height: viewportHeight, width: 320 } },
+      });
+      fireEvent.press(screen.getByTestId("pager-chevron-right"));
+      const composerStyle = StyleSheet.flatten(
+        screen.getByTestId("text-input-surface").props.style,
+      );
+      const composerHeight = Math.max(
+        composerStyle.height,
+        composerStyle.minHeight,
+      );
+      const offset = composerStyle.transform[0].translateY;
+      const top = (viewportHeight - composerHeight) / 2 + offset;
+      expect(top).toBeGreaterThanOrEqual(0);
+      expect(top + composerHeight).toBeLessThanOrEqual(viewportHeight);
+      expect(
+        StyleSheet.flatten(
+          screen.getByTestId("pager-chevron-layer").props.style,
+        ).transform,
+      ).toEqual([{ translateY: offset }]);
+    },
+  );
 
   it("blocks prompt CTAs when the selected voice route is unavailable", () => {
     const onPress = jest.fn();
@@ -556,8 +603,9 @@ describe("MainScreenVoiceStage composer", () => {
       StyleSheet.flatten(screen.getByTestId("text-input-surface").props.style),
     ).toEqual(
       expect.objectContaining({
-        height: "100%",
+        height: 188,
         minHeight: 96,
+        transform: [{ translateY: -24 }],
         width: "100%",
       }),
     );

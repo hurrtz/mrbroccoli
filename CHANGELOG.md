@@ -10,6 +10,12 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- The voice/text pager now holds its chevrons, voice orb, and text composer on
+  one horizontal axis. Image and Hands free move to the outer content edges,
+  Council and Web stay centred, and narrow screens separate the three control
+  groups with quiet hairlines. Short and keyboard-constrained stages keep the
+  complete composer and send control visible.
+
 - Long system and on-device dictation now preserves every finalized recognition
   segment instead of returning only the last sentence from a longer recording.
 

@@ -48,7 +48,11 @@ receive already-derived state and callbacks.
   the voice/text pager discoverable without competing with the voice action.
   Their target centres follow the orb centre returned by the measured
   `OrbTransport` layout, not the midpoint of its asymmetric box with the label
-  allowance below the orb.
+  allowance below the orb. The text composer follows that same returned centre,
+  so the chevrons share one horizontal axis with both input surfaces when the
+  stage has enough height. On a constrained stage, the complete composer stays
+  inside the clipped viewport and the chevrons follow its adjusted centre
+  while text input is selected.
   **Decision:** the pager is a closed circle — every decisive swipe and every
   chevron leaves the current surface, in either direction, so no navigation
   gesture is ever a dead end. With two pages that circle is a toggle, which is
@@ -218,9 +222,9 @@ receive already-derived state and callbacks.
   handoffs use bounded Android fallbacks. Native pickers therefore never
   compete with an existing modal controller. A fresh image-provider recipient
   still requires explicit app-owned disclosure before the turn continues.
-- The Council satellite opens a 252pt anchored, undimmed popover aligned to the
-  same leading edge as the image popup, which visually centres both panels over
-  the composing row. It scrolls every ready home model horizontally, selects
+- The Council satellite opens a 252pt anchored, undimmed popover centred over
+  the Council/Web group, while the image popup remains attached to the leading
+  Image control. It scrolls every ready home model horizontally, selects
   membership directly, and exposes one to five total rounds through a slider
   that claims and tracks the gesture from touch-down. Its permanent caption
   states the resulting sequential answer count and provider billing consequence
@@ -247,8 +251,13 @@ receive already-derived state and callbacks.
   accessibility label states why, and Settings owns the remedy. Controls that
   are only briefly unavailable, such as during an active turn, also stay
   visible and disabled.
-- The satellites — Image, Model Council, Web Search, and Hands free — sit in a row
-  under the portrait orb. The orb or composer and that row form one vertically
+- The satellites — Image, Model Council, Web Search, and Hands free — sit in
+  three semantic groups under the portrait orb: Image at the leading content
+  edge, Council and Web centred together, and Hands free at the trailing edge.
+  Equal flexible outer groups keep the middle pair centred. When the available
+  row is too narrow to leave clear space between those groups, two decorative
+  hairlines make the three responsibilities explicit. The orb or composer and
+  that row form one vertically
   centered stage cluster with the design-system's 18-point separation; surplus
   height surrounds the cluster instead of opening a device-dependent gap or
   pushing the controls down against the transcript handle. They change how the

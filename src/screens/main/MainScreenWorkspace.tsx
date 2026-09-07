@@ -17,6 +17,7 @@ import { TranscriptHandle } from "../../design-system/TranscriptHandle";
 import { Modal } from "../../design-system/NativeControls";
 import { SheetHeader } from "../../design-system/SheetHeader";
 import type { Colors } from "../../theme/colors";
+import { useTheme } from "../../theme/ThemeContext";
 import { fonts } from "../../theme/typography";
 import type { MessageImageAttachment, VoiceVisualPhase } from "../../types";
 import type { IpadLayout } from "../../utils/ipadLayout";
@@ -29,6 +30,8 @@ import type { TranslateFn } from "./shared";
 import { styles } from "./styles";
 
 const ACCESSIBILITY_COMPACT_FONT_SCALE = 1.8;
+const COUNCIL_POPOVER_WIDTH = 252;
+const SATELLITE_GROUP_SEPARATOR_MAX_WIDTH = 296;
 
 interface WorkspaceSatellitesProps {
   attachments: MessageImageAttachment[];
@@ -86,9 +89,11 @@ function WorkspaceSatellites({
   webActive,
   webAvailable,
 }: WorkspaceSatellitesProps) {
+  const { colors } = useTheme();
   const imageAnchorRef = React.useRef<View>(null);
   const councilAnchorRef = React.useRef<View>(null);
   const previousAttachmentCountRef = React.useRef(attachments.length);
+  const [satelliteRowWidth, setSatelliteRowWidth] = React.useState(0);
   const [imagePopoverAnchor, setImagePopoverAnchor] =
     React.useState<AttachmentPopoverAnchor | null>(null);
   const [imagePopoverVisible, setImagePopoverVisible] = React.useState(false);
@@ -125,68 +130,155 @@ function WorkspaceSatellites({
   }, [turnActive]);
 
   const composingDisabled = disabled || turnActive || handsFreeActive;
+  const showGroupSeparators =
+    !compact &&
+    satelliteRowWidth > 0 &&
+    satelliteRowWidth <= SATELLITE_GROUP_SEPARATOR_MAX_WIDTH;
+  const councilSatellite = (
+    <OrbSatellite
+      accessibilityLabel={t("ulraMode")}
+      active={councilActive}
+      compact={compact}
+      disabled={composingDisabled || !councilAvailable}
+      icon="council"
+      kind="toggle"
+      label={t("workspaceCouncilLabel")}
+      onPress={councilAvailable ? openCouncilPopover : undefined}
+      testID="satellite-council"
+    />
+  );
+  const webSatellite = (
+    <OrbSatellite
+      accessibilityLabel={t("webSearch")}
+      active={webActive}
+      compact={compact}
+      disabled={composingDisabled || !webAvailable}
+      icon="search"
+      kind="toggle"
+      label={t("workspaceWebLabel")}
+      onPress={webAvailable ? onToggleWeb : undefined}
+      testID="satellite-web"
+    />
+  );
+  const handsFreeSatellite = (
+    <OrbSatellite
+      accessibilityLabel={t("handsFree")}
+      active={handsFreeActive}
+      compact={compact}
+      disabled={!onToggleHandsFree}
+      icon="car"
+      kind="toggle"
+      label={t("handsFree")}
+      onPress={onToggleHandsFree}
+      testID="satellite-hands-free"
+    />
+  );
 
   return (
     <>
       <View
         collapsable={false}
-        ref={councilAnchorRef}
+        onLayout={(event) => {
+          const nextWidth = Math.round(event.nativeEvent.layout.width);
+          setSatelliteRowWidth((currentWidth) =>
+            currentWidth === nextWidth ? currentWidth : nextWidth,
+          );
+        }}
         style={[
           workspaceStyles.satellites,
-          compact ? workspaceStyles.satellitesCompact : null,
+          compact
+            ? workspaceStyles.satellitesCompact
+            : workspaceStyles.satellitesGrouped,
         ]}
         testID="workspace-satellites"
       >
-        {!compact ? (
-          <View collapsable={false} ref={imageAnchorRef}>
-            <OrbSatellite
-              accessibilityLabel={t("addImage")}
-              disabled={composingDisabled || imageDisabled || !imageAvailable}
-              icon="image"
-              label={
-                attachments.length > 0
-                  ? t("workspaceImageCount", { count: attachments.length })
-                  : t("workspaceImageLabel")
-              }
-              onPress={imageAvailable ? openImagePopover : undefined}
-              testID="satellite-image"
-              thumbnails={attachments.map((attachment) => attachment.uri)}
-            />
-          </View>
-        ) : null}
-        <OrbSatellite
-          accessibilityLabel={t("ulraMode")}
-          active={councilActive}
-          compact={compact}
-          disabled={composingDisabled || !councilAvailable}
-          icon="council"
-          kind="toggle"
-          label={t("workspaceCouncilLabel")}
-          onPress={councilAvailable ? openCouncilPopover : undefined}
-          testID="satellite-council"
+        <View
+          accessible={false}
+          collapsable={false}
+          pointerEvents="none"
+          ref={councilAnchorRef}
+          style={workspaceStyles.councilPopoverAnchor}
+          testID="workspace-council-popover-anchor"
         />
-        <OrbSatellite
-          accessibilityLabel={t("webSearch")}
-          active={webActive}
-          compact={compact}
-          disabled={composingDisabled || !webAvailable}
-          icon="search"
-          kind="toggle"
-          label={t("workspaceWebLabel")}
-          onPress={webAvailable ? onToggleWeb : undefined}
-          testID="satellite-web"
-        />
-        <OrbSatellite
-          accessibilityLabel={t("handsFree")}
-          active={handsFreeActive}
-          compact={compact}
-          disabled={!onToggleHandsFree}
-          icon="car"
-          kind="toggle"
-          label={t("handsFree")}
-          onPress={onToggleHandsFree}
-          testID="satellite-hands-free"
-        />
+        {compact ? (
+          <>
+            <View
+              collapsable={false}
+              style={workspaceStyles.satelliteCenterGroup}
+            >
+              {councilSatellite}
+              {webSatellite}
+            </View>
+            {handsFreeSatellite}
+          </>
+        ) : (
+          <>
+            <View
+              collapsable={false}
+              ref={imageAnchorRef}
+              style={[
+                workspaceStyles.satelliteOuterGroup,
+                workspaceStyles.satelliteLeftGroup,
+              ]}
+              testID="workspace-satellite-left"
+            >
+              <OrbSatellite
+                accessibilityLabel={t("addImage")}
+                disabled={
+                  composingDisabled || imageDisabled || !imageAvailable
+                }
+                icon="image"
+                label={
+                  attachments.length > 0
+                    ? t("workspaceImageCount", { count: attachments.length })
+                    : t("workspaceImageLabel")
+                }
+                onPress={imageAvailable ? openImagePopover : undefined}
+                testID="satellite-image"
+                thumbnails={attachments.map((attachment) => attachment.uri)}
+              />
+            </View>
+            {showGroupSeparators ? (
+              <View
+                accessible={false}
+                pointerEvents="none"
+                style={[
+                  workspaceStyles.satelliteGroupSeparator,
+                  { backgroundColor: colors.border },
+                ]}
+                testID="workspace-satellite-separator-left"
+              />
+            ) : null}
+            <View
+              collapsable={false}
+              style={workspaceStyles.satelliteCenterGroup}
+              testID="workspace-satellite-center"
+            >
+              {councilSatellite}
+              {webSatellite}
+            </View>
+            {showGroupSeparators ? (
+              <View
+                accessible={false}
+                pointerEvents="none"
+                style={[
+                  workspaceStyles.satelliteGroupSeparator,
+                  { backgroundColor: colors.border },
+                ]}
+                testID="workspace-satellite-separator-right"
+              />
+            ) : null}
+            <View
+              style={[
+                workspaceStyles.satelliteOuterGroup,
+                workspaceStyles.satelliteRightGroup,
+              ]}
+              testID="workspace-satellite-right"
+            >
+              {handsFreeSatellite}
+            </View>
+          </>
+        )}
       </View>
       {!compact ? (
         <AttachmentPopover
@@ -725,12 +817,45 @@ const workspaceStyles = StyleSheet.create({
   satellites: {
     alignItems: "flex-start",
     flexDirection: "row",
-    gap: 8,
     justifyContent: "center",
   },
   satellitesCompact: {
     alignItems: "center",
     flexShrink: 0,
+    gap: 8,
+  },
+  satellitesGrouped: {
+    width: "100%",
+  },
+  satelliteOuterGroup: {
+    flex: 1,
+    minWidth: 0,
+  },
+  satelliteLeftGroup: {
+    alignItems: "flex-start",
+  },
+  satelliteCenterGroup: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: 8,
+  },
+  satelliteRightGroup: {
+    alignItems: "flex-end",
+  },
+  satelliteGroupSeparator: {
+    alignSelf: "flex-start",
+    height: 32,
+    marginHorizontal: 4,
+    marginTop: 6,
+    width: StyleSheet.hairlineWidth,
+  },
+  councilPopoverAnchor: {
+    height: 44,
+    left: "50%",
+    marginLeft: -(COUNCIL_POPOVER_WIDTH / 2),
+    position: "absolute",
+    top: 0,
+    width: COUNCIL_POPOVER_WIDTH,
   },
   transcriptHandle: {
     marginHorizontal: 0,

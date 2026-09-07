@@ -101,7 +101,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   textSurface: {
     width: "100%",
-    height: "100%",
     minHeight: 96,
     borderRadius: 15,
     borderWidth: 1.5,

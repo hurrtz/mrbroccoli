@@ -276,6 +276,92 @@ describe("MainScreenWorkspace streaming isolation", () => {
     ).toEqual(expect.objectContaining({ checked: true, disabled: false }));
   });
 
+  it("separates Image, Council/Web, and Hands free into responsive groups", () => {
+    const t = jest.fn((key: string) => key);
+    const base = createWorkspaceProps(t);
+    const screen = renderWorkspace(
+      <MainScreenWorkspace
+        {...base}
+        transcript={{
+          activeConversationId: null,
+          activeReplayMessageId: null,
+          messages: [],
+          onCopyMessage: jest.fn(async () => true),
+          onRetryMessage: jest.fn(),
+          replayPhase: "idle",
+          scrollEnabled: true,
+          showUsageStats: false,
+          showWhenEmpty: true,
+          t,
+        }}
+        visualPhase="idle"
+      />,
+    );
+
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-satellites").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ width: "100%" }));
+    expect(
+      within(screen.getByTestId("workspace-satellite-left")).getByTestId(
+        "satellite-image",
+      ),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("workspace-satellite-center")).getByTestId(
+        "satellite-council",
+      ),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("workspace-satellite-center")).getByTestId(
+        "satellite-web",
+      ),
+    ).toBeTruthy();
+    expect(
+      within(screen.getByTestId("workspace-satellite-right")).getByTestId(
+        "satellite-hands-free",
+      ),
+    ).toBeTruthy();
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-satellite-left").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ alignItems: "flex-start", flex: 1 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-satellite-right").props.style,
+      ),
+    ).toEqual(expect.objectContaining({ alignItems: "flex-end", flex: 1 }));
+    expect(
+      StyleSheet.flatten(
+        screen.getByTestId("workspace-council-popover-anchor").props.style,
+      ),
+    ).toEqual(
+      expect.objectContaining({ left: "50%", marginLeft: -126, width: 252 }),
+    );
+
+    fireEvent(screen.getByTestId("workspace-satellites"), "layout", {
+      nativeEvent: { layout: { height: 61, width: 288, x: 0, y: 0 } },
+    });
+    expect(
+      screen.getByTestId("workspace-satellite-separator-left"),
+    ).toBeTruthy();
+    expect(
+      screen.getByTestId("workspace-satellite-separator-right"),
+    ).toBeTruthy();
+
+    fireEvent(screen.getByTestId("workspace-satellites"), "layout", {
+      nativeEvent: { layout: { height: 61, width: 320, x: 0, y: 0 } },
+    });
+    expect(
+      screen.queryByTestId("workspace-satellite-separator-left"),
+    ).toBeNull();
+    expect(
+      screen.queryByTestId("workspace-satellite-separator-right"),
+    ).toBeNull();
+  });
+
   beforeEach(() => {
     mockRouteBylineRenderCount = 0;
     mockVoicePagerRenderCount = 0;

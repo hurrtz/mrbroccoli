@@ -257,15 +257,25 @@ The sibling layer translates vertically by
 `transportLayout.centreY - transportLayout.height / 2` for the current measured
 orb. This keeps both 44pt targets centred on the orb instead of on the transport
 box whose translated control labels reserve more space below the orb than above
-it.
+it. The composer uses the measured orb diameter as its height and applies the
+same translation while that rectangle fits the measured viewport. If the orb's
+minimum transport footprint exceeds the available height,
+`resolveTextComposerLayout` caps composer height and clamps its translation to
+the visible bounds. The text page's chevrons follow that adjusted centre; the
+voice page retains the orb centre. This preserves the first text line and the
+send target when the keyboard or a short window constrains the stage.
 The portrait pager measures one central stage and derives the largest
 orb-transport cluster that fits its height and the width between the two 44pt
 chevrons, clamped from a 120pt orb to the portrait ceiling. `OrbTransport`
 mounts at idle and active phases alike, reserving the footprint implied by the
 orb plus the 34pt orbit. Its keys render only during a turn, so the primary
-action never moves. The four satellite slots mount as the pager's footer, so
-flexbox centers the complete orb-or-composer plus composing row rather than
-assigning tall-screen surplus between those parts. The footer's 16pt margin
+action never moves. The satellite controls mount as the pager's footer in three
+groups: Image at the leading edge, Council/Web at the absolute centre, and
+Hands free at the trailing edge. Equal outer flex groups hold that centre; on
+narrow portrait rows two decorative hairlines separate the groups. Compact
+icon-only layouts retain their shorter centred row. Flexbox centers the complete
+orb-or-composer plus composing row rather than assigning tall-screen surplus
+between those parts. The footer's 16pt margin
 combines with the pager's 2pt child gap to preserve the design-system's 18pt
 separation when no blocking notice intervenes; a route notice stays between
 the primary action and next-turn controls. The text composer replaces the orb
@@ -290,11 +300,11 @@ has a Council configuration, typed `CouncilProgress` instead keeps the block
 full-strength and replaces its contents with the active participant plus the
 one-based active-model ordinal and round progress; synthesis reports the final
 route explicitly. The
-Council satellite opens an anchored transparent `CouncilPopover`; selected
+Council satellite opens an anchored transparent `CouncilPopover` centred over
+the Council/Web group, independently of the leading Image anchor. Selected
 membership is session-local, while its one-to-five total-round control claims
 the responder at touch-down and adapts the persisted review-round count by
-adding or subtracting the initial answer round. It shares the Image popup's
-leading-edge anchor for a visually centred panel and replaces call arithmetic
+adding or subtracting the initial answer round. It replaces call arithmetic
 with the two-model requirement until Council can actually run. Image Add first
 dismisses its attachment popup, then the app-owned source sheet uses the same
 native-dismissal handoff before camera or library presentation; this prevents

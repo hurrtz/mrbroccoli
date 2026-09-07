@@ -168,6 +168,7 @@ export function VoiceTextInputPager({
           onTextFocusChange={pager.handleTextFocusChange}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
+          viewportHeight={viewportHeight}
           panGesture={pager.panGesture}
           promptBlockedMessage={promptBlockedMessage}
           stageSize={stageSize}
