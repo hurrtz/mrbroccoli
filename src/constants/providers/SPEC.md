@@ -166,6 +166,11 @@ shutdown date. Rejected alternatives: removing the models, which would break
 accounts that still have access, and keeping them as ordinary choices, which
 would fail for most new keys.
 
+Gemini TTS defaults new selections to GA `gemini-3.8-flash-lite-tts`, Google's
+named replacement for the 3.1 preview; saved 3.1 selections are kept. The
+deprecated 2.5 Flash and Pro TTS previews migrate to 3.8 Flash-Lite and Flash
+with the same prebuilt voice.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

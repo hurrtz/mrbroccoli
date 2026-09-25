@@ -468,6 +468,7 @@ describe("synthesizeSpeech", () => {
       voice: "Aoede",
       mode: "provider",
       provider: "gemini",
+      providerModel: "gemini-3.1-flash-tts-preview",
       apiKey: "gemini-test-key",
       language: "de",
     });
@@ -512,6 +513,7 @@ describe("synthesizeSpeech", () => {
       voice: "Aoede",
       mode: "provider",
       provider: "gemini",
+      providerModel: "gemini-3.1-flash-tts-preview",
       apiKey: "gemini-test-key",
       instructions: "Use a calm, reassuring delivery.",
       language: "de",
@@ -525,6 +527,100 @@ describe("synthesizeSpeech", () => {
     expect(prompt).toContain("Transcript:\nHallo Welt");
   });
 
+  it("sends Gemini 3.8 TTS through Interactions with a verbatim transcript", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          steps: [
+            { type: "thought", content: [] },
+            {
+              type: "model_output",
+              content: [
+                { type: "audio", mime_type: "audio/wav", data: "b2xk" },
+                { type: "audio", mime_type: "audio/wav", sample_rate: 24000, data: "UklGRg==" },
+              ],
+            },
+          ],
+        }),
+    });
+
+    const result = await synthesizeSpeech({
+      text: "Hallo Welt",
+      voice: "Aoede",
+      mode: "provider",
+      provider: "gemini",
+      apiKey: "gemini-test-key",
+      instructions: "Use a calm, reassuring delivery.",
+      language: "de",
+    });
+
+    expect(result).toMatch(/^\/tmp\/tts-.*\.wav$/);
+    const [url, options] = (fetch as jest.Mock).mock.calls[0];
+    expect(url).toBe("https://generativelanguage.googleapis.com/v1beta/interactions");
+    expect(options.headers["x-goog-api-key"]).toBe("gemini-test-key");
+    expect(JSON.parse(options.body)).toEqual({
+      model: "gemini-3.8-flash-lite-tts",
+      store: false,
+      input: [
+        {
+          type: "user_input",
+          content: [
+            {
+              type: "text",
+              text: "Hallo Welt",
+              annotations: [
+                { type: "speech_metadata", style: "Use a calm, reassuring delivery." },
+              ],
+            },
+          ],
+        },
+      ],
+      response_format: { type: "audio" },
+      generation_config: { speech_config: [{ voice: "Aoede" }] },
+    });
+    // The last audio item is already a complete WAV and must not be re-wrapped.
+    expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
+      expect.stringMatching(/\.wav$/),
+      "UklGRg==",
+      expect.anything(),
+    );
+  });
+
+  it("wraps raw L16 audio from Gemini Interactions in a WAV header", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          steps: [
+            {
+              type: "model_output",
+              content: [
+                { type: "audio", mime_type: "audio/l16", sample_rate: 24000, data: "AQACAAMABAA=" },
+              ],
+            },
+          ],
+        }),
+    });
+
+    await synthesizeSpeech({
+      text: "Hello",
+      voice: "Kore",
+      mode: "provider",
+      provider: "gemini",
+      providerModel: "gemini-3.8-flash-tts",
+      apiKey: "gemini-test-key",
+      language: "en",
+    });
+
+    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
+    expect(body.model).toBe("gemini-3.8-flash-tts");
+    expect(body.input[0].content[0]).toEqual({ type: "text", text: "Hello" });
+    const written = (FileSystem.writeAsStringAsync as jest.Mock).mock.calls.at(-1)[1];
+    expect(written).not.toBe("AQACAAMABAA=");
+    expect(written.startsWith("UklGR")).toBe(true);
+  });
+
   it("retries Gemini TTS after a transient transport failure", async () => {
     (fetch as jest.Mock)
       .mockRejectedValueOnce(new Error("Network request failed"))
@@ -532,18 +628,12 @@ describe("synthesizeSpeech", () => {
         ok: true,
         json: () =>
           Promise.resolve({
-            candidates: [
+            steps: [
               {
-                content: {
-                  parts: [
-                    {
-                      inlineData: {
-                        mimeType: "audio/L16;rate=24000",
-                        data: "AQACAAMABAA=",
-                      },
-                    },
-                  ],
-                },
+                type: "model_output",
+                content: [
+                  { type: "audio", mime_type: "audio/wav", data: "UklGRg==" },
+                ],
               },
             ],
           }),

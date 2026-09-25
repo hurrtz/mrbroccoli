@@ -21,6 +21,7 @@ import {
   createTtsTimeoutError,
   fetchWithTimeout,
   getGeminiAudioPart,
+  getGeminiInteractionsAudio,
   getProviderTtsTimeoutMs,
   getSelectedProviderModel,
   getSelectedProviderVoice,
@@ -345,6 +346,79 @@ export async function synthesizeProviderSpeech(params: {
         providerTtsModelSupportsInstructions(provider, selectedModel)
           ? instructions.trim()
           : "";
+
+      if (
+        config.kind === "gemini" &&
+        config.interactionsEndpoint &&
+        config.interactionsModelIds.includes(selectedModel)
+      ) {
+        const response = await fetchTtsWithRetries({
+          input: config.interactionsEndpoint,
+          init: {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-goog-api-key": requireProviderKey(provider, apiKey, language),
+            },
+            // The text is a verbatim transcript: delivery instructions travel
+            // as speech metadata so the model never reads them aloud.
+            body: JSON.stringify({
+              model: selectedModel,
+              store: false,
+              input: [
+                {
+                  type: "user_input",
+                  content: [
+                    {
+                      type: "text",
+                      text,
+                      ...(selectedInstructions
+                        ? {
+                            annotations: [
+                              {
+                                type: "speech_metadata",
+                                style: selectedInstructions,
+                              },
+                            ],
+                          }
+                        : {}),
+                    },
+                  ],
+                },
+              ],
+              response_format: { type: "audio" },
+              generation_config: {
+                speech_config: [{ voice: selectedVoice }],
+              },
+            }),
+          },
+          timeoutMs,
+          provider,
+          language,
+          abortSignal,
+        });
+        const audio = getGeminiInteractionsAudio(await response.json());
+
+        if (!audio) {
+          throw new Error(
+            translate(language, "ttsDidNotReturnAudio", {
+              provider: PROVIDER_LABELS[provider],
+            }),
+          );
+        }
+
+        // Interactions returns a complete WAV by default; only raw L16 PCM
+        // still needs a header.
+        return audio.mimeType?.toLowerCase().includes("wav")
+          ? writeBase64AudioFile(audio.data, "wav")
+          : buildWavAudioFileFromPcm({
+              pcmBase64: audio.data,
+              sampleRate:
+                audio.sampleRate ??
+                (Number(audio.mimeType?.match(/rate=(\d+)/i)?.[1]) || 24000),
+              language,
+            });
+      }
 
       if (config.kind === "gemini") {
         const response = await fetchTtsWithRetries({

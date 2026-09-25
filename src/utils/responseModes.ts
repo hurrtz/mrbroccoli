@@ -58,6 +58,9 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   },
   gemini: {
     "gemini-3.1-flash-live-preview": "gemini-2.5-flash",
+    // Deprecated TTS previews; Google names the 3.8 TTS models as replacements.
+    "gemini-2.5-flash-preview-tts": "gemini-3.8-flash-lite-tts",
+    "gemini-2.5-pro-preview-tts": "gemini-3.8-flash-tts",
   },
 };
 

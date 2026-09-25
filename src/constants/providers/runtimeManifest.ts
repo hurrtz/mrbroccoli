@@ -114,6 +114,9 @@ interface RuntimeTtsManifest {
   transport: RuntimeTtsTransport;
   endpoint?: string;
   endpointBase?: string;
+  /** Gemini models served only through the Interactions API. */
+  interactionsEndpoint?: string;
+  interactionsModelIds?: string[];
   requestFormat?: RuntimeTtsBinaryRequestFormat;
   defaultModel?: string;
   fallbackModelIds?: string[];
@@ -964,18 +967,20 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "gemini",
       endpointBase: "https://generativelanguage.googleapis.com/v1beta/models",
-      defaultModel: "gemini-3.1-flash-tts-preview",
+      interactionsEndpoint: "https://generativelanguage.googleapis.com/v1beta/interactions",
+      interactionsModelIds: ["gemini-3.8-flash-lite-tts", "gemini-3.8-flash-tts"],
+      defaultModel: "gemini-3.8-flash-lite-tts",
       fallbackModelIds: [
+        "gemini-3.8-flash-lite-tts",
+        "gemini-3.8-flash-tts",
         "gemini-3.1-flash-tts-preview",
-        "gemini-2.5-flash-preview-tts",
-        "gemini-2.5-pro-preview-tts",
       ],
       defaultVoice: "Kore",
       voiceFallback: "Kore",
       models: [
+        withInstructions(namedModel("gemini-3.8-flash-lite-tts", "Gemini 3.8 Flash-Lite TTS")),
+        withInstructions(namedModel("gemini-3.8-flash-tts", "Gemini 3.8 Flash TTS")),
         withInstructions(namedModel("gemini-3.1-flash-tts-preview", "Gemini 3.1 Flash TTS Preview")),
-        withInstructions(namedModel("gemini-2.5-flash-preview-tts", "Gemini 2.5 Flash Preview TTS")),
-        withInstructions(namedModel("gemini-2.5-pro-preview-tts", "Gemini 2.5 Pro Preview TTS")),
       ],
       languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "hu", "cs", "pl", "tr", "sv", "ur"],
       voiceOptions: [

@@ -138,7 +138,10 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
   Gemini 3.8/3.7/3.6/3.5 Flash models transcribe recorded audio through
   `generateContent` with the same AI Studio API key used by the other Google
   capabilities.
-- TTS picker: Gemini TTS preview rows.
+- TTS picker: `gemini-3.8-flash-lite-tts` (default) and `gemini-3.8-flash-tts`
+  through Interactions, plus `gemini-3.1-flash-tts-preview` through
+  generateContent. Deprecated 2.5 TTS previews migrate to their named 3.8
+  replacements.
 
 ### xAI (`xai`)
 
