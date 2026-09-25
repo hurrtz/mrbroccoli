@@ -4,6 +4,8 @@ import { migrateProviderModelAlias ,
   getDefaultModelForProvider,
   getProviderValidationModel,
   isResponseModeReady,
+  getSelectableProviderLlmModelOptions,
+  isValidModelForProvider,
 } from "../../src/utils/responseModes";
 import { PROVIDER_MODELS } from "../../src/constants/models";
 import { DEFAULT_SETTINGS } from "../../src/types";
@@ -250,4 +252,25 @@ it("moves retired DeepSeek V4 Flash selections to V4.1 Flash", () => {
 
 it("pins the existing OpenRouter Grok alias", () => {
   expect(migrateProviderModelAlias("openrouter", "x-ai/grok-4.6")).toBe("x-ai/grok-4.6-20260810");
+});
+
+describe("existing-access-only Gemini 2.5 models", () => {
+  const legacyModels = ["gemini-2.5-pro", "gemini-2.5-flash", "gemini-2.5-flash-lite"];
+
+  it("keeps saved 2.5 routes valid without offering 2.5 as a new choice", () => {
+    const selectable = getSelectableProviderLlmModelOptions("gemini").map(({ id }) => id);
+
+    for (const model of legacyModels) {
+      expect(isValidModelForProvider("gemini", model)).toBe(true);
+      expect(selectable).not.toContain(model);
+    }
+    expect(selectable).toContain("gemini-3.8-flash");
+  });
+
+  it("still lists a 2.5 model while it is the current selection", () => {
+    const selectable = getSelectableProviderLlmModelOptions("gemini", "gemini-2.5-pro").map(({ id }) => id);
+
+    expect(selectable).toContain("gemini-2.5-pro");
+    expect(selectable).not.toContain("gemini-2.5-flash");
+  });
 });

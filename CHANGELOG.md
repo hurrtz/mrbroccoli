@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Gemini 2.5 models are no longer offered as new choices because Google now
+  limits them to accounts that already used them. Existing selections keep working.
+
 - OpenRouter adds GPT-6 Sol, GPT-6 Luna, and DeepSeek V4.1 Flash snapshots.
 
 - GPT-6 Sol and GPT-6 Luna are available as answering models with every
