@@ -380,6 +380,12 @@ const ANTHROPIC_EXTENDED_OUTPUT_EFFORT = effortConfig(
   "high",
   ["low", "medium", "high", "xhigh", "max"],
 );
+// Opus 5.5 offers every tier but runs at medium when effort is omitted.
+const ANTHROPIC_MEDIUM_DEFAULT_OUTPUT_EFFORT = effortConfig(
+  "anthropic-output-effort",
+  "medium",
+  ["low", "medium", "high", "xhigh", "max"],
+);
 const ANTHROPIC_STANDARD_OUTPUT_EFFORT = effortConfig(
   "anthropic-output-effort",
   "high",
@@ -687,6 +693,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "anthropic/claude-sonnet-5-20260630",
       ],
       models: [
+        withEffort(namedModel("anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"), effortConfig("reasoning-effort", "medium", ["low", "medium", "high", "xhigh", "max"])),
         withEffort(namedModel("anthropic/claude-opus-5-20260723", "Anthropic · Claude Opus 5"), OPENROUTER_HIGH_REASONING_EFFORT),
         withEffort(namedModel("google/gemini-3.8-flash-20260902", "Google · Gemini 3.8 Flash"), effortConfig("reasoning-effort", "high", ["low", "medium", "high"])),
         withEffort(namedModel("qwen/qwen3.8-max-20260902", "Qwen · Qwen3.8 Max"), effortConfig("reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
@@ -802,11 +809,12 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           namedModel("claude-fable-5-1", "Claude Fable 5.1"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
         ),
-        withEffort(namedModel("claude-opus-5", "Claude Opus 5"), ANTHROPIC_EXTENDED_OUTPUT_EFFORT),
+        withEffort(namedModel("claude-opus-5-5", "Claude Opus 5.5"), ANTHROPIC_MEDIUM_DEFAULT_OUTPUT_EFFORT),
         withEffort(
           namedModel("claude-sonnet-5", "Claude Sonnet 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
         ),
+        withEffort(namedModel("claude-opus-5", "Claude Opus 5"), ANTHROPIC_EXTENDED_OUTPUT_EFFORT),
         withEffort(
           namedModel("claude-fable-5", "Claude Fable 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
