@@ -116,6 +116,13 @@ low/medium/high/xhigh contract. It leads the xAI picker, so derived xAI modes
 become 4.7, 4.6, and 4.5, while `grok-4.6` stays the default. OpenRouter pins
 `x-ai/grok-4.7-20260916`. It joins no web-search candidate list.
 
+OpenRouter pins `openai/gpt-6-sol-20260922`, `openai/gpt-6-luna-20260922`
+(both none through max, medium default), and
+`deepseek/deepseek-v4.1-flash-20260910` (low/high/max, high default, image
+input). **Decision:** `qwen/qwen3.8-max-prime` is not offered: it is the same
+model as the listed Qwen 3.8 Max snapshot, sold as a higher-throughput SKU at
+twice the price, so it adds no distinct answering choice.
+
 Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
 reasoning choices are low/medium/high only; minimal is never sent.
 

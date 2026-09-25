@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- OpenRouter adds GPT-6 Sol, GPT-6 Luna, and DeepSeek V4.1 Flash snapshots.
+
 - GPT-6 Sol and GPT-6 Luna are available as answering models with every
   reasoning effort from none to max.
 

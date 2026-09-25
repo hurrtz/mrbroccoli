@@ -29,6 +29,9 @@ describe("provider model accuracy", () => {
     ["xai", "grok-4.7", "Grok 4.7"],
     ["openrouter", "anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"],
     ["openrouter", "x-ai/grok-4.7-20260916", "xAI · Grok 4.7"],
+    ["openrouter", "openai/gpt-6-sol-20260922", "OpenAI · GPT-6 Sol"],
+    ["openrouter", "openai/gpt-6-luna-20260922", "OpenAI · GPT-6 Luna"],
+    ["openrouter", "deepseek/deepseek-v4.1-flash-20260910", "DeepSeek · DeepSeek V4.1 Flash"],
     ["openrouter", "openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"],
     [
       "openrouter",
