@@ -1058,10 +1058,10 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       supportsImageInput: false,
       transport: "openai-compatible",
       endpoint: "https://api.deepseek.com/chat/completions",
-      defaultModel: "deepseek-v4-flash",
-      fallbackModelIds: ["deepseek-v4-flash", "deepseek-v4-pro"],
+      defaultModel: "deepseek-flash",
+      fallbackModelIds: ["deepseek-flash", "deepseek-v4-pro"],
       models: [
-        withEffort(namedModel("deepseek-v4-flash", "DeepSeek V4 Flash"), DEEPSEEK_THINKING_EFFORT),
+        withEffort({ ...namedModel("deepseek-flash", "DeepSeek V4.1 Flash"), supportsImageInput: true }, DEEPSEEK_THINKING_EFFORT),
         withEffort(namedModel("deepseek-v4-pro", "DeepSeek V4 Pro"), DEEPSEEK_THINKING_EFFORT),
       ],
     },

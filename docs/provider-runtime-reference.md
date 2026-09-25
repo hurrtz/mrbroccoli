@@ -156,7 +156,7 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 ### DeepSeek (`deepseek`)
 
 - LLM transport: OpenAI-compatible chat completions.
-- LLM picker: `deepseek-v4-flash`, `deepseek-v4-pro`.
+- LLM picker: `deepseek-flash` (V4.1 Flash, image input), `deepseek-v4-pro`.
 - Effort: disabled thinking, or `reasoning_effort` low/high/max with thinking
   enabled.
 - STT/TTS/web search: not runtime-exposed.

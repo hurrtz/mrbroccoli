@@ -89,8 +89,11 @@ translations. The current direct IDs have no distinct dated snapshots in the
 or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
 OpenRouter snapshots are verified against its public Models and Endpoints APIs.
 
-DeepSeek V4 Flash and Pro expose disabled, low, high, and max effort.
-Enabled thinking sends the selected `reasoning_effort`; high remains default.
+DeepSeek V4.1 Flash (`deepseek-flash`) and V4 Pro expose disabled, low, high,
+and max effort. Enabled thinking sends the selected `reasoning_effort`; high
+remains default. Flash is the default and accepts images; Pro stays text-only.
+DeepSeek retired V4 Flash and only temporarily routes `deepseek-v4-flash` to
+V4.1, so saved selections migrate to `deepseek-flash` with their effort intact.
 
 Claude Opus 5 uses the canonical direct `claude-opus-5` ID, high default,
 and low/medium/high/xhigh/max effort through Messages. Existing defaults stay

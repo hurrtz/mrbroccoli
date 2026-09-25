@@ -52,7 +52,7 @@ describe("settingsRules", () => {
       ],
       providerModels: {
         ...DEFAULT_SETTINGS.providerModels,
-        deepseek: "deepseek-v4-flash",
+        deepseek: "deepseek-flash",
       },
     };
 
@@ -63,7 +63,7 @@ describe("settingsRules", () => {
         id: "mode-1",
         route: {
           provider: "deepseek",
-          model: "deepseek-v4-flash",
+          model: "deepseek-flash",
           effort: "high",
         },
       },
@@ -71,7 +71,7 @@ describe("settingsRules", () => {
         id: "mode-2",
         route: {
           provider: "deepseek",
-          model: "deepseek-v4-flash",
+          model: "deepseek-flash",
           effort: "high",
         },
       },
@@ -79,7 +79,7 @@ describe("settingsRules", () => {
         id: "mode-3",
         route: {
           provider: "deepseek",
-          model: "deepseek-v4-flash",
+          model: "deepseek-flash",
           effort: "high",
         },
       },

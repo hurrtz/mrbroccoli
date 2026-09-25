@@ -207,8 +207,8 @@ const PINNED_RELEASE_PRICING: Record<
     rates: { million_input_tokens: 0.3, million_output_tokens: 2.5 },
     source: "https://ai.google.dev/gemini-api/docs/pricing",
   },
-  "deepseek:deepseek-v4-flash": {
-    rates: { million_input_tokens: 0.14, million_output_tokens: 0.28 },
+  "deepseek:deepseek-flash": {
+    rates: { million_input_tokens: 0.3, million_output_tokens: 1.2 },
     source: "https://api-docs.deepseek.com/quick_start/pricing",
     note: "Cache-miss input pricing is used as the conservative standard rate.",
   },
