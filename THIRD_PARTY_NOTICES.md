@@ -6274,8 +6274,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### lightningcss-darwin-arm64@1.33.0
-Packages (2): lightningcss-darwin-arm64@1.33.0, lightningcss@1.33.0
+### lightningcss-android-arm64@1.33.0
+Packages (12): lightningcss-android-arm64@1.33.0, lightningcss-darwin-arm64@1.33.0, lightningcss-darwin-x64@1.33.0, lightningcss-freebsd-x64@1.33.0, lightningcss-linux-arm-gnueabihf@1.33.0, lightningcss-linux-arm64-gnu@1.33.0, lightningcss-linux-arm64-musl@1.33.0, lightningcss-linux-x64-gnu@1.33.0, lightningcss-linux-x64-musl@1.33.0, lightningcss-win32-arm64-msvc@1.33.0, lightningcss-win32-x64-msvc@1.33.0, lightningcss@1.33.0
 
 License: MPL-2.0
 

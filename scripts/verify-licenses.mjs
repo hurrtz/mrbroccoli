@@ -173,6 +173,57 @@ function collectProductionPackages() {
   return [...byPath.values()];
 }
 
+/**
+ * npm installs only the host's variant of a platform-specific optional binary
+ * (for example lightningcss-darwin-arm64 on a Mac, -linux-x64-gnu on CI). Each
+ * variant is the parent package built for another OS under the same license,
+ * so list every variant with the parent's license text. This keeps the notices
+ * identical in coverage no matter which machine generates them.
+ */
+export function portablePlatformVariants(packages, lockPackages, rootDir) {
+  const installed = new Set(packages.map(packageKey));
+  const variants = [];
+
+  for (const parent of packages) {
+    const parentLockKey = path
+      .relative(rootDir, parent.packagePath)
+      .split(path.sep)
+      .join("/");
+    const parentEntry = lockPackages[parentLockKey];
+
+    for (const childName of Object.keys(parentEntry?.optionalDependencies ?? {})) {
+      const childEntry =
+        lockPackages[`${parentLockKey}/node_modules/${childName}`] ??
+        lockPackages[`node_modules/${childName}`];
+      const variant = {
+        name: childName,
+        version: childEntry?.version,
+        license: childEntry?.license,
+        packagePath: parent.packagePath,
+      };
+
+      if (
+        childEntry &&
+        !childEntry.dev &&
+        (childEntry.os || childEntry.cpu) &&
+        resolvedLicense(variant) === resolvedLicense(parent) &&
+        !installed.has(packageKey(variant))
+      ) {
+        installed.add(packageKey(variant));
+        variants.push(variant);
+      }
+    }
+  }
+
+  return variants;
+}
+
+function readLockPackages() {
+  return JSON.parse(
+    fs.readFileSync(path.join(root, "package-lock.json"), "utf8"),
+  ).packages ?? {};
+}
+
 function normalizeLicenseText(text) {
   return text
     .replace(/\r\n?/g, "\n")
@@ -352,7 +403,10 @@ export function verifyLicenses({ write = false } = {}) {
   }
 
   verifyNativeLicenses();
-  const expectedNotices = renderNotices(packages);
+  const expectedNotices = renderNotices([
+    ...packages,
+    ...portablePlatformVariants(packages, readLockPackages(), root),
+  ]);
 
   if (write) {
     fs.writeFileSync(noticesPath, expectedNotices);
