@@ -22,6 +22,8 @@ function providerModelIds(provider: Provider) {
 describe("provider model accuracy", () => {
   it.each<[Provider, string, string]>([
     ["openai", "gpt-6-astra", "GPT-6 Astra"],
+    ["openai", "gpt-6-sol", "GPT-6 Sol"],
+    ["openai", "gpt-6-luna", "GPT-6 Luna"],
     ["anthropic", "claude-fable-5-1", "Claude Fable 5.1"],
     ["anthropic", "claude-opus-5-5", "Claude Opus 5.5"],
     ["xai", "grok-4.7", "Grok 4.7"],
