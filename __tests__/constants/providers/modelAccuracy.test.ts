@@ -23,6 +23,8 @@ describe("provider model accuracy", () => {
   it.each<[Provider, string, string]>([
     ["openai", "gpt-6-astra", "GPT-6 Astra"],
     ["anthropic", "claude-fable-5-1", "Claude Fable 5.1"],
+    ["anthropic", "claude-opus-5-5", "Claude Opus 5.5"],
+    ["openrouter", "anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"],
     ["openrouter", "openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"],
     [
       "openrouter",

@@ -96,6 +96,12 @@ Claude Opus 5 uses the canonical direct `claude-opus-5` ID, high default,
 and low/medium/high/xhigh/max effort through Messages. Existing defaults stay
 unchanged when new answering choices are added.
 
+Claude Opus 5.5 uses the pinned dateless `claude-opus-5-5` ID with all five
+efforts and a `medium` default, matching Anthropic's omitted-effort
+behavior. It takes Opus 5's slot in picker order so the first three derived
+Anthropic modes stay Fable, Opus, and Sonnet. OpenRouter pins
+`anthropic/claude-opus-5.5-20260921`. It joins no web-search candidate list.
+
 Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
 reasoning choices are low/medium/high only; minimal is never sent.
 

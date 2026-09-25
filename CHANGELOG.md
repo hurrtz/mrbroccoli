@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Claude Opus 5.5 is available as an answering model, directly and through
+  OpenRouter, with all five reasoning efforts.
+
 - Saved conversation voices survive speech-model snapshot updates.
 
 - Gemini 3.5 Transcribe is available for recorded speech with verbatim transcription.
