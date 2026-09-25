@@ -175,3 +175,15 @@ it("moves saved DeepSeek V4 Flash routes to V4.1 Flash with their effort", () =>
   expect(settings.providerModels.deepseek).toBe("deepseek-flash");
   expect(settings.responseModes[0].route).toEqual({ provider: "deepseek", model: "deepseek-flash", effort: "max" });
 });
+
+it("moves deprecated Gemini 2.5 TTS previews to their 3.8 replacements", () => {
+  const flash = mergeSettings({ providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, gemini: "gemini-2.5-flash-preview-tts" } });
+  const pro = mergeSettings({ providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, gemini: "gemini-2.5-pro-preview-tts" } });
+  expect(flash.providerTtsModels.gemini).toBe("gemini-3.8-flash-lite-tts");
+  expect(pro.providerTtsModels.gemini).toBe("gemini-3.8-flash-tts");
+});
+
+it("keeps an explicit Gemini 3.1 TTS preview selection", () => {
+  const settings = mergeSettings({ providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, gemini: "gemini-3.1-flash-tts-preview" } });
+  expect(settings.providerTtsModels.gemini).toBe("gemini-3.1-flash-tts-preview");
+});

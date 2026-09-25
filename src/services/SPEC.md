@@ -58,6 +58,13 @@ verbatim mode, and optional BCP-47 hints. Only completed model-output text
 becomes a transcript; thought and partial output stay hidden. A conservative
 14 MB raw-file ceiling keeps base64 and JSON below the 20 MB request limit.
 
+Gemini 3.8 Flash and Flash-Lite TTS use Interactions with `store: false`. The
+transcript is sent verbatim; delivery instructions travel as a
+`speech_metadata` style annotation so they are never spoken. The last
+`model_output` audio item is used. A WAV response is written as-is and only
+raw L16 PCM receives a WAV header, avoiding a doubled header. The 3.1 preview
+keeps the generateContent prompt path.
+
 OpenAI `gpt-transcribe` uses repeated multipart `languages[]` hints and never
 the legacy singular `language`; auto-detection omits hints. Legacy file
 transcribers keep their existing language and diarization contracts.

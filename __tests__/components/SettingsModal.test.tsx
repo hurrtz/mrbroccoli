@@ -1148,7 +1148,7 @@ describe("SettingsModal", () => {
       },
       providerTtsModels: {
         ...DEFAULT_SETTINGS.providerTtsModels,
-        gemini: "gemini-2.5-pro-preview-tts",
+        gemini: "gemini-3.1-flash-tts-preview",
       },
     };
     const llmTarget = getProviderValidationTarget(
@@ -1172,7 +1172,7 @@ describe("SettingsModal", () => {
       "search",
     );
     expect(llmTarget.model).toBe("gemini-3.6-flash");
-    expect(ttsTarget.model).toBe("gemini-3.1-flash-tts-preview");
+    expect(ttsTarget.model).toBe("gemini-3.8-flash-lite-tts");
     expect(searchTarget.model).toBe("gemini-3.6-flash");
     const settings: Settings = {
       ...baseSettings,

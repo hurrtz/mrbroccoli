@@ -89,6 +89,8 @@ type BinaryTtsConfig = {
 type GeminiTtsConfig = {
   kind: "gemini";
   endpointBase: string;
+  interactionsEndpoint?: string;
+  interactionsModelIds: string[];
   defaultModel: string;
   voiceFallback: string;
 };
@@ -129,6 +131,8 @@ for (const provider of Object.keys(RUNTIME_PROVIDER_MANIFEST) as Provider[]) {
       {
         kind: "gemini",
         endpointBase: manifest.tts.endpointBase,
+        interactionsEndpoint: manifest.tts.interactionsEndpoint,
+        interactionsModelIds: manifest.tts.interactionsModelIds ?? [],
         defaultModel: manifest.tts.defaultModel,
         voiceFallback: manifest.tts.voiceFallback,
       },
@@ -258,6 +262,26 @@ export async function writeBytesAudioFile(params: {
     bytesToBase64(params.bytes, params.language),
     params.extension,
   );
+}
+
+/** Last audio item of an Interactions response, as the Gemini docs select it. */
+export function getGeminiInteractionsAudio(
+  data: any,
+): { data: string; mimeType?: string; sampleRate?: number } | null {
+  const steps = Array.isArray(data?.steps) ? data.steps : [];
+  const audioItems = steps
+    .filter((step: any) => step?.type === "model_output")
+    .flatMap((step: any) => (Array.isArray(step?.content) ? step.content : []))
+    .filter((item: any) => item?.type === "audio" && typeof item?.data === "string");
+  const audio = audioItems[audioItems.length - 1];
+
+  return audio
+    ? {
+        data: audio.data,
+        mimeType: typeof audio.mime_type === "string" ? audio.mime_type : undefined,
+        sampleRate: Number(audio.sample_rate) || undefined,
+      }
+    : null;
 }
 
 export function getGeminiAudioPart(data: any) {

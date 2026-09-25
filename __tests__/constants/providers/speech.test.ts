@@ -74,19 +74,12 @@ describe("speech provider constants", () => {
         (option) => option.id === "gpt-4o-mini-tts-2025-12-15",
       )?.name,
     ).toBe("GPT-4o mini TTS");
-    expect(
-      getProviderTtsModelOptions("gemini").find(
-        (option) => option.id === "gemini-2.5-flash-preview-tts",
-      )?.name,
-    ).toBe("Gemini 2.5 Flash Preview TTS");
-    expect(
-      getProviderTtsModelOptions("gemini").find(
-        (option) => option.id === "gemini-3.1-flash-tts-preview",
-      )?.name,
-    ).toBe("Gemini 3.1 Flash TTS Preview");
-    expect(PROVIDER_DEFAULT_TTS_MODELS.gemini).toBe(
-      "gemini-3.1-flash-tts-preview",
-    );
+    expect(getProviderTtsModelOptions("gemini")).toEqual([
+      { id: "gemini-3.8-flash-lite-tts", name: "Gemini 3.8 Flash-Lite TTS" },
+      { id: "gemini-3.8-flash-tts", name: "Gemini 3.8 Flash TTS" },
+      { id: "gemini-3.1-flash-tts-preview", name: "Gemini 3.1 Flash TTS Preview" },
+    ]);
+    expect(PROVIDER_DEFAULT_TTS_MODELS.gemini).toBe("gemini-3.8-flash-lite-tts");
   });
 
   it("keeps xAI TTS aligned to the merged catalog service ids", () => {
