@@ -10,12 +10,6 @@ export type MultipartTranscriptionConfig = {
   defaultModel: string;
 };
 
-export type OpenAiAudioInputTranscriptionConfig = {
-  kind: "openai-audio-input";
-  endpoint: string;
-  defaultModel: string;
-};
-
 export type GoogleSpeechTranscriptionConfig = {
   kind: "google-speech";
   interactionsEndpoint?: string;
@@ -31,7 +25,6 @@ export type XaiRestSttTranscriptionConfig = {
 
 export type ProviderSttConfig =
   | MultipartTranscriptionConfig
-  | OpenAiAudioInputTranscriptionConfig
   | GoogleSpeechTranscriptionConfig
   | XaiRestSttTranscriptionConfig;
 
@@ -70,14 +63,6 @@ function buildConfigForTransport(params: {
             kind: "google-speech",
             interactionsEndpoint: params.interactionsEndpoint,
             endpointBase: params.endpointBase,
-            defaultModel: params.defaultModel,
-          }
-        : null;
-    case "openai-audio-input":
-      return params.endpoint
-        ? {
-            kind: "openai-audio-input",
-            endpoint: params.endpoint,
             defaultModel: params.defaultModel,
           }
         : null;

@@ -492,60 +492,6 @@ describe("transcribeAudio", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("uses the configured audio-input endpoint for DashScope short-file STT", async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        choices: [
-          {
-            message: {
-              content: "Hello world",
-            },
-          },
-        ],
-      }),
-    });
-
-    const result = await transcribeAudio({
-      fileUri: "/tmp/recording.m4a",
-      mode: "provider",
-      provider: "alibaba-qwen-dashscope",
-      apiKey: "dashscope-test|beijing",
-      language: "en",
-      speechLanguage: "uk",
-    });
-
-    expect(result).toBe("Hello world");
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe(
-      "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
-    );
-    const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-asr-flash-2026-02-10");
-    expect(body.messages[0].content[0].type).toBe("input_audio");
-    expect(body.messages[0].content[0].input_audio.data).toMatch(
-      /^data:audio\/m4a;base64,/,
-    );
-    expect(body.asr_options).toEqual({
-      language: "uk",
-      enable_itn: false,
-    });
-  });
-
-  it("rejects Qwen STT when the credential belongs to the US region", async () => {
-    await expect(
-      transcribeAudio({
-        fileUri: "/tmp/recording.m4a",
-        mode: "provider",
-        provider: "alibaba-qwen-dashscope",
-        apiKey: "dashscope-test|us",
-        language: "en",
-      }),
-    ).rejects.toThrow("not available in the US region");
-
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
   it("aborts before starting the provider request when the signal is already cancelled", async () => {
     const controller = new AbortController();
     controller.abort();

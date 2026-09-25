@@ -1,5 +1,9 @@
 import { isRuntimeProviderId } from "../../constants/providers/runtimeState";
 import {
+  PROVIDER_STT_SUPPORT,
+  PROVIDER_TTS_SUPPORT,
+} from "../../constants/providers/providerMetadata";
+import {
   isWebSearchMode,
   isWebSearchProvider,
 } from "../../constants/webSearch";
@@ -88,6 +92,16 @@ function getStoredProvider(
   fallback: Provider | null,
 ): Provider | null {
   return isRuntimeProviderId(value) ? value : fallback;
+}
+
+// A provider can lose a speech capability (Qwen retired its DashScope speech
+// models). Clear that selection so provider mode falls back to native speech
+// instead of pointing at a route that no longer exists.
+function isRetiredSpeechProvider(
+  value: unknown,
+  support: Record<Provider, "none" | "provider">,
+) {
+  return isRuntimeProviderId(value) && support[value] !== "provider";
 }
 
 function getStoredTtsListenLanguages(
@@ -182,6 +196,14 @@ export function normalizeStoredScalarSettings(
     storedSettings?.webSearchMode === "auto"
       ? "on"
       : storedSettings?.webSearchMode;
+  const storedSttProviderRetired = isRetiredSpeechProvider(
+    storedSettings?.sttProvider,
+    PROVIDER_STT_SUPPORT,
+  );
+  const storedTtsProviderRetired = isRetiredSpeechProvider(
+    storedSettings?.ttsProvider,
+    PROVIDER_TTS_SUPPORT,
+  );
   const ulraModeEnabled = getStoredBoolean(
     storedSettings?.ulraModeEnabled,
     DEFAULT_SETTINGS.ulraModeEnabled,
@@ -198,7 +220,9 @@ export function normalizeStoredScalarSettings(
           ),
     ttsMode:
       storedSettings?.ttsMode === "provider"
-        ? "provider"
+        ? storedTtsProviderRetired
+          ? "native"
+          : "provider"
         : storedSettings?.ttsMode === "local" &&
             getStoredLocalModelId(storedSettings?.localTtsModelId, "tts")
           ? "local"
@@ -214,7 +238,9 @@ export function normalizeStoredScalarSettings(
     ),
     sttMode:
       storedSettings?.sttMode === "provider"
-        ? "provider"
+        ? storedSttProviderRetired
+          ? "native"
+          : "provider"
         : storedSettings?.sttMode === "local" &&
             getStoredLocalModelId(storedSettings?.localSttModelId, "stt")
           ? "local"
@@ -309,14 +335,18 @@ export function normalizeStoredScalarSettings(
           ? "on"
           : "off"
         : DEFAULT_SETTINGS.webSearchMode,
-    sttProvider: getStoredProvider(
-      storedSettings?.sttProvider,
-      DEFAULT_SETTINGS.sttProvider,
-    ),
-    ttsProvider: getStoredProvider(
-      storedSettings?.ttsProvider,
-      DEFAULT_SETTINGS.ttsProvider,
-    ),
+    sttProvider: storedSttProviderRetired
+      ? null
+      : getStoredProvider(
+          storedSettings?.sttProvider,
+          DEFAULT_SETTINGS.sttProvider,
+        ),
+    ttsProvider: storedTtsProviderRetired
+      ? null
+      : getStoredProvider(
+          storedSettings?.ttsProvider,
+          DEFAULT_SETTINGS.ttsProvider,
+        ),
     webSearchProvider: isWebSearchProvider(storedSettings?.webSearchProvider)
       ? storedSettings.webSearchProvider
       : DEFAULT_SETTINGS.webSearchProvider,

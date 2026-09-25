@@ -122,9 +122,14 @@ DeepSeek V4 Pro routes. Grok 4.6 uses `x-ai/grok-4.6-20260810` and preserves
 the older saved alias through normalization. Per-model image and effort
 capabilities remain independent of the gateway provider.
 
-Qwen speech pins ASR to the February 2026 snapshot, standard TTS to November
-2025, and instruct TTS to January 2026. Voice filters and saved aliases follow
-those exact models; the US speech restriction remains in force.
+**Decision:** Qwen offers chat and search only. Alibaba retires every DashScope
+speech snapshot the app used (Qwen3-ASR-Flash and both Qwen3-TTS-Flash
+families) on 2026-10-10. Its recommended successors, Fun-ASR and CosyVoice,
+use different APIs and voices and are not region-complete, so they are not
+drop-in replacements. Saved Qwen speech selections fall back to native speech.
+Rejected alternative: pinning the rolling aliases, which have no published
+successor snapshot and no US-region parity. Re-adding Qwen speech requires a
+new adapter.
 
 OpenAI defaults new recorded-transcription selections to `gpt-transcribe`.
 Older transcription routes remain selectable until their announced February

@@ -39,12 +39,8 @@ describe("provider language notes", () => {
 
   it("falls back to the curated provider STT note when catalog language data is too generic", () => {
     expect(
-      getProviderSttLanguageNoteForModel(
-        "alibaba-qwen-dashscope",
-        "qwen3-asr-flash-2026-02-10",
-        "en",
-      ),
-    ).toContain("DashScope STT is limited");
+      getProviderSttLanguageNoteForModel("openai", "gpt-transcribe", "en"),
+    ).toContain("OpenAI currently exposes gpt-transcribe");
   });
 
   it("derives a TTS language note from exact catalog model metadata", () => {

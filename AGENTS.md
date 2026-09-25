@@ -200,8 +200,8 @@ applies.
 
 - STT provider support is currently wired in `src/services/whisper.ts`.
 - TTS provider support is currently wired in `src/services/tts.ts`.
-- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini, Mistral, xAI, Alibaba Qwen, and ElevenLabs currently have provider STT routes in code. Gemini uses the same AI Studio API key as chat, search, and TTS.
-- Text-to-speech uses the device's native voices by default. An optional downloaded Kokoro model provides on-device English and Simplified Chinese speech; provider TTS is capability-gated. OpenAI, Gemini, xAI, Alibaba Qwen, Mistral, and ElevenLabs currently have provider TTS routes in code.
+- Speech-to-text prefers the device's native system recognizer (`src/services/speech/`); provider STT is capability-gated. OpenAI, Gemini, Mistral, xAI, and ElevenLabs currently have provider STT routes in code. Gemini uses the same AI Studio API key as chat, search, and TTS.
+- Text-to-speech uses the device's native voices by default. An optional downloaded Kokoro model provides on-device English and Simplified Chinese speech; provider TTS is capability-gated. OpenAI, Gemini, xAI, Mistral, and ElevenLabs currently have provider TTS routes in code.
 - Mistral, ElevenLabs, and xAI load account-visible voices through provider voice-directory services. Keep those integrations, their fallback voice lists, and `src/services/providerVoiceDirectory.ts` in sync. ElevenLabs must retain a built-in premade fallback because restricted TTS/STT keys do not necessarily include `voices_read`.
 - Optional Kokoro on-device TTS uses `react-native-sherpa-onnx` and downloads its model only after the user opts in; the model is not bundled with the app.
 - TTS fallbacks are explicit and ordered. Provider and Kokoro primary routes default to no fallback; native speech never has a fallback policy.

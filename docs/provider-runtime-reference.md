@@ -47,7 +47,7 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 | `openai` | enabled | enabled | enabled | enabled | Uses Responses web search and OpenAI speech routes. |
 | `openrouter` | none | enabled | none | none | Optional multi-provider gateway with route metadata and privacy-constrained routing. |
 | `anthropic` | enabled | enabled | none | none | Claude Messages plus Anthropic web search. |
-| `alibaba-qwen-dashscope` | enabled | enabled | enabled | enabled | OpenAI-compatible chat plus Qwen Responses search and simple DashScope ASR/TTS routes. |
+| `alibaba-qwen-dashscope` | enabled | enabled | none | none | OpenAI-compatible chat plus Qwen Responses search; DashScope speech retired 2026-10-10. |
 | `gemini` | enabled | enabled | enabled | enabled | One AI Studio key covers Gemini GenerateContent/Live, Interactions search, recorded-audio transcription, and Gemini TTS. |
 | `xai` | enabled | enabled | enabled | enabled | Grok chat/Responses search plus standalone xAI STT/TTS routes. |
 | `deepseek` | none | enabled | none | none | DeepSeek chat completions only. |
@@ -118,10 +118,8 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Effort: Qwen 3.8 uses `reasoning_effort` (`none`, `low`, `medium`,
   `xhigh`) and `preserve_thinking: false`; earlier models retain the
   `enable_thinking` toggle. Search uses `reasoning.effort: none`.
-- STT picker: `qwen3-asr-flash-2026-02-10`.
-- TTS picker: `qwen3-tts-flash-2025-11-27`,
-  `qwen3-tts-instruct-flash-2026-01-26`. Saved aliases migrate without losing
-  the selected speech family.
+- STT/TTS: not runtime-exposed. Alibaba retires the DashScope speech snapshots
+  on 2026-10-10; saved Qwen speech selections return to native speech.
 
 ### Google / Gemini (`gemini`)
 

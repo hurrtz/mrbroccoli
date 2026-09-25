@@ -14,11 +14,6 @@ import { providerSupportsTtsLanguage } from "../../constants/providerSpeechLangu
 import { getTtsListenLanguageLabel } from "../../constants/localTts";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { getDefaultTtsListenLanguageForLocale } from "../../i18n/localeRegistry";
-import {
-  parseQwenApiCredential,
-  qwenRegionSupportsAppSpeech,
-  resolveQwenApiEndpoint,
-} from "../../utils/qwenRegion";
 
 import {
   buildTtsRequestError,
@@ -242,13 +237,6 @@ function getBinaryTtsHeaders(params: {
       };
 }
 
-function getDashScopeAudioUrl(data: any) {
-  const url = data?.output?.audio?.url;
-  return typeof url === "string"
-    ? url.replace(/^http:\/\//i, "https://")
-    : null;
-}
-
 function getBinaryTtsVoice(params: {
   requestFormat: RuntimeTtsBinaryRequestFormat;
   selectedModel: string;
@@ -315,13 +303,6 @@ export async function synthesizeProviderSpeech(params: {
         language: getTtsListenLanguageLabel(speechLanguage, language),
       }),
     );
-  }
-
-  if (
-    provider === "alibaba-qwen-dashscope" &&
-    !qwenRegionSupportsAppSpeech(parseQwenApiCredential(apiKey ?? "").region)
-  ) {
-    throw new Error(translate(language, "qwenSpeechUnavailableInUs"));
   }
 
   const selectedVoice = getSelectedProviderVoice({
@@ -425,67 +406,6 @@ export async function synthesizeProviderSpeech(params: {
           sampleRate,
           language,
         });
-      }
-
-      if (config.kind === "dashscope") {
-        const response = await fetchTtsWithRetries({
-          input:
-            provider === "alibaba-qwen-dashscope"
-              ? resolveQwenApiEndpoint(config.endpoint, apiKey ?? "")
-              : config.endpoint,
-          init: {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
-            },
-            body: JSON.stringify({
-              model: selectedModel,
-              input: {
-                text,
-                voice: selectedVoice,
-                ...(getSpeechLanguageDefinition(speechLanguage).qwenTtsLanguage
-                  ? {
-                      language_type:
-                        getSpeechLanguageDefinition(speechLanguage)
-                          .qwenTtsLanguage,
-                    }
-                  : {}),
-                ...(selectedInstructions
-                  ? { instructions: selectedInstructions }
-                  : {}),
-              },
-            }),
-          },
-          timeoutMs,
-          provider,
-          language,
-          abortSignal,
-        });
-
-        const data = await response.json();
-        const audioUrl = getDashScopeAudioUrl(data);
-
-        if (!audioUrl) {
-          throw new Error(
-            translate(language, "ttsDidNotReturnAudio", {
-              provider: PROVIDER_LABELS[provider],
-            }),
-          );
-        }
-
-        const audioResponse = await fetchTtsWithRetries({
-          input: audioUrl,
-          init: {
-            method: "GET",
-          },
-          timeoutMs,
-          provider,
-          language,
-          abortSignal,
-        });
-
-        return writeBlobAudioFile(await audioResponse.blob(), "wav");
       }
 
       const authorizationKey = requireProviderKey(provider, apiKey, language);

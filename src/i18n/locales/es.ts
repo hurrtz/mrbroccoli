@@ -444,16 +444,12 @@ export const es = {
     "La entrada manual permanece disponible cuando no se puede cargar la biblioteca de voces.",
   providerVoiceIdRequired: ({ provider }) =>
     `Actualiza la biblioteca de voces de ${provider} o introduce un ID de voz antes de usar la salida de voz.`,
-  qwenSpeechUnavailableInUs:
-    "Las rutas de voz de Qwen que uso actualmente no están disponibles en la región de EE. UU. Elige Singapur o Pekín para la voz de Qwen.",
   qwenApiRegion: "Región de la API de Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "Estados Unidos (Virginia)",
   qwenRegionBeijing: "China (Pekín)",
   qwenRegionHint:
     "La región seleccionada debe coincidir con la región en la que se creó esta clave API.",
-  qwenRegionUsSpeechHint:
-    "Las claves de la región de EE. UU. admiten chat y búsqueda web aquí. Mis rutas actuales de STT y TTS de Qwen requieren una clave de Singapur o Pekín.",
   providerDefaultVoiceHint:
     "Actualmente, este proveedor utiliza su voz predeterminada para obtener vistas previas y respuestas habladas.",
   listenLanguages: "Idiomas de escucha",

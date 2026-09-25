@@ -51,7 +51,3 @@ export function resolveQwenApiEndpoint(endpoint: string, credential: string) {
     `https://${QWEN_API_HOSTS[region]}`,
   );
 }
-
-export function qwenRegionSupportsAppSpeech(region: QwenApiRegion) {
-  return region !== "us";
-}

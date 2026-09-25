@@ -442,16 +442,12 @@ export const cs = {
     "Pokud nelze načíst hlasovou knihovnu, zůstává k dispozici ruční zadávání.",
   providerVoiceIdRequired: ({ provider }) =>
     `Před použitím hlasového výstupu aktualizuj hlasovou knihovnu ${provider} nebo zadej hlasové ID.`,
-  qwenSpeechUnavailableInUs:
-    "Mé aktuální hlasové trasy Qwen nejsou v regionu USA dostupné. Pro řeč Qwen vyber Singapur nebo Peking.",
   qwenApiRegion: "Oblast API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginie)",
   qwenRegionBeijing: "Čína (Peking)",
   qwenRegionHint:
     "Vybraná oblast se musí shodovat s oblastí, ve které byl tento klíč API vytvořen.",
-  qwenRegionUsSpeechHint:
-    "Klíče pro oblast USA zde podporují chat a vyhledávání na webu. Mé aktuální trasy Qwen STT a TTS vyžadují singapurský nebo pekingský klíč.",
   providerDefaultVoiceHint:
     "Tento poskytovatel aktuálně používá svůj výchozí hlas pro náhled a mluvené odpovědi.",
   listenLanguages: "Jazyky poslechu",

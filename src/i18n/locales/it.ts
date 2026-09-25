@@ -444,16 +444,12 @@ export const it = {
     "L'immissione manuale rimane disponibile quando non è possibile caricare la libreria vocale.",
   providerVoiceIdRequired: ({ provider }) =>
     `Aggiorna la libreria vocale ${provider} o inserisci un ID vocale prima di utilizzare l'output vocale.`,
-  qwenSpeechUnavailableInUs:
-    "I miei attuali percorsi vocali Qwen non sono disponibili nella regione degli Stati Uniti. Scegli Singapore o Pechino per le funzioni vocali Qwen.",
   qwenApiRegion: "Regione API Qwen",
   qwenRegionSingapore: "Singapore",
   qwenRegionUs: "Stati Uniti (Virginia)",
   qwenRegionBeijing: "Cina (Pechino)",
   qwenRegionHint:
     "La regione selezionata deve corrispondere alla regione in cui è stata creata questa chiave API.",
-  qwenRegionUsSpeechHint:
-    "Le chiavi per la regione degli Stati Uniti supportano la chat e la ricerca web qui. I miei attuali percorsi STT e TTS di Qwen richiedono una chiave della regione Singapore o Pechino.",
   providerDefaultVoiceHint:
     "Questo provider attualmente utilizza la sua voce predefinita per l'anteprima e le risposte vocali.",
   listenLanguages: "Lingue di ascolto",

@@ -7,18 +7,12 @@ import { AppLanguage, Provider, SttBackendMode } from "../types";
 import type { SttLanguage } from "../types";
 import { providerSupportsSttLanguage } from "../constants/providerSpeechLanguages";
 import { getTtsListenLanguageLabel } from "../constants/localTts";
-import {
-  parseQwenApiCredential,
-  qwenRegionSupportsAppSpeech,
-  resolveQwenApiEndpoint,
-} from "../utils/qwenRegion";
 import { getProviderSttConfig } from "./whisper/config";
 import { createSttRecordingTooLargeError } from "./whisper/errors";
 import { waitForRecordedFileReady } from "./whisper/recordedFileReady";
 import {
   transcribeWithGoogleSpeechProvider,
   transcribeWithMultipartProvider,
-  transcribeWithOpenAiAudioInputProvider,
   transcribeWithXaiRestSttProvider,
 } from "./whisper/providers";
 import { getProviderModelCandidates } from "./providerModelCandidates";
@@ -148,7 +142,7 @@ export async function transcribeAudio(params: {
     capability: "stt",
     provider,
     request: async (resolvedModel) => {
-      let config = getProviderSttConfig(provider, resolvedModel);
+      const config = getProviderSttConfig(provider, resolvedModel);
 
       if (!config) {
         throw new Error(
@@ -158,40 +152,12 @@ export async function transcribeAudio(params: {
         );
       }
 
-      if (provider === "alibaba-qwen-dashscope") {
-        const region = parseQwenApiCredential(apiKey ?? "").region;
-
-        if (!qwenRegionSupportsAppSpeech(region)) {
-          throw new Error(translate(language, "qwenSpeechUnavailableInUs"));
-        }
-
-        if ("endpoint" in config) {
-          config = {
-            ...config,
-            endpoint: resolveQwenApiEndpoint(config.endpoint, apiKey ?? ""),
-          };
-        }
-      }
-
       if (!remoteAudioSource) {
         await assertSttUploadFitsCatalogLimits({
           fileUri,
           provider,
           modelId: resolvedModel,
           language,
-        });
-      }
-
-      if (config.kind === "openai-audio-input") {
-        return transcribeWithOpenAiAudioInputProvider({
-          abortSignal,
-          apiKey,
-          config,
-          fileUri,
-          language,
-          speechLanguage,
-          provider,
-          providerModel: resolvedModel,
         });
       }
 
