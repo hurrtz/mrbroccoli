@@ -44,6 +44,11 @@ and paid provider phases remain local-only. The remote run makes the gates
 enforced rather than advisory — a `--no-verify` push no longer bypasses
 validation silently.
 
+Contracts must hold on both the macOS developer machine and the Linux runner.
+`THIRD_PARTY_NOTICES.md` therefore lists every platform variant of an
+installed optional native binary under its parent's license, because npm
+installs only the host's variant.
+
 ```mermaid
 flowchart LR
     Hook[Git pre-push] --> Spec[Living-spec review]

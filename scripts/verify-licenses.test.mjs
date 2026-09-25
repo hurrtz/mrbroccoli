@@ -5,6 +5,7 @@ import {
   isApprovedLicense,
   noticePackageKeys,
   noticesCoverPackages,
+  portablePlatformVariants,
   resolvedLicense,
 } from "./verify-licenses.mjs";
 
@@ -65,4 +66,63 @@ test("accepts a portable notice inventory that is a superset of this platform", 
     ]),
     false,
   );
+});
+
+test("lists every platform variant of an installed optional binary", () => {
+  const rootDir = "/repo";
+  const packages = [
+    {
+      name: "css-engine",
+      version: "1.0.0",
+      license: "MPL-2.0",
+      packagePath: "/repo/node_modules/css-engine",
+    },
+    {
+      name: "css-engine-darwin-arm64",
+      version: "1.0.0",
+      license: "MPL-2.0",
+      packagePath: "/repo/node_modules/css-engine-darwin-arm64",
+    },
+  ];
+  const lockPackages = {
+    "node_modules/css-engine": {
+      version: "1.0.0",
+      license: "MPL-2.0",
+      optionalDependencies: {
+        "css-engine-darwin-arm64": "1.0.0",
+        "css-engine-linux-x64-gnu": "1.0.0",
+        "css-engine-relicensed": "1.0.0",
+        "plain-optional": "1.0.0",
+      },
+    },
+    "node_modules/css-engine-darwin-arm64": {
+      version: "1.0.0",
+      license: "MPL-2.0",
+      os: ["darwin"],
+      optional: true,
+    },
+    "node_modules/css-engine-linux-x64-gnu": {
+      version: "1.0.0",
+      license: "MPL-2.0",
+      os: ["linux"],
+      cpu: ["x64"],
+      optional: true,
+    },
+    "node_modules/css-engine-relicensed": {
+      version: "1.0.0",
+      license: "GPL-3.0-only",
+      os: ["win32"],
+      optional: true,
+    },
+    "node_modules/plain-optional": { version: "1.0.0", license: "MPL-2.0", optional: true },
+  };
+
+  assert.deepEqual(portablePlatformVariants(packages, lockPackages, rootDir), [
+    {
+      name: "css-engine-linux-x64-gnu",
+      version: "1.0.0",
+      license: "MPL-2.0",
+      packagePath: "/repo/node_modules/css-engine",
+    },
+  ]);
 });
