@@ -20,10 +20,6 @@ import { executeProviderModelRequest } from "./providerResilience";
 import type { LocalSttModelId } from "../constants/localModels";
 import { transcribeLocalAudio } from "./localSpeechModels";
 
-function isRemoteAudioSource(fileUri: string) {
-  return /^(https?:\/\/|oss:\/\/)/i.test(fileUri);
-}
-
 async function assertSttUploadFitsCatalogLimits(params: {
   fileUri: string;
   provider: Provider;
@@ -94,9 +90,7 @@ export async function transcribeAudio(params: {
     if (!localModelId) {
       throw new Error(translate(language, "chooseOnDeviceSttModel"));
     }
-    if (!isRemoteAudioSource(fileUri)) {
-      await waitForRecordedFileReady(fileUri, language, abortSignal);
-    }
+    await waitForRecordedFileReady(fileUri, language, abortSignal);
     const result = await transcribeLocalAudio({
       fileUri,
       modelId: localModelId,
@@ -125,11 +119,7 @@ export async function transcribeAudio(params: {
     );
   }
 
-  const remoteAudioSource = isRemoteAudioSource(fileUri);
-
-  if (!remoteAudioSource) {
-    await waitForRecordedFileReady(fileUri, language, abortSignal);
-  }
+  await waitForRecordedFileReady(fileUri, language, abortSignal);
 
   const candidateModels = getProviderModelCandidates({
     capability: "stt",
@@ -152,14 +142,12 @@ export async function transcribeAudio(params: {
         );
       }
 
-      if (!remoteAudioSource) {
-        await assertSttUploadFitsCatalogLimits({
-          fileUri,
-          provider,
-          modelId: resolvedModel,
-          language,
-        });
-      }
+      await assertSttUploadFitsCatalogLimits({
+        fileUri,
+        provider,
+        modelId: resolvedModel,
+        language,
+      });
 
       if (config.kind === "google-speech") {
         return transcribeWithGoogleSpeechProvider({
