@@ -706,6 +706,9 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       models: [
         withEffort(namedModel("anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"), effortConfig("reasoning-effort", "medium", ["low", "medium", "high", "xhigh", "max"])),
         withEffort(namedModel("x-ai/grok-4.7-20260916", "xAI · Grok 4.7"), XAI_GROK_46_EFFORT),
+        withEffort(namedModel("openai/gpt-6-sol-20260922", "OpenAI · GPT-6 Sol"), OPENAI_GPT_6_EFFORT),
+        withEffort(namedModel("openai/gpt-6-luna-20260922", "OpenAI · GPT-6 Luna"), OPENAI_GPT_6_EFFORT),
+        withEffort(namedModel("deepseek/deepseek-v4.1-flash-20260910", "DeepSeek · DeepSeek V4.1 Flash"), effortConfig("reasoning-effort", "high", ["low", "high", "max"])),
         withEffort(namedModel("anthropic/claude-opus-5-20260723", "Anthropic · Claude Opus 5"), OPENROUTER_HIGH_REASONING_EFFORT),
         withEffort(namedModel("google/gemini-3.8-flash-20260902", "Google · Gemini 3.8 Flash"), effortConfig("reasoning-effort", "high", ["low", "medium", "high"])),
         withEffort(namedModel("qwen/qwen3.8-max-20260902", "Qwen · Qwen3.8 Max"), effortConfig("reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),

@@ -9,11 +9,21 @@ import {
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 import type { Provider } from "../../src/types";
 
-it.each(["gpt-6-sol", "gpt-6-luna"])("offers the full GPT-6 effort range for %s without downgrading max", (model) => {
-  expect(getModelEffortOptions("openai", model).map(({ id }) => id)).toEqual(["none", "low", "medium", "high", "xhigh", "max"]);
-  expect(getDefaultModelEffort("openai", model)).toBe("medium");
-  expect(getModelEffortRequestBody("openai", model, "max")).toEqual({ reasoning_effort: "max" });
-  expect(getModelEffortRequestBody("openai", model, "none")).toEqual({ reasoning_effort: "none" });
+it("limits OpenRouter DeepSeek V4.1 Flash to its published efforts", () => {
+  expect(getModelEffortOptions("openrouter", "deepseek/deepseek-v4.1-flash-20260910").map(({ id }) => id)).toEqual(["low", "high", "max"]);
+  expect(getDefaultModelEffort("openrouter", "deepseek/deepseek-v4.1-flash-20260910")).toBe("high");
+});
+
+it.each<[Provider, string]>([
+  ["openai", "gpt-6-sol"],
+  ["openai", "gpt-6-luna"],
+  ["openrouter", "openai/gpt-6-sol-20260922"],
+  ["openrouter", "openai/gpt-6-luna-20260922"],
+])("offers the full GPT-6 effort range for %s %s without downgrading max", (provider, model) => {
+  expect(getModelEffortOptions(provider, model).map(({ id }) => id)).toEqual(["none", "low", "medium", "high", "xhigh", "max"]);
+  expect(getDefaultModelEffort(provider, model)).toBe("medium");
+  expect(getModelEffortTransportValue(provider, model, "max")).toBe("max");
+  expect(getModelEffortTransportValue(provider, model, "none")).toBe("none");
 });
 
 describe("model effort metadata", () => {
