@@ -24,7 +24,9 @@ describe("provider model accuracy", () => {
     ["openai", "gpt-6-astra", "GPT-6 Astra"],
     ["anthropic", "claude-fable-5-1", "Claude Fable 5.1"],
     ["anthropic", "claude-opus-5-5", "Claude Opus 5.5"],
+    ["xai", "grok-4.7", "Grok 4.7"],
     ["openrouter", "anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"],
+    ["openrouter", "x-ai/grok-4.7-20260916", "xAI · Grok 4.7"],
     ["openrouter", "openai/gpt-6-astra-20260903", "OpenAI · GPT-6 Astra"],
     [
       "openrouter",
@@ -242,6 +244,7 @@ describe("provider model accuracy", () => {
 
   it("keeps code-specific xAI models out of the voice-chat picker", () => {
     expect(providerModelIds("xai")).toEqual([
+      "grok-4.7",
       "grok-4.6",
       "grok-4.5",
       "grok-4.3",

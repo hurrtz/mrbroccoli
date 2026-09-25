@@ -237,9 +237,9 @@ describe("deriveResponseModesForProvider", () => {
     const modes = deriveResponseModesForProvider("xai");
 
     expect(modes.map((mode) => mode.route.model)).toEqual([
+      "grok-4.7",
       "grok-4.6",
       "grok-4.5",
-      "grok-4.3",
     ]);
   });
 });

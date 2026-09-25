@@ -102,6 +102,11 @@ behavior. It takes Opus 5's slot in picker order so the first three derived
 Anthropic modes stay Fable, Opus, and Sonnet. OpenRouter pins
 `anthropic/claude-opus-5.5-20260921`. It joins no web-search candidate list.
 
+Grok 4.7 uses `grok-4.7` (xAI publishes no dated snapshot) with Grok 4.6's
+low/medium/high/xhigh contract. It leads the xAI picker, so derived xAI modes
+become 4.7, 4.6, and 4.5, while `grok-4.6` stays the default. OpenRouter pins
+`x-ai/grok-4.7-20260916`. It joins no web-search candidate list.
+
 Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
 reasoning choices are low/medium/high only; minimal is never sent.
 
