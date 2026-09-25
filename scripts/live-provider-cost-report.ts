@@ -210,12 +210,12 @@ const PINNED_RELEASE_PRICING: Record<
   "deepseek:deepseek-flash": {
     rates: { million_input_tokens: 0.3, million_output_tokens: 1.2 },
     source: "https://api-docs.deepseek.com/quick_start/pricing",
-    note: "Cache-miss input pricing is used as the conservative standard rate.",
+    note: "Peak cache-miss input pricing is used as the conservative standard rate; off-peak is half.",
   },
   "deepseek:deepseek-v4-pro": {
-    rates: { million_input_tokens: 0.435, million_output_tokens: 0.87 },
+    rates: { million_input_tokens: 1.32, million_output_tokens: 3.96 },
     source: "https://api-docs.deepseek.com/quick_start/pricing",
-    note: "Cache-miss input pricing is used as the conservative standard rate.",
+    note: "Peak cache-miss input pricing for V4-Pro-0813 is used as the conservative standard rate; off-peak is half.",
   },
 };
 
