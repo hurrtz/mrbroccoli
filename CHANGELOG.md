@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Grok 4.7 is available as an answering model, directly and through OpenRouter,
+  with low through extra-high reasoning effort.
+
 - Claude Opus 5.5 is available as an answering model, directly and through
   OpenRouter, with all five reasoning efforts.
 
