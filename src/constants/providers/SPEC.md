@@ -157,6 +157,15 @@ ElevenLabs keeps the legacy fallback voice ID because the provider redirects
 it to Janet. The displayed identity is Janet; no unverified replacement ID or
 new voice-directory permission requirement is introduced.
 
+**Decision:** A model the provider serves only to accounts that already used
+it is marked `existingAccessOnly`. It stays valid for saved routes, fallback
+normalization, and release testing, but pickers, new-mode suggestions, and
+derived defaults do not offer it unless it is the current selection. Google
+limited Gemini 2.5 Pro, Flash, and Flash-Lite this way on 2026-09-18 with no
+shutdown date. Rejected alternatives: removing the models, which would break
+accounts that still have access, and keeping them as ordinary choices, which
+would fail for most new keys.
+
 ## Capability Boundaries
 
 LLM, STT, TTS, search, and voice discovery are independent capabilities. A

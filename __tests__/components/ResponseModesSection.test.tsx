@@ -79,10 +79,11 @@ describe("ThinkingSettingsPage response modes", () => {
 
     fireEvent.press(screen.getByTestId("thinking-slot-model"));
     expect(presentedModals()[0]).toBe(presentedModal);
-    fireEvent.press(screen.getByRole("radio", { name: "Gemini 2.5 Flash-Lite" }));
+    expect(screen.queryByRole("radio", { name: "Gemini 2.5 Flash-Lite" })).toBeNull();
+    fireEvent.press(screen.getByRole("radio", { name: "Gemini 3.5 Flash-Lite" }));
     expect(
       within(screen.getByTestId("thinking-slot-model")).getByText(
-        "gemini-2.5-flash-lite",
+        "gemini-3.5-flash-lite",
       ),
     ).toBeTruthy();
     expect(presentedModals()[0]).toBe(presentedModal);
@@ -152,6 +153,26 @@ describe("ThinkingSettingsPage response modes", () => {
     expect(
       screen.getByTestId("thinking-effort-high").props.accessibilityState,
     ).toEqual({ checked: true });
+  });
+
+  it("keeps a saved existing-access-only model selectable without offering others", () => {
+    const screen = renderPage({
+      ...DEFAULT_SETTINGS,
+      responseModes: [
+        {
+          id: "mode-1",
+          route: { provider: "gemini", model: "gemini-2.5-flash-lite" },
+        },
+      ],
+    });
+
+    fireEvent.press(screen.getByTestId("thinking-slot-mode-1"));
+    fireEvent.press(screen.getByTestId("thinking-slot-model"));
+
+    expect(
+      screen.getByRole("radio", { name: "Gemini 2.5 Flash-Lite" }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("radio", { name: "Gemini 2.5 Pro" })).toBeNull();
   });
 
   it("uses the selected model's documented effort ladder", () => {

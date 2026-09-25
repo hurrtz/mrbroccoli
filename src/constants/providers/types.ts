@@ -3,6 +3,7 @@ export interface ModelInfo {
   name: string;
   releaseDate?: string;
   effort?: ModelEffortConfig;
+  existingAccessOnly?: boolean;
 }
 
 export interface ModelEffortOption {

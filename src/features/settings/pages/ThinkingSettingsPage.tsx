@@ -25,7 +25,7 @@ import {
 import {
   getAvailableResponseModes,
   getDefaultModelForProvider,
-  getProviderLlmModelOptions,
+  getSelectableProviderLlmModelOptions,
 } from "../../../utils/responseModes";
 import type { TextInputFocusHandler } from "../../settings-core/types";
 import {
@@ -488,7 +488,10 @@ export function ThinkingSettingsPage({
               onPress={() => setSheet({ ...sheet, view: "slot" })}
             />
             <SettingsGroup title={PROVIDER_LABELS[currentMode.route.provider]}>
-              {getProviderLlmModelOptions(currentMode.route.provider).map(
+              {getSelectableProviderLlmModelOptions(
+                currentMode.route.provider,
+                currentMode.route.model,
+              ).map(
                 (model, index, models) => (
                   <RouteOptionRow
                     key={model.id}

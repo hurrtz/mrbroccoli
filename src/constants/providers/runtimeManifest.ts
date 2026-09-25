@@ -36,6 +36,12 @@ export interface RuntimeModelSpec {
   effort?: RuntimeModelEffortConfig;
   supportsInstructions?: boolean;
   supportsImageInput?: boolean;
+  /**
+   * The provider only serves this model to accounts that already used it.
+   * Saved routes stay valid, but pickers and derived defaults never offer it
+   * as a new choice.
+   */
+  existingAccessOnly?: boolean;
 }
 
 export type RuntimeModelEffortTransportParam =
@@ -147,6 +153,10 @@ function namedModel(
   releaseDate?: string,
 ): RuntimeModelSpec {
   return releaseDate ? { id, fallbackName, releaseDate } : { id, fallbackName };
+}
+
+function existingAccessOnly(modelSpec: RuntimeModelSpec): RuntimeModelSpec {
+  return { ...modelSpec, existingAccessOnly: true };
 }
 
 function withEffort(
@@ -900,7 +910,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           geminiThinkingEffort("minimal", ["minimal", "low", "medium", "high"]),
         ),
         withEffort(
-          model("gemini-2.5-pro"),
+          existingAccessOnly(model("gemini-2.5-pro")),
           geminiThinkingBudgetEffort({
             defaultOptionId: "dynamic",
             minimumBudget: 128,
@@ -909,7 +919,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           }),
         ),
         withEffort(
-          model("gemini-2.5-flash"),
+          existingAccessOnly(model("gemini-2.5-flash")),
           geminiThinkingBudgetEffort({
             defaultOptionId: "dynamic",
             minimumBudget: 1024,
@@ -918,7 +928,7 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           }),
         ),
         withEffort(
-          model("gemini-2.5-flash-lite"),
+          existingAccessOnly(model("gemini-2.5-flash-lite")),
           geminiThinkingBudgetEffort({
             defaultOptionId: "disabled",
             minimumBudget: 512,

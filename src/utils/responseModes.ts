@@ -110,7 +110,7 @@ export function getSuggestedResponseModeRoute(
       (route) => route.provider === provider,
     )?.model;
 
-    return getProviderLlmModelOptions(provider)
+    return getSelectableProviderLlmModelOptions(provider)
       .filter(({ id }) => id !== primaryModel)
       .map(({ id: model }) =>
         normalizeResponseModeRouteEffort({ provider, model }),
@@ -144,7 +144,7 @@ export function deriveResponseModesForProvider(
 ): ResponseModeSelections {
   const runtimeModelIds = Array.from(
     new Set(
-      getProviderLlmModelOptions(provider)
+      getSelectableProviderLlmModelOptions(provider)
         .map((model) => model.id)
         .filter((model) => model.trim().length > 0),
     ),
@@ -226,9 +226,22 @@ export function getProviderLlmModelOptions(provider: Provider) {
   );
 }
 
+/**
+ * Models offered as a new choice. Existing-access-only models stay valid for
+ * saved routes and remain listed while they are the current selection.
+ */
+export function getSelectableProviderLlmModelOptions(
+  provider: Provider,
+  currentModel?: string,
+) {
+  return getProviderLlmModelOptions(provider).filter(
+    (model) => !model.existingAccessOnly || model.id === currentModel,
+  );
+}
+
 export function getDefaultModelForProvider(provider: Provider): string {
   const curatedDefault = PROVIDER_DEFAULT_MODELS[provider];
-  const availableModels = getProviderLlmModelOptions(provider);
+  const availableModels = getSelectableProviderLlmModelOptions(provider);
 
   if (isValidModelForProvider(provider, curatedDefault)) {
     return curatedDefault;
