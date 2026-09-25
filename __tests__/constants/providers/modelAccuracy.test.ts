@@ -46,6 +46,14 @@ describe("provider model accuracy", () => {
     expect(modelSupportsImageInput(provider, model)).toBe(true);
   });
 
+  it("gives every answering model a display name instead of its raw ID", () => {
+    for (const provider of PROVIDER_ORDER) {
+      for (const model of PROVIDER_MODELS[provider]) {
+        expect(`${provider}:${model.name}`).not.toBe(`${provider}:${model.id}`);
+      }
+    }
+  });
+
   it("keeps Astra and Fable OpenRouter aliases out of the snapshot picker", () => {
     expect(providerModelIds("openrouter")).not.toContain("openai/gpt-6-astra");
     expect(providerModelIds("openrouter")).not.toContain(

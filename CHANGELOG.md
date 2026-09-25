@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Gemini 3.8 Flash and 3.7 Flash show their names instead of raw model IDs in
+  the model picker.
+
 - Gemini 2.5 models are no longer offered as new choices because Google now
   limits them to accounts that already used them. Existing selections keep working.
 
