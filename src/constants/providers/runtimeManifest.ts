@@ -887,8 +887,8 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "gemini-3.5-flash-lite",
       ],
       models: [
-        withEffort(model("gemini-3.8-flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
-        withEffort(model("gemini-3.7-flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
+        withEffort(namedModel("gemini-3.8-flash", "Gemini 3.8 Flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
+        withEffort(namedModel("gemini-3.7-flash", "Gemini 3.7 Flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
         withEffort(
           model("gemini-3.6-flash"),
           geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
