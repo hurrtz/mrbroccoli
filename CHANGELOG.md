@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- GPT-6 Sol and GPT-6 Luna are available as answering models with every
+  reasoning effort from none to max.
+
 - Qwen speech input and output are removed ahead of Alibaba retiring them on
   October 10, 2026. Qwen chat and search are unchanged; saved Qwen speech
   selections switch to the device's built-in speech.

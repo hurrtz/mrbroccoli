@@ -366,6 +366,16 @@ const OPENAI_GPT_6_ASTRA_EFFORT = effortConfig("reasoning-effort", "medium", [
   "max",
 ]);
 
+// GPT-6 Sol and Luna add `max` and, unlike Astra, can turn reasoning off.
+const OPENAI_GPT_6_EFFORT = effortConfig("reasoning-effort", "medium", [
+  "none",
+  "low",
+  "medium",
+  "high",
+  "xhigh",
+  "max",
+]);
+
 const OPENAI_GPT_54_EFFORT = effortConfig("reasoning-effort", "none", [
   "none",
   "low",
@@ -550,6 +560,8 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
           namedModel("gpt-6-astra", "GPT-6 Astra"),
           OPENAI_GPT_6_ASTRA_EFFORT,
         ),
+        withEffort(namedModel("gpt-6-sol", "GPT-6 Sol"), OPENAI_GPT_6_EFFORT),
+        withEffort(namedModel("gpt-6-luna", "GPT-6 Luna"), OPENAI_GPT_6_EFFORT),
         withEffort(
           namedModel("gpt-5.6-sol", "GPT-5.6 Sol"),
           OPENAI_GPT_56_EFFORT,

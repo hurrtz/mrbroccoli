@@ -163,6 +163,14 @@ const PINNED_RELEASE_PRICING: Record<
     rates: { million_input_tokens: 10, million_output_tokens: 50 },
     source: "https://developers.openai.com/api/docs/models/gpt-6-astra",
   },
+  "openai:gpt-6-sol": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6-sol",
+  },
+  "openai:gpt-6-luna": {
+    rates: { million_input_tokens: 0.1, million_output_tokens: 0.5 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  },
   "openai:gpt-5.6-sol": {
     rates: { million_input_tokens: 5, million_output_tokens: 30 },
     source: "https://developers.openai.com/api/docs/models",

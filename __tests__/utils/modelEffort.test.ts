@@ -9,6 +9,13 @@ import {
 import { APP_LANGUAGES } from "../../src/i18n/localeRegistry";
 import type { Provider } from "../../src/types";
 
+it.each(["gpt-6-sol", "gpt-6-luna"])("offers the full GPT-6 effort range for %s without downgrading max", (model) => {
+  expect(getModelEffortOptions("openai", model).map(({ id }) => id)).toEqual(["none", "low", "medium", "high", "xhigh", "max"]);
+  expect(getDefaultModelEffort("openai", model)).toBe("medium");
+  expect(getModelEffortRequestBody("openai", model, "max")).toEqual({ reasoning_effort: "max" });
+  expect(getModelEffortRequestBody("openai", model, "none")).toEqual({ reasoning_effort: "none" });
+});
+
 describe("model effort metadata", () => {
   it.each<[Provider, string, string]>([
     ["openai", "gpt-6-astra", "medium"],

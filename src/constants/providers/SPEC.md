@@ -89,6 +89,12 @@ translations. The current direct IDs have no distinct dated snapshots in the
 or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
 OpenRouter snapshots are verified against its public Models and Endpoints APIs.
 
+GPT-6 Sol and Luna use their dateless direct IDs (OpenAI publishes no dated
+snapshot) through Chat Completions with none/low/medium/high/xhigh/max effort
+and a medium default. Their `max` passes through unchanged; the GPT-5.6
+downgrade does not apply. They follow Astra in picker order, so derived OpenAI
+modes are Astra, Sol, and Luna, while `gpt-5.6-sol` stays the default.
+
 DeepSeek V4.1 Flash (`deepseek-flash`) and V4 Pro expose disabled, low, high,
 and max effort. Enabled thinking sends the selected `reasoning_effort`; high
 remains default. Flash is the default and accepts images; Pro stays text-only.
