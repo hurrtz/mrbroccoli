@@ -447,16 +447,12 @@ export const de = {
     "Die manuelle Eingabe bleibt verfügbar, wenn die Stimmenbibliothek nicht geladen werden kann.",
   providerVoiceIdRequired: ({ provider }) =>
     `Aktualisiere die ${provider}-Stimmenbibliothek oder gib vor der Sprachausgabe eine Stimmen-ID ein.`,
-  qwenSpeechUnavailableInUs:
-    "Meine aktuellen Qwen-Sprachrouten sind in der US-Region nicht verfügbar. Wähle für Qwen-Spracherkennung und -ausgabe Singapur oder Peking.",
   qwenApiRegion: "Qwen-API-Region",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Virginia)",
   qwenRegionBeijing: "China (Peking)",
   qwenRegionHint:
     "Die ausgewählte Region muss der Region entsprechen, in der dieser API-Schlüssel erstellt wurde.",
-  qwenRegionUsSpeechHint:
-    "Keys aus der US-Region unterstützen hier Chat und Websuche. Meine aktuellen Qwen-Routen für Spracherkennung und -ausgabe benötigen einen Key aus Singapur oder Peking.",
   providerDefaultVoiceHint:
     "Dieser Anbieter nutzt aktuell seine Standardstimme für Vorschau und Sprachausgabe.",
   listenLanguages: "Sprachen",

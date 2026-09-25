@@ -439,16 +439,12 @@ export const sv = {
     "Manuell inmatning förblir tillgänglig när röstbiblioteket inte kan laddas.",
   providerVoiceIdRequired: ({ provider }) =>
     `Uppdatera ${provider} röstbibliotek eller ange ett röst-ID innan du använder tal.`,
-  qwenSpeechUnavailableInUs:
-    "Mina nuvarande Qwen-talrutter är inte tillgängliga i USA-regionen. Välj Singapore eller Peking för Qwen-tal.",
   qwenApiRegion: "Qwen API-region",
   qwenRegionSingapore: "Singapore",
   qwenRegionUs: "USA (Virginia)",
   qwenRegionBeijing: "Kina (Peking)",
   qwenRegionHint:
     "Den valda regionen måste matcha regionen där denna API-nyckel skapades.",
-  qwenRegionUsSpeechHint:
-    "USA-regionnycklar stöder chatt och webbsökning här. Mina nuvarande Qwen STT- och TTS-rutter kräver en Singapore- eller Peking-nyckel.",
   providerDefaultVoiceHint:
     "Denna leverantör använder för närvarande sin standardröst för förhandsgranskning och talade svar.",
   listenLanguages: "Lyssningsspråk",

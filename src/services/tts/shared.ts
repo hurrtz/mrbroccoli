@@ -25,7 +25,6 @@ export const PROVIDER_TTS_TIMEOUT_MS_PER_CHAR = 8;
 export const PROVIDER_TTS_MAX_TIMEOUT_MS = 40000;
 
 const PROVIDER_TTS_CHUNK_CHAR_LIMITS: Partial<Record<Provider, number>> = {
-  "alibaba-qwen-dashscope": 550,
   // xAI generation latency grows noticeably with long clauses. Smaller
   // chunks let the first clip play while the next one is prefetched.
   xai: 240,
@@ -42,11 +41,6 @@ const PROVIDER_TTS_TIMEOUT_POLICIES: Partial<
   elevenlabs: { baseMs: 20000, maxMs: 60000, perCharacterMs: 20 },
   gemini: { baseMs: 30000, maxMs: 90000, perCharacterMs: 50 },
   xai: { baseMs: 30000, maxMs: 120000, perCharacterMs: 30 },
-  "alibaba-qwen-dashscope": {
-    baseMs: 30000,
-    maxMs: 90000,
-    perCharacterMs: 20,
-  },
 };
 
 export class TtsRequestError extends Error {
@@ -99,17 +93,7 @@ type GeminiTtsConfig = {
   voiceFallback: string;
 };
 
-type DashScopeTtsConfig = {
-  kind: "dashscope";
-  endpoint: string;
-  defaultModel: string;
-  voiceFallback: string;
-};
-
-export type ProviderTtsConfig =
-  | BinaryTtsConfig
-  | GeminiTtsConfig
-  | DashScopeTtsConfig;
+export type ProviderTtsConfig = BinaryTtsConfig | GeminiTtsConfig;
 
 const ttsProviderConfigEntries: [Provider, ProviderTtsConfig][] = [];
 
@@ -130,23 +114,6 @@ for (const provider of Object.keys(RUNTIME_PROVIDER_MANIFEST) as Provider[]) {
         requestFormat: manifest.tts.requestFormat,
         defaultModel: manifest.tts.defaultModel,
         voiceFallback: manifest.tts.voiceFallback ?? "",
-      },
-    ]);
-  }
-
-  if (
-    manifest.tts.transport === "dashscope" &&
-    manifest.tts.endpoint &&
-    manifest.tts.defaultModel &&
-    manifest.tts.voiceFallback
-  ) {
-    ttsProviderConfigEntries.push([
-      provider,
-      {
-        kind: "dashscope",
-        endpoint: manifest.tts.endpoint,
-        defaultModel: manifest.tts.defaultModel,
-        voiceFallback: manifest.tts.voiceFallback,
       },
     ]);
   }

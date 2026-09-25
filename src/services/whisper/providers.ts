@@ -13,13 +13,11 @@ import { fetchWithTimeout } from "./abort";
 import { getProviderSttTimeoutMs } from "./config";
 import type {
   GoogleSpeechTranscriptionConfig,
-  OpenAiAudioInputTranscriptionConfig,
   MultipartTranscriptionConfig,
   XaiRestSttTranscriptionConfig,
 } from "./config";
 import {
   createSttTimeoutError,
-  extractTextFromOpenAiAudioInputResponse,
   requireProviderKey,
 } from "./errors";
 
@@ -136,112 +134,6 @@ export async function transcribeWithMultipartProvider(
 
   const data = await response.json();
   const text = data.text?.trim();
-  return text ? text : null;
-}
-
-export async function transcribeWithOpenAiAudioInputProvider(
-  params: SharedProviderParams & {
-    config: OpenAiAudioInputTranscriptionConfig;
-  },
-) {
-  return transcribeWithOpenAiStyleAudioInputProvider({
-    ...params,
-    endpoint: params.config.endpoint,
-    headers: {
-      Authorization: `Bearer ${requireProviderKey(
-        params.provider,
-        params.apiKey,
-        params.language,
-      )}`,
-    },
-  });
-}
-
-async function transcribeWithOpenAiStyleAudioInputProvider(
-  params: SharedProviderParams & {
-    endpoint: string;
-    headers: Record<string, string>;
-    config: OpenAiAudioInputTranscriptionConfig;
-  },
-) {
-  const {
-    abortSignal,
-    config,
-    fileUri,
-    language,
-    provider,
-    providerModel,
-    speechLanguage,
-  } = params;
-  const base64 = await FileSystem.readAsStringAsync(fileUri, {
-    encoding: "base64",
-  });
-  const mimeType = getFileAudioMimeType(fileUri);
-  const dataUri = `data:${mimeType};base64,${base64}`;
-
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    response = await fetchWithTimeout(
-      params.endpoint,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...params.headers,
-        },
-        body: JSON.stringify({
-          model: providerModel || config.defaultModel,
-          messages: [
-            {
-              role: "user",
-              content: [
-                {
-                  type: "input_audio",
-                  input_audio: {
-                    data: dataUri,
-                  },
-                },
-              ],
-            },
-          ],
-          ...(speechLanguage === "auto"
-            ? {}
-            : {
-                asr_options: {
-                  language: getProviderSpeechLanguageCode(speechLanguage),
-                  enable_itn: false,
-                },
-              }),
-          stream: false,
-        }),
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText,
-      action: "transcription",
-    });
-  }
-
-  const data = await response.json();
-  const text = extractTextFromOpenAiAudioInputResponse(data);
   return text ? text : null;
 }
 

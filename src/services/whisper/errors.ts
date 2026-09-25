@@ -72,26 +72,3 @@ export function extractTextFromGeminiResponse(data: any) {
     .join("")
     .trim();
 }
-
-export function extractTextFromOpenAiAudioInputResponse(data: any) {
-  const content = data?.choices?.[0]?.message?.content;
-
-  if (typeof content === "string") {
-    return content.trim();
-  }
-
-  if (Array.isArray(content)) {
-    return content
-      .map((part) =>
-        typeof part?.text === "string"
-          ? part.text
-          : typeof part?.content === "string"
-            ? part.content
-            : "",
-      )
-      .join("")
-      .trim();
-  }
-
-  return "";
-}

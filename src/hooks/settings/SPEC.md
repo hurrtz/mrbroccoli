@@ -79,7 +79,8 @@ centralized at hydration rather than implemented as scattered null checks and
 fallbacks in screens and services.
 
 Speech model aliases migrate before availability/voice validation, preserving
-the selected speech family (including Qwen instruction-capable TTS).
+the selected speech family. A saved STT or TTS provider that no longer offers
+that capability is cleared at hydration and its mode returns to native speech.
 
 ## Runtime Capability Overrides
 

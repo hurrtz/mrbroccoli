@@ -28,47 +28,6 @@ describe("synthesizeProviderSpeech", () => {
     jest.clearAllMocks();
   });
 
-  it("upgrades DashScope's HTTP result URL before downloading the wav file", async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            output: {
-              audio: {
-                url: "http://dashscope.example/audio.wav",
-              },
-            },
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        blob: () => Promise.resolve(new Blob(["fake-audio"])),
-      });
-
-    const result = await synthesizeProviderSpeech({
-      text: "Hello world",
-      voice: "",
-      provider: "alibaba-qwen-dashscope",
-      apiKey: "dashscope-test",
-      language: "en",
-    });
-
-    expect(result).toMatch(/^\/tmp\/tts-.*\.wav$/);
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe(
-      "https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
-    );
-    const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-tts-flash-2025-11-27");
-    expect(body.input.voice).toBe("Cherry");
-    expect(body.input.text).toBe("Hello world");
-    expect(body.input.language_type).toBe("English");
-    expect((fetch as jest.Mock).mock.calls[1][0]).toBe(
-      "https://dashscope.example/audio.wav",
-    );
-  });
-
   it("uses the merged xAI grok-speech route with the documented payload", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -215,45 +174,4 @@ describe("synthesizeProviderSpeech", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
-  it("retries a transient DashScope audio download failure", async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            output: {
-              audio: {
-                url: "https://dashscope.example/audio.wav",
-              },
-            },
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: false,
-        status: 500,
-        text: () => Promise.resolve("Temporary download failure"),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        blob: () => Promise.resolve(new Blob(["fake-audio"])),
-      });
-
-    await expect(
-      synthesizeProviderSpeech({
-        text: "Please retry this download.",
-        voice: "Cherry",
-        provider: "alibaba-qwen-dashscope",
-        apiKey: "dashscope-test",
-        language: "en",
-      }),
-    ).resolves.toMatch(/^\/tmp\/tts-.*\.wav$/);
-
-    expect(fetch).toHaveBeenCalledTimes(3);
-    expect((fetch as jest.Mock).mock.calls[1][0]).toBe(
-      "https://dashscope.example/audio.wav",
-    );
-    expect((fetch as jest.Mock).mock.calls[2][0]).toBe(
-      "https://dashscope.example/audio.wav",
-    );
-  });
 });

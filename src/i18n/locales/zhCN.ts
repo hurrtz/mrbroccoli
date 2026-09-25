@@ -438,16 +438,12 @@ export const zhCN = {
     "当语音库无法加载时，手动输入仍然可用。",
   providerVoiceIdRequired: ({ provider }) =>
     `使用语音输出前，请刷新 ${provider} 语音库或输入语音 ID。`,
-  qwenSpeechUnavailableInUs:
-    "我当前的 Qwen 语音路由在美国区域不可用。请为 Qwen 语音选择新加坡或北京区域。",
   qwenApiRegion: "Qwen API 区域",
   qwenRegionSingapore: "新加坡",
   qwenRegionUs: "美国（弗吉尼亚州）",
   qwenRegionBeijing: "中国（北京）",
   qwenRegionHint:
     "所选区域必须与创建此 API 密钥的区域匹配。",
-  qwenRegionUsSpeechHint:
-    "美国区域的密钥支持此处的聊天和网页搜索。我当前的 Qwen STT 和 TTS 路由需要新加坡或北京区域的密钥。",
   providerDefaultVoiceHint:
     "该提供商当前使用其默认语音进行预览和语音回复。",
   listenLanguages: "收听语言",

@@ -440,16 +440,12 @@ export const ar = {
     "يظل الإدخال اليدوي متاحًا عندما لا يمكن تحميل مكتبة الأصوات.",
   providerVoiceIdRequired: ({ provider }) =>
     `قم بتحديث مكتبة أصوات ${provider} أو أدخل معرّف صوت قبل استخدام إخراج الكلام.`,
-  qwenSpeechUnavailableInUs:
-    "مسارات كلام Qwen الحالية لديّ غير متوفرة في منطقة الولايات المتحدة. اختر سنغافورة أو بكين لكلام Qwen.",
   qwenApiRegion: "منطقة Qwen API",
   qwenRegionSingapore: "سنغافورة",
   qwenRegionUs: "الولايات المتحدة (فرجينيا)",
   qwenRegionBeijing: "الصين (بكين)",
   qwenRegionHint:
     "يجب أن تتطابق المنطقة المحددة مع المنطقة التي تم إنشاء مفتاح API فيها.",
-  qwenRegionUsSpeechHint:
-    "تدعم مفاتيح منطقة الولايات المتحدة الدردشة وبحث الويب هنا. تتطلب مسارات Qwen STT وTTS الحالية لديّ مفتاح سنغافورة أو بكين.",
   providerDefaultVoiceHint:
     "يستخدم هذا المزوّد حاليًا صوته الافتراضي للمعاينة والردود المنطوقة.",
   listenLanguages: "لغات الاستماع",

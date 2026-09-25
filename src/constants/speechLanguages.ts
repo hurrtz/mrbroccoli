@@ -7,7 +7,6 @@ export interface SpeechLanguageDefinition {
   providerCode: string;
   googleCloudLocale: string;
   xaiTtsLocale: string | null;
-  qwenTtsLanguage: string | null;
 }
 
 /**
@@ -23,7 +22,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "en",
     googleCloudLocale: "en-US",
     xaiTtsLocale: "en",
-    qwenTtsLanguage: "English",
   },
   de: {
     labelKey: "german",
@@ -31,7 +29,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "de",
     googleCloudLocale: "de-DE",
     xaiTtsLocale: "de",
-    qwenTtsLanguage: "German",
   },
   uk: {
     labelKey: "ukrainian",
@@ -39,7 +36,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "uk",
     googleCloudLocale: "uk-UA",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
   hi: {
     labelKey: "hindi",
@@ -47,7 +43,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "hi",
     googleCloudLocale: "hi-IN",
     xaiTtsLocale: "hi",
-    qwenTtsLanguage: null,
   },
   es: {
     labelKey: "spanish",
@@ -55,7 +50,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "es",
     googleCloudLocale: "es-ES",
     xaiTtsLocale: "es-ES",
-    qwenTtsLanguage: "Spanish",
   },
   fr: {
     labelKey: "french",
@@ -63,7 +57,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "fr",
     googleCloudLocale: "fr-FR",
     xaiTtsLocale: "fr",
-    qwenTtsLanguage: "French",
   },
   it: {
     labelKey: "italian",
@@ -71,7 +64,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "it",
     googleCloudLocale: "it-IT",
     xaiTtsLocale: "it",
-    qwenTtsLanguage: "Italian",
   },
   pt: {
     labelKey: "portuguese",
@@ -79,7 +71,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "pt",
     googleCloudLocale: "pt-PT",
     xaiTtsLocale: "pt-PT",
-    qwenTtsLanguage: "Portuguese",
   },
   "pt-BR": {
     labelKey: "portugueseBrazil",
@@ -87,7 +78,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "pt",
     googleCloudLocale: "pt-BR",
     xaiTtsLocale: "pt-BR",
-    qwenTtsLanguage: "Portuguese",
   },
   ru: {
     labelKey: "russian",
@@ -95,7 +85,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "ru",
     googleCloudLocale: "ru-RU",
     xaiTtsLocale: "ru",
-    qwenTtsLanguage: "Russian",
   },
   "zh-CN": {
     labelKey: "simplifiedChinese",
@@ -103,7 +92,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "zh",
     googleCloudLocale: "cmn-Hans-CN",
     xaiTtsLocale: "zh",
-    qwenTtsLanguage: "Chinese",
   },
   ar: {
     labelKey: "arabic",
@@ -111,7 +99,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "ar",
     googleCloudLocale: "ar-XA",
     xaiTtsLocale: "ar-SA",
-    qwenTtsLanguage: null,
   },
   ja: {
     labelKey: "japanese",
@@ -119,7 +106,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "ja",
     googleCloudLocale: "ja-JP",
     xaiTtsLocale: "ja",
-    qwenTtsLanguage: "Japanese",
   },
   hu: {
     labelKey: "hungarian",
@@ -127,7 +113,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "hu",
     googleCloudLocale: "hu-HU",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
   cs: {
     labelKey: "czech",
@@ -135,7 +120,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "cs",
     googleCloudLocale: "cs-CZ",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
   pl: {
     labelKey: "polish",
@@ -143,7 +127,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "pl",
     googleCloudLocale: "pl-PL",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
   tr: {
     labelKey: "turkish",
@@ -151,7 +134,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "tr",
     googleCloudLocale: "tr-TR",
     xaiTtsLocale: "tr-TR",
-    qwenTtsLanguage: null,
   },
   sv: {
     labelKey: "swedish",
@@ -159,7 +141,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "sv",
     googleCloudLocale: "sv-SE",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
   ur: {
     labelKey: "urdu",
@@ -167,7 +148,6 @@ export const SPEECH_LANGUAGE_REGISTRY = {
     providerCode: "ur",
     googleCloudLocale: "ur-PK",
     xaiTtsLocale: null,
-    qwenTtsLanguage: null,
   },
 } as const satisfies Record<string, SpeechLanguageDefinition>;
 

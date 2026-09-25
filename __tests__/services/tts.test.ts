@@ -525,96 +525,6 @@ describe("synthesizeSpeech", () => {
     expect(prompt).toContain("Transcript:\nHallo Welt");
   });
 
-  it("uses DashScope TTS and downloads the generated wav file", async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            output: {
-              audio: {
-                url: "https://dashscope.example/audio.wav",
-              },
-            },
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        blob: () => Promise.resolve(new Blob(["fake-audio"])),
-      });
-
-    const result = await synthesizeSpeech({
-      text: "Hello world",
-      voice: "",
-      mode: "provider",
-      provider: "alibaba-qwen-dashscope",
-      apiKey: "dashscope-test|beijing",
-      language: "en",
-    });
-
-    expect(result).toMatch(/^\/tmp\/tts-.*\.wav$/);
-    const [url, options] = (fetch as jest.Mock).mock.calls[0];
-    expect(url).toBe(
-      "https://dashscope.aliyuncs.com/api/v1/services/aigc/multimodal-generation/generation",
-    );
-    const body = JSON.parse(options.body);
-    expect(body.model).toBe("qwen3-tts-flash-2025-11-27");
-    expect(body.input.voice).toBe("Cherry");
-    expect(body.input.text).toBe("Hello world");
-    expect(body.input.language_type).toBe("English");
-    expect((fetch as jest.Mock).mock.calls[1][0]).toBe(
-      "https://dashscope.example/audio.wav",
-    );
-  });
-
-  it("sends instructions only to Qwen's instruct TTS model", async () => {
-    (fetch as jest.Mock)
-      .mockResolvedValueOnce({
-        ok: true,
-        json: () =>
-          Promise.resolve({
-            output: {
-              audio: {
-                url: "https://dashscope.example/audio.wav",
-              },
-            },
-          }),
-      })
-      .mockResolvedValueOnce({
-        ok: true,
-        blob: () => Promise.resolve(new Blob(["fake-audio"])),
-      });
-
-    await synthesizeSpeech({
-      text: "Hello world",
-      voice: "Cherry",
-      mode: "provider",
-      provider: "alibaba-qwen-dashscope",
-      providerModel: "qwen3-tts-instruct-flash-2026-01-26",
-      apiKey: "dashscope-test|beijing",
-      instructions: "Sound optimistic and energetic.",
-      language: "en",
-    });
-
-    const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
-    expect(body.input.instructions).toBe("Sound optimistic and energetic.");
-  });
-
-  it("rejects Qwen TTS when the credential belongs to the US region", async () => {
-    await expect(
-      synthesizeSpeech({
-        text: "Hello world",
-        voice: "Cherry",
-        mode: "provider",
-        provider: "alibaba-qwen-dashscope",
-        apiKey: "dashscope-test|us",
-        language: "en",
-      }),
-    ).rejects.toThrow("not available in the US region");
-
-    expect(fetch).not.toHaveBeenCalled();
-  });
-
   it("retries Gemini TTS after a transient transport failure", async () => {
     (fetch as jest.Mock)
       .mockRejectedValueOnce(new Error("Network request failed"))
@@ -940,7 +850,6 @@ describe("synthesizeSpeech", () => {
 
   it("uses provider-specific TTS chunk targets", () => {
     expect(getProviderTtsTargetChunkChars("gemini")).toBe(600);
-    expect(getProviderTtsTargetChunkChars("alibaba-qwen-dashscope")).toBe(550);
     expect(getProviderTtsTargetChunkChars("openai")).toBe(600);
     expect(getProviderTtsTargetChunkChars("xai")).toBe(240);
   });
@@ -950,7 +859,6 @@ describe("synthesizeSpeech", () => {
 
     expect(getProviderTtsTimeoutMs(text, "openai")).toBe(32000);
     expect(getProviderTtsTimeoutMs(text, "gemini")).toBe(60000);
-    expect(getProviderTtsTimeoutMs(text, "alibaba-qwen-dashscope")).toBe(42000);
     expect(getProviderTtsTimeoutMs(text, "xai")).toBe(48000);
   });
 });

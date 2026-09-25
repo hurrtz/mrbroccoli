@@ -50,10 +50,15 @@ describe("speech provider constants", () => {
     expect(PROVIDER_DEFAULT_STT_MODELS.elevenlabs).toBe("scribe_v2");
   });
 
+  it("offers no Qwen speech routes after the DashScope speech retirement", () => {
+    expect(getProviderSttModelOptions("alibaba-qwen-dashscope")).toEqual([]);
+    expect(getProviderTtsModelOptions("alibaba-qwen-dashscope")).toEqual([]);
+    expect(
+      getProviderTtsVoiceOptions("alibaba-qwen-dashscope", "en"),
+    ).toEqual([]);
+  });
+
   it("surfaces newly wired catalog-backed STT providers through the runtime manifest", () => {
-    expect(getProviderSttModelOptions("alibaba-qwen-dashscope")).toEqual([
-      { id: "qwen3-asr-flash-2026-02-10", name: "Qwen3-ASR-Flash" },
-    ]);
     expect(getProviderSttModelOptions("xai")).toEqual([
       {
         id: "grok-stt",
@@ -69,10 +74,6 @@ describe("speech provider constants", () => {
         (option) => option.id === "gpt-4o-mini-tts-2025-12-15",
       )?.name,
     ).toBe("GPT-4o mini TTS");
-    expect(getProviderTtsModelOptions("alibaba-qwen-dashscope")).toEqual([
-      { id: "qwen3-tts-flash-2025-11-27", name: "Qwen3-TTS-Flash" },
-      { id: "qwen3-tts-instruct-flash-2026-01-26", name: "Qwen3-TTS-Instruct-Flash" },
-    ]);
     expect(
       getProviderTtsModelOptions("gemini").find(
         (option) => option.id === "gemini-2.5-flash-preview-tts",
@@ -110,28 +111,6 @@ describe("speech provider constants", () => {
     ).toBe("Janet (built-in)");
   });
 
-  it("filters the official Qwen system voices to the selected TTS model", () => {
-    const flashVoices = getProviderTtsVoiceOptions(
-      "alibaba-qwen-dashscope",
-      "en",
-      "qwen3-tts-flash-2025-11-27",
-    );
-    const instructVoices = getProviderTtsVoiceOptions(
-      "alibaba-qwen-dashscope",
-      "en",
-      "qwen3-tts-instruct-flash-2026-01-26",
-    );
-
-    expect(flashVoices).toHaveLength(48);
-    expect(flashVoices.map((voice) => voice.id)).toEqual(
-      expect.arrayContaining(["Cherry", "Jennifer", "Kiki"]),
-    );
-    expect(instructVoices).toHaveLength(24);
-    expect(instructVoices.map((voice) => voice.id)).toEqual(
-      expect.arrayContaining(["Cherry", "Eldric Sage", "Stella"]),
-    );
-    expect(instructVoices.map((voice) => voice.id)).not.toContain("Jennifer");
-  });
 });
 
 it.each(["tts-1", "tts-1-hd"])("excludes mini-TTS-only voices from %s", (model) => {

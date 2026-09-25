@@ -1,9 +1,6 @@
 import type { Provider, ProviderCapability } from "../types";
 import { parseGoogleAiStudioCredentials } from "../services/google";
-import {
-  parseQwenApiCredential,
-  qwenRegionSupportsAppSpeech,
-} from "./qwenRegion";
+import { parseQwenApiCredential } from "./qwenRegion";
 
 export type ProviderCredentialCapability = Exclude<
   ProviderCapability,
@@ -31,7 +28,9 @@ export function hasAnyProviderCredential(provider: Provider, apiKey: string) {
 export function hasProviderCredentialForCapability(
   provider: Provider,
   apiKey: string,
-  capability: ProviderCredentialCapability,
+  // Every current credential unlocks all of its provider's capabilities; the
+  // parameter keeps callers explicit for capability-specific key rules.
+  _capability: ProviderCredentialCapability,
 ) {
   const trimmedApiKey = apiKey.trim();
 
@@ -44,17 +43,7 @@ export function hasProviderCredentialForCapability(
   }
 
   if (provider === "alibaba-qwen-dashscope") {
-    const credentials = parseQwenApiCredential(trimmedApiKey);
-
-    if (!credentials.apiKey) {
-      return false;
-    }
-
-    return (
-      capability === "llm" ||
-      capability === "search" ||
-      qwenRegionSupportsAppSpeech(credentials.region)
-    );
+    return Boolean(parseQwenApiCredential(trimmedApiKey).apiKey);
   }
 
   return true;

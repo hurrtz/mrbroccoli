@@ -407,11 +407,7 @@ export function ProviderConnectionPanel({
           <View style={styles.connectionFullBleed}>
             <AntPickerRows
               helperTextStyle={styles.connectionImprintText}
-              helperText={
-                qwenCredentials.region === "us"
-                  ? t("qwenRegionUsSpeechHint")
-                  : t("qwenRegionHint")
-              }
+              helperText={t("qwenRegionHint")}
             >
               <AntPickerRow
                 value={qwenCredentials.region}

@@ -438,16 +438,12 @@ export const ur = {
     "وائس لائبریری لوڈ نہ ہونے پر دستی اندراج دستیاب رہتا ہے۔",
   providerVoiceIdRequired: ({ provider }) =>
     `اسپیچ آؤٹ پٹ استعمال کرنے سے پہلے ${provider} وائس لائبریری کو ریفریش کریں یا وائس ID درج کریں۔`,
-  qwenSpeechUnavailableInUs:
-    "میرے موجودہ Qwen تقریر کے راستے امریکی خطے میں دستیاب نہیں ہیں۔ Qwen تقریر کے لیے سنگاپور یا بیجنگ کا انتخاب کریں۔",
   qwenApiRegion: "Qwen API علاقہ",
   qwenRegionSingapore: "سنگاپور",
   qwenRegionUs: "US (ورجینیا)",
   qwenRegionBeijing: "چین (بیجنگ)",
   qwenRegionHint:
     "منتخب شدہ علاقہ اس خطے سے مماثل ہونا چاہیے جس میں یہ API کلید بنائی گئی تھی۔",
-  qwenRegionUsSpeechHint:
-    "یو ایس ریجن کیز یہاں چیٹ اور ویب سرچ کو سپورٹ کرتی ہیں۔ میرے موجودہ Qwen STT اور TTS روٹس کے لیے سنگاپور یا بیجنگ کلید درکار ہے۔",
   providerDefaultVoiceHint:
     "یہ فراہم کنندہ فی الحال پیش نظارہ اور بولے گئے جوابات کے لیے اپنی ڈیفالٹ آواز استعمال کرتا ہے۔",
   listenLanguages: "سننے کی زبانیں",

@@ -443,16 +443,12 @@ export const pl = {
     "Wprowadzanie ręczne pozostaje dostępne, gdy nie można załadować biblioteki głosowej.",
   providerVoiceIdRequired: ({ provider }) =>
     `Odśwież bibliotekę głosową ${provider} lub wprowadź identyfikator głosu przed użyciem mowy.`,
-  qwenSpeechUnavailableInUs:
-    "Moje obecne trasy mowy Qwen nie są dostępne w regionie USA. Dla mowy Qwen wybierz Singapur lub Pekin.",
   qwenApiRegion: "Region API Qwen",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "USA (Wirginia)",
   qwenRegionBeijing: "Chiny (Pekin)",
   qwenRegionHint:
     "Wybrany region musi odpowiadać regionowi, w którym utworzono ten klucz API.",
-  qwenRegionUsSpeechHint:
-    "Klucze regionu USA obsługują tutaj czat i wyszukiwanie w Internecie. Moje obecne trasy Qwen STT i TTS wymagają klucza z Singapuru lub Pekinu.",
   providerDefaultVoiceHint:
     "Ten dostawca używa obecnie domyślnego głosu do podglądu i odpowiedzi głosowych.",
   listenLanguages: "Języki słuchania",

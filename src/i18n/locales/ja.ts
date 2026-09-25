@@ -439,16 +439,12 @@ export const ja = {
     "音声ライブラリをロードできない場合でも、手動入力は利用可能です。",
   providerVoiceIdRequired: ({ provider }) =>
     `音声出力を使用する前に、${provider} 音声ライブラリを更新するか、音声 ID を入力してください。`,
-  qwenSpeechUnavailableInUs:
-    "私の現在のQwen音声ルートは米国リージョンでは利用できません。Qwenの音声機能にはシンガポールまたは北京を選択してください。",
   qwenApiRegion: "Qwen API リージョン",
   qwenRegionSingapore: "シンガポール",
   qwenRegionUs: "米国 (バージニア)",
   qwenRegionBeijing: "中国 (北京)",
   qwenRegionHint:
     "選択したリージョンは、この API キーが作成されたリージョンと一致する必要があります。",
-  qwenRegionUsSpeechHint:
-    "米国リージョンのキーは、ここでチャットとウェブ検索に使用できます。私の現在の Qwen STT および TTS ルートには、シンガポールまたは北京のキーが必要です。",
   providerDefaultVoiceHint:
     "このプロバイダーは現在、プレビューおよび音声応答にデフォルトの音声を使用しています。",
   listenLanguages: "読み上げ言語",

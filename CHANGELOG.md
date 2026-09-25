@@ -10,6 +10,10 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Qwen speech input and output are removed ahead of Alibaba retiring them on
+  October 10, 2026. Qwen chat and search are unchanged; saved Qwen speech
+  selections switch to the device's built-in speech.
+
 - DeepSeek uses V4.1 Flash, which also accepts images; saved V4 Flash selections
   move to it automatically.
 

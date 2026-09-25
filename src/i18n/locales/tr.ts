@@ -441,16 +441,12 @@ export const tr = {
     "Ses kitaplığı yüklenemediğinde manuel giriş kullanılabilir durumda kalır.",
   providerVoiceIdRequired: ({ provider }) =>
     `Konuşma çıkışını kullanmadan önce ${provider} ses kitaplığını yenile veya bir ses kimliği gir.`,
-  qwenSpeechUnavailableInUs:
-    "Mevcut Qwen konuşma yollarım ABD bölgesinde kullanılamıyor. Qwen konuşması için Singapur veya Pekin'i seç.",
   qwenApiRegion: "Qwen API Bölgesi",
   qwenRegionSingapore: "Singapur",
   qwenRegionUs: "ABD (Virginia)",
   qwenRegionBeijing: "Çin (Pekin)",
   qwenRegionHint:
     "Seçilen bölge, bu API anahtarının oluşturulduğu bölgeyle eşleşmelidir.",
-  qwenRegionUsSpeechHint:
-    "ABD bölgesi anahtarları burada sohbeti ve web aramasını destekler. Mevcut Qwen STT ve TTS rotalarım, Singapur veya Pekin anahtarı gerektirir.",
   providerDefaultVoiceHint:
     "Bu sağlayıcı şu anda önizleme ve sesli yanıtlar için varsayılan sesini kullanıyor.",
   listenLanguages: "Dinleme Dilleri",

@@ -138,10 +138,21 @@ describe("settings storage", () => {
   });
 });
 
-it("pins legacy Qwen speech selections without losing instruct TTS", () => {
-  const settings = mergeSettings({ providerSttModels: { ...DEFAULT_SETTINGS.providerSttModels, "alibaba-qwen-dashscope": "qwen3-asr-flash" }, providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash" } });
-  expect(settings.providerSttModels["alibaba-qwen-dashscope"]).toBe("qwen3-asr-flash-2026-02-10");
-  expect(settings.providerTtsModels["alibaba-qwen-dashscope"]).toBe("qwen3-tts-instruct-flash-2026-01-26");
+it("moves saved Qwen speech selections to native speech after the retirement", () => {
+  const settings = mergeSettings({
+    sttMode: "provider",
+    sttProvider: "alibaba-qwen-dashscope",
+    ttsMode: "provider",
+    ttsProvider: "alibaba-qwen-dashscope",
+    providerSttModels: { ...DEFAULT_SETTINGS.providerSttModels, "alibaba-qwen-dashscope": "qwen3-asr-flash-2026-02-10" },
+    providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash-2026-01-26" },
+  });
+  expect(settings).toMatchObject({ sttMode: "native", sttProvider: null, ttsMode: "native", ttsProvider: null });
+});
+
+it("keeps a saved speech provider that still offers the capability", () => {
+  const settings = mergeSettings({ sttMode: "provider", sttProvider: "openai", ttsMode: "provider", ttsProvider: "openai" });
+  expect(settings).toMatchObject({ sttMode: "provider", sttProvider: "openai", ttsMode: "provider", ttsProvider: "openai" });
 });
 
 it("pins existing OpenAI transcription without overriding a user's selection", () => {

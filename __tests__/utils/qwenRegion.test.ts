@@ -1,10 +1,15 @@
 import {
   formatQwenApiCredential,
   parseQwenApiCredential,
-  qwenRegionSupportsAppSpeech,
   resolveQwenApiEndpoint,
 } from "../../src/utils/qwenRegion";
 import { hasProviderCredentialForCapability } from "../../src/utils/providerCredentials";
+import {
+  getEnabledProviders,
+  getEnabledSttProviders,
+  getEnabledTtsProviders,
+} from "../../src/utils/providerCapabilities";
+import { DEFAULT_SETTINGS } from "../../src/types";
 
 describe("Qwen regional credentials", () => {
   it("defaults plain credentials to Singapore", () => {
@@ -35,30 +40,30 @@ describe("Qwen regional credentials", () => {
     );
   });
 
-  it("limits the app's current speech transports to supported regions", () => {
-    expect(qwenRegionSupportsAppSpeech("singapore")).toBe(true);
-    expect(qwenRegionSupportsAppSpeech("beijing")).toBe(true);
-    expect(qwenRegionSupportsAppSpeech("us")).toBe(false);
-    expect(
-      hasProviderCredentialForCapability(
+  it("keeps every region for chat while offering no Qwen speech routes", () => {
+    for (const credential of ["sk-test", "sk-test|us", "sk-test|beijing"]) {
+      const settings = {
+        ...DEFAULT_SETTINGS,
+        apiKeys: {
+          ...DEFAULT_SETTINGS.apiKeys,
+          "alibaba-qwen-dashscope": credential,
+        },
+      };
+
+      expect(
+        hasProviderCredentialForCapability(
+          "alibaba-qwen-dashscope",
+          credential,
+          "llm",
+        ),
+      ).toBe(true);
+      expect(getEnabledProviders(settings)).toContain("alibaba-qwen-dashscope");
+      expect(getEnabledSttProviders(settings)).not.toContain(
         "alibaba-qwen-dashscope",
-        "sk-test|us",
-        "llm",
-      ),
-    ).toBe(true);
-    expect(
-      hasProviderCredentialForCapability(
+      );
+      expect(getEnabledTtsProviders(settings)).not.toContain(
         "alibaba-qwen-dashscope",
-        "sk-test|us",
-        "stt",
-      ),
-    ).toBe(false);
-    expect(
-      hasProviderCredentialForCapability(
-        "alibaba-qwen-dashscope",
-        "sk-test|us",
-        "tts",
-      ),
-    ).toBe(false);
+      );
+    }
   });
 });

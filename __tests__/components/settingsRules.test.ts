@@ -178,25 +178,25 @@ describe("settingsRules", () => {
     expect(nextProviderVoices?.elevenlabs).toBe("21m00Tcm4TlvDq8ikWAM");
   });
 
-  it("repairs a Qwen voice that is unavailable on the selected TTS model", () => {
+  it("repairs a voice that is unavailable on the selected TTS model", () => {
     const settings = {
       ...DEFAULT_SETTINGS,
       providerTtsModels: {
         ...DEFAULT_SETTINGS.providerTtsModels,
-        "alibaba-qwen-dashscope": "qwen3-tts-instruct-flash-2026-01-26",
+        openai: "tts-1",
       },
       providerTtsVoices: {
         ...DEFAULT_SETTINGS.providerTtsVoices,
-        "alibaba-qwen-dashscope": "Jennifer",
+        openai: "ballad",
       },
     };
 
     const nextProviderVoices = getNormalizedProviderTtsVoices(
       settings,
-      ["alibaba-qwen-dashscope"],
+      ["openai"],
       "en",
     );
 
-    expect(nextProviderVoices?.["alibaba-qwen-dashscope"]).toBe("Cherry");
+    expect(nextProviderVoices?.openai).toBe("alloy");
   });
 });

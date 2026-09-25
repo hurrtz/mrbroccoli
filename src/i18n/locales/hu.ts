@@ -448,16 +448,12 @@ export const hu = {
     "A kézi bejegyzés elérhető marad, ha a hangkönyvtár nem tölthető be.",
   providerVoiceIdRequired: ({ provider }) =>
     `Frissítsd a(z) ${provider} hangkönyvtárát, vagy adjon meg egy hangazonosítót a beszédkimenet használata előtt.`,
-  qwenSpeechUnavailableInUs:
-    "A jelenlegi Qwen beszédútvonalaim nem érhetők el az Egyesült Államok régiójában. Válaszd Szingapúrt vagy Pekinget a Qwen beszédhez.",
   qwenApiRegion: "Qwen API régió",
   qwenRegionSingapore: "Szingapúr",
   qwenRegionUs: "USA (Virginia)",
   qwenRegionBeijing: "Kína (Peking)",
   qwenRegionHint:
     "A kiválasztott régiónak meg kell egyeznie azzal a régióval, amelyben ez az API-kulcs létrejött.",
-  qwenRegionUsSpeechHint:
-    "Az amerikai régiókulcsok itt támogatják a csevegést és a webes keresést. A jelenlegi Qwen STT- és TTS-útvonalaimhoz szingapúri vagy pekingi kulcs szükséges.",
   providerDefaultVoiceHint:
     "Ez a szolgáltató jelenleg az alapértelmezett hangját használd az előnézethez és a szóbeli válaszokhoz.",
   listenLanguages: "Felolvasási nyelvek",
