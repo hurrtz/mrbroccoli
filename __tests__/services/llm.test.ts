@@ -268,7 +268,7 @@ describe("streamChat", () => {
           ],
         },
       ],
-      model: "deepseek-v4-flash",
+      model: "deepseek-v4-pro",
       provider: "deepseek",
       apiKey: "sk-test-key",
       assistantInstructions: "",

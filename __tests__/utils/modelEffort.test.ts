@@ -298,7 +298,7 @@ describe("model effort metadata", () => {
   });
 });
 
- it.each(["deepseek-v4-flash", "deepseek-v4-pro"])("sends low thinking effort for %s", (model) => {
+ it.each(["deepseek-flash", "deepseek-v4-pro"])("sends low thinking effort for %s", (model) => {
   expect(getModelEffortRequestBody("deepseek", model, "low")).toEqual({ thinking: { type: "enabled" }, reasoning_effort: "low" });
 });
 

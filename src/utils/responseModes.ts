@@ -27,6 +27,10 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   openrouter: {
     "x-ai/grok-4.6": "x-ai/grok-4.6-20260810",
   },
+  // DeepSeek retired V4 Flash and only temporarily routes its name to V4.1.
+  deepseek: {
+    "deepseek-v4-flash": "deepseek-flash",
+  },
   openai: {
     "gpt-4o-mini-tts": "gpt-4o-mini-tts-2025-12-15",
     "gpt-4o-mini-transcribe": "gpt-4o-mini-transcribe-2025-12-15",

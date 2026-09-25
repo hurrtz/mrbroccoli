@@ -244,6 +244,10 @@ describe("deriveResponseModesForProvider", () => {
   });
 });
 
+it("moves retired DeepSeek V4 Flash selections to V4.1 Flash", () => {
+  expect(migrateProviderModelAlias("deepseek", "deepseek-v4-flash")).toBe("deepseek-flash");
+});
+
 it("pins the existing OpenRouter Grok alias", () => {
   expect(migrateProviderModelAlias("openrouter", "x-ai/grok-4.6")).toBe("x-ai/grok-4.6-20260810");
 });

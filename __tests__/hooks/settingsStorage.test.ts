@@ -154,3 +154,13 @@ it("pins mini-TTS while preserving the saved voice", () => {
   expect(settings.providerTtsModels.openai).toBe("gpt-4o-mini-tts-2025-12-15");
   expect(settings.providerTtsVoices.openai).toBe("marin");
 });
+
+it("moves saved DeepSeek V4 Flash routes to V4.1 Flash with their effort", () => {
+  const settings = mergeSettings({
+    providerModels: { ...DEFAULT_SETTINGS.providerModels, deepseek: "deepseek-v4-flash" },
+    responseModes: [{ id: "mode-1", route: { provider: "deepseek", model: "deepseek-v4-flash", effort: "max" } }],
+    activeResponseMode: "mode-1",
+  });
+  expect(settings.providerModels.deepseek).toBe("deepseek-flash");
+  expect(settings.responseModes[0].route).toEqual({ provider: "deepseek", model: "deepseek-flash", effort: "max" });
+});

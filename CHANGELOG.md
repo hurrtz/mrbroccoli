@@ -10,6 +10,9 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- DeepSeek uses V4.1 Flash, which also accepts images; saved V4 Flash selections
+  move to it automatically.
+
 - Grok 4.7 is available as an answering model, directly and through OpenRouter,
   with low through extra-high reasoning effort.
 

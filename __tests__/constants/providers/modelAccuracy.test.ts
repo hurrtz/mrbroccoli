@@ -137,12 +137,14 @@ describe("provider model accuracy", () => {
     expect(PROVIDER_DEFAULT_MODELS.anthropic).toBe("claude-sonnet-5");
   });
 
-  it("uses current DeepSeek V4 model IDs instead of deprecated aliases", () => {
+  it("uses current DeepSeek model IDs instead of retired aliases", () => {
     expect(providerModelIds("deepseek")).toEqual([
-      "deepseek-v4-flash",
+      "deepseek-flash",
       "deepseek-v4-pro",
     ]);
-    expect(PROVIDER_DEFAULT_MODELS.deepseek).toBe("deepseek-v4-flash");
+    expect(PROVIDER_DEFAULT_MODELS.deepseek).toBe("deepseek-flash");
+    expect(modelSupportsImageInput("deepseek", "deepseek-flash")).toBe(true);
+    expect(modelSupportsImageInput("deepseek", "deepseek-v4-pro")).toBe(false);
   });
 
   it("keeps Gemini Live out of the text-chat picker", () => {
