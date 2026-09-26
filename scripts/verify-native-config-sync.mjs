@@ -362,6 +362,21 @@ assertIncludes(
   "<key>UIBackgroundModes</key>",
 );
 assertIncludes("iOS background audio mode value", iosInfo, "<string>audio</string>");
+
+// LSMinimumSystemVersion is the *macOS* minimum (iOS apps on Apple silicon),
+// not the iOS minimum: Xcode derives MinimumOSVersion from the deployment
+// target. macOS jumped from 15 to 26, so App Store Connect rejects 16.x-25.x.
+const macMinimumVersion = iosInfo.match(
+  /<key>LSMinimumSystemVersion<\/key>\s*<string>([^<]+)<\/string>/,
+)?.[1];
+if (macMinimumVersion !== undefined) {
+  const macMajor = Number.parseInt(macMinimumVersion, 10);
+  assertEqual(
+    `iOS LSMinimumSystemVersion ${macMinimumVersion} is a valid macOS version (below 16 or at least 26)`,
+    Number.isFinite(macMajor) && (macMajor < 16 || macMajor >= 26),
+    true,
+  );
+}
 assertIncludes(
   "Android URL scheme",
   androidManifest,

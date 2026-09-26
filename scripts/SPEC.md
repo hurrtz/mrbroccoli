@@ -151,6 +151,9 @@ the architectural answer for the author.
   absence cannot be exercised by the Debug instrumentation build. On iOS it
   also locks Expo tablet support, dynamic resizing, all four orientations, and
   the six app/test/Live-Activity target-family settings to universal `1,2`.
+  `LSMinimumSystemVersion` is the macOS minimum for iOS apps on Apple silicon,
+  not the iOS minimum (Xcode derives `MinimumOSVersion` from the deployment
+  target); parity rejects values App Store Connect refuses, 16.x through 25.x.
 - `application-identifiers.mjs` is the automation source of truth for the
   intentionally distinct Android and iOS production, debug, and Maestro
   identities. Cross-platform runners must select by platform rather than reuse
