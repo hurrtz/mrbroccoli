@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.2.0 - 2026-09-26
+
 - Gemini 3.8 Flash TTS and Flash-Lite TTS are available for spoken replies, and
   Flash-Lite becomes the default for new Gemini voice selections. Deprecated
   Gemini 2.5 voice models move to their 3.8 replacements with the same voice.
