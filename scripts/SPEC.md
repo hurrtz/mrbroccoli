@@ -154,6 +154,9 @@ the architectural answer for the author.
   `LSMinimumSystemVersion` is the macOS minimum for iOS apps on Apple silicon,
   not the iOS minimum (Xcode derives `MinimumOSVersion` from the deployment
   target); parity rejects values App Store Connect refuses, 16.x through 25.x.
+  Parity also requires the UIScene manifest with `EXExpoAppSceneDelegate`
+  and an `AppDelegate` that exposes its factory instead of creating the
+  window, because iOS 27 terminates apps that do not adopt scenes.
 - `application-identifiers.mjs` is the automation source of truth for the
   intentionally distinct Android and iOS production, debug, and Maestro
   identities. Cross-platform runners must select by platform rather than reuse

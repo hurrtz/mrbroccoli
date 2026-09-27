@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Fixed an iOS 27 crash that closed the app immediately after launch.
+
 ## 4.2.0 - 2026-09-26
 
 - Gemini 3.8 Flash TTS and Flash-Lite TTS are available for spoken replies, and

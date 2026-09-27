@@ -372,6 +372,16 @@ and 2. `supportsTablet: true`, `UIRequiresFullScreen: false`, and all four
 orientations make the same binary resize across iPhone, iPad, Split View, and
 Stage Manager rather than introducing an iPad-specific entry point.
 
+iOS launches through the UIScene life cycle. Apps linked against the iOS 27 SDK
+are terminated at launch without it. `Info.plist` declares a single-scene
+`UIApplicationSceneManifest` whose delegate is Expo's `ExpoAppSceneDelegate`;
+that delegate creates the window and starts React Native. `AppDelegate` only
+builds the React Native factory and exposes it through
+`ExpoReactNativeFactoryProvider`. Native code that needs foreground or
+background transitions observes the `UIApplication` notifications, which UIKit
+still posts under scenes, rather than app-delegate callbacks, which it no longer
+invokes.
+
 The installed Sherpa runtime is the licence-safe libphonemize variant. Its
 model validation accepts the curated pack-only `espeak-ng-data` directory, and
 the patched iOS TTS wrapper checks both its optional C++ wrapper and its
