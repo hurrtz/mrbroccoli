@@ -17,6 +17,7 @@ const packageLock = JSON.parse(readText("package-lock.json"));
 const easConfig = JSON.parse(readText("eas.json"));
 const fastlaneAppfile = readText("fastlane/Appfile");
 const iosInfo = readText("ios/MrBroccoli/Info.plist");
+const iosAppDelegate = readText("ios/MrBroccoli/AppDelegate.swift");
 const iosPodfile = readText("ios/Podfile");
 const iosPodfileProperties = JSON.parse(readText("ios/Podfile.properties.json"));
 const iosProject = readText("ios/MrBroccoli.xcodeproj/project.pbxproj");
@@ -377,6 +378,34 @@ if (macMinimumVersion !== undefined) {
     true,
   );
 }
+
+// Apps linked against the iOS 27 SDK must adopt the UIScene life cycle; iOS 27
+// traps at launch otherwise (_UIApplicationEvaluateRuntimeIssueForNoSceneLifecycleAdoption).
+// Expo's ExpoAppSceneDelegate creates the window and starts React Native from
+// the factory the app delegate exposes through ExpoReactNativeFactoryProvider.
+assertIncludes("iOS scene manifest", iosInfo, "<key>UIApplicationSceneManifest</key>");
+assertEqual(
+  "iOS single-scene application",
+  /<key>UIApplicationSupportsMultipleScenes<\/key>\s*<false\/>/.test(iosInfo),
+  true,
+);
+assertEqual(
+  "iOS scene delegate is Expo's ExpoAppSceneDelegate",
+  /<key>UIWindowSceneSessionRoleApplication<\/key>[\s\S]*?<key>UISceneDelegateClassName<\/key>\s*<string>EXExpoAppSceneDelegate<\/string>/.test(
+    iosInfo,
+  ),
+  true,
+);
+assertIncludes(
+  "iOS AppDelegate exposes its React Native factory to the scene delegate",
+  iosAppDelegate,
+  "ExpoReactNativeFactoryProvider",
+);
+assertExcludes(
+  "iOS AppDelegate leaves window creation to the scene delegate",
+  iosAppDelegate,
+  "UIScreen.main.bounds",
+);
 assertIncludes(
   "Android URL scheme",
   androidManifest,
