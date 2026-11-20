@@ -89,6 +89,7 @@ tags:
 - assertVisible:
     id: satellite-hands-free
     checked: true
+- waitForAnimationToEnd
 - takeScreenshot:
     path: ${PLATFORM}/visual/drive-three-routes-landscape
 - tapOn:

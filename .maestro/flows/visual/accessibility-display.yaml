@@ -60,6 +60,7 @@ tags:
     id: landscape-left-pane
 - assertVisible:
     id: landscape-right-pane
+- waitForAnimationToEnd
 - takeScreenshot:
     path: ${PLATFORM}/accessibility/home-landscape
 - setOrientation: PORTRAIT

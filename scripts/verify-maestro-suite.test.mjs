@@ -9,6 +9,9 @@ import {
   findMaestroYamlErrors,
   findRetiredMaestroSelectors,
   findUnsettledNativeModalDismissals,
+  MAESTRO_ACCESSIBILITY_FLOW,
+  MAESTRO_LAYOUT_FLOW,
+  MAESTRO_LOCALIZED_FLOW,
   MAESTRO_LOCALIZED_SCREENSHOTS,
   MAESTRO_SMOKE_FLOW,
   readAppLanguages,
@@ -29,6 +32,24 @@ import {
   ORB_MATRIX,
   parseOrbMatrixArguments,
 } from "./run-orb-matrix.mjs";
+
+test("captures landscape after the native rotation animation settles", () => {
+  const flows = [
+    MAESTRO_SMOKE_FLOW,
+    MAESTRO_LAYOUT_FLOW,
+    MAESTRO_ACCESSIBILITY_FLOW,
+    MAESTRO_LOCALIZED_FLOW,
+  ];
+  for (const flow of flows) {
+    const source = fs.readFileSync(flow, "utf8");
+    const orientation = source.indexOf("- setOrientation: LANDSCAPE_LEFT");
+    const landscape = source.slice(orientation);
+    const capture = landscape
+      .slice(0, landscape.indexOf("- takeScreenshot:"))
+      .trimEnd();
+    assert.ok(capture.endsWith("- waitForAnimationToEnd"), flow);
+  }
+});
 
 test("derives the complete locale order from the TypeScript registry", () => {
   const languages = readAppLanguages();

@@ -106,6 +106,8 @@ Localized coverage captures exactly fourteen non-redundant frames per language
 in both light and dark schemes:
 the language picker, both genuinely distinct App and overview positions, all
 six Settings detail pages, the empty home and sessions drawer, and landscape.
+Landscape captures wait for the system rotation animation to finish after the
+split panes appear. Both panes can be present while iOS still rotates the screen.
 It navigates to stable bottom selectors instead of blindly repeating swipes,
 because a page that already fits on a tall phone must not produce duplicate
 frames that imply missing content.

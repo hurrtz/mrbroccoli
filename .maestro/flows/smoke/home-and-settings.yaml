@@ -41,6 +41,7 @@ tags:
     id: landscape-left-pane
 - assertVisible:
     id: landscape-right-pane
+- waitForAnimationToEnd
 - takeScreenshot:
     path: ${PLATFORM}/smoke/home-landscape
 - setOrientation: PORTRAIT
