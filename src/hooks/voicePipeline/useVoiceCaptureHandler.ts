@@ -128,6 +128,7 @@ export function useVoiceCaptureHandler({
       existingUserMessageId,
       messagesOverride,
       transcriptionOverride,
+      inputSource = transcriptionOverride ? "text" : "voice",
       turnId: requestedTurnId,
     }: VoiceCaptureRequest) => {
       const previousAbortController = abortRef.current;
@@ -216,6 +217,7 @@ export function useVoiceCaptureHandler({
         },
         streamingRenderRunId,
         t,
+        inputSource,
         transcriptionOverride,
         turnId,
       });
@@ -272,6 +274,7 @@ export function useVoiceCaptureHandler({
         },
         streamingRenderRunId,
         t,
+        inputSource,
         transcriptionOverride,
         ttsMode,
         ttsProvider,
@@ -289,6 +292,7 @@ export function useVoiceCaptureHandler({
           turnId,
           turnStartedAtMs,
           audioUri,
+          inputSource,
           transcriptionOverride,
           attachments,
           messages: messagesOverride ?? conversationForRun?.messages ?? [],

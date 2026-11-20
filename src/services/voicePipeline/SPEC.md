@@ -39,7 +39,10 @@ them. Other notices and other messages keep their own history.
 A pipeline run receives an immutable snapshot of:
 
 - turn and conversation identity;
-- audio URI or a text transcription override;
+- audio URI or a transcript with its voice or keyboard origin. A completed
+  System recognition remains voice input. Keyboard input has no STT route;
+- the receipt names the serialized effort field, including `reasoning.effort`
+  for OpenRouter and `reasoning_effort` for the corresponding DashScope route;
 - current messages and optional image attachments;
 - response route, model effort, and provider key;
 - STT and TTS modes, models, language, voice, and explicit fallback order;

@@ -5,6 +5,7 @@ import type {
   SttBackendMode,
   TtsBackendMode,
 } from "../types";
+import type { ModelEffortConfig } from "../constants/models";
 import type { WebSearchMode, WebSearchProvider } from "../constants/webSearch";
 import {
   getModelEffortConfig,
@@ -17,12 +18,16 @@ import type {
   LocalTtsModelId,
 } from "../constants/localModels";
 
-const EFFORT_TRANSPORT_PARAMETERS: Record<string, string> = {
+const EFFORT_TRANSPORT_PARAMETERS: Record<
+  ModelEffortConfig["transportParam"],
+  string
+> = {
   "anthropic-output-effort": "output_config.effort",
   "deepseek-thinking-effort": "reasoning_effort",
   "gemini-thinking-budget": "generationConfig.thinkingConfig.thinkingBudget",
   "gemini-thinking-level": "generationConfig.thinkingConfig.thinkingLevel",
   "qwen-enable-thinking": "enable_thinking",
+  "qwen-reasoning-effort": "reasoning_effort",
   "reasoning-effort": "reasoning_effort",
 };
 
@@ -72,6 +77,10 @@ export function createTurnReceipt({
     (option) => option.id === modelEffort,
   );
   const effortTransportKey = getModelEffortTransportParam(provider, model);
+  const effortTransportParameter =
+    provider === "openrouter" && effortTransportKey === "reasoning-effort"
+      ? "reasoning.effort"
+      : effortTransportKey && EFFORT_TRANSPORT_PARAMETERS[effortTransportKey];
   const effortTransportValue = getModelEffortTransportValue(
     provider,
     model,
@@ -81,17 +90,20 @@ export function createTurnReceipt({
   return {
     version: 1,
     startedAt: new Date(startedAtMs).toISOString(),
-    input: {
-      source: inputSource,
-      mode: sttMode,
-      provider: sttMode === "provider" ? sttProvider : null,
-      model:
-        sttMode === "provider"
-          ? sttModel
-          : sttMode === "local"
-            ? (localSttModelId ?? undefined)
-            : undefined,
-    },
+    input:
+      inputSource === "text"
+        ? { source: "text" }
+        : {
+            source: "voice",
+            mode: sttMode,
+            provider: sttMode === "provider" ? sttProvider : null,
+            model:
+              sttMode === "provider"
+                ? sttModel
+                : sttMode === "local"
+                  ? (localSttModelId ?? undefined)
+                  : undefined,
+          },
     requestedRoute: {
       provider,
       model,
@@ -107,10 +119,7 @@ export function createTurnReceipt({
         ? {
             selected: modelEffort,
             label: getModelEffortOptionLabel(effortOption, language),
-            transportParameter: effortTransportKey
-              ? (EFFORT_TRANSPORT_PARAMETERS[effortTransportKey] ??
-                effortTransportKey)
-              : undefined,
+            transportParameter: effortTransportParameter,
             transportValue: effortTransportValue,
             semantics: "provider-native",
           }

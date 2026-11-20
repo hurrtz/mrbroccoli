@@ -51,6 +51,7 @@ export interface VoiceCaptureRequest {
   conversationOverride?: Conversation;
   existingUserMessageId?: string;
   messagesOverride?: Message[];
+  inputSource?: "voice" | "text";
   transcriptionOverride?: string;
   turnId?: string;
 }

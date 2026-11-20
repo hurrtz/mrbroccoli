@@ -271,6 +271,7 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
     expect(nativeStt.startRecognition).toHaveBeenCalledTimes(1);
     expect(nativeStt.stopRecognition).toHaveBeenCalledTimes(1);
     expect(params.processCapturedVoiceTurn).toHaveBeenCalledWith({
+      inputSource: "voice",
       transcriptionOverride: "hello",
     });
   });

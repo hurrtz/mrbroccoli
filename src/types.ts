@@ -332,7 +332,7 @@ export interface MessageTurnReceipt {
   startedAt: string;
   input: {
     source: "voice" | "text";
-    mode: SttBackendMode;
+    mode?: SttBackendMode;
     provider?: Provider | null;
     model?: string;
   };

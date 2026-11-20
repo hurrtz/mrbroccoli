@@ -57,6 +57,7 @@ export interface UseVoiceSessionControllerParams {
   completedReplyVersion: number;
   handleVoiceCaptureDone: (params: {
     audioUri?: string;
+    inputSource?: "voice" | "text";
     transcriptionOverride?: string;
   }) => Promise<void>;
   isBusy: boolean;

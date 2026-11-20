@@ -74,6 +74,7 @@ export interface RunVoicePipelineParams {
   turnId: string;
   turnStartedAtMs?: number;
   audioUri?: string;
+  inputSource?: "voice" | "text";
   transcriptionOverride?: string;
   attachments?: MessageImageAttachment[];
   messages: Message[];

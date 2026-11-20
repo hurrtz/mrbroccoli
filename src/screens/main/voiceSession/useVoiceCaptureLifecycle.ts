@@ -28,6 +28,7 @@ interface UseVoiceCaptureLifecycleParams {
   player: AudioPlayerController;
   processCapturedVoiceTurn: (params: {
     audioUri?: string;
+    inputSource?: "voice" | "text";
     transcriptionOverride?: string;
   }) => Promise<void>;
   recorder: AudioRecorderController;
@@ -296,6 +297,7 @@ export function useVoiceCaptureLifecycle({
             },
           });
           void processCapturedVoiceTurn({
+            inputSource: "voice",
             transcriptionOverride: transcription,
           });
         } else {

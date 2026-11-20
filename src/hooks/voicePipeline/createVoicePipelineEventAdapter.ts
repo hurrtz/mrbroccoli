@@ -70,6 +70,7 @@ type EventAdapterParams = Pick<
   state: VoiceTurnRunState;
   streaming: ReturnType<typeof useStreamingTextScheduler>;
   streamingRenderRunId: number;
+  inputSource: "text" | "voice";
   transcriptionOverride?: string;
   turnId: string;
   turnStartedAtMs: number;
@@ -111,6 +112,7 @@ export function createVoicePipelineEventAdapter({
   streaming,
   streamingRenderRunId,
   t,
+  inputSource,
   transcriptionOverride,
   ttsMode,
   ttsProvider,
@@ -143,7 +145,7 @@ export function createVoicePipelineEventAdapter({
       phase: "request-preparation",
       provider,
       model,
-      inputSource: transcriptionOverride ? "text" : "voice",
+      inputSource,
       webSearchMode,
       webSearchProvider,
       ulraModelCount: ulraMode?.routes.length,
@@ -215,7 +217,7 @@ export function createVoicePipelineEventAdapter({
       effort: modelEffort,
       responseLength,
       responseTone,
-      inputSource: transcriptionOverride ? "text" : "voice",
+      inputSource,
       sttMode,
       sttProvider,
       sttModel: selectedSttModel,

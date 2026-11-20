@@ -430,7 +430,7 @@ describe("runVoicePipeline", () => {
     expect(synthesizeSpeech).not.toHaveBeenCalled();
   });
 
-  it("keeps replies text-only when spoken replies are disabled", async () => {
+  it.each(["text", "voice"] as const)("records the %s origin of a pretranscribed prompt without a fake STT time", async (inputSource) => {
     (streamChat as jest.Mock).mockImplementation(
       async ({
         onChunk,
@@ -454,6 +454,7 @@ describe("runVoicePipeline", () => {
     };
 
     await runVoicePipeline({
+      inputSource,
       transcriptionOverride: "Explain wind.",
       messages: [],
       model: "gpt-5.4",
@@ -471,15 +472,13 @@ describe("runVoicePipeline", () => {
       callbacks,
     });
 
+    expect(callbacks.onResponseDone.mock.calls[0][2].turnReceipt.timing.transcriptionMs).toBeUndefined();
     expect(callbacks.onResponseDone).toHaveBeenCalledWith(
       "Wind is moving air.",
       undefined,
       expect.objectContaining({
         turnReceipt: expect.objectContaining({
-          input: expect.objectContaining({
-            source: "text",
-            mode: "native",
-          }),
+          input: inputSource === "text" ? { source: "text" } : expect.objectContaining({ source: "voice", mode: "native" }),
           requestedRoute: {
             provider: "openai",
             model: "gpt-5.4",
@@ -496,7 +495,6 @@ describe("runVoicePipeline", () => {
             actualMode: "off",
           }),
           timing: expect.objectContaining({
-            transcriptionMs: expect.any(Number),
             modelMs: expect.any(Number),
             replyReadyMs: expect.any(Number),
             totalMs: expect.any(Number),

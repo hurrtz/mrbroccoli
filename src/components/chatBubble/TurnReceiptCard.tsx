@@ -88,10 +88,10 @@ function formatInput(
   receipt: MessageTurnReceipt,
   t: ReturnType<typeof useLocalization>["t"],
 ) {
-  const source =
-    receipt.input.source === "voice"
-      ? t("turnReceiptVoiceInput")
-      : t("turnReceiptTypedInput");
+  if (receipt.input.source === "text") {
+    return t("turnReceiptTypedInput");
+  }
+  const source = t("turnReceiptVoiceInput");
 
   if (receipt.input.mode === "native") {
     return `${source} · ${t("turnReceiptSystemSpeech")}`;
@@ -201,7 +201,7 @@ function formatTimings(
 ) {
   const timing = receipt.timing;
   return [
-    timing.transcriptionMs !== undefined
+    receipt.input.source === "voice" && timing.transcriptionMs !== undefined
       ? `${t("turnReceiptTimingStt")} ${formatDuration(timing.transcriptionMs)}`
       : undefined,
     timing.contextMs !== undefined

@@ -24,6 +24,7 @@ export async function runVoicePipeline(
     turnStartedAtMs = Date.now(),
     audioUri,
     transcriptionOverride,
+    inputSource = transcriptionOverride ? "text" : "voice",
     attachments,
     messages,
     model,
@@ -95,7 +96,7 @@ export async function runVoicePipeline(
   const effectiveWebSearchMode = webSearchMode ?? "off";
   const turnReceipt = createTurnReceipt({
     startedAtMs: turnStartedAtMs,
-    inputSource: transcriptionOverride ? "text" : "voice",
+    inputSource,
     sttMode,
     sttProvider,
     sttModel,
@@ -147,8 +148,9 @@ export async function runVoicePipeline(
       retainCapturedAudio = Boolean(audioUri && !abortSignal?.aborted);
       throw error;
     } finally {
-      turnReceipt.timing.transcriptionMs =
-        Date.now() - transcriptionStartedAtMs;
+      if (!transcriptionOverride?.trim()) {
+        turnReceipt.timing.transcriptionMs = Date.now() - transcriptionStartedAtMs;
+      }
     }
 
     if (!transcription) {

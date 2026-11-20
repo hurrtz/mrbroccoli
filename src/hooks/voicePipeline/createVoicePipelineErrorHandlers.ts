@@ -69,6 +69,7 @@ type ErrorHandlerParams = Pick<
     "cancelStreamingRender"
   >;
   streamingRenderRunId: number;
+  inputSource: "text" | "voice";
   transcriptionOverride?: string;
   playbackStartedRef: MutableRefObject<boolean>;
   turnId: string;
@@ -96,6 +97,7 @@ export function createVoicePipelineErrorHandlers({
   streaming,
   streamingRenderRunId,
   t,
+  inputSource,
   transcriptionOverride,
   turnId,
 }: ErrorHandlerParams) {
@@ -153,6 +155,7 @@ export function createVoicePipelineErrorHandlers({
               existingUserMessageId:
                 messageState.lastUserMessageIdRef.current ?? undefined,
               messagesOverride,
+              inputSource,
               transcriptionOverride,
             });
           };
