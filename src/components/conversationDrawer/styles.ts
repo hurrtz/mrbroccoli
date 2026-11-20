@@ -129,7 +129,6 @@ export const styles = StyleSheet.create({
   headerCopy: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
   },
   sidebarHeader: {
     justifyContent: "space-between",
@@ -188,15 +187,26 @@ export const styles = StyleSheet.create({
     minHeight: 46,
     borderRadius: 10,
     borderWidth: 1,
-    paddingLeft: 12,
+    paddingStart: 12,
     flexDirection: "row",
     alignItems: "center",
   },
-  searchInput: {
+  searchField: {
     flex: 1,
+    minWidth: 0,
     minHeight: 46,
+    justifyContent: "center",
+  },
+  searchText: {
     fontSize: 14,
     fontFamily: fonts.body,
+  },
+  searchHint: {
+    paddingVertical: 8,
+  },
+  searchInput: {
+    minHeight: 46,
+    paddingHorizontal: 0,
   },
   searchClearButton: {
     width: 44,

@@ -1,5 +1,11 @@
 import React from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AppWordmark } from "../AppWordmark";
@@ -153,8 +159,10 @@ export function ConversationDrawerSearch({
   onClearSearch,
 }: ConversationDrawerSearchProps) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
+  const { isRtl, t } = useLocalization();
   const insets = useSafeAreaInsets();
+  const hint = t("searchConversationsPlaceholder");
+  const textAlign = isRtl ? "right" : "left";
 
   return (
     <View
@@ -180,16 +188,39 @@ export function ConversationDrawerSearch({
           },
         ]}
       >
-        <TextInput
-          testID="conversation-drawer-search-input"
-          value={searchQuery}
-          onChangeText={onChangeSearchQuery}
-          placeholder={t("searchConversationsPlaceholder")}
-          placeholderTextColor={colors.textMuted}
-          selectionColor={colors.accent}
-          style={[styles.searchInput, { color: colors.text }]}
-          returnKeyType="search"
-        />
+        <View style={styles.searchField}>
+          {!searchQuery && (
+            <Text
+              accessible={false}
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              pointerEvents="none"
+              style={[
+                styles.searchText,
+                styles.searchHint,
+                { color: colors.textMuted, textAlign },
+              ]}
+            >
+              {hint}
+            </Text>
+          )}
+          <TextInput
+            accessibilityLabel={hint}
+            testID="conversation-drawer-search-input"
+            value={searchQuery}
+            onChangeText={onChangeSearchQuery}
+            multiline={false}
+            selectionColor={colors.accent}
+            underlineColorAndroid="transparent"
+            style={[
+              styles.searchText,
+              styles.searchInput,
+              !searchQuery && StyleSheet.absoluteFill,
+              { color: colors.text, textAlign },
+            ]}
+            returnKeyType="search"
+          />
+        </View>
         {searchQuery.trim() ? (
           <TouchableOpacity
             testID="conversation-drawer-clear-search"

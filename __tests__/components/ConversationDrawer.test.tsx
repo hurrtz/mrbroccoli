@@ -13,7 +13,7 @@ import { fireEvent, waitFor, within } from "@testing-library/react-native";
 import { ConversationDrawer } from "../../src/components/ConversationDrawer";
 import { ConversationDrawerList } from "../../src/components/conversationDrawer/ConversationDrawerList";
 import { darkColors, lightColors } from "../../src/theme/colors";
-import { ConversationMeta } from "../../src/types";
+import type { AppLanguage, ConversationMeta } from "../../src/types";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 
 const hiddenIconQuery = { includeHiddenElements: true } as const;
@@ -74,7 +74,7 @@ const conversations: ConversationMeta[] = [
 
 function renderConversationDrawer(
   overrideProps: Partial<React.ComponentProps<typeof ConversationDrawer>> = {},
-  language: "en" | "ar" = "en",
+  language: AppLanguage = "en",
   themeMode: "light" | "dark" = "light",
 ) {
   return renderWithProviders(
@@ -366,6 +366,30 @@ describe("ConversationDrawer", () => {
       }
     });
   });
+
+  it.each([
+    ["uk", "Пошук за назвами, моделями й текстом повідомлень", "left"],
+    ["ar", "البحث في العناوين والنماذج ونص الرسالة", "right"],
+  ] as const)(
+    "wraps the %s search hint while preserving a single-line editor",
+    (language, hint, alignment) => {
+      const screen = renderConversationDrawer({}, language);
+      const input = screen.getByTestId("conversation-drawer-search-input");
+      const hintText = screen.getByText(hint, { includeHiddenElements: true });
+
+      expect(input.props.accessibilityLabel).toBe(hint);
+      expect(input.props.multiline).toBe(false);
+      expect(input.props.returnKeyType).toBe("search");
+      expect(hintText.props.numberOfLines).toBeUndefined();
+      expect(hintText.props.accessibilityElementsHidden).toBe(true);
+      expect(StyleSheet.flatten(hintText.props.style).textAlign).toBe(alignment);
+
+      fireEvent.changeText(input, "travel");
+      expect(screen.queryByText(hint, { includeHiddenElements: true })).toBeNull();
+      fireEvent.press(screen.getByTestId("conversation-drawer-clear-search"));
+      expect(screen.getByText(hint, { includeHiddenElements: true })).toBeTruthy();
+    },
+  );
 
   it("filters conversations through async search", async () => {
     const onSearchConversations = jest.fn(async () => [conversations[1]]);

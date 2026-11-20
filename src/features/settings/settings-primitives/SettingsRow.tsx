@@ -67,35 +67,41 @@ export function SettingsRow({
       {icon ? (
         <PhosphorIcon name={icon} size="control" color={iconColor} />
       ) : null}
-      <View style={styles.copy}>
-        <Text numberOfLines={1} style={[styles.label, { color: labelColor }]}>
-          {label}
-        </Text>
-        {supporting ? (
+      <View style={styles.details}>
+        <View style={styles.copy}>
+          <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
+          {supporting ? (
+            <Text
+              numberOfLines={supportingLines}
+              style={[
+                styles.supporting,
+                {
+                  color:
+                    supportingTone === "danger"
+                      ? colors.danger
+                      : colors.textSecondary,
+                },
+              ]}
+            >
+              {supporting}
+            </Text>
+          ) : null}
+        </View>
+        {value ? (
           <Text
-            numberOfLines={supportingLines}
+            numberOfLines={1}
             style={[
-              styles.supporting,
+              styles.value,
               {
-                color:
-                  supportingTone === "danger"
-                    ? colors.danger
-                    : colors.textSecondary,
+                color: colors.textSecondary,
+                textAlign: isRtl ? "left" : "right",
               },
             ]}
           >
-            {supporting}
+            {value}
           </Text>
         ) : null}
       </View>
-      {value ? (
-        <Text
-          numberOfLines={1}
-          style={[styles.value, { color: colors.textSecondary }]}
-        >
-          {value}
-        </Text>
-      ) : null}
       {control !== undefined ? (
         control
       ) : (
@@ -152,6 +158,7 @@ const styles = StyleSheet.create({
   row: {
     minHeight: 52,
     paddingHorizontal: 14,
+    paddingVertical: 8,
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
@@ -159,7 +166,6 @@ const styles = StyleSheet.create({
   },
   rowWithSupporting: {
     minHeight: 64,
-    paddingVertical: 8,
   },
   last: {
     borderBottomWidth: 0,
@@ -169,6 +175,13 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.5,
+  },
+  details: {
+    flex: 1,
+    minWidth: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
   },
   copy: {
     flex: 1,
@@ -191,6 +204,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: 14,
     lineHeight: 20,
-    textAlign: "right",
   },
 });

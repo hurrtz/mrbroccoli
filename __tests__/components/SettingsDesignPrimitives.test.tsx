@@ -96,6 +96,32 @@ describe("settings design primitives", () => {
     expect(onToggle).toHaveBeenCalledTimes(1);
   });
 
+  it("lets complete action labels and empty-state instructions set the row height", () => {
+    const message =
+      "No recent speech requests yet. Preview a voice or play a reply.";
+    const screen = wrap(
+      <>
+        <SettingsRow
+          label="Recent Speech Activity"
+          value="0"
+          onPress={jest.fn()}
+        />
+        <SettingsRow testID="empty-state" label={message} control={null} />
+      </>,
+    );
+
+    expect(
+      screen.getByText("Recent Speech Activity").props.numberOfLines,
+    ).toBeUndefined();
+    expect(screen.getByText(message).props.numberOfLines).toBeUndefined();
+    expect(
+      StyleSheet.flatten(screen.getByTestId("empty-state").props.style),
+    ).toMatchObject({
+      minHeight: 52,
+      paddingVertical: 8,
+    });
+  });
+
   it("expresses selected, locked, and removable route states accessibly", () => {
     const onSelect = jest.fn();
     const onRemove = jest.fn();

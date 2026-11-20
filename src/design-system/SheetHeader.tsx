@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     width: 38,
   },
   copy: {
-    alignItems: "center",
+    alignSelf: "stretch",
     gap: 4,
     minWidth: 0,
   },
