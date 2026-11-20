@@ -1918,6 +1918,21 @@ describe("validateProviderConnection", () => {
     expect(body.messages[1].content).toBe("Reply with OK only.");
   });
 
+  it("rejects successful HTTP responses that contain no usable reply", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ choices: [{ message: { content: "  " } }] }),
+    });
+    await expect(
+      validateProviderConnection({
+        provider: "openai",
+        model: "gpt-5.4-2026-03-05",
+        apiKey: "test",
+        language: "en",
+      }),
+    ).rejects.toThrow();
+  });
+
   it("validates Gemini with the native generateContent API key path", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,

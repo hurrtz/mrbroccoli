@@ -1,5 +1,6 @@
 import * as FileSystem from "expo-file-system/legacy";
 
+import { translate } from "../i18n";
 import type { AppLanguage, Provider } from "../types";
 
 import { STT_VALIDATION_AUDIO_BASE64 } from "./sttValidationAudio";
@@ -53,7 +54,7 @@ export async function validateSttProviderConnection(params: {
         encoding: FileSystem.EncodingType.Base64,
       },
     );
-    await transcribeAudio({
+    const transcript = await transcribeAudio({
       fileUri: audioPath,
       mode: "provider",
       provider: params.provider,
@@ -63,6 +64,9 @@ export async function validateSttProviderConnection(params: {
       speechLanguage: "en",
       abortSignal: params.abortSignal,
     });
+    if (!transcript?.trim()) {
+      throw new Error(translate(params.language, "noSpeechDetected"));
+    }
   } finally {
     await FileSystem.deleteAsync(audioPath, {
       idempotent: true,

@@ -176,7 +176,8 @@ prompts and result validation.
 
 **Decision:** Internal generated text never becomes hidden authoritative user
 data. Summaries remain editable conversation state; titles remain cosmetic;
-validation results describe only the tested capability and configuration.
+validation results describe only the tested capability and configuration. Chat and
+speech-recognition checks require nonempty output from the validation sample.
 
 ## Evidence
 

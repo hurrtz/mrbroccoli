@@ -223,7 +223,7 @@ export async function validateProviderConnection(params: {
   language: AppLanguage;
   abortSignal?: AbortSignal;
 }) {
-  await requestChatText({
+  const reply = await requestChatText({
     messages: [
       {
         role: "user",
@@ -238,4 +238,7 @@ export async function validateProviderConnection(params: {
       "You are validating a provider connection for a voice assistant app. Reply with exactly OK.",
     abortSignal: params.abortSignal,
   });
+  if (!reply.trim()) {
+    throw buildProviderEmptyReplyError(params.provider, params.language);
+  }
 }

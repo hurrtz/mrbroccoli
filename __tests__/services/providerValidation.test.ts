@@ -92,6 +92,25 @@ describe("validateSttProviderConnection", () => {
     });
   });
 
+  it.each([null, "  "])(
+    "rejects an empty sample transcription (%j) and removes it",
+    async (transcript) => {
+      (transcribeAudio as jest.Mock).mockResolvedValue(transcript);
+      await expect(
+        validateSttProviderConnection({
+          provider: "elevenlabs",
+          model: "scribe_v2",
+          apiKey: "test",
+          language: "en",
+        }),
+      ).rejects.toThrow();
+      expect(FileSystem.deleteAsync).toHaveBeenCalledWith(
+        expect.stringContaining("provider-stt-validation"),
+        { idempotent: true },
+      );
+    },
+  );
+
   it("removes the validation sample after a provider failure", async () => {
     (transcribeAudio as jest.Mock).mockRejectedValue(new Error("Forbidden"));
 
