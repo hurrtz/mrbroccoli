@@ -47,7 +47,7 @@ final class MrBroccoliWaveformView: UIView {
   private let fillLayer = CAShapeLayer()
   private let glowLayer = CAShapeLayer()
   private let waveformLayer = CAShapeLayer()
-  private let displayScale = UIScreen.main.scale
+  private var displayScale: CGFloat { max(1, traitCollection.displayScale) }
   private var waveformChannel: MrBroccoliWaveformChannel = .input
   private var displayLink: CADisplayLink?
   private var renderedSamples = Array(repeating: CGFloat.zero, count: 96)
@@ -81,12 +81,20 @@ final class MrBroccoliWaveformView: UIView {
     fillLayer.frame = bounds
     glowLayer.frame = bounds
     waveformLayer.frame = bounds
+    baselineLayer.contentsScale = displayScale
+    fillLayer.contentsScale = displayScale
+    glowLayer.contentsScale = displayScale
+    waveformLayer.contentsScale = displayScale
+    if let displayLink {
+      updateFrameRate(displayLink)
+    }
     updateBaselinePath()
     redrawCurrentFrame()
   }
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
+    setNeedsLayout()
     updateDisplayLinkState()
   }
 
@@ -100,10 +108,11 @@ final class MrBroccoliWaveformView: UIView {
     glowLayer.fillColor = UIColor.clear.cgColor
     waveformLayer.fillColor = UIColor.clear.cgColor
 
-    baselineLayer.contentsScale = displayScale
-    fillLayer.contentsScale = displayScale
-    glowLayer.contentsScale = displayScale
-    waveformLayer.contentsScale = displayScale
+    if #available(iOS 17.0, *) {
+      registerForTraitChanges([UITraitDisplayScale.self]) { (view: MrBroccoliWaveformView, _) in
+        view.setNeedsLayout()
+      }
+    }
 
     fillLayer.lineCap = .round
     fillLayer.lineJoin = .round
@@ -156,18 +165,16 @@ final class MrBroccoliWaveformView: UIView {
     }
 
     let link = CADisplayLink(target: self, selector: #selector(handleDisplayLink))
-    if #available(iOS 15.0, *) {
-      let maximumFramesPerSecond = Float(UIScreen.main.maximumFramesPerSecond)
-      link.preferredFrameRateRange = CAFrameRateRange(
-        minimum: min(60, maximumFramesPerSecond),
-        maximum: maximumFramesPerSecond,
-        preferred: maximumFramesPerSecond
-      )
-    } else {
-      link.preferredFramesPerSecond = 60
-    }
+    updateFrameRate(link)
     link.add(to: .main, forMode: .common)
     displayLink = link
+  }
+
+  private func updateFrameRate(_ link: CADisplayLink) {
+    let maximum = Float(window?.windowScene?.screen.maximumFramesPerSecond ?? 60)
+    link.preferredFrameRateRange = CAFrameRateRange(
+      minimum: min(60, maximum), maximum: maximum, preferred: maximum
+    )
   }
 
   private func stopDisplayLink() {
@@ -217,7 +224,8 @@ final class MrBroccoliWaveformView: UIView {
     if resolvedRenderStyle == .envelope {
       let inputLinePath = MrBroccoliWaveformRendering.buildEnvelopeLinePath(
         bounds: bounds,
-        samples: renderedSamples
+        samples: renderedSamples,
+        displayScale: displayScale
       )
       glowLayer.path = nil
       waveformLayer.path = inputLinePath.cgPath
@@ -225,7 +233,8 @@ final class MrBroccoliWaveformView: UIView {
         active
           ? MrBroccoliWaveformRendering.buildEnvelopeFillPath(
               bounds: bounds,
-              samples: renderedSamples
+              samples: renderedSamples,
+              displayScale: displayScale
             ).cgPath
           : nil
       return

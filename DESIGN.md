@@ -78,14 +78,16 @@ missing route opens Connections from the attempted action instead of placing a
 setup layer in front of the workspace.
 
 The iOS presentation remains one component tree across iPhone and iPad.
-`resolveIpadLayout` maps the live window and native iPad identity into compact
-or regular presentation state. Compact windows take the unchanged phone tree;
-regular windows retain the same controllers while `MainScreenPresentation`
-adds the persistent conversations sidebar, `MainScreenWorkspace` selects the
-regular workspace geometry, and Settings changes to master-detail.
+`resolveIpadLayout` reads live window dimensions. Compact windows use the
+phone presentation. A tall, expanded iPhone window uses the iPad portrait
+sidebar and master-detail Settings. A wide, expanded iPhone window gives
+equal space to the input controls and transcript. The existing controllers
+own the active turn, input surface, and draft across these transitions.
 
 **Decision:** React Native does not expose UIKit's live horizontal size class
-to this shared tree, so 680pt is the centralized regular-width approximation.
+to this shared tree. Regular iPad presentation begins at 680pt of width. An
+iPhone window can show two panes when its shorter edge accommodates a 300pt
+conversation list and at least 320pt of workspace.
 Transcript docking has a separate 1024pt viability threshold: a 296pt sidebar
 plus a roughly 400pt transcript at every regular landscape width would leave
 no useful centre workspace. Narrower regular windows keep the transcript

@@ -85,8 +85,8 @@ capability-specific contracts are regression-tested at the request boundary.
 - Platform-specific behavior belongs behind a service boundary and must be
   validated against both native projects.
 - Resize-sensitive presentation policy belongs in a pure shared resolver under
-  `utils/`; screens consume that result instead of inventing independent iPad
-  breakpoints or copying runtime state into form-factor-specific trees.
+  `utils/`. The workspace and Settings share the iPad and expanded-iPhone
+  layout decision. Conversation and composer state survive each change in size.
 
 ## Deep Specs
 

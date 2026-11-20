@@ -87,12 +87,10 @@ enum MrBroccoliWaveformRendering {
     return path
   }
 
-  static func buildEnvelopeLinePath(bounds: CGRect, samples: [CGFloat]) -> UIBezierPath {
+  static func buildEnvelopeLinePath(
+    bounds: CGRect, samples: [CGFloat], displayScale: CGFloat
+  ) -> UIBezierPath {
     let path = UIBezierPath()
-    guard !samples.isEmpty else {
-      return buildBaselinePath(bounds: bounds, displayScale: UIScreen.main.scale)
-    }
-
     let midY = bounds.midY
     let amplitude = max(11, bounds.height * 0.41)
     let points: [CGPoint] = samples.enumerated().map { index, sample in
@@ -102,7 +100,7 @@ enum MrBroccoliWaveformRendering {
     }
 
     guard let firstPoint = points.first else {
-      return buildBaselinePath(bounds: bounds, displayScale: UIScreen.main.scale)
+      return buildBaselinePath(bounds: bounds, displayScale: displayScale)
     }
 
     path.move(to: firstPoint)
@@ -130,8 +128,10 @@ enum MrBroccoliWaveformRendering {
     return path
   }
 
-  static func buildEnvelopeFillPath(bounds: CGRect, samples: [CGFloat]) -> UIBezierPath {
-    let path = buildEnvelopeLinePath(bounds: bounds, samples: samples)
+  static func buildEnvelopeFillPath(
+    bounds: CGRect, samples: [CGFloat], displayScale: CGFloat
+  ) -> UIBezierPath {
+    let path = buildEnvelopeLinePath(bounds: bounds, samples: samples, displayScale: displayScale)
     guard !samples.isEmpty else {
       return path
     }

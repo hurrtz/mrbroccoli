@@ -56,9 +56,9 @@ shared design system and settings primitives.
 
 ## Adaptive Presentation
 
-Phones and compact iPad windows use the existing full-window overview followed
-by a pushed detail page. Regular iPad remains a full-window replacement but
-uses a 300pt persistent category rail and one detail pane. The rail reuses the
+Compact windows and wide iPhones use the full-window overview followed by a
+pushed detail page. Regular iPad and tall, expanded iPhone windows use a
+300pt persistent category rail and one detail pane. The rail reuses the
 overview's exact seven pages, icons, and Conversation / Voice / Privacy & app
 groups, marks one row selected, and has no chevrons or back action because
 nothing is pushed. A plain regular open selects Connections; a deep link

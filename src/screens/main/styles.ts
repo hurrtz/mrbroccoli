@@ -84,6 +84,9 @@ export const styles = StyleSheet.create({
     minWidth: 0,
     paddingRight: 12,
   },
+  expandedPhoneColumn: {
+    flex: 1,
+  },
   landscapeRightColumn: {
     flex: 1,
     minWidth: 0,

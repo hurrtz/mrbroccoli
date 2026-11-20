@@ -321,9 +321,11 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     disabled,
     footer,
     initialInputSurface,
+    initialTextMessage,
     isActive,
     onAddImage,
     onResolvePromptBlock,
+    onTextMessageChange,
     promptBlockedActionEnabled,
     promptBlockedActionLabel,
     promptBlockedMessage,
@@ -331,15 +333,17 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
     disabled?: boolean;
     footer?: React.ReactNode;
     initialInputSurface?: string;
+    initialTextMessage?: string;
     isActive?: boolean;
     onAddImage?: () => void;
     onResolvePromptBlock?: () => void;
+    onTextMessageChange?: (text: string) => void;
     promptBlockedActionEnabled?: boolean;
     promptBlockedActionLabel?: string | null;
     promptBlockedMessage?: string | null;
   }) => {
     const React = require("react");
-    const { Text, TouchableOpacity, View } = require("react-native");
+    const { Text, TextInput, TouchableOpacity, View } = require("react-native");
     return React.createElement(
       View,
       null,
@@ -358,6 +362,11 @@ jest.mock("../../src/screens/main/MainScreenVoiceStage", () => ({
         null,
         `surface:${initialInputSurface ?? "voice"}`,
       ),
+      React.createElement(TextInput, {
+        testID: "stub-composer",
+        defaultValue: initialTextMessage,
+        onChangeText: onTextMessageChange,
+      }),
       onAddImage ? React.createElement(Text, null, "image-action") : null,
       promptBlockedMessage
         ? React.createElement(
@@ -1074,6 +1083,56 @@ describe("MainScreen", () => {
     expect(leftPane.queryByTestId("satellite-image")).toBeNull();
     expect(rightPane.getByTestId("transcript-preview")).toBeTruthy();
     expect(rightPane.queryByText("transcript-style-control")).toBeNull();
+  });
+
+  it("moves one iPhone conversation between the folded, tall and wide workspaces", () => {
+    const resize = (width: number, height: number) =>
+      mockUseWindowDimensions.mockReturnValue({
+        width, height, scale: 3, fontScale: 1,
+      });
+    resize(466, 678);
+    const screen = renderWithProviders(<MainScreen />);
+    const rerenderWorkspace = () =>
+      screen.rerender(
+        <ThemeProvider mode="light">
+          <LocalizationProvider language="en">
+            <MainScreen />
+          </LocalizationProvider>
+        </ThemeProvider>,
+      );
+    const draft = "Keep this question while I unfold the phone";
+    fireEvent.changeText(screen.getByTestId("stub-composer"), draft);
+    expect(screen.queryByTestId("landscape-left-pane")).toBeNull();
+    expect(screen.queryByTestId("ipad-transcript-pane")).toBeNull();
+    expect(screen.queryByTestId("stub-sidebar-open-settings")).toBeNull();
+
+    resize(669, 951);
+    rerenderWorkspace();
+    expect(screen.getByTestId("stub-sidebar-open-settings")).toBeTruthy();
+    expect(screen.getByTestId("stub-composer").props.defaultValue).toBe(draft);
+    expect(screen.queryByTestId("landscape-left-pane")).toBeNull();
+
+    resize(951, 669);
+    rerenderWorkspace();
+    const left = screen.getByTestId("landscape-left-pane");
+    const right = screen.getByTestId("landscape-right-pane");
+    expect(StyleSheet.flatten(left.props.style).flex).toBe(
+      StyleSheet.flatten(right.props.style).flex,
+    );
+    expect(within(right).getByTestId("transcript-preview")).toBeTruthy();
+    expect(within(left).getByTestId("stub-composer").props.defaultValue).toBe(
+      draft,
+    );
+    expect(screen.queryByTestId("stub-sidebar-open-settings")).toBeNull();
+    expect(screen.getByTestId("main-safe-area").props.edges).toEqual([
+      "top", "bottom", "left", "right",
+    ]);
+
+    resize(466, 678);
+    rerenderWorkspace();
+    expect(screen.queryByTestId("landscape-left-pane")).toBeNull();
+    expect(screen.queryByTestId("stub-sidebar-open-settings")).toBeNull();
+    expect(screen.getByTestId("stub-composer").props.defaultValue).toBe(draft);
   });
 
   it("composes a persistent sidebar and docked transcript on a wide iPad", () => {

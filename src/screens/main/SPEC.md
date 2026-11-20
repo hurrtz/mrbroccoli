@@ -296,6 +296,10 @@ receive already-derived state and callbacks.
   New control as the phone drawer. It has no backdrop, close action, or menu
   button; selection and New keep it mounted. Its header also retains the global
   Settings entry.
+- An expanded iPhone in portrait uses the regular portrait sidebar and
+  transcript sheet. In landscape its input stage and inline transcript each
+  occupy half the usable window, with both panels inside the system insets.
+  Folding the device restores the compact phone interface.
 - Regular iPad keeps the route byline centred, the conversation-settings
   control at the trailing edge, and the voice/composer stage in the remaining
   content pane. Portrait and narrower regular landscape keep the transcript

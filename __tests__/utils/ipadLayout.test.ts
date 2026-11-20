@@ -30,6 +30,23 @@ describe("resolveIpadLayout", () => {
     ).toBe(false);
   });
 
+  it.each<[number, number, boolean, boolean]>([
+    [466, 678, false, false],
+    [678, 466, false, false],
+    [669, 951, true, true],
+    [951, 669, true, false],
+    [440, 951, false, false],
+  ])("adapts a resizable iPhone window at %s by %s", (width, height, expanded, sidebar) => {
+    const layout = resolveIpadLayout({ width, height, platform: "ios", isPad: false });
+    expect(layout).toMatchObject({
+      isIpad: false,
+      isExpandedPhone: expanded,
+      isRegularWidth: sidebar,
+      sidebarWidth: sidebar ? 300 : null,
+      transcriptDocked: false,
+    });
+  });
+
   it("collapses a compact iPad window to the phone layout", () => {
     expect(
       resolveIpadLayout({
@@ -87,6 +104,7 @@ describe("resolveIpadLayout", () => {
         width: 1180,
       }),
     ).toEqual({
+      isExpandedPhone: false,
       isIpad: true,
       isLandscape: true,
       isRegularWidth: true,

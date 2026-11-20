@@ -44,6 +44,8 @@ TypeScript owns product policy; native modules expose focused capabilities.
   audio-session transitions, interruptions, and route changes.
 - `MrBroccoliNativeWaveform` and the `Waveform/` subsystem own recording/file
   analysis, bounded level delivery, rendering, and interruption policy.
+  The view obtains its pixel scale and refresh rate from its current display
+  so an active waveform follows an iPhone Duo display change.
 - `MrBroccoliBackgroundVoiceTurn` keeps an authorized active turn alive across
   supported background transitions.
 - `MrBroccoliVoiceLiveActivity` bridges ActivityKit state and remote voice

@@ -140,20 +140,23 @@ starts. Changing Listening settings mid-turn applies to the next recording.
 Submission uses the captured input route and its current credential, so
 removing a credential takes effect immediately.
 
-## Adaptive iPad Composition
+## Adaptive iOS Composition
 
 `MainScreen` resolves one resize-aware `IpadLayout` from the current window,
 platform, and native iPad identity. Controllers, conversation data, input
 drafts, composer-focus intent, and pipeline state remain above that decision.
 Only presentation ownership changes:
 
-- compact iPad and all phones render the existing phone workspace and modal
-  conversations drawer;
+- compact iPad and compact iPhone windows render the phone workspace and
+  modal conversations drawer;
+- a tall, expanded iPhone shares the regular portrait sidebar and sheet. A
+  wide, expanded iPhone divides the safe area evenly between input and
+  transcript and keeps the conversations drawer available;
 - regular iPad moves that same drawer content into a persistent leading
   sidebar and renders the workspace beside it;
 - regular portrait and narrower landscape retain the transcript handle and
   sheet; and
-- landscape windows at least 1024pt wide dock the transcript as a third pane.
+- iPad landscape windows at least 1024pt wide dock the transcript as a third pane.
 
 **Decision:** the 680pt regular boundary is the shared-tree approximation of
 UIKit's size class, because React Native does not expose the live class during

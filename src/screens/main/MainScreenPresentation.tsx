@@ -82,7 +82,7 @@ export function MainScreenPresentation({
       testID="main-screen"
       style={[styles.container, { backgroundColor: colors.background }]}
       edges={
-        ipadLayout.isRegularWidth
+        ipadLayout.isRegularWidth || ipadLayout.isExpandedPhone
           ? ["top", "bottom", "left", "right"]
           : Platform.OS === "ios" && isLandscape
             ? ["top"]

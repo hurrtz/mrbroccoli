@@ -610,7 +610,13 @@ export function MainScreenWorkspace({
   if (isLandscape) {
     return (
       <View style={styles.landscapeShell}>
-        <View testID="landscape-left-pane" style={styles.landscapeLeftColumn}>
+        <View
+          testID="landscape-left-pane"
+          style={[
+            styles.landscapeLeftColumn,
+            ipadLayout.isExpandedPhone && styles.expandedPhoneColumn,
+          ]}
+        >
           <MainScreenTopBar colors={colors} {...landscapeTopBar} />
 
           {/* In landscape the row belongs in the left pane, above the byline. */}
@@ -643,10 +649,7 @@ export function MainScreenWorkspace({
                 />
               }
               layout="landscape"
-              // Short phone windows must retain the complete 44pt transport
-              // row above the system gesture area. Regular-width iPads use
-              // their larger, separately measured ceilings above.
-              maxOrbSize={150}
+              maxOrbSize={ipadLayout.isExpandedPhone ? 224 : 150}
               {...voiceStage}
               // The left pane cannot fit the full notice paragraph above the
               // status line at any font scale, so landscape always takes the

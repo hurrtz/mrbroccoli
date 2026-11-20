@@ -244,6 +244,10 @@ provider resource storage where the API supports it; this does not override the 
   windows expose persistent navigation and wider information layouts while
   preserving the active conversation and configured routes through rotation,
   Split View, and Stage Manager resizing.
+- On iPhone Duo, the outer display uses the phone workspace. Opening the
+  phone in portrait reveals the same conversation sidebar as iPad. In
+  landscape, the input controls and transcript each occupy half the window.
+  The current turn and unsent draft survive folding and rotation.
 - **Decision:** iOS retains `com.tobiaswinkler.app.mrbroccoli`, while Android
   uses the independent Play identity
   `com.tobiaswinkler.app.android.mrbroccoli`. This deliberate split supports
