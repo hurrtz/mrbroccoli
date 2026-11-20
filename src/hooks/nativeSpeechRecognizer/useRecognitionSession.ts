@@ -17,6 +17,7 @@ export interface RecognitionSession {
   isRecordingRef: React.MutableRefObject<boolean>;
   startedAtRef: React.MutableRefObject<number>;
   latestTranscriptRef: React.MutableRefObject<string>;
+  completedLiveTranscriptRef: React.MutableRefObject<string | null>;
   finalTranscriptRef: React.MutableRefObject<string>;
   stopResolverRef: React.MutableRefObject<StopResolver | null>;
   stopRejectRef: React.MutableRefObject<StopRejecter | null>;
@@ -52,6 +53,7 @@ export function useRecognitionSession({
   const isRecordingRef = useRef(false);
   const startedAtRef = useRef(0);
   const latestTranscriptRef = useRef("");
+  const completedLiveTranscriptRef = useRef<string | null>(null);
   const finalTranscriptRef = useRef("");
   const stopResolverRef = useRef<StopResolver | null>(null);
   const stopRejectRef = useRef<StopRejecter | null>(null);
@@ -128,6 +130,7 @@ export function useRecognitionSession({
     isRecordingRef,
     startedAtRef,
     latestTranscriptRef,
+    completedLiveTranscriptRef,
     finalTranscriptRef,
     stopResolverRef,
     stopRejectRef,

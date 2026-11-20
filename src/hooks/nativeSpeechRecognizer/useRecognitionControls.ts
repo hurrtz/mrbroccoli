@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { ExpoSpeechRecognitionModule } from "expo-speech-recognition";
 import type { TranslationKey } from "../../i18n";
 import {
@@ -12,6 +12,7 @@ import {
   RECOGNITION_METER_INTERVAL_MS,
   RECOGNITION_STOP_TIMEOUT_MS,
 } from "./shared";
+import { cleanupCapturedAudio } from "../../services/voicePipeline/cleanup";
 import { transcribeRecordedFile } from "./transcribeRecordedFile";
 import type { RecognitionSession } from "./useRecognitionSession";
 import type { SttLanguage } from "../../types";
@@ -37,6 +38,7 @@ export function useRecognitionControls({
   const {
     abortRequestedRef,
     clearPendingResolution,
+    completedLiveTranscriptRef,
     finalTranscriptRef,
     isRecordingRef,
     latestTranscriptRef,
@@ -50,6 +52,9 @@ export function useRecognitionControls({
     stopRequestedRef,
     stopResolverRef,
   } = session;
+
+  const fileRecognitionAbortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => fileRecognitionAbortRef.current?.abort(), []);
 
   const ensurePermissions = useCallback(async () => {
     if (!ExpoSpeechRecognitionModule.isRecognitionAvailable()) {
@@ -76,6 +81,7 @@ export function useRecognitionControls({
 
     setLastError(null);
     setInputMetering(null);
+    completedLiveTranscriptRef.current = null;
     latestTranscriptRef.current = "";
     finalTranscriptRef.current = "";
     clearPendingResolution();
@@ -128,6 +134,7 @@ export function useRecognitionControls({
     }
   }, [
     clearPendingResolution,
+    completedLiveTranscriptRef,
     ensurePermissions,
     finalTranscriptRef,
     isRecordingRef,
@@ -144,6 +151,12 @@ export function useRecognitionControls({
   ]);
 
   const abortRecognition = useCallback(async () => {
+    fileRecognitionAbortRef.current?.abort();
+    if (completedLiveTranscriptRef.current !== null) {
+      completedLiveTranscriptRef.current = null;
+      resolvePendingStop(null);
+      return;
+    }
     if (!isRecordingRef.current) {
       clearPendingResolution();
       return;
@@ -189,6 +202,7 @@ export function useRecognitionControls({
   }, [
     abortRequestedRef,
     clearPendingResolution,
+    completedLiveTranscriptRef,
     isRecordingRef,
     nativeSessionIdRef,
     resolvePendingStop,
@@ -201,6 +215,12 @@ export function useRecognitionControls({
   ]);
 
   const stopRecognition = useCallback(async (): Promise<string | null> => {
+    const completed = completedLiveTranscriptRef.current;
+    if (completed !== null) {
+      completedLiveTranscriptRef.current = null;
+      resolvePendingStop(completed);
+      return completed;
+    }
     if (!isRecordingRef.current) {
       return null;
     }
@@ -231,20 +251,29 @@ export function useRecognitionControls({
         throw new Error(t("couldntProcessVoiceInput"));
       }
 
-      const transcription = await transcribeRecordedFile({
-        fileUri,
-        finalTranscriptRef,
-        latestTranscriptRef,
-        sttLanguage,
-        requiresOnDeviceRecognition,
-        t,
-      });
-
-      if (!transcription) {
-        throw new Error(t("couldntCatchThatTryAgain"));
+      const controller = new AbortController();
+      fileRecognitionAbortRef.current = controller;
+      try {
+        const transcription = await transcribeRecordedFile({
+          abortSignal: controller.signal,
+          durationMs: Math.max(0, Date.now() - startedAtRef.current),
+          fileUri,
+          finalTranscriptRef,
+          latestTranscriptRef,
+          sttLanguage,
+          requiresOnDeviceRecognition,
+          t,
+        });
+        if (!transcription && !controller.signal.aborted) {
+          throw new Error(t("couldntCatchThatTryAgain"));
+        }
+        return transcription;
+      } finally {
+        if (fileRecognitionAbortRef.current === controller) {
+          fileRecognitionAbortRef.current = null;
+        }
+        await cleanupCapturedAudio(fileUri);
       }
-
-      return transcription;
     }
 
     stopRequestedRef.current = true;
@@ -289,6 +318,7 @@ export function useRecognitionControls({
   }, [
     abortRecognition,
     abortRequestedRef,
+    completedLiveTranscriptRef,
     finalTranscriptRef,
     isRecordingRef,
     latestTranscriptRef,

@@ -1,4 +1,7 @@
 import React from "react";
+import { cleanupCapturedAudio } from "../../src/services/voicePipeline/cleanup";
+
+jest.mock("../../src/services/voicePipeline/cleanup", () => ({ cleanupCapturedAudio: jest.fn() }));
 import { act, renderHook } from "@testing-library/react-native";
 
 import { LocalizationProvider } from "../../src/i18n";
@@ -196,6 +199,7 @@ describe("useNativeSpeechRecognizer", () => {
     });
 
     await expect(transcriptPromise!).resolves.toBe("Hello native world");
+    expect(cleanupCapturedAudio).toHaveBeenCalledWith("file://capture.wav");
     expect(stopNativeWaveformRecording).toHaveBeenCalledWith(
       (startNativeWaveformRecording as jest.Mock).mock.calls[0][0].sessionId,
     );
@@ -299,6 +303,57 @@ describe("useNativeSpeechRecognizer", () => {
       });
     },
   );
+
+  it("keeps an automatically completed live result until the user submits or discards it", async () => {
+    jest.mocked(isNativeWaveformAvailable).mockReturnValue(false);
+    const { result } = renderHook(() => useNativeSpeechRecognizer(), { wrapper });
+    for (const discard of [false, true]) {
+      await act(async () => { await result.current.startRecognition(); });
+      dateNowSpy.mockReturnValue(Date.now() + 2_000);
+      act(() => {
+        emitSpeechEvent("result", { results: [{ transcript: "Book the train" }], isFinal: true });
+        emitSpeechEvent("end", {});
+      });
+      expect(result.current.isRecording).toBe(true);
+      if (discard) await act(async () => { await result.current.abortRecognition(); });
+      let transcript: string | null = null;
+      await act(async () => { transcript = await result.current.stopRecognition(); });
+      expect(transcript).toBe(discard ? null : "Book the train");
+      expect(result.current.isRecording).toBe(false);
+      await expect(result.current.stopRecognition()).resolves.toBeNull();
+    }
+  });
+
+  it("allows a long System recording to finish and rejects incomplete file recognition", async () => {
+    jest.useFakeTimers({ doNotFake: ["Date"] });
+    try {
+      const { result } = renderHook(() => useNativeSpeechRecognizer(), { wrapper });
+      for (const complete of [true, false]) {
+        await act(async () => { await result.current.startRecognition(); });
+        dateNowSpy.mockReturnValue(Date.now() + 900_000);
+        let pending!: Promise<string | null>;
+        await act(async () => {
+          pending = result.current.stopRecognition();
+          await Promise.resolve();
+          await Promise.resolve();
+          emitSpeechEvent("result", { results: [{ transcript: "Partial speech" }], isFinal: false });
+        });
+        const outcome = pending.then(value => value, () => "rejected");
+        jest.advanceTimersByTime(120_000);
+        expect(ExpoSpeechRecognitionModule.abort).not.toHaveBeenCalled();
+        if (complete) {
+          emitSpeechEvent("result", { results: [{ transcript: "Complete speech" }], isFinal: true });
+          emitSpeechEvent("end", {});
+        } else {
+          jest.runOnlyPendingTimers();
+        }
+        expect(await outcome).toBe(complete ? "Complete speech" : "rejected");
+        expect(cleanupCapturedAudio).toHaveBeenCalledWith("file://capture.wav");
+      }
+    } finally {
+      jest.useRealTimers();
+    }
+  });
 
   it("aborts recorded-file recognition and removes its listeners and watchdog", async () => {
     jest.useFakeTimers({ doNotFake: ["Date"] });

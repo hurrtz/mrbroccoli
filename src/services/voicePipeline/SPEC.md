@@ -159,10 +159,11 @@ collapse a multi-paragraph reply into paragraph zero. Wait-mode playback retains
 an explicit pause between paragraphs, including when synthesis falls back to
 native speech; seek metadata alone does not create an audible pause.
 
-Native recognizer stop, abort, and file transcription carry bounded watchdogs:
-a platform recognizer that drops its terminal event settles with the latest
-transcript and is forced down instead of wedging voice capture for the rest of
-the session.
+Live System recognition holds a platform-completed result until the user submits
+or discards the capture. File recognition allows the recording duration plus
+processing headroom. A deadline failure aborts the recognizer and surfaces an
+error. The microphone WAV is deleted after recognition settles, including on
+failure and cancellation.
 
 Fallback routes are normalized from the user's explicit policy. A failed
 primary route may move only through that order, and diagnostics retain every

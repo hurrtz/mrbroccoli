@@ -18,6 +18,7 @@ export function useRecognitionSubscriptions({
 }: UseRecognitionSubscriptionsParams) {
   const {
     abortRequestedRef,
+    completedLiveTranscriptRef,
     finalTranscriptRef,
     handleError,
     handleResult,
@@ -114,8 +115,15 @@ export function useRecognitionSubscriptions({
         return;
       }
 
-      isRecordingRef.current = false;
-      setIsRecording(false);
+      // Single-shot recognizers can finish while the user still holds the orb.
+      // Keep the completed turn available to the normal submit or discard action.
+      const transcript = finalTranscriptRef.current.trim() || latestTranscriptRef.current.trim();
+      if (isRecordingRef.current && transcript) {
+        completedLiveTranscriptRef.current = transcript;
+      } else {
+        isRecordingRef.current = false;
+        setIsRecording(false);
+      }
       setInputMetering(null);
     });
 
@@ -132,6 +140,7 @@ export function useRecognitionSubscriptions({
     };
   }, [
     abortRequestedRef,
+    completedLiveTranscriptRef,
     finalTranscriptRef,
     handleError,
     handleResult,
