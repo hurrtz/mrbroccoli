@@ -164,7 +164,9 @@ receive already-derived state and callbacks.
   voice preview while a reply is paused also performs that full teardown before
   preview audio begins; an unpaused reply or any earlier turn phase remains
   protected from preview interruption.
-- A localized line above the orb describes the active operation. An icon
+- A localized line above the orb describes the active operation. It uses the
+  same caption typography as the controls below. Its distance from the ring
+  mirrors the lower control row when the stage has room. An icon
   identifies the provider doing the work. It follows recording, transcription,
   search, prompt submission, model thinking and streaming, speech transfer,
   playback, and pause. Recording also shows the time left until auto-send.

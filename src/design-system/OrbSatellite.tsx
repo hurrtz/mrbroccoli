@@ -9,7 +9,7 @@ import {
   type ViewStyle,
 } from "react-native";
 
-import { fonts } from "../theme/typography";
+import { textStyles } from "../theme/typography";
 import { useTheme } from "../theme/ThemeContext";
 import {
   MIN_ICON_TOUCH_TARGET,
@@ -173,12 +173,8 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   label: {
-    fontFamily: fonts.mono,
-    fontSize: 9,
-    letterSpacing: 0.75,
-    lineHeight: 12,
+    ...textStyles.orbCaption,
     textAlign: "center",
-    textTransform: "uppercase",
   },
   disabled: {
     opacity: 0.38,

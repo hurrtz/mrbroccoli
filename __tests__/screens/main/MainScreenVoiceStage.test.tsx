@@ -4,6 +4,7 @@ import { AccessibilityInfo, Keyboard, StyleSheet, View } from "react-native";
 
 import { Circle } from "react-native-svg";
 
+import { OrbSatellite } from "../../../src/design-system/OrbSatellite";
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
@@ -244,6 +245,38 @@ describe("MainScreenVoiceStage composer", () => {
       maxHeight: 174,
     });
     expect(screen.getByTestId("landscape-stage-controls")).toBeTruthy();
+  });
+
+  it("matches the captions below the orb and mirrors their clearance as space permits", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          activity: { label: "Ready to listen" },
+          footer: <OrbSatellite icon="image" label="Image" />,
+        })}
+      />,
+    );
+    const viewport = screen.getByTestId("voice-text-input-viewport");
+    const styleOf = (testID: string) =>
+      StyleSheet.flatten(screen.getByTestId(testID).props.style);
+    expect(styleOf("orb-activity").marginBottom)
+      .toBe(styleOf("voice-text-input-footer").marginTop);
+    expect(StyleSheet.flatten(screen.getByText("Ready to listen").props.style))
+      .toMatchObject(StyleSheet.flatten(screen.getByText("Image").props.style));
+    const transportHeight = styleOf("orb-transport-idle").height;
+    const orbSize = styleOf("voice-orb-idle").height;
+    const lowerClearance = transportHeight - orbSize;
+    expect(lowerClearance).toBeGreaterThan(0);
+
+    for (const availableSpace of [lowerClearance, 10, 0]) {
+      fireEvent(viewport, "layout", {
+        nativeEvent: {
+          layout: { height: transportHeight + availableSpace, width: 390 },
+        },
+      });
+      expect(styleOf("voice-text-input-pager-shell").top).toBe(availableSpace);
+      expect(styleOf("voice-orb-idle").height).toBe(orbSize);
+    }
   });
 
   it("rests on the voice orb as the screen's one loud element", () => {

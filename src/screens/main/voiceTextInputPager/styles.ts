@@ -2,6 +2,8 @@ import { StyleSheet } from "react-native";
 import { textStyles } from "../../../theme/typography";
 
 export const PAGE_GAP = 32;
+// The stage's 2pt row gap completes the 18pt separation on either side.
+const CONTROL_ROW_MARGIN = 16;
 
 export const voiceTextInputPagerStyles = StyleSheet.create({
   root: {
@@ -16,10 +18,11 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     flexWrap: "wrap",
     justifyContent: "center",
     columnGap: 6,
-    minHeight: 24,
+    marginBottom: CONTROL_ROW_MARGIN,
+    minHeight: 36,
   },
-  activityText: { ...textStyles.body, flexShrink: 1, textAlign: "center" },
-  activityTimer: { ...textStyles.body, fontVariant: ["tabular-nums"] },
+  activityText: { ...textStyles.orbCaption, flexShrink: 1, textAlign: "center" },
+  activityTimer: { ...textStyles.orbCaption, fontVariant: ["tabular-nums"] },
   rootWithFooter: {
     justifyContent: "center",
   },
@@ -47,10 +50,8 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     flexGrow: 0,
     flexShrink: 1,
   },
-  pagerShell: {
-    height: "100%",
-    position: "relative",
-    width: "100%",
+  viewportContent: {
+    ...StyleSheet.absoluteFill,
   },
   track: {
     flexDirection: "row",
@@ -59,9 +60,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   trackCovered: {
     opacity: 0,
-  },
-  activeActionOverlay: {
-    ...StyleSheet.absoluteFill,
   },
   activeOrbOverlay: {
     alignItems: "center",
@@ -167,7 +165,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   footer: {
     flexShrink: 0,
-    marginTop: 16,
+    marginTop: CONTROL_ROW_MARGIN,
     width: "100%",
   },
 });

@@ -1,6 +1,8 @@
 import { PhosphorIcon } from "../../../design-system/PhosphorIcon";
 import React from "react";
-import { TextInput, TouchableOpacity, View } from "react-native";
+import {
+  TextInput, TouchableOpacity, View, type StyleProp, type ViewStyle,
+} from "react-native";
 import { GestureDetector, GestureType } from "react-native-gesture-handler";
 import Animated from "react-native-reanimated";
 import {
@@ -19,6 +21,7 @@ interface InputSurfacePagesProps {
   activeSurface: InputSurface;
   colors: Colors;
   disabled: boolean;
+  style: StyleProp<ViewStyle>;
   inputMode: InputMode;
   isActive: boolean;
   onPress: () => void;
@@ -297,7 +300,7 @@ export function InputSurfacePages(props: InputSurfacePagesProps) {
     activeSurface === "text" ? composerLayout.centreOffsetY : orbCentreOffsetY;
 
   return (
-    <View style={styles.pagerShell} testID="voice-text-input-pager-shell">
+    <View style={props.style} testID="voice-text-input-pager-shell">
       <GestureDetector gesture={panGesture}>
         <Animated.View
           testID="voice-text-input-pager"

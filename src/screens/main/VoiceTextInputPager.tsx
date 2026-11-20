@@ -122,6 +122,25 @@ export function VoiceTextInputPager({
   const readyToListen = !promptBlockedMessage && !voiceInputUnavailableMessage;
   const statusText =
     visualPhase === "idle" && !readyToListen ? null : activity?.label;
+  const showActivity = Boolean(
+    statusText && (isActive || pager.activeSurface === "voice"),
+  );
+  const balanceActivity = showActivity && Boolean(footer);
+  // The transport keys extend below the orb. Mirror their footprint above it
+  // when there is room, giving space back to the controls on short screens.
+  const maximumViewportHeight =
+    maximumTransportLayout.height +
+    (balanceActivity ? maximumTransportLayout.height - maxOrbSize : 0);
+  const transportHeight = getOrbTransportLayout(
+    stageSize, showTransportLabels,
+  ).height;
+  const spaceAboveOrb = balanceActivity
+    ? Math.min(
+        transportHeight - stageSize,
+        Math.max(0, (viewportHeight || maximumViewportHeight) - transportHeight),
+      )
+    : 0;
+  const contentStyle = [styles.viewportContent, { top: spaceAboveOrb }];
   const providerName = provider ? PROVIDER_LABELS[provider] : "";
   const spokenStatus = activity?.providerAfterLabel
     ? [statusText, providerName].filter(Boolean).join(" ")
@@ -139,7 +158,7 @@ export function VoiceTextInputPager({
     ? null
     : t("orbTimeRemaining", { time: formatCountdown(recordingTime) });
   const providerIcon = provider ? (
-    <ProviderIcon provider={provider} color={colors.text} size="compact" />
+    <ProviderIcon provider={provider} color={colors.textSecondary} size="compact" />
   ) : null;
 
   const handleViewportLayout = (
@@ -160,7 +179,7 @@ export function VoiceTextInputPager({
       style={[styles.root, footer ? styles.rootWithFooter : null]}
       testID="voice-text-input-stage"
     >
-      {statusText && (isActive || pager.activeSurface === "voice") ? (
+      {showActivity ? (
         <View
           accessible
           accessibilityLabel={[spokenStatus, timeLabel].filter(Boolean).join(" · ")}
@@ -168,7 +187,7 @@ export function VoiceTextInputPager({
           testID="orb-activity"
         >
           {!activity?.providerAfterLabel && providerIcon}
-          <Text style={[styles.activityText, { color: colors.text }]}>
+          <Text style={[styles.activityText, { color: colors.textSecondary }]}>
             {statusText}
           </Text>
           {activity?.providerAfterLabel && providerIcon}
@@ -188,8 +207,8 @@ export function VoiceTextInputPager({
             ? [
                 styles.viewportWithFooter,
                 {
-                  flexBasis: maximumTransportLayout.height,
-                  maxHeight: maximumTransportLayout.height,
+                  flexBasis: maximumViewportHeight,
+                  maxHeight: maximumViewportHeight,
                 },
               ]
             : null,
@@ -198,6 +217,7 @@ export function VoiceTextInputPager({
         <InputSurfacePages
           activeSurface={pager.activeSurface}
           colors={colors}
+          style={contentStyle}
           disabled={disabled}
           inputMode={inputMode}
           isActive={isActive}
@@ -213,7 +233,7 @@ export function VoiceTextInputPager({
           onTextFocusChange={pager.handleTextFocusChange}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
-          viewportHeight={viewportHeight}
+          viewportHeight={Math.max(0, viewportHeight - spaceAboveOrb)}
           panGesture={pager.panGesture}
           promptBlockedMessage={promptBlockedMessage}
           stageSize={stageSize}
@@ -235,7 +255,7 @@ export function VoiceTextInputPager({
         />
         {isActive ? (
           <View
-            style={[styles.activeActionOverlay, styles.activeOrbOverlay]}
+            style={[contentStyle, styles.activeOrbOverlay]}
             testID={`voice-stage-${visualPhase}-orb`}
           >
             <OrbTransport

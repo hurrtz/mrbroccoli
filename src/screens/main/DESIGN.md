@@ -285,10 +285,12 @@ Hands free at the trailing edge. Equal outer flex groups hold that centre; on
 narrow portrait rows two decorative hairlines separate the groups. Compact
 icon-only layouts retain their shorter centred row. Flexbox centers the complete
 orb-or-composer plus composing row rather than assigning tall-screen surplus
-between those parts. The footer's 16pt margin
-combines with the pager's 2pt child gap to preserve the design-system's 18pt
-separation when no blocking notice intervenes; a route notice stays between
-the primary action and next-turn controls. The text composer replaces the orb
+between those parts. The status and footer each have 18pt of separation from
+the stage including its 2pt child gap. When the status is visible, the pager
+also mirrors the transport controls' extension below the ring above it. On
+short screens it gives that extra space back to the orb first. A route notice
+can sit between the primary action and next-turn controls. The text composer
+replaces the orb
 rather than adding a competing call to action. Chevron selection and swipe
 settling use a 220ms timing transition; no workspace pager motion springs or
 bounces. Landscape uses the same cluster measurement under a 150pt ceiling,
