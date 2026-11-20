@@ -10,6 +10,8 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.3.0 - 2026-11-20
+
 - Added GPT-6.2 Astra and Sol, Claude Fable 5.2, Qwen4-Max, four Gemini 4
   models, Mistral Large 4, and 15 OpenRouter snapshots including Kimi K3.1 Pro.
   Recorded transcription gains Scribe v3 and Voxtral 3. Spoken replies gain
