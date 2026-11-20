@@ -324,6 +324,37 @@ describe("useNativeSpeechRecognizer", () => {
     }
   });
 
+  it("cancels recognition while the recorder is still finalizing its file", async () => {
+    let releaseFile!: (recording: { uri: string }) => void;
+    jest.mocked(stopNativeWaveformRecording).mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseFile = resolve;
+        }),
+    );
+    const { result } = renderHook(() => useNativeSpeechRecognizer(), {
+      wrapper,
+    });
+    await act(async () => {
+      await result.current.startRecognition();
+    });
+    dateNowSpy.mockReturnValue(5_000);
+    let stop!: Promise<string | null>;
+    act(() => {
+      stop = result.current.stopRecognition();
+    });
+    await act(async () => {
+      await result.current.abortRecognition();
+    });
+    await act(async () => {
+      releaseFile({ uri: "file://discarded.wav" });
+      await Promise.resolve();
+      expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
+      await expect(stop).resolves.toBeNull();
+    });
+    expect(cleanupCapturedAudio).toHaveBeenCalledWith("file://discarded.wav");
+  });
+
   it("allows a long System recording to finish and rejects incomplete file recognition", async () => {
     jest.useFakeTimers({ doNotFake: ["Date"] });
     try {

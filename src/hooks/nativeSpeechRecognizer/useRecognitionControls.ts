@@ -244,19 +244,19 @@ export function useRecognitionControls({
       setIsRecording(false);
       setInputMetering(null);
 
-      const recording = await stopNativeWaveformRecording(sessionId);
-      const fileUri = recording.uri ?? null;
-
-      if (!fileUri) {
-        throw new Error(t("couldntProcessVoiceInput"));
-      }
-
+      const durationMs = Math.max(0, Date.now() - startedAtRef.current);
       const controller = new AbortController();
       fileRecognitionAbortRef.current = controller;
+      let fileUri: string | undefined;
       try {
+        const recording = await stopNativeWaveformRecording(sessionId);
+        fileUri = recording.uri;
+        if (controller.signal.aborted) return null;
+        if (!fileUri) throw new Error(t("couldntProcessVoiceInput"));
+
         const transcription = await transcribeRecordedFile({
           abortSignal: controller.signal,
-          durationMs: Math.max(0, Date.now() - startedAtRef.current),
+          durationMs,
           fileUri,
           finalTranscriptRef,
           latestTranscriptRef,
