@@ -13,37 +13,28 @@ import type { TranslateFn } from "../shared";
 interface UseVoiceRemoteControlsParams {
   canRepeat: boolean;
   handsFreeEnabled: boolean;
+  drivePaused: boolean;
   isRecording: boolean;
   onRepeat: () => Promise<void>;
   onStopRecording: () => Promise<void>;
-  onToggleHandsFree: () => void;
+  onPauseHandsFree: () => void;
+  onResumeHandsFree: () => void;
   player: AudioPlayerController;
   t: TranslateFn;
 }
 
 export function useVoiceRemoteControls({
   canRepeat,
+  drivePaused,
   handsFreeEnabled,
   isRecording,
   onRepeat,
   onStopRecording,
-  onToggleHandsFree,
+  onPauseHandsFree,
+  onResumeHandsFree,
   player,
   t,
 }: UseVoiceRemoteControlsParams) {
-  const callbacksRef = useRef({
-    onRepeat,
-    onStopRecording,
-    onToggleHandsFree,
-    player,
-  });
-  callbacksRef.current = {
-    onRepeat,
-    onStopRecording,
-    onToggleHandsFree,
-    player,
-  };
-
   const mode = useMemo<VoiceRemoteControlMode>(() => {
     if (isRecording) {
       return "recording";
@@ -55,8 +46,10 @@ export function useVoiceRemoteControls({
           : "playback-active"
         : "inactive";
     }
-    return handsFreeEnabled ? "drive-active" : "drive-paused";
+    if (handsFreeEnabled) return "drive-active";
+    return drivePaused ? "drive-paused" : "inactive";
   }, [
+    drivePaused,
     handsFreeEnabled,
     isRecording,
     player.isPlaybackPaused,
@@ -64,10 +57,22 @@ export function useVoiceRemoteControls({
     player.usesNativeAudioQueue,
   ]);
 
+  const callbacks = {
+    canRepeat,
+    mode,
+    onPauseHandsFree,
+    onResumeHandsFree,
+    onRepeat,
+    onStopRecording,
+    player,
+  };
+  const callbacksRef = useRef(callbacks);
+  callbacksRef.current = callbacks;
+
   useEffect(() => {
     setVoiceRemoteControlState({
       canRepeat,
-      continueLabel: t("handsFree"),
+      continueLabel: mode === "playback-paused" ? t("resume") : t("handsFree"),
       mode,
       pauseLabel: t("pause"),
       phaseLabel:
@@ -85,19 +90,25 @@ export function useVoiceRemoteControls({
     const handleAction = (action: VoiceRemoteAction) => {
       const current = callbacksRef.current;
 
-      if (action === "repeat") {
-        void current.onRepeat();
-        return;
+      switch (action) {
+        case "repeat":
+          if (current.canRepeat && current.mode !== "inactive")
+            void current.onRepeat();
+          break;
+        case "stop":
+          if (current.mode === "recording") void current.onStopRecording();
+          break;
+        case "pause":
+          if (current.mode === "playback-active")
+            void current.player.pausePlayback();
+          if (current.mode === "drive-active") current.onPauseHandsFree();
+          break;
+        case "continue":
+          if (current.mode === "playback-paused")
+            void current.player.resumePlayback();
+          if (current.mode === "drive-paused") current.onResumeHandsFree();
+          break;
       }
-      if (action === "stop") {
-        void current.onStopRecording();
-        return;
-      }
-      if (action === "pause") {
-        current.onToggleHandsFree();
-        return;
-      }
-      current.onToggleHandsFree();
     };
 
     return subscribeToVoiceRemoteActions(handleAction);

@@ -2,6 +2,7 @@ export interface DriveSessionState {
   armRequested: boolean;
   autoContinueEnabled: boolean;
   engaged: boolean;
+  remotePaused?: true;
 }
 
 export type DriveSessionEvent =
@@ -9,7 +10,7 @@ export type DriveSessionEvent =
   | { type: "arm-requested" }
   | { type: "disengage" }
   | { type: "engage" }
-  | { type: "pause" }
+  | { type: "pause"; keepRemoteControls?: boolean }
   | { type: "resume" }
   | { type: "suspend" };
 
@@ -44,9 +45,8 @@ export function transitionDriveSessionState(
       };
     case "pause":
       return {
-        armRequested: false,
-        autoContinueEnabled: false,
-        engaged: false,
+        ...createDriveSessionState(),
+        ...(event.keepRemoteControls ? { remotePaused: true } : {}),
       };
     case "resume":
       return {

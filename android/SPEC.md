@@ -18,6 +18,10 @@ last_validated_sha: 7db5c94
 
 # Android Native Specification
 
+Native media controls stay inactive at cold idle. Only an explicitly paused
+Hands free session keeps its remote Continue control. During reply playback,
+Pause and Continue operate on the player, and Stop submits an active recording.
+
 ## Purpose
 
 The Android project implements operating-system and lifecycle behavior that

@@ -46,6 +46,23 @@ describe("driveSessionStateMachine", () => {
     });
   });
 
+  it("keeps Continue available after a deliberate remote pause until reset", () => {
+    const active = transitionDriveSessionState(createDriveSessionState(), {
+      type: "resume",
+    });
+    const paused = transitionDriveSessionState(active, {
+      type: "pause",
+      keepRemoteControls: true,
+    });
+    expect(paused.remotePaused).toBe(true);
+    expect(transitionDriveSessionState(paused, { type: "pause" })).toEqual(
+      createDriveSessionState(),
+    );
+    expect(transitionDriveSessionState(paused, { type: "resume" })).toEqual(
+      active,
+    );
+  });
+
   it("separates temporary disengagement from a full suspension", () => {
     const armed = transitionDriveSessionState(createDriveSessionState(), {
       type: "resume",

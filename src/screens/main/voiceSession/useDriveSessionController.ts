@@ -348,14 +348,14 @@ export function useDriveSessionController({
     replayPhase,
   ]);
 
-  const disable = useCallback(() => {
+  const disable = useCallback((keepRemoteControls = false) => {
     if (!driveSessionStateRef.current.autoContinueEnabled) {
       return;
     }
 
     generationRef.current += 1;
     pendingAutoRearmCueRef.current = false;
-    transition({ type: "pause" });
+    transition({ type: "pause", keepRemoteControls });
     resetAcousticProfile();
     void stopAmbientMonitoring?.();
     recordDebugLogEvent({ event: "hands-free-disabled" });
@@ -439,6 +439,7 @@ export function useDriveSessionController({
     autoContinueEnabled,
     canRepeat: Boolean(lastCompletedReplyRef.current.trim()),
     engaged,
+    remotePaused: driveSessionState.remotePaused === true,
     silenceCountdownSeconds,
     voiceActive,
     disable,

@@ -174,10 +174,12 @@ export function useVoiceSessionController({
   useVoiceRemoteControls({
     canRepeat: driveSession.canRepeat,
     handsFreeEnabled: driveSession.autoContinueEnabled,
+    drivePaused: driveSession.remotePaused,
     isRecording,
     onRepeat: driveSession.handleRepeat,
     onStopRecording: stopVoiceCapture,
-    onToggleHandsFree: toggleHandsFree,
+    onPauseHandsFree: () => driveSession.disable(true),
+    onResumeHandsFree: driveSession.enable,
     player,
     t,
   });
