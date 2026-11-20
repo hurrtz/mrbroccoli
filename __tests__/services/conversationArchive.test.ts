@@ -150,6 +150,27 @@ describe("conversationArchive", () => {
     );
   });
 
+  it("preserves the last complete snapshot on a failed body read and prunes an intentionally locked row", async () => {
+    const root = new Directory("file:///archive");
+    root.create();
+    const { conversation, meta } = createRecord("unreadable");
+    const config = { version: 1 as const, directoryName: "Archive", directoryUri: root.uri };
+    const params = { activeConversationId: null, config, conversationMetas: [meta] };
+    await syncConversationArchive({ ...params, getConversationById: async () => conversation });
+    const session = `${root.uri}/sessions/${getConversationArchiveFileName(meta.id)}`;
+    const lastIndex = fileSystemTestApi.__getFileContent(`${root.uri}/index.md`);
+    const lastBody = fileSystemTestApi.__getFileContent(session);
+    expect(lastBody).toContain(conversation.messages[0].content);
+    await expect(syncConversationArchive({ ...params, getConversationById: async () => null }))
+      .rejects.toMatchObject({ code: "sync-failed" });
+    expect(fileSystemTestApi.__getFileContent(`${root.uri}/index.md`)).toBe(lastIndex);
+    expect(fileSystemTestApi.__getFileContent(session)).toBe(lastBody);
+
+    await syncConversationArchive({ ...params, conversationMetas: [{ ...meta, isLocked: true }],
+      getConversationById: async () => null });
+    expect(fileSystemTestApi.__getFileContent(session)).toBeUndefined();
+  });
+
   it("keeps the destination device-local and outside app-data backups", async () => {
     const config = {
       version: 1 as const,

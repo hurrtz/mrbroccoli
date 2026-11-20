@@ -1,5 +1,6 @@
 import * as React from "react";
 
+import { readStoredConversationMetas } from "./conversations/storage";
 import type { useConversations } from "./useConversations";
 import {
   clearConversationArchiveConfig,
@@ -108,7 +109,7 @@ export function useConversationArchive(params: {
         const result = await syncConversationArchive({
           activeConversationId: currentParams.activeConversationId,
           config: currentConfig,
-          conversationMetas: currentParams.conversationMetas,
+          conversationMetas: await readStoredConversationMetas(true),
           getConversationById: currentParams.getConversationById,
         });
         setConfig(result.config);
@@ -198,6 +199,8 @@ export function useConversationArchive(params: {
           meta.updatedAt,
           meta.messageCount,
           meta.pinned,
+          meta.isLocked,
+          meta.archived,
         ]),
       }),
     [params.activeConversationId, params.conversationMetas],

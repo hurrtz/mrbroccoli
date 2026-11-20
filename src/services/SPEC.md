@@ -229,7 +229,9 @@ being dropped from the backup without a trace.
 
 `conversationArchive.ts` is a separate readable AI handoff. It writes an index,
 per-conversation Markdown, and a latest pointer in an app-owned archive
-directory. It is not a lossless restore format and does not include hidden
+directory. Publication and pruning require an authoritative metadata list and
+all eligible session bodies. A transient storage failure preserves the previous
+snapshot. It is not a lossless restore format and does not include hidden
 context, keys, or internal prompts.
 
 **Decision:** Recovery and AI handoff have separate formats because a

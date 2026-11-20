@@ -1,11 +1,16 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native";
 
+import { readStoredConversationMetas } from "../../src/hooks/conversations/storage";
 import { useConversationArchive } from "../../src/hooks/useConversationArchive";
 import {
   loadConversationArchiveConfig,
   syncConversationArchive,
 } from "../../src/services/conversationArchive";
 import type { ConversationMeta } from "../../src/types";
+
+jest.mock("../../src/hooks/conversations/storage", () => ({
+  readStoredConversationMetas: jest.fn(),
+}));
 
 jest.mock("../../src/services/conversationArchive", () => {
   const actual = jest.requireActual("../../src/services/conversationArchive");
@@ -61,6 +66,7 @@ describe("useConversationArchive", () => {
 
   it("automatically syncs after hydration and after conversation changes", async () => {
     const getConversationById = jest.fn();
+    jest.mocked(readStoredConversationMetas).mockResolvedValue([createMeta("2026-08-02T08:01:00.000Z")]);
     const hook = renderHook(
       ({ updatedAt }) =>
         useConversationArchive({
@@ -101,6 +107,19 @@ describe("useConversationArchive", () => {
     await waitFor(() =>
       expect(syncConversationArchive).toHaveBeenCalledTimes(2),
     );
+  });
+
+  it("skips destructive sync when the authoritative list cannot be read", async () => {
+    jest.mocked(readStoredConversationMetas).mockRejectedValue(new Error("unavailable"));
+    const hook = renderHook(() => useConversationArchive({
+      enabled: true, activeConversationId: null, conversationMetas: [],
+      conversationsLoaded: true, getConversationById: jest.fn(),
+    }));
+    await waitFor(() => expect(hook.result.current.loaded).toBe(true));
+    await act(async () => { await hook.result.current.syncNow(); });
+    expect(readStoredConversationMetas).toHaveBeenCalledWith(true);
+    expect(syncConversationArchive).not.toHaveBeenCalled();
+    expect(hook.result.current.error).toBe("sync-failed");
   });
 
   it("does not sync a configured archive while the feature is disabled", async () => {

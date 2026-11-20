@@ -43,8 +43,7 @@ interface IosArchiveDirectoryNativeModule {
 
 function getIosArchiveDirectoryNativeModule() {
   return NativeModules.MrBroccoliArchiveDirectory as
-    | IosArchiveDirectoryNativeModule
-    | undefined;
+    IosArchiveDirectoryNativeModule | undefined;
 }
 
 function isArchiveConfig(value: unknown): value is ConversationArchiveConfig {
@@ -223,7 +222,10 @@ export async function syncConversationArchive(params: {
   activeConversationId: string | null;
   config: ConversationArchiveConfig;
   conversationMetas: ConversationMeta[];
-  getConversationById: (id: string) => Promise<Conversation | null>;
+  getConversationById: (
+    id: string,
+    strict?: boolean,
+  ) => Promise<Conversation | null>;
   now?: () => Date;
 }) {
   const resolved = await resolveArchiveDirectory(params.config);
@@ -240,7 +242,9 @@ export async function syncConversationArchive(params: {
   const records = (
     await Promise.all(
       params.conversationMetas.map(async (meta) => {
-        const conversation = await params.getConversationById(meta.id);
+        const conversation = await params.getConversationById(meta.id, true);
+        if (!conversation && !meta.isLocked)
+          throw new ConversationArchiveError("sync-failed");
         return conversation ? { conversation, meta } : null;
       }),
     )
