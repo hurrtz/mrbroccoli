@@ -208,6 +208,9 @@ receive already-derived state and callbacks.
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback
   restarting recording, playback, or another request.
+- Branch and retry consent uses the exact outbound history and the existing
+  prompt's stored photo grants. The branch checkpoint remains a historical
+  image even when submitted separately from its preceding messages.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
 - Pending images live in the Image satellite's fixed-size thumbnail deck and

@@ -22,21 +22,20 @@ interface ImagePromptRoute {
   provider: Provider;
 }
 
-function getContextualMessages(conversation: Conversation | null) {
-  if (!conversation) {
-    return [];
-  }
-
+function getContextualMessages(
+  conversation: Conversation | null,
+  messages = conversation?.messages ?? [],
+) {
   const canReuseSummary = hasCurrentConversationSummaryProvenance(
-    conversation.contextSummary,
+    conversation?.contextSummary,
   );
   return buildConversationContextPlan({
-    messages: conversation.messages,
+    messages,
     contextSummary: canReuseSummary
-      ? getConversationSummaryBody(conversation.contextSummary)
+      ? getConversationSummaryBody(conversation?.contextSummary)
       : "",
     summarizedMessageCount: canReuseSummary
-      ? conversation.summarizedMessageCount
+      ? conversation?.summarizedMessageCount
       : 0,
   }).recentMessages;
 }
@@ -133,9 +132,12 @@ export function useImagePromptSubmission(params: {
     async (request: VoiceCaptureRequest) => {
       const conversation =
         request.conversationOverride ?? params.activeConversation;
-      const requestContextualMessages = getContextualMessages(conversation);
       const conversationMessages =
         request.messagesOverride ?? conversation?.messages ?? [];
+      const requestContextualMessages = getContextualMessages(
+        conversation,
+        conversationMessages,
+      );
       const contextualMessageIds = new Set(
         requestContextualMessages.map((message) => message.id),
       );
@@ -168,22 +170,28 @@ export function useImagePromptSubmission(params: {
       const recipientProviders = [
         ...new Set(params.imageRoutes.map((route) => route.provider)),
       ];
-      const pendingIds = new Set(
-        (request.attachments ?? []).map((attachment) => attachment.id),
-      );
-      const hasHistoricalImage = allAttachments.some(
-        (attachment) => !pendingIds.has(attachment.id),
-      );
-      const hasNewRecipient = allAttachments.some((attachment) =>
-        recipientProviders.some(
-          (recipient) => !attachment.sharedWithProviders.includes(recipient),
+      const historicalIds = new Set(
+        requestContextualMessages.flatMap((message) =>
+          (message.attachments ?? []).map(({ id }) => id),
         ),
       );
+      const checkpoint = request.existingUserMessageId
+        ? conversation?.messages.find(
+            ({ id }) => id === request.existingUserMessageId,
+          )
+        : undefined;
+      for (const attachment of checkpoint?.attachments ?? []) {
+        historicalIds.add(attachment.id);
+      }
+      const needsDisclosure = allAttachments.some(
+        (attachment) =>
+          (historicalIds.has(attachment.id) || recipientProviders.length > 1) &&
+          recipientProviders.some(
+            (recipient) => !attachment.sharedWithProviders.includes(recipient),
+          ),
+      );
 
-      if (
-        hasNewRecipient &&
-        (hasHistoricalImage || recipientProviders.length > 1)
-      ) {
+      if (needsDisclosure) {
         const confirmed = await requestConsent(
           params.t("imageProviderConsentTitle"),
           params.t("imageProviderConsentMessage", {
@@ -207,6 +215,13 @@ export function useImagePromptSubmission(params: {
           ]),
         ],
       });
+      const outboundIds = new Set(allAttachments.map(({ id }) => id));
+      const authorizeMessage = (message: Message): Message => ({
+        ...message,
+        attachments: message.attachments?.map((attachment) =>
+          outboundIds.has(attachment.id) ? authorize(attachment) : attachment,
+        ),
+      });
       const messagesOverride = conversationMessages.map((message) => {
         if (
           !contextualMessageIds.has(message.id) ||
@@ -214,13 +229,15 @@ export function useImagePromptSubmission(params: {
         ) {
           return message;
         }
-        const nextMessage = {
-          ...message,
-          attachments: message.attachments.map(authorize),
-        };
-        params.updateMessage(message.id, () => nextMessage);
-        return nextMessage;
+        params.updateMessage(message.id, authorizeMessage);
+        return authorizeMessage(message);
       });
+      if (
+        checkpoint?.attachments?.some(({ id }) => outboundIds.has(id)) &&
+        !contextualMessageIds.has(checkpoint.id)
+      ) {
+        params.updateMessage(checkpoint.id, authorizeMessage);
+      }
 
       await params.runVoiceCapture({
         ...request,

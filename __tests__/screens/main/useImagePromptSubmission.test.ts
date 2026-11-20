@@ -186,6 +186,81 @@ describe("useImagePromptSubmission", () => {
     );
   });
 
+  it("asks before sending the branched prompt photo to a new single provider", async () => {
+    const photo = {
+      ...attachment,
+      sharedWithProviders: ["anthropic" as const],
+    };
+    const checkpoint = {
+      id: "checkpoint",
+      role: "user" as const,
+      content: "Look again",
+      attachments: [photo],
+      model: null,
+      provider: null,
+      timestamp: "2026-11-15T12:00:00Z",
+    };
+    const conversation = {
+      id: "branch",
+      title: "Look again",
+      createdAt: checkpoint.timestamp,
+      updatedAt: checkpoint.timestamp,
+      messages: [checkpoint],
+    };
+    const runVoiceCapture = jest.fn(async () => undefined);
+    const updateMessage = jest.fn(() => null);
+    const { result } = renderHook(() =>
+      useImagePromptSubmission({
+        activeConversation: conversation,
+        imagesEnabled: true,
+        imageRoutes: [{ provider: "openai", model: "gpt-5.5-2026-04-23" }],
+        onAddImage: jest.fn(),
+        pendingAttachments: [],
+        runVoiceCapture,
+        showToast: jest.fn(),
+        t,
+        updateMessage,
+      }),
+    );
+    const request = {
+      existingUserMessageId: checkpoint.id,
+      attachments: [photo],
+      conversationOverride: conversation,
+      messagesOverride: [],
+      transcriptionOverride: checkpoint.content,
+    };
+    let submission!: Promise<void>;
+    act(() => {
+      submission = result.current.handleVoiceCaptureDone(request);
+    });
+    expect(result.current.consent).not.toBeNull();
+    await act(async () => {
+      result.current.cancelConsent();
+      await submission;
+    });
+    expect(runVoiceCapture).not.toHaveBeenCalled();
+    expect(updateMessage).not.toHaveBeenCalled();
+    act(() => {
+      submission = result.current.handleVoiceCaptureDone(request);
+    });
+    await act(async () => {
+      result.current.confirmConsent();
+      await submission;
+    });
+    expect(updateMessage).toHaveBeenCalledWith(
+      checkpoint.id,
+      expect.any(Function),
+    );
+    expect(runVoiceCapture).toHaveBeenCalledWith(
+      expect.objectContaining({
+        attachments: [
+          { ...photo, sharedWithProviders: ["anthropic", "openai"] },
+        ],
+        messagesOverride: [],
+      }),
+    );
+  });
+
   it("blocks image submission for a text-only route", () => {
     const showToast = jest.fn();
     const onAddImage = jest.fn();
