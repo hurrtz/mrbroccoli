@@ -13,6 +13,7 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     gap: 2,
   },
   activity: {
+    alignContent: "center",
     alignItems: "center",
     flexDirection: "row",
     flexWrap: "wrap",

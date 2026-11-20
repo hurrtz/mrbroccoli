@@ -259,8 +259,10 @@ describe("MainScreenVoiceStage composer", () => {
     const viewport = screen.getByTestId("voice-text-input-viewport");
     const styleOf = (testID: string) =>
       StyleSheet.flatten(screen.getByTestId(testID).props.style);
-    expect(styleOf("orb-activity").marginBottom)
-      .toBe(styleOf("voice-text-input-footer").marginTop);
+    expect(styleOf("orb-activity")).toMatchObject({
+      alignContent: "center",
+      marginBottom: styleOf("voice-text-input-footer").marginTop,
+    });
     expect(StyleSheet.flatten(screen.getByText("Ready to listen").props.style))
       .toMatchObject(StyleSheet.flatten(screen.getByText("Image").props.style));
     const transportHeight = styleOf("orb-transport-idle").height;
