@@ -47,7 +47,7 @@ export function useConversationSearch(params: {
 
           const conversation = await getConversationById(conversationMeta.id);
 
-          if (!conversation) {
+          if (!conversation || conversation.isLocked) {
             return null;
           }
 

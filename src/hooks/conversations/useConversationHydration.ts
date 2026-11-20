@@ -1,6 +1,5 @@
 import {
   useEffect,
-  useMemo,
   type Dispatch,
   type MutableRefObject,
   type SetStateAction,
@@ -22,33 +21,6 @@ import {
   saveConversation,
 } from "./storage";
 
-async function hydrateConversationMetas(metas: ConversationMeta[]) {
-  return Promise.all(
-    metas.map(async (meta) => {
-      if (meta.isLocked) {
-        return meta;
-      }
-      const shouldHydrate =
-        !meta.createdAt ||
-        meta.messageCount === 0 ||
-        meta.providers.length === 0 ||
-        Object.keys(meta.providerModels ?? {}).length === 0;
-
-      if (!shouldHydrate) {
-        return meta;
-      }
-
-      const conversation = await readConversation(meta.id);
-
-      if (!conversation) {
-        return meta;
-      }
-
-      return buildConversationMetaFromConversation(conversation, meta);
-    }),
-  );
-}
-
 function mergeConversationMetas(
   storedMetas: ConversationMeta[],
   currentMetas: ConversationMeta[],
@@ -68,23 +40,16 @@ function mergeConversationMetas(
 
 export function useConversationHydration(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
-  conversations: ConversationMeta[];
   onHydrated: () => void;
   setActiveConversationValue: (conversation: Conversation | null) => void;
   setConversations: Dispatch<SetStateAction<ConversationMeta[]>>;
 }) {
   const {
     activeConversationRef,
-    conversations,
     onHydrated,
     setActiveConversationValue,
     setConversations,
   } = params;
-
-  const hydrateConversationMetasCallback = useMemo(
-    () => hydrateConversationMetas,
-    [],
-  );
 
   useEffect(() => {
     let cancelled = false;
@@ -128,6 +93,8 @@ export function useConversationHydration(params: {
               return normalizedMeta;
             }
 
+            if (conversation.isLocked)
+              return { ...normalizedMeta, isLocked: true };
             const titleRestoredConversation =
               restoreLegacyConversationTitle(conversation);
             const legacyParentId =
@@ -139,10 +106,10 @@ export function useConversationHydration(params: {
               : null;
             const restoredConversation = restoreLegacyConversationBranch(
               titleRestoredConversation,
-              legacyParent,
+              legacyParent?.isLocked ? null : legacyParent,
             );
             if (restoredConversation !== conversation) {
-              void saveConversation(restoredConversation);
+              void saveConversation(restoredConversation, { mode: "update" });
             }
 
             return buildConversationMetaFromConversation(
@@ -152,26 +119,19 @@ export function useConversationHydration(params: {
           }),
         );
 
-        const hydratedMetas =
-          await hydrateConversationMetasCallback(normalizedMetas);
-
         if (cancelled) {
           return;
         }
 
-        const sortedStoredMetas = sortConversationMeta(hydratedMetas);
-        setConversations((currentMetas) => {
-          const mergedMetas = mergeConversationMetas(
-            sortedStoredMetas,
-            currentMetas,
-          );
-
-          if (JSON.stringify(mergedMetas) !== JSON.stringify(storedMetas)) {
-            persistConversationMeta(mergedMetas);
-          }
-
-          return mergedMetas;
-        });
+        const sortedStoredMetas = sortConversationMeta(normalizedMetas);
+        const repairs = normalizedMetas.filter(
+          (meta, index) =>
+            JSON.stringify(meta) !== JSON.stringify(storedMetas[index]),
+        );
+        if (repairs.length) persistConversationMeta(repairs, storedMetas);
+        setConversations((current) =>
+          mergeConversationMetas(sortedStoredMetas, current),
+        );
 
         if (!storedActiveConversationId) {
           return;
@@ -189,16 +149,19 @@ export function useConversationHydration(params: {
         const storedActiveConversation = activeConversationMeta
           ? await readConversation(storedActiveConversationId)
           : null;
-        const restoredActiveConversation = storedActiveConversation
-          ? restoreLegacyConversationTitle(storedActiveConversation)
-          : null;
+        const restoredActiveConversation =
+          storedActiveConversation && !storedActiveConversation.isLocked
+            ? restoreLegacyConversationTitle(storedActiveConversation)
+            : null;
 
         if (
           storedActiveConversation &&
           restoredActiveConversation &&
           restoredActiveConversation !== storedActiveConversation
         ) {
-          void saveConversation(restoredActiveConversation);
+          void saveConversation(restoredActiveConversation, {
+            mode: "update",
+          });
         }
 
         if (!cancelled && !activeConversationRef.current) {
@@ -216,44 +179,8 @@ export function useConversationHydration(params: {
     };
   }, [
     activeConversationRef,
-    hydrateConversationMetasCallback,
     onHydrated,
     setActiveConversationValue,
     setConversations,
   ]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    if (
-      conversations.length === 0 ||
-      !conversations.some(
-        (conversation) =>
-          !conversation.isLocked &&
-          (conversation.messageCount === 0 ||
-            conversation.providers.length === 0),
-      )
-    ) {
-      return;
-    }
-
-    void (async () => {
-      const hydratedMetas =
-        await hydrateConversationMetasCallback(conversations);
-
-      if (cancelled) {
-        return;
-      }
-
-      if (JSON.stringify(hydratedMetas) === JSON.stringify(conversations)) {
-        return;
-      }
-
-      setConversations(persistConversationMeta(hydratedMetas));
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [conversations, hydrateConversationMetasCallback, setConversations]);
 }

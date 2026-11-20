@@ -3,7 +3,6 @@ import { AppState } from "react-native";
 import { Conversation, ConversationMeta } from "../types";
 import {
   persistActiveConversationId,
-  persistConversationMeta,
   saveConversation,
 } from "./conversations/storage";
 import { useConversationHydration } from "./conversations/useConversationHydration";
@@ -35,27 +34,26 @@ export function useConversations({
     },
     [],
   );
-  const persistMetas = useCallback((metas: ConversationMeta[]) => {
-    return persistConversationMeta(metas);
-  }, []);
   const handleHydrated = useCallback(() => {
     setLoaded(true);
   }, []);
   const conversationMetasRef = useRef(conversations);
   conversationMetasRef.current = conversations;
   const canAccessConversation = useCallback(
-    (id: string) => {
+    (id: string, documentLocked = false) => {
       const meta = conversationMetasRef.current.find(
         (conversation) => conversation.id === id,
       );
-      return !meta?.isLocked || authorizedConversationIdsRef.current.has(id);
+      return (
+        !(documentLocked || meta?.isLocked) ||
+        authorizedConversationIdsRef.current.has(id)
+      );
     },
     [],
   );
 
   useConversationHydration({
     activeConversationRef,
-    conversations,
     onHydrated: handleHydrated,
     setActiveConversationValue,
     setConversations,
@@ -77,6 +75,7 @@ export function useConversations({
 
   const {
     addMessage,
+    claimFirstPrompt,
     clearActiveConversation,
     createConversation,
     deleteConversation,
@@ -98,7 +97,6 @@ export function useConversations({
     activeConversationRef,
     canAccessConversation,
     conversationMetas: conversations,
-    persistMetas,
     setActiveConversationValue,
     setConversations,
     pastConversationKnowledgeEnabled,
@@ -117,10 +115,11 @@ export function useConversations({
     [updateConversationLockedValue],
   );
   const deleteConversationWithCredentials = useCallback(
-    (id: string) => {
-      authorizedConversationIdsRef.current.delete(id);
-      void clearSessionLock(id);
-      deleteConversation(id);
+    async (id: string) => {
+      if (await deleteConversation(id)) {
+        authorizedConversationIdsRef.current.delete(id);
+        await clearSessionLock(id);
+      }
     },
     [deleteConversation],
   );
@@ -134,10 +133,11 @@ export function useConversations({
       const activeId = activeConversationRef.current?.id;
       if (
         activeId &&
-        conversations.some(
-          (conversation) =>
-            conversation.id === activeId && conversation.isLocked,
-        )
+        (activeConversationRef.current?.isLocked ||
+          conversations.some(
+            (conversation) =>
+              conversation.id === activeId && conversation.isLocked,
+          ))
       ) {
         setActiveConversationValue(null);
       }
@@ -199,7 +199,10 @@ export function useConversations({
               ...conversation,
               knowledgeExcludedConversationIds: nextExcludedIds,
             };
-            await saveConversation(updatedConversation);
+            await saveConversation(updatedConversation, {
+              mode: "update",
+              preserveTitle: true,
+            });
             if (activeConversationRef.current?.id === conversationId) {
               setActiveConversationValue(updatedConversation);
             }
@@ -270,6 +273,7 @@ export function useConversations({
     grantConversationAccess,
     getConversationById,
     addMessage,
+    claimFirstPrompt,
     updateMessage,
     updateConversationContextSummary,
     updateConversationSettings,

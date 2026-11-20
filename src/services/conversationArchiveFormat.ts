@@ -102,7 +102,7 @@ function formatArtifactBody(conversation: Conversation) {
     "## Saved insights",
     "",
     ...conversation.artifacts.map((artifact) => {
-      const source = messagesById.get(artifact.sourceMessageId);
+      const source = artifact.sourceMessageId ? messagesById.get(artifact.sourceMessageId) : undefined;
       const sourceLabel = source
         ? `${formatMessageHeading(source)}, ${source.timestamp}`
         : "source message unavailable";

@@ -5,10 +5,10 @@ import {
   type MutableRefObject,
   type SetStateAction,
 } from "react";
+import { reconcileConversationMessageLinks } from "../../utils/conversationMessageLinks";
 import uuid from "react-native-uuid";
 import {
   Conversation,
-  ConversationArtifact,
   ConversationBranchResult,
   ConversationMeta,
   ConversationSettings,
@@ -23,14 +23,21 @@ import type {
 } from "../../services/appDataBackup";
 import {
   buildConversationMetaFromConversation,
-  getVisibleConversationMessageCount,
+  sortConversationMeta,
   normalizeConversationTitle,
   truncateConversationTitle,
 } from "./meta";
 import {
+  consumeFirstPrompt,
   readConversation,
+  readStoredConversationMetas,
+  persistConversationMeta,
+  renameStoredConversation,
   removeConversation,
   saveConversation,
+  saveConversationBranch,
+  setConversationPinned,
+  setStoredConversationLock,
   saveConversationsAtomically,
 } from "./storage";
 import {
@@ -44,54 +51,67 @@ import {
   writeRestoredImageAttachment,
 } from "../../services/imageAttachmentFiles";
 
-async function cloneMessagesForBranch(messages: Message[]) {
-  const attachmentsBySourceId = new Map<string, MessageImageAttachment>();
-  const createdAttachments: MessageImageAttachment[] = [];
-  const messageIds = new Map<string, string>();
-
+// Files cannot participate in a SQLite transaction. Transfer ownership to the
+// conversation row only after every staged record commits.
+async function withStagedImages<T>(
+  write: (created: MessageImageAttachment[]) => Promise<T>,
+) {
+  const created: MessageImageAttachment[] = [];
   try {
-    const clonedMessages: Message[] = [];
-    for (const message of messages) {
-      const id = uuid.v4() as string;
-      messageIds.set(message.id, id);
-      const attachments: MessageImageAttachment[] = [];
-
-      for (const attachment of message.attachments ?? []) {
-        let clonedAttachment = attachmentsBySourceId.get(attachment.id);
-        if (!clonedAttachment) {
-          clonedAttachment = await writeRestoredImageAttachment({
-            ...attachment,
-            data: await readImageAttachmentData(attachment),
-            id: uuid.v4() as string,
-          });
-          attachmentsBySourceId.set(attachment.id, clonedAttachment);
-          createdAttachments.push(clonedAttachment);
-        }
-        attachments.push(clonedAttachment);
-      }
-
-      clonedMessages.push({
-        ...message,
-        id,
-        ...(attachments.length > 0
-          ? { attachments }
-          : { attachments: undefined }),
-      });
-    }
-
-    return { clonedMessages, messageIds };
+    return await write(created);
   } catch (error) {
-    await deleteImageAttachments(createdAttachments);
+    await deleteImageAttachments(created);
     throw error;
   }
+}
+
+async function cloneMessagesForBranch(
+  messages: Message[],
+  createdAttachments: MessageImageAttachment[],
+) {
+  const attachmentsBySourceId = new Map<string, MessageImageAttachment>();
+  const messageIds = new Map<string, string>();
+
+  const clonedMessages: Message[] = [];
+  for (const message of messages) {
+    const id = uuid.v4() as string;
+    messageIds.set(message.id, id);
+    const attachments: MessageImageAttachment[] = [];
+
+    for (const attachment of message.attachments ?? []) {
+      let clonedAttachment = attachmentsBySourceId.get(attachment.id);
+      if (!clonedAttachment) {
+        clonedAttachment = await writeRestoredImageAttachment({
+          ...attachment,
+          data: await readImageAttachmentData(attachment),
+          id: uuid.v4() as string,
+        });
+        attachmentsBySourceId.set(attachment.id, clonedAttachment);
+        createdAttachments.push(clonedAttachment);
+      }
+      attachments.push(clonedAttachment);
+    }
+
+    clonedMessages.push({
+      ...message,
+      id,
+      ...(attachments.length > 0
+        ? { attachments }
+        : { attachments: undefined }),
+    });
+  }
+
+  return { clonedMessages, messageIds };
 }
 
 async function isIdenticalBackupConversation(
   existing: Conversation,
   record: AppDataBackupConversation,
 ) {
+  const { awaitingFirstPrompt: _pendingTitle, ...existingConversation } =
+    existing;
   const portableExisting: Conversation = {
-    ...existing,
+    ...existingConversation,
     messages: existing.messages.map((message, messageIndex) => ({
       ...message,
       attachments: message.attachments?.map((attachment, attachmentIndex) => {
@@ -109,9 +129,9 @@ async function isIdenticalBackupConversation(
       }),
     })),
   };
-  if (
-    JSON.stringify(portableExisting) !== JSON.stringify(record.conversation)
-  ) {
+  const { awaitingFirstPrompt: _importedPendingTitle, ...portableIncoming } =
+    record.conversation;
+  if (JSON.stringify(portableExisting) !== JSON.stringify(portableIncoming)) {
     return false;
   }
 
@@ -145,6 +165,7 @@ async function isIdenticalBackupConversation(
 
 async function materializeBackupConversation(
   record: AppDataBackupConversation,
+  createdAttachments: MessageImageAttachment[],
 ) {
   const backupAttachments = new Map(
     (record.attachments ?? []).map((attachment) => [attachment.id, attachment]),
@@ -154,49 +175,44 @@ async function materializeBackupConversation(
     Awaited<ReturnType<typeof writeRestoredImageAttachment>>
   >();
 
-  try {
-    for (const message of record.conversation.messages) {
-      for (const attachment of message.attachments ?? []) {
-        if (restoredAttachments.has(attachment.id)) {
-          continue;
-        }
-        const backupAttachment = backupAttachments.get(attachment.id);
-        if (!backupAttachment) {
+  for (const message of record.conversation.messages) {
+    for (const attachment of message.attachments ?? []) {
+      if (restoredAttachments.has(attachment.id)) {
+        continue;
+      }
+      const backupAttachment = backupAttachments.get(attachment.id);
+      if (!backupAttachment) {
+        throw new Error("Backup image data is missing.");
+      }
+      const restored = await writeRestoredImageAttachment({
+        ...backupAttachment,
+        id: uuid.v4() as string,
+        sharedWithProviders: attachment.sharedWithProviders,
+      });
+      createdAttachments.push(restored);
+      restoredAttachments.set(attachment.id, restored);
+    }
+  }
+
+  return {
+    ...record.conversation,
+    messages: record.conversation.messages.map((message) => ({
+      ...message,
+      attachments: message.attachments?.map((attachment) => {
+        const restored = restoredAttachments.get(attachment.id);
+        if (!restored) {
           throw new Error("Backup image data is missing.");
         }
-        const restored = await writeRestoredImageAttachment({
-          ...backupAttachment,
-          id: uuid.v4() as string,
-          sharedWithProviders: attachment.sharedWithProviders,
-        });
-        restoredAttachments.set(attachment.id, restored);
-      }
-    }
-
-    return {
-      ...record.conversation,
-      messages: record.conversation.messages.map((message) => ({
-        ...message,
-        attachments: message.attachments?.map((attachment) => {
-          const restored = restoredAttachments.get(attachment.id);
-          if (!restored) {
-            throw new Error("Backup image data is missing.");
-          }
-          return restored;
-        }),
-      })),
-    };
-  } catch (error) {
-    await deleteImageAttachments([...restoredAttachments.values()]);
-    throw error;
-  }
+        return restored;
+      }),
+    })),
+  };
 }
 
 export function useConversationMutations(params: {
   activeConversationRef: MutableRefObject<Conversation | null>;
-  canAccessConversation: (id: string) => boolean;
+  canAccessConversation: (id: string, documentLocked?: boolean) => boolean;
   conversationMetas: ConversationMeta[];
-  persistMetas: (metas: ConversationMeta[]) => ConversationMeta[];
   setActiveConversationValue: (conversation: Conversation | null) => void;
   setConversations: Dispatch<SetStateAction<ConversationMeta[]>>;
   pastConversationKnowledgeEnabled: boolean;
@@ -205,7 +221,6 @@ export function useConversationMutations(params: {
     activeConversationRef,
     canAccessConversation,
     conversationMetas,
-    persistMetas,
     setActiveConversationValue,
     setConversations,
     pastConversationKnowledgeEnabled,
@@ -227,6 +242,7 @@ export function useConversationMutations(params: {
         createdAt: now,
         updatedAt: now,
         messages: [],
+        awaitingFirstPrompt: true,
         ...(initialSettings && Object.keys(initialSettings).length > 0
           ? { settings: initialSettings }
           : {}),
@@ -247,14 +263,30 @@ export function useConversationMutations(params: {
         pinned: false,
         isLocked: false,
         archived: false,
+        branchSchemaVersion: 2,
+        providerHistoryVersion: 1,
       };
 
-      setConversations((previous) => persistMetas([meta, ...previous]));
-      saveConversation(conversation);
+      setConversations((previous) => sortConversationMeta([meta, ...previous]));
+      void saveConversation(conversation, { initialMeta: meta });
       setActiveConversationValue(conversation);
       return conversation.id;
     },
-    [persistMetas, setActiveConversationValue, setConversations],
+    [setActiveConversationValue, setConversations],
+  );
+
+  const claimFirstPrompt = useCallback(
+    async (id: string) => {
+      const active = activeConversationRef.current;
+      if (active?.id !== id || !active.awaitingFirstPrompt) return null;
+      const { awaitingFirstPrompt: _claimed, ...conversation } = active;
+      // A second submission in the same event loop must see this immediately.
+      const claim = consumeFirstPrompt(id);
+      setActiveConversationValue(conversation);
+      const title = await claim;
+      return active.isLocked ? null : title;
+    },
+    [activeConversationRef, setActiveConversationValue],
   );
 
   const selectConversation = useCallback(
@@ -269,25 +301,45 @@ export function useConversationMutations(params: {
       if (
         conversation &&
         selectionRequestRef.current === requestId &&
-        canAccessConversation(id)
+        canAccessConversation(id, conversation.isLocked)
       ) {
+        const previous = conversationMetas.find((meta) => meta.id === id);
+        if (previous && previous.providerHistoryVersion !== 1) {
+          const repaired = buildConversationMetaFromConversation(
+            conversation,
+            previous,
+          );
+          persistConversationMeta([repaired], [previous]);
+          setConversations((current) =>
+            current.map((meta) => (meta.id === id ? repaired : meta)),
+          );
+        }
         setActiveConversationValue(conversation);
       }
     },
-    [canAccessConversation, setActiveConversationValue],
+    [
+      canAccessConversation,
+      conversationMetas,
+      setActiveConversationValue,
+      setConversations,
+    ],
   );
 
   const getConversationById = useCallback(
-    async (id: string) => {
+    async (id: string, strict = false) => {
       if (!canAccessConversation(id)) {
         return null;
       }
-      if (activeConversationRef.current?.id === id) {
-        return activeConversationRef.current;
+      if (!strict && activeConversationRef.current?.id === id) {
+        return canAccessConversation(id, activeConversationRef.current.isLocked)
+          ? activeConversationRef.current
+          : null;
       }
 
-      const conversation = await readConversation(id);
-      return canAccessConversation(id) ? conversation : null;
+      const conversation = await readConversation(id, strict);
+      return canAccessConversation(id, conversation?.isLocked)
+        ? conversation
+        : null;
     },
     [activeConversationRef, canAccessConversation],
   );
@@ -318,11 +370,11 @@ export function useConversationMutations(params: {
         updatedAt: message.timestamp,
         messages: [...currentConversation.messages, message],
       };
-      const lastModel = messageInput.model ?? undefined;
-      const lastProvider = messageInput.provider ?? undefined;
-
       setActiveConversationValue(updatedConversation);
-      saveConversation(updatedConversation);
+      void saveConversation(updatedConversation, {
+        preserveTitle: !startsAssistantCheckpointBranch,
+        mode: "update",
+      });
       if (
         messageInput.role === "user" &&
         pastConversationKnowledgeEnabled &&
@@ -331,40 +383,10 @@ export function useConversationMutations(params: {
         void syncConversationKnowledge(updatedConversation, true);
       }
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((meta) =>
             meta.id === updatedConversation.id
-              ? {
-                  ...meta,
-                  title: updatedConversation.title,
-                  createdAt: updatedConversation.createdAt,
-                  updatedAt: updatedConversation.updatedAt,
-                  messageCount:
-                    getVisibleConversationMessageCount(updatedConversation),
-                  providers:
-                    messageInput.provider &&
-                    !meta.providers.includes(messageInput.provider)
-                      ? [...meta.providers, messageInput.provider]
-                      : meta.providers,
-                  providerModels:
-                    messageInput.provider && messageInput.model
-                      ? {
-                          ...meta.providerModels,
-                          [messageInput.provider]: (
-                            meta.providerModels[messageInput.provider] ?? []
-                          ).includes(messageInput.model)
-                            ? meta.providerModels[messageInput.provider]
-                            : [
-                                ...(meta.providerModels[
-                                  messageInput.provider
-                                ] ?? []),
-                                messageInput.model,
-                              ],
-                        }
-                      : meta.providerModels,
-                  ...(lastModel !== undefined ? { lastModel } : {}),
-                  ...(lastProvider !== undefined ? { lastProvider } : {}),
-                }
+              ? buildConversationMetaFromConversation(updatedConversation, meta)
               : meta,
           ),
         ),
@@ -375,7 +397,6 @@ export function useConversationMutations(params: {
     [
       activeConversationRef,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -411,15 +432,15 @@ export function useConversationMutations(params: {
       };
 
       setActiveConversationValue(updatedConversation);
-      saveConversation(updatedConversation);
+      void saveConversation(updatedConversation, {
+        preserveTitle: true,
+        mode: "update",
+      });
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((meta) =>
             meta.id === updatedConversation.id
-              ? {
-                  ...meta,
-                  updatedAt,
-                }
+              ? buildConversationMetaFromConversation(updatedConversation, meta)
               : meta,
           ),
         ),
@@ -427,12 +448,7 @@ export function useConversationMutations(params: {
 
       return updatedMessage;
     },
-    [
-      activeConversationRef,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
+    [activeConversationRef, setActiveConversationValue, setConversations],
   );
 
   const removeMessage = useCallback(
@@ -446,22 +462,54 @@ export function useConversationMutations(params: {
         return false;
       }
 
-      const updatedAt = new Date().toISOString();
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        updatedAt,
-        messages: currentConversation.messages.filter(
-          (message) => message.id !== messageId,
+      // An assistant stream can append or update a message while the SQLite write
+      // is pending. Reapply the deletion to its newest document before releasing
+      // any bytes a concurrent save could still reference.
+      let source = currentConversation;
+      let updatedConversation: Conversation;
+      for (;;) {
+        updatedConversation = reconcileConversationMessageLinks({
+          ...source,
+          updatedAt: new Date().toISOString(),
+          messages: source.messages.filter(
+            (message) => message.id !== messageId,
+          ),
+        });
+        delete updatedConversation.contextSummary;
+        delete updatedConversation.summarizedMessageCount;
+        if (
+          !(await saveConversation(updatedConversation, {
+            clearRouteHistory: true,
+            preserveTitle: true,
+            mode: "update",
+          }))
+        )
+          return false;
+        if (activeConversationRef.current === source) {
+          setActiveConversationValue(updatedConversation);
+          break;
+        }
+        const latest =
+          activeConversationRef.current?.id === source.id
+            ? activeConversationRef.current
+            : await readConversation(source.id);
+        if (!latest) return false;
+        if (!latest.messages.some(({ id }) => id === messageId)) {
+          updatedConversation = latest;
+          break;
+        }
+        source = latest;
+      }
+      const retainedImages = new Set(
+        updatedConversation.messages.flatMap(
+          (message) => message.attachments?.map(({ id }) => id) ?? [],
         ),
-      };
-      delete updatedConversation.contextSummary;
-      delete updatedConversation.summarizedMessageCount;
-
-      await saveConversation(updatedConversation);
-      await deleteImageAttachments(removedMessage.attachments ?? []);
-      setActiveConversationValue(updatedConversation);
+      );
+      const removedImages = (removedMessage.attachments ?? []).filter(
+        ({ id }) => !retainedImages.has(id),
+      );
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((meta) =>
             meta.id === updatedConversation.id
               ? buildConversationMetaFromConversation(updatedConversation, {
@@ -478,16 +526,18 @@ export function useConversationMutations(params: {
         ),
       );
 
-      if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
-        await syncConversationKnowledge(updatedConversation, true);
-      }
+      await Promise.all([
+        deleteImageAttachments(removedImages),
+        pastConversationKnowledgeEnabled && !updatedConversation.isLocked
+          ? syncConversationKnowledge(updatedConversation, true)
+          : undefined,
+      ]);
 
       return true;
     },
     [
       activeConversationRef,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -527,9 +577,10 @@ export function useConversationMutations(params: {
       delete updatedConversation.summarizedMessageCount;
 
       setActiveConversationValue(updatedConversation);
-      await saveConversation(updatedConversation);
+      if (!(await saveConversation(updatedConversation, { mode: "update" })))
+        return false;
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((meta) =>
             meta.id === updatedConversation.id ? { ...meta, updatedAt } : meta,
           ),
@@ -545,7 +596,6 @@ export function useConversationMutations(params: {
     [
       activeConversationRef,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -564,116 +614,83 @@ export function useConversationMutations(params: {
         return null;
       }
 
-      const now = new Date().toISOString();
-      const { clonedMessages, messageIds } = await cloneMessagesForBranch(
-        currentConversation.messages.slice(0, messageIndex + 1),
-      );
-      const checkpointMessage = clonedMessages.at(-1);
-      if (!checkpointMessage) {
-        return null;
-      }
-
-      const conversationId = uuid.v4() as string;
-      const rootConversationId =
-        currentConversation.branch?.rootConversationId ??
-        currentConversation.id;
-      const familyIds = [
-        ...new Set([
-          currentConversation.id,
-          ...conversationMetas
-            .filter(
-              (meta) =>
-                meta.id === rootConversationId ||
-                meta.branch?.rootConversationId === rootConversationId,
-            )
-            .map(({ id }) => id),
-        ]),
-      ];
-
-      const artifacts = currentConversation.artifacts
-        ?.map((artifact) => {
-          const clonedSourceMessageId = messageIds.get(
-            artifact.sourceMessageId,
-          );
-          return clonedSourceMessageId
-            ? {
-                ...artifact,
-                id: uuid.v4() as string,
-                sourceMessageId: clonedSourceMessageId,
-              }
-            : null;
-        })
-        .filter((artifact): artifact is ConversationArtifact =>
-          Boolean(artifact),
+      const branch = await withStagedImages(async (created) => {
+        const now = new Date().toISOString();
+        const { clonedMessages, messageIds } = await cloneMessagesForBranch(
+          currentConversation.messages.slice(0, messageIndex + 1),
+          created,
         );
-      const conversation: Conversation = {
-        id: conversationId,
-        title: truncateConversationTitle(
-          sourceMessage.role === "user"
-            ? checkpointMessage.content
-            : currentConversation.title,
-        ),
-        createdAt: now,
-        updatedAt: now,
-        messages: clonedMessages,
-        knowledgeExcludedConversationIds: familyIds,
-        branch: {
-          rootConversationId,
-          parentConversationId: currentConversation.id,
-          parentMessageId: sourceMessage.id,
-          branchMessageId: checkpointMessage.id,
-          kind:
-            sourceMessage.role === "assistant"
-              ? "continue-from-message"
-              : sourceMessage.editedAt
-                ? "edited-prompt"
-                : "alternative-response",
+        const checkpointMessage = clonedMessages.at(-1);
+        if (!checkpointMessage) {
+          return null;
+        }
+
+        const conversationId = uuid.v4() as string;
+        const rootConversationId =
+          currentConversation.branch?.rootConversationId ??
+          currentConversation.id;
+        const artifacts = currentConversation.artifacts
+          ?.map((artifact) => {
+            const clonedSourceMessageId = artifact.sourceMessageId
+              ? messageIds.get(artifact.sourceMessageId)
+              : undefined;
+            return clonedSourceMessageId
+              ? {
+                  ...artifact,
+                  id: uuid.v4() as string,
+                  sourceMessageId: clonedSourceMessageId,
+                }
+              : null;
+          })
+          .filter((artifact) => artifact !== null);
+        const branchDocument: Conversation = {
+          id: conversationId,
+          title: truncateConversationTitle(
+            sourceMessage.role === "user"
+              ? checkpointMessage.content
+              : currentConversation.title,
+          ),
           createdAt: now,
-        },
-        ...(artifacts?.length ? { artifacts } : {}),
-        ...(currentConversation.settings
-          ? {
-              settings: {
-                ...currentConversation.settings,
-                ...(currentConversation.settings.ttsVoice
-                  ? { ttsVoice: { ...currentConversation.settings.ttsVoice } }
-                  : {}),
-              },
-            }
-          : {}),
-      };
-      const meta = buildConversationMetaFromConversation(conversation);
-
-      // Read the family first, then write the branch and every updated sibling
-      // in one transaction. Saving them separately could leave a family whose
-      // members disagree about which conversations to exclude from retrieval.
-      const familyUpdates = await Promise.all(
-        familyIds.map(async (familyConversationId) => {
-          const familyConversation =
-            familyConversationId === currentConversation.id
-              ? currentConversation
-              : await readConversation(familyConversationId);
-          if (!familyConversation) {
-            return null;
-          }
-
-          return {
-            ...familyConversation,
-            knowledgeExcludedConversationIds: [
-              ...new Set([
-                ...(familyConversation.knowledgeExcludedConversationIds ?? []),
-                ...familyIds.filter((id) => id !== familyConversationId),
-                conversationId,
-              ]),
-            ],
-          };
-        }),
-      );
-      await saveConversationsAtomically([
-        conversation,
-        ...familyUpdates.filter((entry) => entry !== null),
-      ]);
-      setConversations((previous) => persistMetas([meta, ...previous]));
+          updatedAt: now,
+          messages: clonedMessages,
+          awaitingFirstPrompt: true,
+          branch: {
+            rootConversationId,
+            parentConversationId: currentConversation.id,
+            parentMessageId: sourceMessage.id,
+            branchMessageId: checkpointMessage.id,
+            kind:
+              sourceMessage.role === "assistant"
+                ? "continue-from-message"
+                : sourceMessage.editedAt
+                  ? "edited-prompt"
+                  : "alternative-response",
+            createdAt: now,
+          },
+          ...(artifacts?.length ? { artifacts } : {}),
+          ...(currentConversation.settings
+            ? {
+                settings: {
+                  ...currentConversation.settings,
+                  ...(currentConversation.settings.ttsVoice
+                    ? { ttsVoice: { ...currentConversation.settings.ttsVoice } }
+                    : {}),
+                },
+              }
+            : {}),
+        };
+        const conversation = await saveConversationBranch(
+          branchDocument,
+          rootConversationId,
+          currentConversation.id,
+          canAccessConversation,
+        );
+        const meta = buildConversationMetaFromConversation(conversation);
+        return { conversation, meta, clonedMessages, checkpointMessage };
+      });
+      if (!branch) return null;
+      const { conversation, meta, clonedMessages, checkpointMessage } = branch;
+      setConversations((previous) => sortConversationMeta([meta, ...previous]));
       setActiveConversationValue(conversation);
 
       if (pastConversationKnowledgeEnabled && !conversation.isLocked) {
@@ -688,9 +705,8 @@ export function useConversationMutations(params: {
     },
     [
       activeConversationRef,
-      conversationMetas,
+      canAccessConversation,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -732,7 +748,10 @@ export function useConversationMutations(params: {
       };
 
       setActiveConversationValue(updatedConversation);
-      saveConversation(updatedConversation);
+      void saveConversation(updatedConversation, {
+        preserveTitle: true,
+        mode: "update",
+      });
     },
     [activeConversationRef, setActiveConversationValue],
   );
@@ -754,7 +773,10 @@ export function useConversationMutations(params: {
       };
 
       setActiveConversationValue(updatedConversation);
-      saveConversation(updatedConversation);
+      void saveConversation(updatedConversation, {
+        preserveTitle: true,
+        mode: "update",
+      });
       return updatedConversation;
     },
     [activeConversationRef, setActiveConversationValue],
@@ -773,43 +795,32 @@ export function useConversationMutations(params: {
     };
 
     setActiveConversationValue(updatedConversation);
-    saveConversation(updatedConversation);
+    void saveConversation(updatedConversation, {
+      preserveTitle: true,
+      mode: "update",
+    });
     return updatedConversation;
   }, [activeConversationRef, setActiveConversationValue]);
 
   const deleteConversation = useCallback(
-    (id: string) => {
-      const activeConversation =
-        activeConversationRef.current?.id === id
-          ? activeConversationRef.current
-          : null;
-      void (async () => {
-        const conversation = activeConversation ?? (await readConversation(id));
-        await Promise.all([
-          removeConversation(id),
-          removeConversationKnowledge(id),
-          deleteImageAttachments(
-            conversation?.messages.flatMap(
-              (message) => message.attachments ?? [],
-            ) ?? [],
-          ),
-        ]);
-      })();
-      setConversations((previous) =>
-        persistMetas(previous.filter((entry) => entry.id !== id)),
-      );
+    async (id: string) => {
+      const attachments = await removeConversation(id);
+      if (!attachments) return false;
 
+      setConversations((previous) =>
+        previous.filter((entry) => entry.id !== id),
+      );
       if (activeConversationRef.current?.id === id) {
         selectionRequestRef.current += 1;
         setActiveConversationValue(null);
       }
+      await Promise.all([
+        removeConversationKnowledge(id),
+        deleteImageAttachments(attachments),
+      ]);
+      return true;
     },
-    [
-      activeConversationRef,
-      persistMetas,
-      setActiveConversationValue,
-      setConversations,
-    ],
+    [activeConversationRef, setActiveConversationValue, setConversations],
   );
 
   const restoreConversationBackup = useCallback(
@@ -818,7 +829,9 @@ export function useConversationMutations(params: {
       importedActiveConversationId: string | null,
     ): Promise<Omit<AppDataBackupRestoreResult, "settingsRestored">> => {
       const existingMetasById = new Map(
-        conversationMetas.map((meta) => [meta.id, meta] as const),
+        (await readStoredConversationMetas(true)).map(
+          (meta) => [meta.id, meta] as const,
+        ),
       );
 
       const usedIds = new Set(existingMetasById.keys());
@@ -834,106 +847,116 @@ export function useConversationMutations(params: {
       let conversationsRestored = 0;
       let conversationsSkipped = 0;
 
-      for (const record of records) {
-        const originalId = record.conversation.id;
-        const existingMeta = existingMetasById.get(originalId);
-        const importedPinned = record.conversation.archived
-          ? false
-          : record.pinned;
-        const existingPinned = existingMeta?.archived
-          ? false
-          : existingMeta?.pinned;
+      await withStagedImages(async (created) => {
+        for (const record of records) {
+          const originalId = record.conversation.id;
+          const existingMeta = existingMetasById.get(originalId);
+          const importedPinned = record.conversation.archived
+            ? false
+            : record.pinned;
+          const existingPinned = existingMeta?.archived
+            ? false
+            : existingMeta?.pinned;
 
-        if (existingMeta) {
-          const existingConversation = await readConversation(originalId);
-          if (
-            existingConversation &&
-            (await isIdenticalBackupConversation(
-              existingConversation,
-              record,
-            )) &&
-            existingPinned === importedPinned
-          ) {
-            conversationsSkipped += 1;
-            restoredByOriginalId.set(originalId, existingConversation);
-            continue;
+          if (existingMeta) {
+            const existingConversation = await readConversation(
+              originalId,
+              true,
+            );
+            if (
+              existingConversation &&
+              (await isIdenticalBackupConversation(
+                existingConversation,
+                record,
+              )) &&
+              existingPinned === importedPinned
+            ) {
+              conversationsSkipped += 1;
+              restoredByOriginalId.set(originalId, existingConversation);
+              continue;
+            }
           }
+
+          let restoredId = originalId;
+          if (usedIds.has(restoredId)) {
+            do {
+              restoredId = uuid.v4() as string;
+            } while (usedIds.has(restoredId));
+            conversationsCopied += 1;
+          }
+          usedIds.add(restoredId);
+
+          const materializedConversation = await materializeBackupConversation(
+            record,
+            created,
+          );
+          const {
+            isLocked: _isLocked,
+            awaitingFirstPrompt: _pendingTitle,
+            ...unlockedConversation
+          } = materializedConversation;
+          const restoredConversation = {
+            ...unlockedConversation,
+            id: restoredId,
+          };
+          restoredByOriginalId.set(originalId, restoredConversation);
+          pendingRestores.push({
+            originalId,
+            conversation: restoredConversation,
+            pinned: importedPinned,
+          });
+          conversationsRestored += 1;
         }
 
-        let restoredId = originalId;
-        if (usedIds.has(restoredId)) {
-          do {
-            restoredId = uuid.v4() as string;
-          } while (usedIds.has(restoredId));
-          conversationsCopied += 1;
-        }
-        usedIds.add(restoredId);
-
-        const materializedConversation =
-          await materializeBackupConversation(record);
-        const { isLocked: _isLocked, ...unlockedConversation } =
-          materializedConversation;
-        const restoredConversation = {
-          ...unlockedConversation,
-          id: restoredId,
-        };
-        restoredByOriginalId.set(originalId, restoredConversation);
-        pendingRestores.push({
-          originalId,
-          conversation: restoredConversation,
-          pinned: importedPinned,
-        });
-        conversationsRestored += 1;
-      }
-
-      const restoredIdByOriginalId = new Map(
-        [...restoredByOriginalId.entries()].map(
-          ([originalId, conversation]) =>
-            [originalId, conversation.id] as const,
-        ),
-      );
-      for (const pending of pendingRestores) {
-        const remapConversationId = (id: string) =>
-          restoredIdByOriginalId.get(id) ?? id;
-        const restoredConversation: Conversation = {
-          ...pending.conversation,
-          ...(pending.conversation.knowledgeExcludedConversationIds
-            ? {
-                knowledgeExcludedConversationIds: [
-                  ...new Set(
-                    pending.conversation.knowledgeExcludedConversationIds.map(
-                      remapConversationId,
+        const restoredIdByOriginalId = new Map(
+          [...restoredByOriginalId.entries()].map(
+            ([originalId, conversation]) =>
+              [originalId, conversation.id] as const,
+          ),
+        );
+        for (const pending of pendingRestores) {
+          const remapConversationId = (id: string) =>
+            restoredIdByOriginalId.get(id) ?? id;
+          const restoredConversation: Conversation = {
+            ...pending.conversation,
+            ...(pending.conversation.knowledgeExcludedConversationIds
+              ? {
+                  knowledgeExcludedConversationIds: [
+                    ...new Set(
+                      pending.conversation.knowledgeExcludedConversationIds.map(
+                        remapConversationId,
+                      ),
                     ),
-                  ),
-                ],
-              }
-            : {}),
-          ...(pending.conversation.branch
-            ? {
-                branch: {
-                  ...pending.conversation.branch,
-                  rootConversationId: remapConversationId(
-                    pending.conversation.branch.rootConversationId,
-                  ),
-                  parentConversationId: remapConversationId(
-                    pending.conversation.branch.parentConversationId,
-                  ),
-                },
-              }
-            : {}),
-        };
-        restoredConversations.push(restoredConversation);
-        restoredMetas.push({
-          ...buildConversationMetaFromConversation(restoredConversation),
-          pinned: pending.pinned,
-        });
-        restoredByOriginalId.set(pending.originalId, restoredConversation);
-      }
+                  ],
+                }
+              : {}),
+            ...(pending.conversation.branch
+              ? {
+                  branch: {
+                    ...pending.conversation.branch,
+                    rootConversationId: remapConversationId(
+                      pending.conversation.branch.rootConversationId,
+                    ),
+                    parentConversationId: remapConversationId(
+                      pending.conversation.branch.parentConversationId,
+                    ),
+                  },
+                }
+              : {}),
+          };
+          restoredConversations.push(restoredConversation);
+          restoredMetas.push({
+            ...buildConversationMetaFromConversation(restoredConversation),
+            pinned: pending.pinned,
+          });
+          restoredByOriginalId.set(pending.originalId, restoredConversation);
+        }
 
-      // One transaction for the whole import. Writing record by record could
-      // leave a restore half-applied, with branch references pointing at
-      // conversations that never landed.
-      await saveConversationsAtomically(restoredConversations);
+        // One transaction for the whole import. Writing record by record could
+        // leave a restore half-applied, with branch references pointing at
+        // conversations that never landed.
+        await saveConversationsAtomically(restoredConversations, restoredMetas);
+      });
 
       if (pastConversationKnowledgeEnabled) {
         for (const restoredConversation of restoredConversations) {
@@ -943,7 +966,7 @@ export function useConversationMutations(params: {
 
       if (restoredMetas.length > 0) {
         setConversations((current) =>
-          persistMetas([...restoredMetas, ...current]),
+          sortConversationMeta([...restoredMetas, ...current]),
         );
       }
 
@@ -962,22 +985,26 @@ export function useConversationMutations(params: {
       };
     },
     [
-      conversationMetas,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
   );
 
   const renameConversation = useCallback(
-    async (id: string, nextTitle: string) => {
+    async (id: string, nextTitle: string, expectedTitle?: string) => {
       const currentConversation =
         activeConversationRef.current?.id === id
           ? activeConversationRef.current
           : await getConversationById(id);
 
-      if (!currentConversation) {
+      if (
+        !currentConversation ||
+        !canAccessConversation(id, currentConversation.isLocked) ||
+        (expectedTitle !== undefined &&
+          (currentConversation.isLocked ||
+            currentConversation.title !== expectedTitle))
+      ) {
         return;
       }
 
@@ -985,22 +1012,21 @@ export function useConversationMutations(params: {
         nextTitle,
         currentConversation.title,
       );
-      const updatedConversation: Conversation = {
-        ...currentConversation,
-        title,
-      };
-
-      saveConversation(updatedConversation);
+      if (!(await renameStoredConversation(id, title, expectedTitle))) return;
+      const latest =
+        activeConversationRef.current?.id === id
+          ? activeConversationRef.current
+          : currentConversation;
+      const updatedConversation = { ...latest, title };
       if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
         void syncConversationKnowledge(updatedConversation, true);
       }
-
       if (activeConversationRef.current?.id === id) {
         setActiveConversationValue(updatedConversation);
       }
 
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((conversation) =>
             conversation.id === id
               ? {
@@ -1014,9 +1040,9 @@ export function useConversationMutations(params: {
     },
     [
       activeConversationRef,
+      canAccessConversation,
       getConversationById,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -1024,52 +1050,28 @@ export function useConversationMutations(params: {
 
   const toggleConversationPinned = useCallback(
     async (id: string) => {
-      const target = conversationMetas.find(
-        (conversation) => conversation.id === id,
-      );
-      if (!target) {
-        return false;
-      }
-      const nextPinned = !target.pinned;
-      const wasArchived = Boolean(target.archived);
-
+      const target = conversationMetas.find((meta) => meta.id === id);
+      if (!target) return false;
+      const pinned = !target.pinned;
+      if (!(await setConversationPinned(id, pinned))) return false;
       setConversations((previous) =>
-        persistMetas(
-          previous.map((conversation) => {
-            if (conversation.id !== id) {
-              return conversation;
-            }
-
-            return {
-              ...conversation,
-              pinned: nextPinned,
-              ...(nextPinned && wasArchived ? { archived: false } : {}),
-            };
-          }),
+        sortConversationMeta(
+          previous.map((meta) =>
+            meta.id === id
+              ? { ...meta, pinned, archived: pinned ? false : meta.archived }
+              : meta,
+          ),
         ),
       );
-
-      if (nextPinned && wasArchived) {
-        const currentConversation = await getConversationById(id);
-        if (currentConversation?.archived) {
-          const updatedConversation = {
-            ...currentConversation,
-            archived: false,
-          };
-          await saveConversation(updatedConversation);
-          if (activeConversationRef.current?.id === id) {
-            setActiveConversationValue(updatedConversation);
-          }
-        }
+      const active = activeConversationRef.current;
+      if (active?.id === id && active.archived && pinned) {
+        setActiveConversationValue({ ...active, archived: false });
       }
-
-      return nextPinned;
+      return pinned;
     },
     [
       activeConversationRef,
       conversationMetas,
-      getConversationById,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -1092,13 +1094,14 @@ export function useConversationMutations(params: {
         archived,
       };
 
-      await saveConversation(updatedConversation);
+      if (!(await saveConversation(updatedConversation, { mode: "update" })))
+        return null;
       if (activeConversationRef.current?.id === id) {
         setActiveConversationValue(updatedConversation);
       }
 
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((conversation) =>
             conversation.id === id
               ? {
@@ -1117,7 +1120,6 @@ export function useConversationMutations(params: {
     [
       activeConversationRef,
       getConversationById,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -1129,7 +1131,10 @@ export function useConversationMutations(params: {
         activeConversationRef.current?.id === id
           ? activeConversationRef.current
           : await readConversation(id);
-      if (!currentConversation) {
+      if (
+        !currentConversation ||
+        (!isLocked && !canAccessConversation(id, currentConversation.isLocked))
+      ) {
         return false;
       }
 
@@ -1137,10 +1142,10 @@ export function useConversationMutations(params: {
         ...currentConversation,
         isLocked,
       };
-      await saveConversation(updatedConversation);
-      await setConversationKnowledgeExcluded(id, isLocked);
+      if (!(await setStoredConversationLock(id, isLocked))) return false;
+      const knowledgeUpdate = setConversationKnowledgeExcluded(id, isLocked);
       setConversations((previous) =>
-        persistMetas(
+        sortConversationMeta(
           previous.map((conversation) =>
             conversation.id === id
               ? { ...conversation, isLocked }
@@ -1157,6 +1162,7 @@ export function useConversationMutations(params: {
           setActiveConversationValue(updatedConversation);
         }
       }
+      await knowledgeUpdate;
       if (!isLocked && pastConversationKnowledgeEnabled) {
         await syncConversationKnowledge(updatedConversation, true);
       }
@@ -1164,8 +1170,8 @@ export function useConversationMutations(params: {
     },
     [
       activeConversationRef,
+      canAccessConversation,
       pastConversationKnowledgeEnabled,
-      persistMetas,
       setActiveConversationValue,
       setConversations,
     ],
@@ -1178,6 +1184,7 @@ export function useConversationMutations(params: {
 
   return {
     addMessage,
+    claimFirstPrompt,
     clearActiveConversation,
     createConversation,
     deleteConversation,

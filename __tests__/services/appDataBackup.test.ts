@@ -520,6 +520,19 @@ describe("appDataBackup", () => {
     );
   });
 
+  it("recovers deleted checkpoint and insight sources without losing the fork or the insight", async () => {
+    const backup = await createBackup();
+    const record = backup.data.conversations[0];
+    expect(record.conversation.branch?.branchMessageId).toBe("message-1");
+    record.conversation.messages = [];
+    const restored = parseAppDataBackup(JSON.stringify(backup)).data.conversations[0].conversation;
+    expect(restored.branch).toEqual({ ...conversation.branch, branchMessageId: null });
+    expect(restored.artifacts).toEqual([{ ...conversation.artifacts![0], sourceMessageId: null }]);
+    expect(parseAppDataBackup(JSON.stringify({ ...backup, data: {
+      ...backup.data, conversations: [{ ...record, conversation: restored }],
+    } })).data.conversations[0].conversation).toEqual(restored);
+  });
+
   it("rejects saved insights whose type or source provenance is invalid", async () => {
     const backup = await createBackup();
     const invalid = {

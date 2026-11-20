@@ -141,35 +141,28 @@ export function writeAppStateValue(key: string, value: string | null) {
   });
 }
 
-/**
- * Writes the conversation document, inserting a starting metadata row when the
- * conversation is new.
- *
- * An existing row keeps its stored metadata. Pinned state lives only in
- * metadata, and callers own the metadata list, so overwriting it here would
- * unpin a conversation as a side effect of saving a message.
- */
+/** Write the authoritative document and its derived drawer metadata together. */
 export async function upsertConversationRow(
   database: SQLite.SQLiteDatabase,
   params: {
     conversation: Conversation;
     document: string;
-    initialMeta: ConversationMeta;
+    meta: ConversationMeta;
   },
 ) {
-  const { conversation, document, initialMeta } = params;
+  const { conversation, document, meta } = params;
 
   await database.runAsync(
     `INSERT INTO conversations (id, document, meta, updated_at, pinned)
      VALUES (?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET
-       document = excluded.document,
-       updated_at = excluded.updated_at`,
+       document = excluded.document, meta = excluded.meta,
+       updated_at = excluded.updated_at, pinned = excluded.pinned`,
     conversation.id,
     document,
-    JSON.stringify(initialMeta),
+    JSON.stringify(meta),
     conversation.updatedAt,
-    initialMeta.pinned ? 1 : 0,
+    meta.pinned ? 1 : 0,
   );
 }
 
@@ -183,16 +176,22 @@ export async function upsertConversationRow(
 export async function updateConversationMetaRows(
   database: SQLite.SQLiteDatabase,
   metas: ConversationMeta[],
+  expected?: ConversationMeta[],
 ) {
+  const originals = new Map(
+    expected?.map((meta) => [meta.id, JSON.stringify(meta)]),
+  );
   for (const meta of metas) {
     await database.runAsync(
       `UPDATE conversations
        SET meta = ?, updated_at = ?, pinned = ?
-       WHERE id = ?`,
+       WHERE id = ? AND (? IS NULL OR meta = ?)`,
       JSON.stringify(meta),
       meta.updatedAt,
       meta.pinned ? 1 : 0,
       meta.id,
+      originals.get(meta.id) ?? null,
+      originals.get(meta.id) ?? null,
     );
   }
 }

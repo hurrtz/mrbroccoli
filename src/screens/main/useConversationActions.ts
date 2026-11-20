@@ -232,7 +232,7 @@ export function useConversationActions({
         await resetVoiceSessionState();
       }
 
-      deleteConversation(conversationId);
+      await deleteConversation(conversationId);
     },
     [activeConversation?.id, deleteConversation, resetVoiceSessionState],
   );

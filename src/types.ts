@@ -548,7 +548,8 @@ export interface ConversationArtifact {
   id: string;
   kind: ConversationArtifactKind;
   text: string;
-  sourceMessageId: string;
+  /** Null when the source was deleted from the conversation. */
+  sourceMessageId: string | null;
   createdAt: string;
 }
 
@@ -559,7 +560,8 @@ export interface ConversationBranchOrigin {
   rootConversationId: string;
   parentConversationId: string;
   parentMessageId: string;
-  branchMessageId: string;
+  /** Null when the cloned checkpoint was deleted. Family lineage remains intact. */
+  branchMessageId: string | null;
   kind: ConversationBranchKind;
   createdAt: string;
 }
@@ -569,6 +571,8 @@ export interface Conversation {
   title: string;
   createdAt: string;
   updatedAt: string;
+  /** Set on newly created sessions until their first prompt is submitted. */
+  awaitingFirstPrompt?: boolean;
   messages: Message[];
   /** @deprecated Retained only for restoring and exporting legacy app data. */
   artifacts?: ConversationArtifact[];
@@ -605,3 +609,5 @@ export interface ConversationMeta {
   isLocked?: boolean;
   archived?: boolean;
 }
+  /** Version 1 includes Model Council contributions in provider history. */
+  providerHistoryVersion?: 1;

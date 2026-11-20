@@ -48,9 +48,12 @@ counts are published. A missing or unreadable conversation does not
 crash hydration; it is reported through the persistence alert path and handled
 as unavailable state.
 
-**Decision:** `storage.ts` keeps its previous function signatures. Hydration,
-mutations, search, and backup restore were written against them, so holding the
-boundary steady kept the store swap out of a 1,200-line mutation surface.
+The document and its derived provider, lock, title and ordering metadata
+commit together. Appending a message touches just its own conversation row.
+Launch repairs legacy metadata with a compare-and-set against the stored
+version so it cannot overwrite a concurrent lock, pin or message. Model Council
+history includes successful contributor routes alongside the final answerer.
+An authorized selection can backfill history for a previously locked record.
 
 ## Conversation Mutations
 
@@ -68,8 +71,16 @@ boundary steady kept the store swap out of a 1,200-line mutation surface.
   override global defaults without mutating them. Clearing those overrides
   removes the conversation settings object so the session inherits current and
   future defaults again.
-- Deleting a conversation also deletes its derived knowledge rows and
-  app-owned image files.
+- Delete attachment files and device-local credentials only after SQLite
+  commits deletion of the corresponding message or session. Shared images
+  remain until their last reference is removed.
+- When a checkpoint or legacy insight source is deleted, its local link
+  becomes null. The fork retains its family and the saved insight retains
+  its text. Older backups carrying dangling links receive the same repair.
+- The first accepted prompt in a newly created root or branch consumes its
+  local naming eligibility exactly once. An automatic title can replace only
+  the original title and cannot replace a manual rename or apply to a locked
+  conversation.
 - Lock state is canonical conversation data mirrored into metadata. A locked
   record cannot be selected, read by ID, content-searched, hydrated as active,
   or indexed until its ID receives a foreground-only authorization grant.
@@ -129,7 +140,8 @@ Backup restore is non-destructive:
 - archive state implies an unpinned record, so stale pinned metadata in an
   archived backup cannot create a duplicate of identical conversation data;
 - a conflicting conversation ID is restored under a new UUID;
-- attachment IDs and files are materialized safely;
+- staged attachment files transfer to the branch or import only on a successful database commit;
+- encrypted imports use the envelope size limit before format detection and the plaintext limit after decryption;
 - branch root/parent references and knowledge exclusions are remapped across
   copied IDs; and
 - existing conversations, provider keys, and unrelated settings remain.

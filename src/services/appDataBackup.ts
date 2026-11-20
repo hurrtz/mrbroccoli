@@ -1,3 +1,4 @@
+import { reconcileConversationMessageLinks } from "../utils/conversationMessageLinks";
 import {
   AESEncryptionKey,
   AESSealedData,
@@ -214,10 +215,7 @@ const CONVERSATION_BRANCH_KINDS = [
   "continue-from-message",
 ] as const;
 
-function isValidConversationBranch(
-  value: unknown,
-  messages: Conversation["messages"],
-) {
+function isValidConversationBranch(value: unknown) {
   return (
     isRecord(value) &&
     typeof value.rootConversationId === "string" &&
@@ -226,8 +224,9 @@ function isValidConversationBranch(
     value.parentConversationId.length > 0 &&
     typeof value.parentMessageId === "string" &&
     value.parentMessageId.length > 0 &&
-    typeof value.branchMessageId === "string" &&
-    messages.some((message) => message.id === value.branchMessageId) &&
+    (value.branchMessageId === null ||
+      (typeof value.branchMessageId === "string" &&
+        value.branchMessageId.length > 0)) &&
     CONVERSATION_BRANCH_KINDS.includes(
       value.kind as (typeof CONVERSATION_BRANCH_KINDS)[number],
     ) &&
@@ -245,8 +244,9 @@ function isValidConversationArtifact(value: unknown) {
     ) &&
     typeof value.text === "string" &&
     value.text.trim().length > 0 &&
-    typeof value.sourceMessageId === "string" &&
-    value.sourceMessageId.length > 0 &&
+    (value.sourceMessageId === null ||
+      (typeof value.sourceMessageId === "string" &&
+        value.sourceMessageId.length > 0)) &&
     typeof value.createdAt === "string"
   );
 }
@@ -294,22 +294,13 @@ function isValidConversation(value: unknown): value is Conversation {
     messages.every(isValidMessage) &&
     (value.artifacts === undefined ||
       (Array.isArray(value.artifacts) &&
-        value.artifacts.every(isValidConversationArtifact) &&
-        value.artifacts.every((artifact) =>
-          messages.some(
-            (message) =>
-              isRecord(artifact) &&
-              isRecord(message) &&
-              artifact.sourceMessageId === message.id,
-          ),
-        ))) &&
+        value.artifacts.every(isValidConversationArtifact))) &&
     (value.knowledgeExcludedConversationIds === undefined ||
       (Array.isArray(value.knowledgeExcludedConversationIds) &&
         value.knowledgeExcludedConversationIds.every(
           (id) => typeof id === "string" && id.length > 0,
         ))) &&
-    (value.branch === undefined ||
-      isValidConversationBranch(value.branch, messages)) &&
+    (value.branch === undefined || isValidConversationBranch(value.branch)) &&
     isOptionalString(value.contextSummary) &&
     (value.summarizedMessageCount === undefined ||
       (typeof value.summarizedMessageCount === "number" &&
@@ -419,9 +410,15 @@ function parsePlainBackupDocument(value: unknown): AppDataBackup {
     data: {
       ...backup.data,
       conversations: backup.data.conversations.map((record) => {
-        const { isPrivate: _legacyIsPrivate, ...conversation } =
-          record.conversation as Conversation & { isPrivate?: unknown };
-        return { ...record, conversation };
+        const {
+          isPrivate: _legacyIsPrivate,
+          awaitingFirstPrompt: _pendingTitle,
+          ...conversation
+        } = record.conversation as Conversation & { isPrivate?: unknown };
+        return {
+          ...record,
+          conversation: reconcileConversationMessageLinks(conversation),
+        };
       }),
     },
   };
@@ -484,19 +481,23 @@ export async function createAppDataBackup(params: {
   const conversations = await Promise.all(
     params.conversationMetas.map((meta) => params.getConversationById(meta.id)),
   );
-  const estimatedImageDataBytes = conversations.reduce(
-    (total, conversation) =>
+  const imagesByConversation = conversations.map((conversation) => {
+    const attachments =
+      conversation?.messages.flatMap((message) => message.attachments ?? []) ??
+      [];
+    return [
+      ...new Map(
+        attachments.map((attachment) => [attachment.id, attachment]),
+      ).values(),
+    ];
+  });
+  const estimatedImageDataBytes = imagesByConversation.reduce(
+    (total, images) =>
       total +
-      (conversation?.messages.reduce(
-        (conversationTotal, message) =>
-          conversationTotal +
-          (message.attachments ?? []).reduce(
-            (messageTotal, attachment) =>
-              messageTotal + Math.ceil(attachment.byteSize / 3) * 4,
-            0,
-          ),
+      images.reduce(
+        (bytes, attachment) => bytes + Math.ceil(attachment.byteSize / 3) * 4,
         0,
-      ) ?? 0),
+      ),
     0,
   );
   if (estimatedImageDataBytes > APP_DATA_BACKUP_MAX_BYTES) {
@@ -511,18 +512,20 @@ export async function createAppDataBackup(params: {
       }
 
       const attachments = await Promise.all(
-        conversation.messages.flatMap((message) =>
-          (message.attachments ?? []).map(async (attachment) => ({
-            byteSize: attachment.byteSize,
-            data: await readImageAttachmentData(attachment),
-            height: attachment.height,
-            id: attachment.id,
-            mimeType: attachment.mimeType,
-            width: attachment.width,
-          })),
-        ),
+        imagesByConversation[conversationIndex].map(async (attachment) => ({
+          byteSize: attachment.byteSize,
+          data: await readImageAttachmentData(attachment),
+          height: attachment.height,
+          id: attachment.id,
+          mimeType: attachment.mimeType,
+          width: attachment.width,
+        })),
       );
-      const { isLocked: _isLocked, ...portableConversationData } = conversation;
+      const {
+        isLocked: _isLocked,
+        awaitingFirstPrompt: _pendingTitle,
+        ...portableConversationData
+      } = conversation;
       const portableConversation: Conversation = {
         ...portableConversationData,
         messages: conversation.messages.map((message) => ({

@@ -107,27 +107,19 @@ function inferConversationState(messages: Message[]) {
   let lastModel: string | null = null;
   let lastProvider: Provider | null = null;
   const providers: Provider[] = [];
-  const seenProviders = new Set<Provider>();
   const providerModels: Partial<Record<Provider, string[]>> = {};
-  const seenProviderModels = new Map<Provider, Set<string>>();
-
+  function addRoute(provider: Provider | null, model: string | null) {
+    if (!provider) return;
+    if (!providers.includes(provider)) providers.push(provider);
+    if (!model) return;
+    const models = (providerModels[provider] ??= []);
+    if (!models.includes(model)) models.push(model);
+  }
   for (const message of messages) {
-    if (message.provider && !seenProviders.has(message.provider)) {
-      seenProviders.add(message.provider);
-      providers.push(message.provider);
-    }
-
-    if (message.provider && message.model) {
-      const seenModels =
-        seenProviderModels.get(message.provider) ?? new Set<string>();
-      if (!seenModels.has(message.model)) {
-        seenModels.add(message.model);
-        seenProviderModels.set(message.provider, seenModels);
-        providerModels[message.provider] = [
-          ...(providerModels[message.provider] ?? []),
-          message.model,
-        ];
-      }
+    addRoute(message.provider, message.model);
+    for (const contribution of message.metadata?.ulraMode?.contributions ??
+      []) {
+      addRoute(contribution.provider, contribution.model);
     }
   }
 
@@ -223,6 +215,7 @@ export function conversationMetaNeedsHydration(
     typeof meta.providerModels !== "object" ||
     meta.providerModels === null ||
     meta.branchSchemaVersion !== 2 ||
+    meta.providerHistoryVersion !== 1 ||
     typeof meta.isLocked !== "boolean" ||
     typeof meta.archived !== "boolean"
   );
@@ -264,6 +257,7 @@ export function buildConversationMetaFromConversation(
     pinned: existingMeta?.pinned ?? false,
     branch: conversation.branch,
     branchSchemaVersion: 2,
+    providerHistoryVersion: 1,
     isLocked: conversation.isLocked ?? existingMeta?.isLocked ?? false,
     archived: conversation.archived ?? existingMeta?.archived ?? false,
   });

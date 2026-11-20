@@ -21,12 +21,11 @@ function parseLegacyMetas(raw: string | null): ConversationMeta[] {
     return [];
   }
 
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? (parsed as ConversationMeta[]) : [];
-  } catch {
-    return [];
+  const parsed: unknown = JSON.parse(raw);
+  if (!Array.isArray(parsed) || !parsed.every((meta) => meta && typeof meta.id === "string" && meta.id.length > 0)) {
+    throw new Error("Stored conversation metadata is unreadable.");
   }
+  return parsed as ConversationMeta[];
 }
 
 /**

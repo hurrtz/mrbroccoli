@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as FileSystem from "expo-file-system/legacy";
 import * as SQLite from "expo-sqlite";
+import * as SecureStore from "expo-secure-store";
 import { AppState } from "react-native";
 import { renderHook, act, waitFor } from "@testing-library/react-native";
 import { useConversations } from "../../src/hooks/useConversations";
@@ -13,6 +14,7 @@ import {
   removeConversation,
   resetConversationStorageForTests,
   saveConversation,
+  saveConversationsAtomically,
 } from "../../src/hooks/conversations/storage";
 import type { Conversation } from "../../src/types";
 
@@ -505,10 +507,16 @@ describe("useConversations", () => {
     async (operation) => {
       const { result } = renderHook(() => useConversations());
       await waitFor(() => expect(result.current.loaded).toBe(true));
+      const image = {
+        id: "source-image", kind: "image" as const, mimeType: "image/jpeg" as const,
+        uri: "file:///documents/source-image.jpg", width: 10, height: 10, byteSize: 3,
+        sharedWithProviders: [],
+      };
+      jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue("AQID");
       act(() => {
         result.current.createConversation("Keep original");
         result.current.addMessage({
-          role: "user", content: "Checkpoint", provider: null, model: null,
+          role: "user", content: "Checkpoint", provider: null, model: null, attachments: [image],
         });
       });
       const original = result.current.activeConversation!;
@@ -523,12 +531,16 @@ describe("useConversations", () => {
       await act(async () => {
         const pending = operation === "restore"
           ? result.current.restoreConversationBackup([
-              { conversation: { ...original, id: "imported" }, pinned: false },
+              { conversation: { ...original, id: "imported" }, attachments: [{ ...image, data: "AQID" }], pinned: false },
             ], "imported")
           : result.current.branchConversationAtMessage(original.messages[0].id);
         await expect(pending).rejects.toThrow("disk full");
       });
       writeRow.mockImplementation(passThrough);
+      const [stagedUri] = jest.mocked(FileSystem.writeAsStringAsync).mock.calls[0];
+      expect(stagedUri).not.toBe(image.uri);
+      expect(FileSystem.deleteAsync).toHaveBeenCalledWith(stagedUri, { idempotent: true });
+      expect(FileSystem.deleteAsync).not.toHaveBeenCalledWith(image.uri, expect.anything());
       expect(result.current.activeConversation?.id).toBe(original.id);
       expect(result.current.conversations.map(({ id }) => id)).toEqual([original.id]);
       expect((await readStoredConversationMetas()).map(({ id }) => id)).toEqual([original.id]);
@@ -1534,6 +1546,199 @@ describe("useConversations", () => {
         { idempotent: true },
       ),
     );
+  });
+
+  it("writes only the changed conversation when appending among 300 saved sessions", async () => {
+    const now = "2026-11-20T08:00:00.000Z";
+    await saveConversationsAtomically(Array.from({ length: 300 }, (_, index) => ({
+      id: `thread-${index}`, title: `Thread ${index}`, createdAt: now, updatedAt: now, messages: [],
+    })));
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => { await result.current.selectConversation("thread-17"); });
+    const writes = jest.mocked((await getConversationDatabase()).runAsync);
+    writes.mockClear();
+    await act(async () => {
+      result.current.addMessage({ role: "user", content: "First", provider: null, model: null });
+      await readStoredConversationMetas();
+    });
+    const changedRows = writes.mock.calls.filter(([sql]) => /(?:UPDATE|INSERT INTO) conversations/.test(sql));
+    expect(changedRows).toHaveLength(1);
+    expect(changedRows[0][1]).toBe("thread-17");
+    expect(result.current.conversations).toHaveLength(300);
+  });
+
+  it("keeps a locked document inaccessible when an older index marked it unlocked", async () => {
+    const now = "2026-11-20T08:00:00.000Z";
+    await saveConversation({ id: "torn-lock", title: "Private", createdAt: now, updatedAt: now,
+      isLocked: true, messages: [] });
+    await persistActiveConversationId("torn-lock");
+    const db = await getConversationDatabase();
+    await db.runAsync("UPDATE conversations SET meta = json_remove(json_set(meta, '$.isLocked', json('false')), '$.providerHistoryVersion')");
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => { await result.current.selectConversation("torn-lock"); });
+    expect(result.current.activeConversation).toBeNull();
+    expect(await result.current.getConversationById("torn-lock")).toBeNull();
+    expect((await readStoredConversationMetas())[0].isLocked).toBe(true);
+  });
+
+  it("keeps the message, image, session and lock credentials on failed writes", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Keep intact");
+      result.current.addMessage({ role: "user", content: "Photo", model: null, provider: null,
+        attachments: [{ id: "image", kind: "image", uri: "file:///documents/image.jpg",
+          mimeType: "image/jpeg", width: 2, height: 2, byteSize: 3, sharedWithProviders: [] }] });
+    });
+    const original = result.current.activeConversation!;
+    await readStoredConversationMetas();
+    const database = await getConversationDatabase();
+    const write = jest.mocked(database.runAsync);
+    const normalWrite = write.getMockImplementation()!;
+    write.mockImplementation(async (sql, ...args) => {
+      if (/INSERT INTO conversations|DELETE FROM conversations|SET document = json_set/.test(sql)) {
+        throw new Error("disk full");
+      }
+      return normalWrite(sql, ...args);
+    });
+    await act(async () => {
+      expect(await result.current.removeMessage(original.messages[0].id)).toBe(false);
+      expect(await result.current.updateConversationLocked(original.id, true)).toBe(false);
+      await result.current.deleteConversation(original.id);
+    });
+    expect(FileSystem.deleteAsync).not.toHaveBeenCalled();
+    expect(SecureStore.deleteItemAsync).not.toHaveBeenCalled();
+    expect((await readConversation(original.id))?.messages).toHaveLength(1);
+    expect(result.current.activeConversation).toEqual(original);
+    expect((await readStoredConversationMetas())[0].isLocked).toBe(false);
+    write.mockImplementation(normalWrite);
+  });
+
+  it("keeps a concurrently appended message when an image deletion is pending", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => {
+      result.current.createConversation("Concurrent");
+      result.current.addMessage({ role: "user", content: "Delete", model: null, provider: null,
+        attachments: [{ id: "image", kind: "image", uri: "file:///documents/image.jpg",
+          mimeType: "image/jpeg", width: 2, height: 2, byteSize: 3, sharedWithProviders: [] }] });
+    });
+    const original = result.current.activeConversation!;
+    await readStoredConversationMetas();
+    const write = jest.mocked((await getConversationDatabase()).runAsync);
+    const normal = write.getMockImplementation()!;
+    let entered = false;
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    write.mockImplementation(async (sql, ...args) => {
+      if (!entered && sql.includes("INSERT INTO conversations")) { entered = true; await gate; }
+      return normal(sql, ...args);
+    });
+    const deleting = result.current.removeMessage(original.messages[0].id);
+    await waitFor(() => expect(entered).toBe(true));
+    await act(async () => {
+      result.current.addMessage({ role: "assistant", content: "New answer", provider: "openai", model: "gpt" });
+      release();
+      expect(await deleting).toBe(true);
+    });
+    write.mockImplementation(normal);
+    expect(result.current.activeConversation?.messages.map(({ content }) => content)).toEqual(["New answer"]);
+    expect((await readConversation(original.id))?.messages.map(({ content }) => content)).toEqual(["New answer"]);
+    expect(FileSystem.deleteAsync).toHaveBeenCalledTimes(1);
+  });
+
+  it("claims a new session's first prompt once and preserves an intervening manual rename", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    let id: string;
+    await act(async () => {
+      id = result.current.createConversation("First");
+      result.current.addMessage({ role: "user", content: "First", model: null, provider: null });
+      const claims = await Promise.all([result.current.claimFirstPrompt(id), result.current.claimFirstPrompt(id)]);
+      expect(claims).toEqual(["First", null]);
+      await result.current.renameConversation(id, "Chosen manually");
+      await result.current.renameConversation(id, "Generated", "First");
+    });
+    expect(result.current.activeConversation?.title).toBe("Chosen manually");
+    const persisted = await readConversation(id!);
+    expect(persisted?.title).toBe("Chosen manually");
+    expect(persisted?.awaitingFirstPrompt).toBeUndefined();
+    await act(async () => {
+      await result.current.restoreConversationBackup([{
+        conversation: { ...persisted!, id: "restored", awaitingFirstPrompt: true }, pinned: false,
+      }], "restored");
+      expect(await result.current.claimFirstPrompt("restored")).toBeNull();
+      const branch = await result.current.branchConversationAtMessage(persisted!.messages[0].id);
+      expect(await result.current.claimFirstPrompt(branch!.conversation.id)).toBe("First");
+    });
+  });
+
+  it("keeps naming disabled for a consumed first prompt after reloading and enabling the setting", async () => {
+    const first = renderHook(() => useConversations());
+    await waitFor(() => expect(first.result.current.loaded).toBe(true));
+    let id: string;
+    await act(async () => {
+      id = first.result.current.createConversation("Initial");
+      first.result.current.addMessage({ role: "user", content: "Initial", model: null, provider: null });
+      // The pipeline claims regardless of the setting and skips its provider call when disabled.
+      expect(await first.result.current.claimFirstPrompt(id)).toBe("Initial");
+    });
+    first.unmount();
+    const second = renderHook(() => useConversations());
+    await waitFor(() => expect(second.result.current.activeConversation?.id).toBe(id!));
+    await act(async () => {
+      second.result.current.addMessage({ role: "user", content: "Next", model: null, provider: null });
+      expect(await second.result.current.claimFirstPrompt(id!)).toBeNull();
+    });
+  });
+
+  it("removes the fork's checkpoint without invalidating its provenance or backup", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    let branchId: string;
+    let rootId: string;
+    await act(async () => {
+      rootId = result.current.createConversation("Fork");
+      const prompt = result.current.addMessage({ role: "user", content: "Fork", model: null, provider: null })!;
+      const branch = (await result.current.branchConversationAtMessage(prompt.id))!;
+      branchId = branch.conversation.id;
+      expect(await result.current.removeMessage(branch.checkpointMessage.id)).toBe(true);
+    });
+    const restored = await readConversation(branchId!);
+    expect(restored?.branch).toMatchObject({ rootConversationId: rootId!, branchMessageId: null });
+    expect(restored?.messages).toHaveLength(0);
+    expect((await readStoredConversationMetas()).find(({ id }) => id === branchId!)?.branch?.branchMessageId).toBeNull();
+  });
+
+  it("rebuilds existing Council provider marks and updates them when a streamed reply completes", async () => {
+    const now = new Date().toISOString();
+    const review = {
+      contributions: [{ modeId: "critic", model: "claude-sonnet", provider: "anthropic" as const, round: 1,
+        usage: { kind: "reply" as const, source: "estimated" as const, promptTokens: 1, completionTokens: 1, totalTokens: 2 } }],
+      estimatedIntermediateTokens: 2, failedCalls: 0, failures: [], roundsCompleted: 1, roundsRequested: 1, successfulCalls: 1,
+    };
+    const baseline: Conversation = { id: "council", title: "Council", createdAt: now, updatedAt: now,
+      messages: [{ id: "answer", content: "Synthesis", role: "assistant", provider: "openai", model: "gpt", timestamp: now,
+        metadata: { ulraMode: review } }] };
+    await saveConversation(baseline);
+    const db = await getConversationDatabase();
+    await db.runAsync(`UPDATE conversations SET meta = json_remove(json_set(meta, '$.providers',
+      json('["openai"]'), '$.providerModels', json('{"openai":["gpt"]}')), '$.providerHistoryVersion')`);
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    expect(result.current.conversations[0].providers).toEqual(["openai", "anthropic"]);
+    await act(async () => {
+      await result.current.selectConversation("council");
+      result.current.updateMessage("answer", (message) => ({ ...message, metadata: {
+        ulraMode: { ...review, contributions: [...review.contributions, { ...review.contributions[0], provider: "gemini", model: "gemini" }] },
+      } }));
+    });
+    expect((await readStoredConversationMetas())[0]).toMatchObject({
+      providers: ["openai", "anthropic", "gemini"], lastProvider: "openai",
+      providerModels: { openai: ["gpt"], anthropic: ["claude-sonnet"], gemini: ["gemini"] },
+    });
   });
 
   it("renames a conversation and keeps the active conversation in sync", async () => {

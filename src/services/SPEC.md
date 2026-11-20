@@ -151,7 +151,9 @@ Portable settings exclude `apiKeys` and provider-validation diagnostics.
 Backups exclude downloaded models, audio, derived knowledge/index data, debug
 logs, session-lock credentials, and caches. An authorized locked conversation
 is serialized without its device-local lock, and restore always materializes it
-unlocked. Restore validates the complete shape before mutation and delegates
+unlocked. Device-local first-prompt naming eligibility is excluded. Restore
+repairs deleted checkpoint and legacy artifact source links while retaining
+their family and text. Restore validates the complete shape before mutation and delegates
 non-destructive conversation merging to the conversation hook.
 
 ### Phonemization runtime

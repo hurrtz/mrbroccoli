@@ -79,9 +79,12 @@ filtered in-memory lists, so treating omission as deletion would let a drawer
 filter destroy conversations. Deleting a conversation removes its row, which
 removes its metadata in the same statement.
 
-Saving a conversation does not overwrite stored metadata for a row that already
-exists. Pinned state lives only in metadata, so refreshing it on every save
-would unpin a conversation as a side effect of appending a message.
+Each document upsert refreshes its own metadata in the same transaction. It
+reads the current pin, lock and first-prompt eligibility inside the queued
+write. Dedicated lock, pin, and rename operations patch the canonical fields.
+An automatic rename checks the stored title and lock in the SQL update. A
+background metadata repair verifies the original row still matches before
+applying it. A restore aborts if another operation already inserted its new ID.
 
 ## Migration From AsyncStorage
 
@@ -100,9 +103,11 @@ too, so the next launch retries against an untouched store.
   already unrecoverable, and a ghost row would be a permanently broken entry.
 - The legacy keys are left in place as a recovery path for one release.
 
-A failed migration is reported through `reportPersistenceAlert` and swallowed.
-The transaction has rolled back, so SQLite is merely empty while AsyncStorage
-stays intact; propagating the error would break hydration outright.
+A failed migration is reported, rolls back and is retried. Presentation reads
+may show empty state while storage is unavailable. Archive synchronization
+requires a successful authoritative list read and all eligible body reads
+before publishing its index or pruning files. An unauthorized locked record
+is deliberately omitted.
 
 **Decision:** Legacy key removal is deferred to a later version rather than
 bundled with the migration, so a beta install can be recovered by hand if the

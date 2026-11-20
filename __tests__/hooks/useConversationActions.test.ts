@@ -95,7 +95,7 @@ describe("useConversationActions", () => {
     const resetVoiceSessionState = jest.fn(async () => {
       callOrder.push("reset");
     });
-    const deleteConversation = jest.fn((conversationId: string) => {
+    const deleteConversation = jest.fn(async (conversationId: string) => {
       callOrder.push(`delete:${conversationId}`);
     });
     const activeConversation = {

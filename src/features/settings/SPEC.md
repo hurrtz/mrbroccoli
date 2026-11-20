@@ -156,7 +156,8 @@ capability healthy. The UI shows the capability that was actually tested.
   only for the active route. Nobody
   remains usable without configuring a search provider.
 - Data & privacy: the knowledge opt-in, archived-conversation entry point,
-  portable archive management, encrypted/readable backup and restore, and a
+  portable archive management, encrypted/readable backup and restore (including
+  encrypted envelopes larger than the plaintext limit), and a
   storage janitor that may remove or cancel local models without duplicating
   their download and selection controls.
 - App & diagnostics: appearance, transcript-usage visibility, debug capture
