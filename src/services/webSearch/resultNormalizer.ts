@@ -379,8 +379,14 @@ function getMistralEntries(data: unknown): Record<string, unknown>[] {
 
 export function hasMistralWebSearchResult(data: unknown) {
   return getMistralEntries(data).some((entry) => {
-    if (entry.type === "tool.execution" && entry.name === "web_search")
+    if (
+      entry.type === "tool.execution" &&
+      entry.name === "web_search" &&
+      typeof entry.completed_at === "string" &&
+      Number.isFinite(Date.parse(entry.completed_at))
+    ) {
       return true;
+    }
     return (
       entry.type === "message.output" &&
       Array.isArray(entry.content) &&

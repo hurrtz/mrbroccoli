@@ -465,7 +465,7 @@ describe("webSearch", () => {
       assertBody: (body: Record<string, unknown>) => {
         expect(body.tools).toEqual([{ type: "web_search" }]);
         expect(body.store).toBe(false);
-        expect(body.model).toBe("mistral-medium-3-5");
+        expect(body.model).toBe("mistral-large-4-0");
       },
       expectedSummary: "Mistral web search found the current answer.",
       expectedSourceUrl: "https://example.com/mistral-search",
@@ -551,6 +551,33 @@ describe("webSearch", () => {
         query: "Latest news?",
       }),
     ).rejects.toThrow("without running web search");
+  });
+
+  it.each([
+    { completedAt: null, grounded: false },
+    { completedAt: undefined, grounded: false },
+    { completedAt: "2026-11-20T10:00:00Z", grounded: true },
+  ])("requires Mistral to finish an uncited web search (completed_at=$completedAt)", async ({ completedAt, grounded }) => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        outputs: [
+          { type: "tool.execution", name: "web_search", completed_at: completedAt },
+          { type: "message.output", content: [{ type: "text", text: "Summary." }] },
+        ],
+      }),
+    });
+    const result = searchWeb({
+      provider: "mistral",
+      apiKey: "test",
+      language: "en",
+      query: "Latest news?",
+    });
+    if (grounded) {
+      await expect(result).resolves.toMatchObject({ summary: "Summary." });
+    } else {
+      await expect(result).rejects.toThrow("without running web search");
+    }
   });
 
   it("rejects a Qwen response that did not run the web search tool", async () => {

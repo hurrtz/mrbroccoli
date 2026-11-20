@@ -33,8 +33,8 @@ navigation or render UI.
 ### Intelligence and provider integration
 
 OpenAI, Qwen, Gemini, Mistral, and xAI search opt out of provider resource
-storage. Mistral evidence requires a web-search execution or a provider-issued
-search citation. Qwen Responses uses `reasoning.effort: none`.
+storage. Mistral evidence requires a completed web-search execution or a
+provider-issued search citation. Qwen Responses uses `reasoning.effort: none`.
 Gemini recorded-audio transcription omits deprecated sampling parameters.
 
 
