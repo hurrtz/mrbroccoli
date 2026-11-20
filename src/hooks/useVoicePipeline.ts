@@ -49,6 +49,8 @@ export function useVoicePipeline(
     stopReplay,
     handleRepeatLastReply,
   } = useReplyReplayController({
+    activeConversation: params.activeConversation,
+    updateMessage: params.updateMessage,
     isBusy,
     isRecording: params.isRecording,
     language: params.language,

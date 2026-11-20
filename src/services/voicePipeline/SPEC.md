@@ -30,6 +30,10 @@ It is the shared execution path for normal conversation, text submission, and
 Drive Session. UI state remains in screen/hooks; provider and native operations
 remain in services.
 
+Retrying a transcript reply uses the current output route. Starting the retry
+clears that reply’s speech error and its actions. Only a new failure restores
+them. Other notices and other messages keep their own history.
+
 ## Input Contract
 
 A pipeline run receives an immutable snapshot of:

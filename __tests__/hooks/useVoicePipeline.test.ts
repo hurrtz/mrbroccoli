@@ -4,7 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createTurnReceipt } from "../../src/services/turnReceipt";
 import { translate } from "../../src/i18n";
 import { useVoicePipeline } from "../../src/hooks/useVoicePipeline";
-import { DEFAULT_SETTINGS, type UsageEstimate } from "../../src/types";
+import { DEFAULT_SETTINGS, type Message, type UsageEstimate } from "../../src/types";
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   getItem: jest.fn(() => Promise.resolve(null)),
@@ -224,6 +224,104 @@ describe("useVoicePipeline", () => {
     );
     expect(params.player.speakText).not.toHaveBeenCalled();
     expect(params.player.enqueueAudio).not.toHaveBeenCalled();
+  });
+
+  it("clears the tapped reply's old speech error during retry and keeps only a new failure", async () => {
+    const warning = {
+      stage: "web-search" as const,
+      level: "warning" as const,
+      message: "Search unavailable",
+    };
+    const failedSpeech = {
+      stage: "tts" as const,
+      level: "error" as const,
+      message: "Gemini quota exceeded",
+    };
+    const original: Message = {
+      id: "original",
+      role: "assistant",
+      content: "Read me",
+      timestamp: "",
+      model: null,
+      provider: null,
+      metadata: { notices: [warning, failedSpeech] },
+    };
+    const newer = { ...original, id: "newer" };
+    const conversation = {
+      id: "thread",
+      title: "",
+      createdAt: "",
+      updatedAt: "",
+      messages: [original, newer],
+    };
+    const updateMessage = jest.fn(
+      (id: string, update: (message: Message) => Message) => {
+        const index = conversation.messages.findIndex(
+          (message) => message.id === id,
+        );
+        return index < 0
+          ? null
+          : (conversation.messages[index] = update(
+              conversation.messages[index],
+            ));
+      },
+    );
+    const params = createParams({
+      activeConversation: conversation,
+      updateMessage,
+      ttsProvider: "gemini",
+    });
+    const { result, rerender } = renderHook(
+      (props: typeof params) => useVoicePipeline(props),
+      { initialProps: params },
+    );
+    rerender({ ...params, ttsProvider: "openai" });
+    const playbackGate = createDeferredVoid();
+    jest
+      .mocked(params.player.stopPlayback)
+      .mockReturnValueOnce(playbackGate.promise);
+    jest
+      .mocked(synthesizeSpeech)
+      .mockResolvedValue("file:///successful-retry.wav");
+    let retry!: Promise<void>;
+    act(() => {
+      retry = result.current.handleRepeatLastReply(
+        original.content,
+        original.id,
+      );
+    });
+    expect(conversation.messages[0].metadata?.notices).toEqual([warning]);
+    await act(async () => {
+      playbackGate.resolve();
+      await retry;
+    });
+    expect(synthesizeSpeech).toHaveBeenCalledWith(
+      expect.objectContaining({ provider: "openai" }),
+    );
+    expect(conversation.messages[0].metadata?.notices).toEqual([warning]);
+    expect(conversation.messages[1].metadata?.notices).toEqual([
+      warning,
+      failedSpeech,
+    ]);
+
+    jest
+      .mocked(synthesizeSpeech)
+      .mockRejectedValueOnce(new Error("Replacement route unavailable"));
+    await act(async () => {
+      await result.current.handleRepeatLastReply(original.content, original.id);
+    });
+    expect(conversation.messages[0].metadata?.notices).toEqual([
+      warning,
+      expect.objectContaining({
+        stage: "tts",
+        level: "error",
+        detail: "Replacement route unavailable",
+      }),
+    ]);
+    expect(conversation.messages[1].metadata?.notices).toEqual([
+      warning,
+      failedSpeech,
+    ]);
   });
 
   it("reports replay synthesis failures without falling back to native speech", async () => {

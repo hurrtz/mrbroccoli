@@ -4,10 +4,14 @@ import { createVoicePipelineTtsQueue } from "../../services/voicePipeline/ttsQue
 import type { AudioPlayer, ReplayPhase, UseVoicePipelineParams } from "./types";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
 import { PROVIDER_LABELS } from "../../constants/models";
+import { getUnexpectedIssueDetail } from "./useVoiceTurnMessageState";
+import type { MessagePipelineNotice } from "../../types";
 import { getProviderFailureKind } from "../../services/providerResilience";
 
 type ReplayControllerParams = Pick<
   UseVoicePipelineParams,
+  | "activeConversation"
+  | "updateMessage"
   | "isRecording"
   | "language"
   | "selectedTtsModel"
@@ -29,7 +33,13 @@ type ReplayControllerParams = Pick<
   player: AudioPlayer;
 };
 
+function isSpeechError(notice: MessagePipelineNotice) {
+  return notice.stage === "tts" && notice.level === "error";
+}
+
 export function useReplyReplayController({
+  activeConversation,
+  updateMessage,
   isBusy,
   isRecording,
   language,
@@ -49,6 +59,8 @@ export function useReplyReplayController({
   spokenRepliesEnabled,
   ttsProvider,
 }: ReplayControllerParams) {
+  const conversationRef = useRef(activeConversation);
+  conversationRef.current = activeConversation;
   const replayingRef = useRef(false);
   const replaySessionRef = useRef(0);
   const replayAbortRef = useRef<AbortController | null>(null);
@@ -78,6 +90,55 @@ export function useReplyReplayController({
       replayAbortRef.current = replayAbortController;
       setActiveReplayMessageId(messageId ?? null);
       setReplayPhase("preparing");
+
+      const conversation = conversationRef.current;
+      const message =
+        messageId &&
+        conversation?.messages.find(
+          (entry) => entry.id === messageId && entry.role === "assistant",
+        );
+      const setSpeechError = (error?: Error) => {
+        if (!message || conversationRef.current?.id !== conversation?.id) {
+          return;
+        }
+        const label = t("spokenReplyFailed");
+        updateMessage(message.id, (current) => {
+          const notices = (current.metadata?.notices ?? []).filter(
+            (notice) => !isSpeechError(notice),
+          );
+          if (error)
+            notices.push({
+              stage: "tts",
+              level: "error",
+              message: label,
+              detail: getUnexpectedIssueDetail(error, label),
+            });
+          return { ...current, metadata: { ...current.metadata, notices } };
+        });
+      };
+      if (message && message.metadata?.notices?.some(isSpeechError)) {
+        setSpeechError();
+      }
+      const handleReplayError = (error: Error) => {
+        if (
+          replaySessionRef.current !== replaySession ||
+          error.name === "AbortError"
+        )
+          return;
+        if (message) {
+          setSpeechError(error);
+          return;
+        }
+        const kind = getProviderFailureKind(error);
+        const detail =
+          ttsProvider && (kind === "credits" || kind === "quota")
+            ? t("providerCreditsRequired", {
+                provider: PROVIDER_LABELS[ttsProvider],
+                action: t("speechSynthesisAction"),
+              })
+            : error.message;
+        showToast(detail, undefined, "danger");
+      };
 
       try {
         // Clear native or queued playback even when the rendered `isPlaying`
@@ -143,32 +204,7 @@ export function useReplyReplayController({
 
               player.enqueueSpeechPause(durationMs);
             },
-            onError: (error) => {
-              if (
-                replaySessionRef.current !== replaySession ||
-                error.name === "AbortError"
-              ) {
-                return;
-              }
-
-              const failureKind = getProviderFailureKind(error);
-              if (
-                ttsProvider &&
-                (failureKind === "credits" || failureKind === "quota")
-              ) {
-                showToast(
-                  t("providerCreditsRequired", {
-                    provider: PROVIDER_LABELS[ttsProvider],
-                    action: t("speechSynthesisAction"),
-                  }),
-                  undefined,
-                  "danger",
-                );
-                return;
-              }
-
-              showToast(error.message, undefined, "danger");
-            },
+            onError: handleReplayError,
           },
           diagnosticsSource: "repeat",
           language,
@@ -200,6 +236,8 @@ export function useReplyReplayController({
           setReplayPhase("speaking");
         }
         await player.waitForDrain();
+      } catch (error) {
+        handleReplayError(error instanceof Error ? error : new Error(t("couldntReplayReply")));
       } finally {
         if (replaySessionRef.current === replaySession) {
           replayingRef.current = false;
@@ -210,6 +248,7 @@ export function useReplyReplayController({
       }
     },
     [
+      updateMessage,
       language,
       player,
       selectedTtsModel,
