@@ -2,6 +2,7 @@ import React from "react";
 import {
   KeyboardAvoidingView,
   Modal as RNModal,
+  Platform,
   StyleSheet,
   useWindowDimensions,
 } from "react-native";
@@ -907,6 +908,19 @@ describe("MainScreen", () => {
         "The session was not unlocked, so it was not loaded.",
       );
     });
+  });
+
+  it("keeps the Android workspace height tied to the current window after using the keyboard", () => {
+    const platform = jest.replaceProperty(Platform, "OS", "android");
+    try {
+      mockUseWindowDimensions.mockReturnValue({
+        width: 914, height: 411, scale: 2.625, fontScale: 1,
+      });
+      const screen = renderWithProviders(<MainScreen />);
+      expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("padding");
+    } finally {
+      platform.restore();
+    }
   });
 
   it.each([

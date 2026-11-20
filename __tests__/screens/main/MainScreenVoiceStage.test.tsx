@@ -357,6 +357,28 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("landscape-stage-controls")).toBeTruthy();
   });
 
+  it.each([96, 125])("fits all recording controls inside a %ipt landscape viewport", (height) => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({
+          activity: { label: "listening" },
+          footer: <View testID="landscape-stage-controls" />,
+          isActive: true,
+          layout: "landscape",
+          maxOrbSize: 150,
+          visualPhase: "recording",
+        })}
+      />,
+    );
+    fireEvent(screen.getByTestId("voice-text-input-viewport"), "layout", {
+      nativeEvent: { layout: { height, width: 390 } },
+    });
+    const transport = StyleSheet.flatten(screen.getByTestId("orb-transport-active").props.style);
+    const orb = StyleSheet.flatten(screen.getByTestId("voice-orb-active").props.style);
+    expect(transport.height).toBeLessThanOrEqual(height);
+    expect(orb.height).toBeGreaterThanOrEqual(44);
+  });
+
   it("doubles the control caption size above the orb and mirrors the lower clearance as space permits", () => {
     const screen = renderStage(
       <MainScreenVoiceStage

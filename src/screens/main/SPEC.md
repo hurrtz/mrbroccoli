@@ -42,9 +42,11 @@ receive already-derived state and callbacks.
   position and holds its interpolation until playback resumes. The gap between
   the core disc and the ring is only ever a gap: the screen reads through it in
   every phase. The orb is sized from the space the
-  column actually leaves it, clamped between 120pt and its surface ceiling (196
-  phone portrait, 150 phone landscape; 204-224 across regular-iPad states), so
-  a transcript dock or landscape split simply makes it smaller.
+  column actually leaves it. Portrait keeps a 120pt minimum. In landscape the
+  orb can shrink to its 44pt touch target so the transport controls and Hands
+  free remain reachable below the activity label on short phones.
+  Compact phones cap it at 196pt in portrait and 150pt in landscape. The
+  regular iPad workspaces and the open Duo use ceilings between 204 and 224pt.
 - In portrait, left and right 44pt chevrons flank the measured orb. They make
   the voice/text pager discoverable without competing with the voice action.
   Their target centres follow the orb centre returned by the measured

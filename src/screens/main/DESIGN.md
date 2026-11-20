@@ -276,6 +276,9 @@ remount restores focus only when that field actually held it.
 The keyboard avoidance offset follows the workspace's coordinate origin. On
 iOS the compact workspace is measured in screen coordinates, while the regular
 iPad workspace's enclosing sidebar shell begins below the top safe area.
+Keyboard avoidance adds bottom padding inside the current window on both
+platforms. This keeps the landscape panes inside the window after a Settings
+field opened the Android keyboard in portrait.
 The sibling layer translates vertically by
 `transportLayout.centreY - transportLayout.height / 2` for the current measured
 orb. This keeps both 44pt targets centred on the orb instead of on the transport

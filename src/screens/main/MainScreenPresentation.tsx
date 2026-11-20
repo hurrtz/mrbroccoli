@@ -60,7 +60,7 @@ export function MainScreenPresentation({
   const workspaceSurface = (
     <KeyboardAvoidingView
       accessibilityElementsHidden={surfaceTransition.visible}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      behavior="padding"
       importantForAccessibility={
         surfaceTransition.visible ? "no-hide-descendants" : "auto"
       }

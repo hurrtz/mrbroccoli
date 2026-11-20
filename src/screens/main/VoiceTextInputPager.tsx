@@ -3,7 +3,7 @@ import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
 
 import { ProviderIcon } from "../../components/ProviderIcon";
 import { PROVIDER_LABELS } from "../../constants/models";
-import { PhosphorIcon } from "../../design-system/PhosphorIcon";
+import { MIN_ICON_TOUCH_TARGET, PhosphorIcon } from "../../design-system/PhosphorIcon";
 import {
   fitOrbTransportSize,
   getOrbTransportLayout,
@@ -101,7 +101,7 @@ export function VoiceTextInputPager({
     availableWidth: pager.pageWidth || maximumTransportLayout.width,
     labels: showTransportLabels,
     maximum: maxOrbSize,
-    minimum: Math.min(120, maxOrbSize),
+    minimum: showTransportLabels ? 120 : MIN_ICON_TOUCH_TARGET,
   });
   const derivedProgress = useOrbTurnProgress({
     phaseTimingProgress: phaseTimingProgress ?? null,
