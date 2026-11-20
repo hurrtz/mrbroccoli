@@ -19,6 +19,8 @@ the complete Play Store translations are kept in a dedicated file under
   accompany the [shared release notes](docs/google-play-release-notes-4.3.0.md).
 - Hands free and playback controls stay within reach on short landscape phones,
   including after entering a provider key in portrait and rotating.
+- The folded iPhone Duo keeps the activity label and send button visible while
+  typing with the software keyboard.
 - Conversation search hints and Settings labels fit longer translations and
   enlarged text. Arabic and Urdu search hints start at the right edge.
   Drawer and sheet headings use the available width.

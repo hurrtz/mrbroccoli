@@ -291,6 +291,12 @@ minimum transport footprint exceeds the available height,
 the visible bounds. The text page's chevrons follow that adjusted centre; the
 voice page retains the orb centre. This preserves the first text line and the
 send target when the keyboard or a short window constrains the stage.
+While typing, the pager compares its visible height with the measured caption,
+the minimum editor height and the footer. If they exceed the portrait stage,
+the caption starts at the top of a vertical scroll view and the editor shrinks
+to the space below it, down to 68pt for its 46pt send action. The footer follows
+in the same scroll view. The existing text field keeps its focus and draft as
+the keyboard opens or closes.
 The portrait pager measures one central stage and derives the largest
 orb-transport cluster that fits its height and the width between the two 44pt
 chevrons, clamped from a 120pt orb to the portrait ceiling. `OrbTransport`

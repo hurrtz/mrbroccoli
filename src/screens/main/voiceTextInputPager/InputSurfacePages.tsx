@@ -213,6 +213,7 @@ function TextInputSurface({
         {
           backgroundColor: colors.surfaceElevated,
           height: composerLayout.height,
+          minHeight: Math.min(styles.textSurface.minHeight, composerLayout.height),
           // Green at rest, not only on focus: this is the other half of the
           // primary action, and the voice control it pages between is green
           // whenever it can be used. A neutral outline left the composer

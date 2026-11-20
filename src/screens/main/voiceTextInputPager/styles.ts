@@ -2,10 +2,16 @@ import { StyleSheet } from "react-native";
 import { textStyles } from "../../../theme/typography";
 
 export const PAGE_GAP = 32;
+// A 46pt send button, two 8pt insets and the composer border fit within 68pt.
+export const MIN_TYPING_VIEWPORT_HEIGHT = 68;
 // The stage's 2pt row gap completes the 18pt separation on either side.
 const CONTROL_ROW_MARGIN = 16;
 
 export const voiceTextInputPagerStyles = StyleSheet.create({
+  fill: {
+    flex: 1,
+    minHeight: 0,
+  },
   root: {
     flex: 1,
     minHeight: 0,
@@ -20,6 +26,10 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     marginBottom: CONTROL_ROW_MARGIN,
     paddingVertical: 12,
   },
+  activityTyping: {
+    marginBottom: 4,
+    paddingVertical: 2,
+  },
   activityText: {
     ...textStyles.orbCaption,
     fontSize: textStyles.orbCaption.fontSize * 2,
@@ -29,6 +39,11 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
   },
   rootWithFooter: {
     justifyContent: "center",
+  },
+  typingStage: {
+    flex: 0,
+    flexGrow: 1,
+    justifyContent: "flex-start",
   },
   pendingAttachments: {
     left: 0,

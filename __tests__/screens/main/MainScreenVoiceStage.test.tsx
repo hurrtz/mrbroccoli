@@ -199,6 +199,49 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByLabelText("ready")).toBeVisible();
   });
 
+  it.each([
+    { stageHeight: 111, lineHeight: 24, fitsWithoutScrolling: true },
+    { stageHeight: 111, lineHeight: 72, fitsWithoutScrolling: false },
+  ])("keeps a focused draft below its $lineHeight pt caption on a folded phone", ({
+    stageHeight, lineHeight, fitsWithoutScrolling,
+  }) => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({ activity: { label: "ready" }, footer: <View /> })}
+      />,
+    );
+    const stage = screen.getByTestId("voice-text-input-stage");
+    const layoutAt = (height: number) => ({ nativeEvent: { layout: { height, width: 350 } } });
+    fireEvent(stage, "layout", layoutAt(385));
+    fireEvent(screen.getByText("ready"), "layout", layoutAt(lineHeight));
+    fireEvent(screen.getByTestId("voice-text-input-footer"), "layout", layoutAt(61));
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
+    const input = screen.getByTestId("voice-text-input");
+    fireEvent(input, "focus");
+    fireEvent.changeText(input, "Draft");
+    expect(stage.props.scrollEnabled).toBe(false);
+
+    fireEvent(stage, "layout", layoutAt(stageHeight));
+    expect(stage.props.scrollEnabled).toBe(true);
+    const content = StyleSheet.flatten(stage.props.contentContainerStyle);
+    expect(content.justifyContent).toBe("flex-start");
+    const caption = StyleSheet.flatten(screen.getByTestId("orb-activity").props.style);
+    const field = StyleSheet.flatten(screen.getByTestId("text-input-surface").props.style);
+    const fieldTop = 2 * caption.paddingVertical + lineHeight + caption.marginBottom + content.gap;
+    expect(fieldTop).toBeGreaterThan(lineHeight);
+    expect(fieldTop + field.height <= stageHeight).toBe(fitsWithoutScrolling);
+    expect(field.height).toBeGreaterThanOrEqual(68);
+    expect(field.height).toBeGreaterThanOrEqual(field.minHeight);
+    expect(screen.getByTestId("voice-text-primary-action")).toBeEnabled();
+    expect(screen.getByTestId("voice-text-input-footer")).toBeTruthy();
+
+    fireEvent(stage, "layout", layoutAt(385));
+    expect(stage.props.scrollEnabled).toBe(false);
+    expect(screen.getByTestId("voice-text-input")).toBe(input);
+    expect(input.props.value).toBe("Draft");
+    expect(screen.getByLabelText("ready")).toBeVisible();
+  });
+
   it("keeps the typed turn's provider labels and reserves the caption row during speech", () => {
     const props = createProps({
       initialInputSurface: "text",
@@ -312,7 +355,7 @@ describe("MainScreenVoiceStage composer", () => {
 
     expect(
       StyleSheet.flatten(
-        screen.getByTestId("voice-text-input-stage").props.style,
+        screen.getByTestId("voice-text-input-stage").props.contentContainerStyle,
       ),
     ).toMatchObject({ justifyContent: "center" });
     expect(

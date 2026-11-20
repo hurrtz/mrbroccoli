@@ -171,7 +171,10 @@ receive already-derived state and callbacks.
   readiness and the progress of sending, searching, waiting and responding.
   Voice-only operations leave its caption row empty. A working composer
   remains ready when the microphone route is unavailable. Opening the keyboard
-  keeps the caption below the conversation settings and above the field. The 18pt
+  keeps the caption below the conversation settings and above the field. On a
+  folded Duo, the focused field and send button fit beside each other beneath
+  the complete standard-size caption. Next-turn controls and enlarged copy
+  remain reachable by scrolling when space is tight. The 18pt
   monospaced caption is twice the size of the control captions below and scales
   with the user's text size. Its distance from the ring
   mirrors the lower control row when the stage has room. The actor's icon

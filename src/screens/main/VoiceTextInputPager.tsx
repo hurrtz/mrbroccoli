@@ -1,5 +1,11 @@
 import React from "react";
-import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
+import {
+  AccessibilityInfo,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 import { ProviderIcon } from "../../components/ProviderIcon";
 import { PROVIDER_LABELS } from "../../constants/models";
@@ -12,7 +18,10 @@ import {
 import type { VoiceVisualPhase } from "../../types";
 import { useOrbTurnProgress } from "./useOrbTurnProgress";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
-import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
+import {
+  MIN_TYPING_VIEWPORT_HEIGHT,
+  voiceTextInputPagerStyles as styles,
+} from "./voiceTextInputPager/styles";
 import { VoiceTextInputPagerProps } from "./voiceTextInputPager/types";
 import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager";
 
@@ -80,6 +89,9 @@ export function VoiceTextInputPager({
   voiceInputUnavailableMessage = null,
 }: VoiceTextInputPagerProps) {
   const [viewportHeight, setViewportHeight] = React.useState(0);
+  const [stageHeight, setStageHeight] = React.useState(0);
+  const [activityTextHeight, setActivityTextHeight] = React.useState(0);
+  const [footerHeight, setFooterHeight] = React.useState(0);
   const pager = useInputSurfacePager({
     disabled,
     initialSurface,
@@ -136,6 +148,36 @@ export function VoiceTextInputPager({
   const visibleActivity =
     reserveActivityRow && surfaceShowsPhase ? activity : undefined;
   const provider = visibleActivity?.provider;
+  const activityLineHeight = Math.max(
+    activityTextHeight,
+    styles.activityText.lineHeight,
+  );
+  const activityFootprint = reserveActivityRow
+    ? activityLineHeight +
+      2 * styles.activity.paddingVertical +
+      styles.activity.marginBottom +
+      styles.root.gap
+    : 0;
+  const footerFootprint = footer
+    ? footerHeight + styles.footer.marginTop + styles.root.gap
+    : 0;
+  const compactTyping =
+    textSelected && pager.textFocused && !isActive && showTransportLabels &&
+    stageHeight > 0 &&
+    stageHeight < activityFootprint + styles.viewportFlexible.minHeight + footerFootprint;
+  const compactActivityFootprint = reserveActivityRow
+    ? activityLineHeight +
+      2 * styles.activityTyping.paddingVertical +
+      styles.activityTyping.marginBottom +
+      styles.root.gap
+    : 0;
+  const typingViewportHeight = Math.max(
+    MIN_TYPING_VIEWPORT_HEIGHT,
+    Math.min(
+      styles.viewportFlexible.minHeight,
+      stageHeight - compactActivityFootprint,
+    ),
+  );
   const balanceActivity = reserveActivityRow && Boolean(footer);
   // The transport keys extend below the orb. Mirror their footprint above it
   // when there is room, giving space back to the controls on short screens.
@@ -145,7 +187,7 @@ export function VoiceTextInputPager({
   const transportHeight = getOrbTransportLayout(
     stageSize, showTransportLabels,
   ).height;
-  const spaceAboveOrb = balanceActivity
+  const spaceAboveOrb = !compactTyping && balanceActivity
     ? Math.min(
         transportHeight - stageSize,
         Math.max(0, (viewportHeight || maximumViewportHeight) - transportHeight),
@@ -194,8 +236,19 @@ export function VoiceTextInputPager({
   };
 
   return (
-    <View
-      style={[styles.root, footer ? styles.rootWithFooter : null]}
+    <ScrollView
+      contentContainerStyle={[
+        styles.root,
+        footer ? styles.rootWithFooter : null,
+        compactTyping && styles.typingStage,
+      ]}
+      contentInsetAdjustmentBehavior="never"
+      disableScrollViewPanResponder={!compactTyping}
+      keyboardShouldPersistTaps="handled"
+      onLayout={(event) => setStageHeight(event.nativeEvent.layout.height)}
+      scrollEnabled={compactTyping}
+      scrollsToTop={false}
+      style={styles.fill}
       testID="voice-text-input-stage"
     >
       {reserveActivityRow ? (
@@ -204,11 +257,20 @@ export function VoiceTextInputPager({
           accessibilityElementsHidden={!visibleActivity}
           accessibilityLabel={spokenStatus || undefined}
           importantForAccessibility={visibleActivity ? "auto" : "no-hide-descendants"}
-          style={[styles.activity, { direction: rtl ? "rtl" : "ltr" }]}
+          style={[
+            styles.activity,
+            compactTyping && styles.activityTyping,
+            { direction: rtl ? "rtl" : "ltr" },
+          ]}
           testID="orb-activity"
         >
           {providerIcon}
-          <Text style={[styles.activityText, { color: colors.textSecondary }]}>
+          <Text
+            onLayout={(event) =>
+              setActivityTextHeight(event.nativeEvent.layout.height)
+            }
+            style={[styles.activityText, { color: colors.textSecondary }]}
+          >
             {/* A blank line follows Dynamic Type even when this phase has no caption. */}
             {visibleActivity?.label ?? "\u00a0"}
           </Text>
@@ -219,7 +281,13 @@ export function VoiceTextInputPager({
         onLayout={handleViewportLayout}
         style={[
           styles.viewportFlexible,
-          footer
+          compactTyping
+            ? {
+                flex: 0,
+                height: typingViewportHeight,
+                minHeight: MIN_TYPING_VIEWPORT_HEIGHT,
+              }
+            : footer
             ? [
                 styles.viewportWithFooter,
                 {
@@ -249,7 +317,9 @@ export function VoiceTextInputPager({
           onTextFocusChange={pager.handleTextFocusChange}
           onTextMessageChange={pager.handleTextMessageChange}
           pageWidth={pager.pageWidth}
-          viewportHeight={Math.max(0, viewportHeight - spaceAboveOrb)}
+          viewportHeight={
+            compactTyping ? typingViewportHeight : Math.max(0, viewportHeight - spaceAboveOrb)
+          }
           panGesture={pager.panGesture}
           promptBlockedMessage={promptBlockedMessage}
           stageSize={stageSize}
@@ -400,10 +470,14 @@ export function VoiceTextInputPager({
       ) : null}
 
       {footer ? (
-        <View style={styles.footer} testID="voice-text-input-footer">
+        <View
+          onLayout={(event) => setFooterHeight(event.nativeEvent.layout.height)}
+          style={styles.footer}
+          testID="voice-text-input-footer"
+        >
           {footer}
         </View>
       ) : null}
-    </View>
+    </ScrollView>
   );
 }
