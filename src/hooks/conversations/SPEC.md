@@ -78,9 +78,9 @@ An authorized selection can backfill history for a previously locked record.
   becomes null. The fork retains its family and the saved insight retains
   its text. Older backups carrying dangling links receive the same repair.
 - The first accepted prompt in a newly created root or branch consumes its
-  local naming eligibility exactly once. An automatic title can replace only
-  the original title and cannot replace a manual rename or apply to a locked
-  conversation.
+  local naming eligibility exactly once. A manual rename also consumes eligibility,
+  including on branches awaiting their first turn. Automatic naming requires
+  the original title and an unlocked conversation.
 - Lock state is canonical conversation data mirrored into metadata. A locked
   record cannot be selected, read by ID, content-searched, hydrated as active,
   or indexed until its ID receives a foreground-only authorization grant.

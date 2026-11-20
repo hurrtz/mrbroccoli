@@ -1675,6 +1675,40 @@ describe("useConversations", () => {
     });
   });
 
+  it("preserves a manual name chosen while the first prompt awaits its response provider", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    let id = "";
+    await act(async () => {
+      id = result.current.createConversation("First prompt");
+      result.current.addMessage({ role: "user", content: "First prompt", model: null, provider: null });
+      await result.current.renameConversation(id, "My name for this conversation");
+      expect(await result.current.claimFirstPrompt(id)).toBeNull();
+    });
+    expect(await readConversation(id)).toMatchObject({ title: "My name for this conversation" });
+  });
+
+  it("keeps a manual assistant-checkpoint branch title when its first prompt arrives", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    let id = "";
+    await act(async () => {
+      result.current.createConversation("Root");
+      const checkpoint = result.current.addMessage({ role: "assistant", content: "Checkpoint", model: null, provider: null })!;
+      const branch = (await result.current.branchConversationAtMessage(checkpoint.id))!;
+      id = branch.conversation.id;
+      // A first turn can be queued while the manual rename is still saving.
+      const rename = result.current.renameConversation(id, "My branch");
+      result.current.addMessage({ role: "user", content: "Follow-up question", model: null, provider: null });
+      await rename;
+      expect(await result.current.claimFirstPrompt(id)).toBeNull();
+    });
+    expect(result.current.activeConversation?.title).toBe("My branch");
+    const stored = await readConversation(id);
+    expect(stored?.title).toBe("My branch");
+    expect(stored?.messages.at(-1)?.content).toBe("Follow-up question");
+  });
+
   it("keeps naming disabled for a consumed first prompt after reloading and enabling the setting", async () => {
     const first = renderHook(() => useConversations());
     await waitFor(() => expect(first.result.current.loaded).toBe(true));

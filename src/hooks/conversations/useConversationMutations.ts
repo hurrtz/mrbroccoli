@@ -359,6 +359,7 @@ export function useConversationMutations(params: {
       };
       const startsAssistantCheckpointBranch =
         messageInput.role === "user" &&
+        currentConversation.awaitingFirstPrompt &&
         currentConversation.branch?.kind === "continue-from-message" &&
         currentConversation.messages.at(-1)?.id ===
           currentConversation.branch.branchMessageId;
@@ -372,7 +373,7 @@ export function useConversationMutations(params: {
       };
       setActiveConversationValue(updatedConversation);
       void saveConversation(updatedConversation, {
-        preserveTitle: !startsAssistantCheckpointBranch,
+        preserveTitle: startsAssistantCheckpointBranch ? "afterFirstPrompt" : true,
         mode: "update",
       });
       if (
@@ -1017,7 +1018,8 @@ export function useConversationMutations(params: {
         activeConversationRef.current?.id === id
           ? activeConversationRef.current
           : currentConversation;
-      const updatedConversation = { ...latest, title };
+      const { awaitingFirstPrompt: _pendingTitle, ...renamed } = latest;
+      const updatedConversation = { ...renamed, title };
       if (pastConversationKnowledgeEnabled && !updatedConversation.isLocked) {
         void syncConversationKnowledge(updatedConversation, true);
       }

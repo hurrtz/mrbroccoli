@@ -606,8 +606,8 @@ export interface ConversationMeta {
   pinned: boolean;
   branch?: ConversationBranchOrigin;
   branchSchemaVersion?: 2;
+  /** Version 1 includes Model Council contributions in provider history. */
+  providerHistoryVersion?: 1;
   isLocked?: boolean;
   archived?: boolean;
 }
-  /** Version 1 includes Model Council contributions in provider history. */
-  providerHistoryVersion?: 1;

@@ -125,7 +125,7 @@ export async function readActiveConversationId() {
 interface SaveOptions {
   initialMeta?: ConversationMeta;
   clearRouteHistory?: boolean;
-  preserveTitle?: boolean;
+  preserveTitle?: boolean | "afterFirstPrompt";
   mode?: "insert" | "update";
 }
 
@@ -157,7 +157,13 @@ async function writeConversation(
   if (row && Boolean(document.isLocked) !== wasLocked)
     document.isLocked = wasLocked;
   if (row && !row.awaiting) delete document.awaitingFirstPrompt;
-  if (options.preserveTitle && previous) document.title = previous.title;
+  if (
+    previous &&
+    (options.preserveTitle === true ||
+      (options.preserveTitle === "afterFirstPrompt" && !row?.awaiting))
+  ) {
+    document.title = previous.title;
+  }
   const meta = buildConversationMetaFromConversation(
     document,
     options.clearRouteHistory && previous
@@ -327,7 +333,7 @@ export async function renameStoredConversation(
     await ensureReady();
     const result = await runInConversationTransaction((database) =>
       database.runAsync(
-        `UPDATE conversations SET document = json_set(document, '$.title', ?),
+        `UPDATE conversations SET document = json_remove(json_set(document, '$.title', ?), '$.awaitingFirstPrompt'),
          meta = json_set(meta, '$.title', ?)
        WHERE id = ? AND (? IS NULL OR (
          json_extract(document, '$.title') = ? AND NOT coalesce(json_extract(document, '$.isLocked'), 0)
