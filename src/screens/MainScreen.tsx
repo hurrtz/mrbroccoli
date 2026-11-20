@@ -97,6 +97,7 @@ export function MainScreen() {
   const {
     conversations,
     activeConversation,
+    claimFirstPrompt,
     createConversation,
     selectConversation,
     grantConversationAccess,
@@ -485,6 +486,28 @@ export function MainScreen() {
   });
 
   const {
+    canGenerateTitle,
+    handlePromptSubmitted,
+    handleGenerateTitle,
+    handleGenerateTitleForConversation,
+    isGeneratingTitle,
+  } = useConversationTitleGenerator({
+    activeConversation,
+    apiKey: providerApiKey,
+    autoNameConversations: runtimeSettings.autoNameConversations,
+    claimFirstPrompt,
+    getConversationById,
+    language,
+    model,
+    modelEffort,
+    provider,
+    providerReady: !voiceInputDisabled,
+    renameConversation,
+    showToast,
+    t,
+  });
+
+  const {
     completedReplyVersion,
     councilProgress,
     phaseProgress,
@@ -508,6 +531,7 @@ export function MainScreen() {
     addMessage,
     createConversation,
     initialConversationSettings,
+    onPromptSubmitted: handlePromptSubmitted,
     updateMessage,
     updateConversationContextSummary,
     player,
@@ -845,24 +869,6 @@ export function MainScreen() {
     ],
   );
 
-  const {
-    canGenerateTitle,
-    handleGenerateTitle,
-    handleGenerateTitleForConversation,
-    isGeneratingTitle,
-  } = useConversationTitleGenerator({
-    activeConversation,
-    apiKey: providerApiKey,
-    getConversationById,
-    language,
-    model,
-    modelEffort,
-    provider,
-    providerReady: !voiceInputDisabled,
-    renameConversation,
-    showToast,
-    t,
-  });
 
   const handleResponseModeChange = useMainScreenResponseModeSelection({
     activeResponseMode,
@@ -929,6 +935,7 @@ export function MainScreen() {
     setStyleSheetVisible,
     updateSettings,
     webSearchActive,
+    webSearchReady,
   });
   const handleOpenTranscriptSpeakingSettings = React.useCallback(() => {
     runAfterTranscriptDismiss(handleOpenSpeakingSettings);

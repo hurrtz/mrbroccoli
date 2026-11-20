@@ -7,6 +7,7 @@ import {
   getTtsModelLabel,
   providerTtsModelSupportsInstructions,
 } from "../../constants/models";
+import { getConfiguredProvidersForCapability } from "../../features/settings-core/providerSupport";
 import type { ProviderVoiceDirectories } from "../../services/providerVoiceDirectory";
 import { providerHasVoiceDirectory } from "../../services/providerVoiceDirectory";
 import { getProviderCircuitState } from "../../services/providerResilience";
@@ -49,7 +50,6 @@ export function getMainScreenRouteConfiguration(
     settings.sttMode === "provider" ? settings.sttProvider : null;
   const ttsProvider = settings.ttsProvider;
   const webSearchProvider = settings.webSearchProvider;
-  const webSearchMode = settings.webSearchMode;
   const sttApiKey = sttProvider ? settings.apiKeys[sttProvider].trim() : "";
   const ttsApiKey = ttsProvider ? settings.apiKeys[ttsProvider].trim() : "";
   const webSearchApiKey = webSearchProvider
@@ -59,12 +59,15 @@ export function getMainScreenRouteConfiguration(
     ? settings.webSearchProviderSettings[webSearchProvider]
     : undefined;
   const webSearchReady =
+    settings.webSearchMode === "on" &&
     !!webSearchProvider &&
-    hasProviderCredentialForCapability(
-      webSearchProvider,
-      webSearchApiKey,
-      "search",
-    );
+    getConfiguredProvidersForCapability({
+      capability: "search",
+      settings,
+      validationStateByProvider: settings.providerValidationResults,
+    }).includes(webSearchProvider);
+  const webSearchMode: Settings["webSearchMode"] =
+    webSearchReady && settings.homeWebSearchEnabled ? "on" : "off";
   const selectedSttModel = sttProvider
     ? settings.providerSttModels[sttProvider] ||
       PROVIDER_DEFAULT_STT_MODELS[sttProvider] ||
@@ -102,7 +105,7 @@ export function getMainScreenRouteConfiguration(
     voiceInputDisabled:
       !conversationsLoaded ||
       !hasProviderCredentialForCapability(provider, providerApiKey, "llm"),
-    webSearchActive: webSearchMode !== "off" && webSearchReady,
+    webSearchActive: webSearchMode === "on",
     webSearchApiKey,
     webSearchMode,
     webSearchOptions,

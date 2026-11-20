@@ -10,6 +10,17 @@ import {
 import { DEFAULT_SETTINGS } from "../../../src/types";
 
 describe("mainScreenRouteConfiguration", () => {
+  it("lets home pause a selected search provider without changing Settings", () => {
+    const settings = { ...DEFAULT_SETTINGS, webSearchMode: "on" as const,
+      webSearchProvider: "openai" as const, homeWebSearchEnabled: false,
+      apiKeys: { ...DEFAULT_SETTINGS.apiKeys, openai: "test-key" } };
+    expect(getMainScreenRouteConfiguration(settings, true)).toMatchObject({
+      webSearchReady: true, webSearchMode: "off", webSearchActive: false,
+    });
+    expect(getMainScreenRouteConfiguration({ ...settings, homeWebSearchEnabled: true }, true))
+      .toMatchObject({ webSearchMode: "on", webSearchActive: true });
+  });
+
   it("derives the active LLM, speech, and search routes from one settings snapshot", () => {
     const settings = {
       ...DEFAULT_SETTINGS,

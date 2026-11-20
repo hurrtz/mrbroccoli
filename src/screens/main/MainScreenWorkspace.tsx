@@ -151,6 +151,7 @@ function WorkspaceSatellites({
   const webSatellite = (
     <OrbSatellite
       accessibilityLabel={t("webSearch")}
+      accessibilityHint={webAvailable ? undefined : t("openWebSearchSettings")}
       active={webActive}
       compact={compact}
       disabled={composingDisabled || !webAvailable}

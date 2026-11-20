@@ -712,6 +712,21 @@ describe("MainScreen", () => {
     expect(screen.queryByTestId("route-web-search-container")).toBeNull();
   });
 
+  it("cannot enable search from home when Nobody is selected, even with a connected key", () => {
+    const shared = createSharedSettingsValue({
+      apiKeys: { ...DEFAULT_SETTINGS.apiKeys, openai: "test-key" },
+      webSearchProvider: "openai",
+      webSearchMode: "off",
+    });
+    useSharedSettings.mockReturnValue(shared);
+    const screen = renderWithProviders(<MainScreen />);
+    const control = screen.getByTestId("satellite-web");
+    expect(control.props.accessibilityState.disabled).toBe(true);
+    fireEvent.press(control);
+    expect(shared.updateSettings).not.toHaveBeenCalled();
+    expect(useVoicePipeline).toHaveBeenCalledWith(expect.objectContaining({ webSearchMode: "off" }));
+  });
+
   it("turns an active automatic web-search route off from the main switch", () => {
     const sharedSettings = createSharedSettingsValue({
       apiKeys: {
@@ -729,7 +744,7 @@ describe("MainScreen", () => {
     fireEvent.press(searchControl);
 
     expect(sharedSettings.updateSettings).toHaveBeenCalledWith({
-      webSearchMode: "off",
+      homeWebSearchEnabled: false,
     });
   });
 
@@ -1035,7 +1050,7 @@ describe("MainScreen", () => {
     expect(screen.getByTestId("landscape-pane-divider")).toBeTruthy();
     expect(
       leftPane.getByTestId("satellite-web").props.accessibilityState,
-    ).toEqual({ checked: false, disabled: false });
+    ).toMatchObject({ checked: false, disabled: true });
     expect(leftPane.queryByTestId("route-style-control")).toBeNull();
     expect(leftPane.queryByText("status-strip")).toBeNull();
     expect(leftPane.queryByText("toggle-debug-log")).toBeNull();

@@ -54,6 +54,38 @@ describe("useConversationTitleGenerator", () => {
     jest.clearAllMocks();
   });
 
+  it("names a new session only once using its initial prompt and original title", async () => {
+    const params = createParams();
+    const claimFirstPrompt = jest.fn<Promise<string | null>, [string]>()
+      .mockResolvedValueOnce("First title").mockResolvedValue(null);
+    mockGenerateConversationTitle.mockResolvedValueOnce("Generated title");
+    const { result } = renderHook(() => useConversationTitleGenerator({ ...params, claimFirstPrompt }));
+    const prompt = conversation.messages[0];
+    await act(async () => {
+      await Promise.all([result.current.handlePromptSubmitted(conversation.id, prompt),
+        result.current.handlePromptSubmitted(conversation.id, prompt)]);
+      await result.current.handlePromptSubmitted(conversation.id, prompt);
+    });
+    expect(mockGenerateConversationTitle).toHaveBeenCalledTimes(1);
+    expect(mockGenerateConversationTitle).toHaveBeenCalledWith(expect.objectContaining({
+      messages: [{ ...prompt, attachments: undefined }],
+    }));
+    expect(params.renameConversation).toHaveBeenCalledWith(conversation.id, "Generated title", "First title");
+    expect(params.showToast).not.toHaveBeenCalled();
+  });
+
+  it("consumes the initial prompt while opted out and keeps naming available manually", async () => {
+    const params = createParams();
+    const claimFirstPrompt = jest.fn(async () => conversation.title);
+    const { result } = renderHook(() => useConversationTitleGenerator({
+      ...params, claimFirstPrompt, autoNameConversations: false,
+    }));
+    await act(async () => { await result.current.handlePromptSubmitted(conversation.id, conversation.messages[0]); });
+    expect(claimFirstPrompt).toHaveBeenCalledWith(conversation.id);
+    expect(mockGenerateConversationTitle).not.toHaveBeenCalled();
+    expect(result.current.canGenerateTitle).toBe(true);
+  });
+
   it("renames the active conversation with the selected route", async () => {
     const params = createParams();
     mockGenerateConversationTitle.mockResolvedValueOnce(

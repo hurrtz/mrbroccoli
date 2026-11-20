@@ -17,6 +17,7 @@ interface MainScreenSurfaceActionsParams {
   setStyleSheetVisible: (visible: boolean) => void;
   updateSettings: (partial: Partial<Settings>) => void;
   webSearchActive: boolean;
+  webSearchReady: boolean;
 }
 
 export function useMainScreenSurfaceActions({
@@ -30,6 +31,7 @@ export function useMainScreenSurfaceActions({
   setStyleSheetVisible,
   updateSettings,
   webSearchActive,
+  webSearchReady,
 }: MainScreenSurfaceActionsParams) {
   const handleOpenDrawer = useCallback(() => {
     setDrawerVisible(true);
@@ -47,10 +49,10 @@ export function useMainScreenSurfaceActions({
     openSettings(undefined, "tts");
   }, [openSettings]);
   const handleToggleWebSearch = useCallback(() => {
-    updateSettings({
-      webSearchMode: webSearchActive ? "off" : "on",
-    });
-  }, [updateSettings, webSearchActive]);
+    if (webSearchReady) {
+      updateSettings({ homeWebSearchEnabled: !webSearchActive });
+    }
+  }, [updateSettings, webSearchActive, webSearchReady]);
   const handleOpenConversationSettings = useCallback(() => {
     setStyleSheetVisible(true);
   }, [setStyleSheetVisible]);

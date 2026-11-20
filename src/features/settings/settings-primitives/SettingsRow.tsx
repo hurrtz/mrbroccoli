@@ -27,6 +27,7 @@ export function SettingsRow({
   last = false,
   onPress,
   supporting,
+  supportingLines = 1,
   supportingTone = "default",
   testID,
   value,
@@ -42,6 +43,7 @@ export function SettingsRow({
   last?: boolean;
   onPress?: () => void;
   supporting?: string;
+  supportingLines?: number;
   supportingTone?: "default" | "danger";
   testID?: string;
   value?: string;
@@ -71,7 +73,7 @@ export function SettingsRow({
         </Text>
         {supporting ? (
           <Text
-            numberOfLines={1}
+            numberOfLines={supportingLines}
             style={[
               styles.supporting,
               {

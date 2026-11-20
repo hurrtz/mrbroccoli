@@ -83,6 +83,7 @@ export interface UseVoicePipelineParams {
     initialSettings?: ConversationSettings,
   ) => string;
   initialConversationSettings?: ConversationSettings;
+  onPromptSubmitted?: (conversationId: string, prompt: Message) => void;
   updateMessage: (
     messageId: string,
     updater: (message: Message) => Message,

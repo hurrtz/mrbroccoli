@@ -925,6 +925,43 @@ describe("useVoicePipeline", () => {
     );
   });
 
+  it("passes the first submitted prompt to naming even when context is cancelled before the model starts", async () => {
+    const prompt: Message = {
+      id: "submitted-prompt",
+      role: "user",
+      content: "My initial question",
+      timestamp: "2026-08-04T08:00:00.000Z",
+      model: null,
+      provider: null,
+    };
+    const onPromptSubmitted = jest.fn();
+    const params = createParams({
+      createConversation: jest.fn(() => "new-conversation"),
+      addMessage: jest.fn(() => prompt),
+      onPromptSubmitted,
+      spokenRepliesEnabled: false,
+    });
+    const finishContext = createDeferredVoid();
+    (runVoicePipeline as jest.Mock).mockImplementation(async ({ callbacks }) => {
+      callbacks.onTranscription(prompt.content);
+      await finishContext.promise;
+      return prompt.content;
+    });
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let turn: Promise<void> | undefined;
+    await act(async () => {
+      turn = result.current.handleVoiceCaptureDone({ transcriptionOverride: prompt.content });
+      await Promise.resolve();
+    });
+    await act(async () => {
+      result.current.abortRef.current?.abort();
+      finishContext.resolve();
+      await turn;
+    });
+    expect(onPromptSubmitted).toHaveBeenCalledTimes(1);
+    expect(onPromptSubmitted).toHaveBeenCalledWith("new-conversation", prompt);
+  });
+
   it("targets an explicit fork while the rendered conversation is still stale", async () => {
     const originalConversation = {
       id: "original-conversation",
@@ -950,6 +987,7 @@ describe("useVoicePipeline", () => {
       provider: null,
       timestamp: "2026-08-04T08:02:00.000Z",
     };
+    const onPromptSubmitted = jest.fn();
     const forkConversation = {
       id: "fork-conversation",
       title: "Corrected prompt",
@@ -963,11 +1001,13 @@ describe("useVoicePipeline", () => {
     };
     const params = createParams({
       activeConversation: originalConversation,
+      onPromptSubmitted,
       spokenRepliesEnabled: false,
     });
     (runVoicePipeline as jest.Mock).mockImplementation(
       async ({ callbacks }: any) => {
         callbacks.onTranscription("Corrected prompt");
+        expect(onPromptSubmitted).toHaveBeenCalledWith(forkConversation.id, promptMessage);
         callbacks.onResponseDone("Forked reply");
         return "Corrected prompt";
       },
@@ -983,6 +1023,7 @@ describe("useVoicePipeline", () => {
       });
     });
 
+    expect(onPromptSubmitted).toHaveBeenCalledTimes(1);
     expect(runVoicePipeline).toHaveBeenCalledWith(
       expect.objectContaining({
         currentConversationId: "fork-conversation",

@@ -78,7 +78,7 @@ export function SearchSettingsPage({
           last={searchProviders.length === 0}
           description={t("webSearchNobodyDescription")}
           selected={settings.webSearchMode === "off"}
-          onSelect={() => onUpdate({ webSearchMode: "off" })}
+          onSelect={() => onUpdate({ webSearchMode: "off", webSearchProvider: null })}
         />
         {searchProviders.map((provider, index) => (
           <RouteOptionRow
@@ -91,6 +91,7 @@ export function SearchSettingsPage({
             onSelect={() =>
               onUpdate({
                 webSearchMode: "on",
+                homeWebSearchEnabled: true,
                 webSearchProvider: provider,
               })
             }

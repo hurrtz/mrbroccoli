@@ -174,6 +174,7 @@ export interface Settings {
   assistantInstructions: string;
   responseLength: AssistantResponseLength;
   responseTone: AssistantResponseTone;
+  autoNameConversations: boolean;
   showUsageStats: boolean;
   showDebugLogButton: boolean;
   pastConversationKnowledgeEnabled: boolean;
@@ -182,6 +183,7 @@ export interface Settings {
   ulraModeRounds: number;
   ulraModeWarningAcknowledged: boolean;
   webSearchMode: WebSearchMode;
+  homeWebSearchEnabled: boolean;
   webSearchProvider: WebSearchProvider | null;
   webSearchProviderSettings: Record<
     WebSearchProvider,
@@ -471,6 +473,7 @@ export const DEFAULT_SETTINGS: Settings = {
   assistantInstructions: getDefaultAssistantInstructions("en"),
   responseLength: "normal",
   responseTone: "professional",
+  autoNameConversations: true,
   showUsageStats: false,
   showDebugLogButton: false,
   pastConversationKnowledgeEnabled: false,
@@ -479,6 +482,7 @@ export const DEFAULT_SETTINGS: Settings = {
   ulraModeRounds: 2,
   ulraModeWarningAcknowledged: false,
   webSearchMode: DEFAULT_WEB_SEARCH_MODE,
+  homeWebSearchEnabled: true,
   webSearchProvider: null,
   webSearchProviderSettings: createDefaultWebSearchProviderSettings(),
   apiKeys: createRuntimeProviderStringRecord(),

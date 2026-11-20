@@ -160,7 +160,7 @@ capability healthy. The UI shows the capability that was actually tested.
   encrypted envelopes larger than the plaintext limit), and a
   storage janitor that may remove or cancel local models without duplicating
   their download and selection controls.
-- App & diagnostics: appearance, transcript-usage visibility, debug capture
+- App & diagnostics: appearance, automatic first-prompt naming, transcript-usage visibility, debug capture
   access, speech diagnostics, and runtime overrides.
 
 ## Interaction Rules

@@ -27,6 +27,13 @@ describe("settings storage", () => {
     jest.clearAllMocks();
   });
 
+  it("defaults new and older settings to automatic naming and respects saved opt-outs", () => {
+    expect(mergeSettings({}).autoNameConversations).toBe(true);
+    const settings = mergeSettings({ autoNameConversations: false, homeWebSearchEnabled: false });
+    expect(settings.autoNameConversations).toBe(false);
+    expect(settings.homeWebSearchEnabled).toBe(false);
+  });
+
   it("limits concurrent SecureStore reads while loading every provider key", async () => {
     let activeReads = 0;
     let maximumConcurrentReads = 0;

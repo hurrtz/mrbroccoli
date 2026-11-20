@@ -64,6 +64,7 @@ export function OrbSatellite({
   icon,
   label,
   accessibilityLabel,
+  accessibilityHint,
   kind = "action",
   active = false,
   compact = false,
@@ -79,6 +80,7 @@ export function OrbSatellite({
   label: string;
   /** Accessible name when the visible label is too terse. */
   accessibilityLabel?: string;
+  accessibilityHint?: string;
   /** Momentary action, or a switch that stays on. Defaults to action. */
   kind?: "action" | "toggle";
   /** Only meaningful for toggles. */
@@ -110,6 +112,7 @@ export function OrbSatellite({
     <View style={[styles.column, compact ? styles.columnCompact : null, style]}>
       <Pressable
         accessibilityLabel={accessibilityLabel ?? label}
+      accessibilityHint={accessibilityHint}
         accessibilityRole={toggle ? "switch" : "button"}
         accessibilityState={
           toggle ? { checked: !!active, disabled } : { disabled }

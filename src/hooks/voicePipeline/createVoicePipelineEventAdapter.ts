@@ -27,6 +27,7 @@ type EventAdapterParams = Pick<
   | "model"
   | "modelEffort"
   | "onAttachmentsAccepted"
+  | "onPromptSubmitted"
   | "player"
   | "provider"
   | "replyPlayback"
@@ -90,6 +91,7 @@ export function createVoicePipelineEventAdapter({
   model,
   modelEffort,
   onAttachmentsAccepted,
+  onPromptSubmitted,
   onError,
   player,
   playbackStartedRef,
@@ -275,6 +277,12 @@ export function createVoicePipelineEventAdapter({
       }
       setPipelinePhase("thinking-briefly");
       if (existingUserMessageId) {
+        const checkpoint = activeConversation?.messages.find(
+          (message) => message.id === existingUserMessageId && message.role === "user",
+        );
+        if (runConversationId && checkpoint) {
+          onPromptSubmitted?.(runConversationId, checkpoint);
+        }
         return runConversationId;
       }
       if (!activeConversation) {
@@ -296,6 +304,9 @@ export function createVoicePipelineEventAdapter({
         model: null,
         provider: null,
       });
+      if (runConversationId && userMessage) {
+        onPromptSubmitted?.(runConversationId, userMessage);
+      }
       messageState.lastUserMessageIdRef.current = userMessage?.id ?? null;
       if (userMessage && attachments?.length) {
         onAttachmentsAccepted?.(attachments.map((attachment) => attachment.id));

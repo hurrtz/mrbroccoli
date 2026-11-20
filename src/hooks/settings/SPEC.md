@@ -71,6 +71,11 @@ artifacts are preserved.
   preserving local STT/TTS choices; and
 - defaults for fields introduced after the stored snapshot was written.
 
+Automatic first-prompt naming defaults to enabled for new and existing
+settings. An explicit opt-out persists. The search provider and its Settings
+mode govern eligibility. A separate home switch pauses or resumes an eligible
+route without changing the provider selection.
+
 The normalized public shape is written forward after load when it differs from
 the stored JSON.
 
@@ -130,3 +135,7 @@ When `Settings` changes, review together:
 - [`normalizeStoredScalars.ts`](./normalizeStoredScalars.ts)
 - [`../../../__tests__/hooks/settingsStorage.test.ts`](../../../__tests__/hooks/settingsStorage.test.ts)
 - [`../../../__tests__/hooks/useSettingsNormalization.test.ts`](../../../__tests__/hooks/useSettingsNormalization.test.ts)
+
+Provider model aliases resolve to their canonical saved route. Direct Gemini 3.5
+and 3.7 Flash map to the exact successor that Google serves. Existing Scribe,
+Voxtral and OpenRouter snapshot selections retain the model chosen by the user.

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { generateConversationTitle } from "../../services/llm";
-import type { AppLanguage, Conversation, Provider } from "../../types";
+import type { AppLanguage, Conversation, Message, Provider } from "../../types";
 import type { useConversations } from "../../hooks/useConversations";
 import type { ShowToastFn, TranslateFn } from "./shared";
 
@@ -18,6 +18,8 @@ const CONVERSATION_TITLE_TIMEOUT_MS = 45_000;
 interface UseConversationTitleGeneratorParams {
   activeConversation: Conversation | null;
   apiKey: string;
+  autoNameConversations?: boolean;
+  claimFirstPrompt?: (id: string) => Promise<string | null>;
   language: AppLanguage;
   model: string;
   modelEffort?: string;
@@ -32,6 +34,8 @@ interface UseConversationTitleGeneratorParams {
 export function useConversationTitleGenerator({
   activeConversation,
   apiKey,
+  autoNameConversations = true,
+  claimFirstPrompt,
   language,
   model,
   modelEffort,
@@ -43,6 +47,7 @@ export function useConversationTitleGenerator({
   t,
 }: UseConversationTitleGeneratorParams) {
   const [isGeneratingTitle, setIsGeneratingTitle] = useState(false);
+  const automaticRequests = useRef(new Map<string, AbortController>());
   const requestRef = useRef<AbortController | null>(null);
   const activeConversationIdRef = useRef(activeConversation?.id ?? null);
 
@@ -52,6 +57,16 @@ export function useConversationTitleGenerator({
     requestRef.current = null;
     setIsGeneratingTitle(false);
   }, [activeConversation?.id]);
+
+  useEffect(() => {
+    const requests = automaticRequests.current;
+    return () => {
+      for (const request of requests.values()) {
+        request.abort();
+      }
+      requests.clear();
+    };
+  }, [autoNameConversations]);
 
   useEffect(
     () => () => {
@@ -88,6 +103,7 @@ export function useConversationTitleGenerator({
         return;
       }
 
+      automaticRequests.current.get(conversation.id)?.abort();
       requestRef.current?.abort();
       const request = new AbortController();
       let timedOut = false;
@@ -189,6 +205,75 @@ export function useConversationTitleGenerator({
       t,
     ],
   );
+
+  const handlePromptSubmitted = useCallback(
+    async (id: string, prompt: Message) => {
+      if (!claimFirstPrompt) return;
+      const request = new AbortController();
+      try {
+        // Consume the first dispatch even when naming is disabled for this session.
+        // A later prompt must leave an in-flight title request alone.
+        const titleClaim = claimFirstPrompt(id);
+        if (
+          !autoNameConversations ||
+          !providerReady ||
+          !prompt.content.trim() ||
+          automaticRequests.current.has(id)
+        ) {
+          await titleClaim;
+          return;
+        }
+
+        automaticRequests.current.set(id, request);
+        const expectedTitle = await titleClaim;
+        if (expectedTitle === null || request.signal.aborted) return;
+        const timeout = setTimeout(
+          () => request.abort(),
+          CONVERSATION_TITLE_TIMEOUT_MS,
+        );
+        try {
+          const title = await generateConversationTitle({
+            messages: [{ ...prompt, attachments: undefined }],
+            model,
+            modelEffort,
+            provider,
+            apiKey,
+            language,
+            abortSignal: request.signal,
+          });
+          if (!request.signal.aborted && title.trim()) {
+            await renameConversation(id, title, expectedTitle);
+          }
+        } finally {
+          clearTimeout(timeout);
+        }
+      } catch (error) {
+        if (!request.signal.aborted) {
+          recordDebugLogEvent({
+            event: "conversation-title-generation-failed",
+            level: "warn",
+            payload: { conversationId: id, error, model, provider },
+          });
+        }
+      } finally {
+        if (automaticRequests.current.get(id) === request) {
+          automaticRequests.current.delete(id);
+        }
+      }
+    },
+    [
+      apiKey,
+      autoNameConversations,
+      claimFirstPrompt,
+      language,
+      model,
+      modelEffort,
+      provider,
+      providerReady,
+      renameConversation,
+    ],
+  );
+
   const handleGenerateTitle = useCallback(
     () => handleGenerateTitleForConversation(),
     [handleGenerateTitleForConversation],
@@ -196,6 +281,7 @@ export function useConversationTitleGenerator({
 
   return {
     canGenerateTitle,
+    handlePromptSubmitted,
     handleGenerateTitle,
     handleGenerateTitleForConversation,
     isGeneratingTitle,

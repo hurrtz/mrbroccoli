@@ -203,6 +203,20 @@ export function AppSettingsPage({
 
       <SettingsGroup title={t("homeScreen")}>
         <SettingsRow
+          icon="edit"
+          label={t("autoNameConversations")}
+          supporting={t("autoNameConversationsHint")}
+          supportingLines={0}
+          control={
+            <Switch
+              testID="settings-auto-name"
+              label={t("autoNameConversations")}
+              value={settings.autoNameConversations}
+              onChange={(autoNameConversations) => onUpdate({ autoNameConversations })}
+            />
+          }
+        />
+        <SettingsRow
           icon="line-chart"
           label={t("usageStatsInTranscripts")}
           last

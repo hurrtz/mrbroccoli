@@ -11,6 +11,9 @@ the complete Play Store translations are kept in a dedicated file under
 ## Unreleased
 
 - Fixed an iOS 27 crash that closed the app immediately after launch.
+- Web Search on the home screen requires an enabled search provider in Settings.
+- New conversations get a title after their first prompt. Automatic titles can
+  be turned off in App settings. Manually entered titles take precedence.
 
 ## 4.2.0 - 2026-09-26
 

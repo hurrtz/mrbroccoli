@@ -6,6 +6,8 @@
  * short words, never a sentence.
  */
 const en = {
+  autoNameConversations: "Auto-name conversations",
+  autoNameConversationsHint: "Use the reply provider to name each new conversation once, after the first prompt.",
   workspaceRoutePickerTitle: "Answer the next turn with",
   workspaceNoMessagesYet: "No messages yet",
   workspaceImageLabel: "Image",
@@ -75,6 +77,8 @@ function settingsValues(
 export const workspaceTranslations = {
   en,
   ar: define({
+    autoNameConversations: "تسمية المحادثات تلقائيًا",
+    autoNameConversationsHint: "يضع مزوّد الردود اسمًا لكل محادثة جديدة مرة واحدة بعد طلبك الأول.",
     workspaceRoutePickerTitle: "الإجابة على الدور التالي بواسطة",
     workspaceNoMessagesYet: "لا رسائل بعد",
     workspaceImageLabel: "صورة",
@@ -110,6 +114,8 @@ export const workspaceTranslations = {
     threadUnarchived: "تم إلغاء أرشفة الجلسة.",
   }),
   cs: define({
+    autoNameConversations: "Automaticky pojmenovat konverzace",
+    autoNameConversationsHint: "Po prvním dotazu poskytovatel odpovědi jednou pojmenuje novou konverzaci.",
     workspaceRoutePickerTitle: "Na další tah odpoví",
     workspaceNoMessagesYet: "Zatím žádné zprávy",
     workspaceImageLabel: "Obrázek",
@@ -145,6 +151,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Relace byla obnovena z archivu.",
   }),
   de: define({
+    autoNameConversations: "Gespräche automatisch benennen",
+    autoNameConversationsHint: "Der Antwortanbieter benennt jedes neue Gespräch einmal nach der ersten Anfrage.",
     workspaceRoutePickerTitle: "Die nächste Runde beantwortet",
     workspaceNoMessagesYet: "Noch keine Nachrichten",
     workspaceImageLabel: "Bild",
@@ -180,6 +188,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sitzung dearchiviert.",
   }),
   es: define({
+    autoNameConversations: "Nombrar conversaciones automáticamente",
+    autoNameConversationsHint: "El proveedor de respuestas dará nombre a cada nueva conversación una vez, tras la primera consulta.",
     workspaceRoutePickerTitle: "Responder el próximo turno con",
     workspaceNoMessagesYet: "Aún no hay mensajes",
     workspaceImageLabel: "Imagen",
@@ -215,6 +225,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sesión desarchivada.",
   }),
   fr: define({
+    autoNameConversations: "Nommer automatiquement les conversations",
+    autoNameConversationsHint: "Le fournisseur de réponses nomme chaque nouvelle conversation une seule fois, après ta première demande.",
     workspaceRoutePickerTitle: "Répondre au prochain tour avec",
     workspaceNoMessagesYet: "Pas encore de messages",
     workspaceImageLabel: "Image",
@@ -250,6 +262,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Session désarchivée.",
   }),
   hi: define({
+    autoNameConversations: "बातचीत का नाम अपने आप रखें",
+    autoNameConversationsHint: "पहला सवाल भेजने के बाद जवाब देने वाला प्रदाता हर नई बातचीत का नाम एक बार रखता है।",
     workspaceRoutePickerTitle: "अगली बारी का जवाब देगा",
     workspaceNoMessagesYet: "अभी कोई संदेश नहीं",
     workspaceImageLabel: "छवि",
@@ -285,6 +299,8 @@ export const workspaceTranslations = {
     threadUnarchived: "सत्र संग्रह से निकाला गया।",
   }),
   hu: define({
+    autoNameConversations: "Beszélgetések automatikus elnevezése",
+    autoNameConversationsHint: "A válaszadó szolgáltató az első kérés után egyszer elnevez minden új beszélgetést.",
     workspaceRoutePickerTitle: "A következő kört válaszolja",
     workspaceNoMessagesYet: "Még nincs üzenet",
     workspaceImageLabel: "Kép",
@@ -320,6 +336,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Munkamenet visszaállítva az archívumból.",
   }),
   it: define({
+    autoNameConversations: "Assegna un nome alle conversazioni",
+    autoNameConversationsHint: "Il fornitore delle risposte assegna un nome a ogni nuova conversazione una sola volta, dopo la prima richiesta.",
     workspaceRoutePickerTitle: "Risponde al prossimo turno",
     workspaceNoMessagesYet: "Ancora nessun messaggio",
     workspaceImageLabel: "Immagine",
@@ -355,6 +373,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sessione rimossa dall’archivio.",
   }),
   ja: define({
+    autoNameConversations: "会話に自動で名前を付ける",
+    autoNameConversationsHint: "最初のリクエストの送信後、回答プロバイダーが新しい会話に一度だけ名前を付けます。",
     workspaceRoutePickerTitle: "次のターンに答えるのは",
     workspaceNoMessagesYet: "まだメッセージはありません",
     workspaceImageLabel: "画像",
@@ -390,6 +410,8 @@ export const workspaceTranslations = {
     threadUnarchived: "セッションのアーカイブを解除しました。",
   }),
   pl: define({
+    autoNameConversations: "Automatycznie nazywaj rozmowy",
+    autoNameConversationsHint: "Po pierwszym pytaniu dostawca odpowiedzi jednokrotnie nada nazwę każdej nowej rozmowie.",
     workspaceRoutePickerTitle: "Na następną turę odpowie",
     workspaceNoMessagesYet: "Brak wiadomości",
     workspaceImageLabel: "Obraz",
@@ -425,6 +447,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sesja została przywrócona z archiwum.",
   }),
   pt: define({
+    autoNameConversations: "Dar nomes às conversas automaticamente",
+    autoNameConversationsHint: "O fornecedor de respostas dá um nome a cada nova conversa uma vez, após o primeiro pedido.",
     workspaceRoutePickerTitle: "Responder ao próximo turno com",
     workspaceNoMessagesYet: "Ainda sem mensagens",
     workspaceImageLabel: "Imagem",
@@ -460,6 +484,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sessão desarquivada.",
   }),
   ptBR: define({
+    autoNameConversations: "Nomear conversas automaticamente",
+    autoNameConversationsHint: "O provedor de respostas dá um nome a cada nova conversa uma vez, depois da primeira solicitação.",
     workspaceRoutePickerTitle: "Responder o próximo turno com",
     workspaceNoMessagesYet: "Ainda sem mensagens",
     workspaceImageLabel: "Imagem",
@@ -495,6 +521,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sessão desarquivada.",
   }),
   ru: define({
+    autoNameConversations: "Автоматически называть беседы",
+    autoNameConversationsHint: "Сервис ответов даёт название каждой новой беседе один раз после первого запроса.",
     workspaceRoutePickerTitle: "На следующий ход ответит",
     workspaceNoMessagesYet: "Сообщений пока нет",
     workspaceImageLabel: "Фото",
@@ -530,6 +558,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Сеанс возвращён из архива.",
   }),
   sv: define({
+    autoNameConversations: "Namnge samtal automatiskt",
+    autoNameConversationsHint: "Svarstjänsten namnger varje nytt samtal en gång efter din första fråga.",
     workspaceRoutePickerTitle: "Nästa tur besvaras av",
     workspaceNoMessagesYet: "Inga meddelanden än",
     workspaceImageLabel: "Bild",
@@ -565,6 +595,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Sessionen har tagits bort från arkivet.",
   }),
   tr: define({
+    autoNameConversations: "Sohbetleri otomatik adlandır",
+    autoNameConversationsHint: "Yanıt sağlayıcısı ilk isteğinden sonra her yeni sohbete bir kez ad verir.",
     workspaceRoutePickerTitle: "Bir sonraki turu yanıtlayacak",
     workspaceNoMessagesYet: "Henüz mesaj yok",
     workspaceImageLabel: "Görsel",
@@ -600,6 +632,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Oturum arşivden çıkarıldı.",
   }),
   uk: define({
+    autoNameConversations: "Автоматично називати розмови",
+    autoNameConversationsHint: "Після першого запиту сервіс відповідей один раз дає назву кожній новій розмові.",
     workspaceRoutePickerTitle: "На наступний хід відповість",
     workspaceNoMessagesYet: "Повідомлень ще немає",
     workspaceImageLabel: "Фото",
@@ -635,6 +669,8 @@ export const workspaceTranslations = {
     threadUnarchived: "Сеанс повернуто з архіву.",
   }),
   ur: define({
+    autoNameConversations: "گفتگو کو خودکار نام دیں",
+    autoNameConversationsHint: "جواب فراہم کرنے والی سروس پہلی درخواست کے بعد ہر نئی گفتگو کو ایک بار نام دیتی ہے۔",
     workspaceRoutePickerTitle: "اگلی باری کا جواب دے گا",
     workspaceNoMessagesYet: "ابھی کوئی پیغام نہیں",
     workspaceImageLabel: "تصویر",
@@ -670,6 +706,8 @@ export const workspaceTranslations = {
     threadUnarchived: "سیشن محفوظ شدہ فہرست سے نکال دیا گیا۔",
   }),
   "zh-CN": define({
+    autoNameConversations: "自动为对话命名",
+    autoNameConversationsHint: "发送第一条提示词后，回答服务会为每个新对话命名一次。",
     workspaceRoutePickerTitle: "下一轮由谁来回答",
     workspaceNoMessagesYet: "暂无消息",
     workspaceImageLabel: "图片",

@@ -167,6 +167,8 @@ export function normalizeStoredScalarSettings(
   | "localTtsModelId"
   | "nativeSttRequiresOnDevice"
   | "nativeTtsVoiceId"
+  | "autoNameConversations"
+  | "homeWebSearchEnabled"
   | "showUsageStats"
   | "showDebugLogButton"
   | "pastConversationKnowledgeEnabled"
@@ -296,6 +298,14 @@ export function normalizeStoredScalarSettings(
       typeof storedSettings?.nativeTtsVoiceId === "string"
         ? storedSettings.nativeTtsVoiceId
         : DEFAULT_SETTINGS.nativeTtsVoiceId,
+    autoNameConversations: getStoredBoolean(
+      storedSettings?.autoNameConversations,
+      DEFAULT_SETTINGS.autoNameConversations,
+    ),
+    homeWebSearchEnabled: getStoredBoolean(
+      storedSettings?.homeWebSearchEnabled,
+      DEFAULT_SETTINGS.homeWebSearchEnabled,
+    ),
     showUsageStats: getStoredBoolean(
       storedSettings?.showUsageStats,
       DEFAULT_SETTINGS.showUsageStats,
