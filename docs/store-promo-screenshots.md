@@ -72,6 +72,31 @@ checkout.
 The app requires iOS 16.4, so 4-inch and 3.5-inch devices cannot produce genuine
 native screenshots. Let App Store Connect derive those legacy sizes.
 
+### iPhone Duo and App Store artwork
+
+Use the iPhone Duo simulator with iOS 27.1 or later and the isolated
+`.maestro` app. Load the localized conversation fixture used by the iOS
+promo flow. In Device Hub, select Closed for the phone view and Open for
+the inner display. Rotate the open device to capture both layouts. Use
+`xcrun simctl io <udid> enumerate` to identify the active display and
+`xcrun simctl io <udid> screenshot --display=<display> <file.png>` to
+capture it. Export opaque RGB PNGs, preserving the captured pixels.
+
+| Screenshot | Pixels | Visible content |
+| --- | --- | --- |
+| Closed portrait | 1398 × 2034 | Phone workspace |
+| Open landscape | 2853 × 2007 | Input and transcript side by side |
+| Open portrait | 2007 × 2853 | Conversations sidebar and input |
+
+Place the three screenshots in the localization’s iPhone Duo group in
+Asset Library. Regional localizations can reuse the same image when their
+in-app language matches. A single opaque 5244 × 2950 PNG can serve both
+the product page header and search results. The universal template’s
+1402 × 962 safe area starts at (1921, 660). Read back both placements
+on the draft version after assigning the artwork.
+[Apple screenshot sizes](https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/)
+and [creative asset specifications](https://developer.apple.com/help/app-store-connect/reference/app-information/creative-assets-specifications/).
+
 Both commands capture `light` and `dark` by default. Pass
 `--color-scheme light` or `--color-scheme dark` directly to the npm runner when
 only one review set is needed.
@@ -209,9 +234,10 @@ After validating the complete plan, the exporter replaces the generated
 Fastlane configuration intact while preventing retired campaign panels,
 locales, or changelogs from leaking into a later upload.
 
-**Decision:** only the sizes a store cannot derive are exported — iPhone 6.9"
-and 13" iPad for Apple, phone for Play. Apple generates every other iPhone size
-from the 6.9" set, so exporting 6.1", 6.3", 6.5" or 4.7" would upload hundreds
+**Decision:** the Fastlane gallery exports iPhone 6.9", 13" iPad, and Android
+phone. Asset Library manages the dedicated Duo screenshots and header/search
+artwork. Apple derives legacy iPhone sizes from the 6.9" set, so exporting
+6.1", 6.3", 6.5" or 4.7" would upload hundreds
 of files to reproduce what App Store Connect produces for free, and each one
 would then need regenerating whenever copy changes. Change `APPLE_PROFILES` or
 `PLAY_PROFILES` in the exporter if a store's behaviour changes.

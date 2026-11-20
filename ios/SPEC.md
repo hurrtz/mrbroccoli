@@ -130,6 +130,10 @@ or deliver them.
   them.
 - Store-promo automation builds the `.maestro` identity and captures
   deterministic localized states without provider calls.
+- Duo store screenshots come from its simulator’s outer and inner displays.
+  The open portrait capture shows the sidebar and the open landscape capture
+  shows both input and transcript. The two store artwork placements can share
+  one language-neutral universal image.
 - Xcode signing and App Store processing remain external distribution evidence;
   a simulator build is not a substitute.
 
