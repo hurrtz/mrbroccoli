@@ -6,6 +6,7 @@ import {
 import type { ReactNode } from "react";
 import { Colors } from "../../../theme/colors";
 import { TranslateFn } from "../shared";
+import type { OrbActivity } from "../statusSelectors";
 import type { OrbTurnProgress } from "../useOrbTurnProgress";
 
 export type InputSurface = "voice" | "text";
@@ -54,12 +55,13 @@ export interface VoiceTextInputPagerProps {
   rtl?: boolean;
   showTransportLabels?: boolean;
   phaseTimingProgress?: VoiceTimingProgress | null;
-  speechStartProgress?: VoiceTimingProgress | null;
+  processingProgress?: VoiceTimingProgress | null;
   /**
    * The orb slot — 196 in portrait, 150 in landscape. Portrait follows the
    * approved fixed-size exploration; landscape measures its tighter pane.
    */
   maxOrbSize: number;
+  activity?: OrbActivity;
   statusLabel: string;
   t: TranslateFn;
   transportLabels: {

@@ -10,6 +10,16 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     width: "100%",
     gap: 2,
   },
+  activity: {
+    alignItems: "center",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    columnGap: 6,
+    minHeight: 24,
+  },
+  activityText: { ...textStyles.body, flexShrink: 1, textAlign: "center" },
+  activityTimer: { ...textStyles.body, fontVariant: ["tabular-nums"] },
   rootWithFooter: {
     justifyContent: "center",
   },

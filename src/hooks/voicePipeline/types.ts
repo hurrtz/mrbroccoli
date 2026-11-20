@@ -3,6 +3,7 @@ import type {
   WebSearchProvider,
   WebSearchProviderSettings,
 } from "../../constants/webSearch";
+import type { SpeechTransferStage } from "../../services/voicePipeline/types";
 import type { TranslationKey } from "../../i18n";
 import type {
   AppLanguage,
@@ -148,7 +149,13 @@ export interface UseVoicePipelineParams {
   onAttachmentsAccepted?: (attachmentIds: string[]) => void;
 }
 
+export interface SpeechTransfer {
+  stage: SpeechTransferStage;
+  provider: Provider;
+}
+
 export interface UseVoicePipelineResult {
+  speechTransfer: SpeechTransfer | null;
   councilProgress: CouncilProgress | null;
   pipelinePhase: PipelinePhase;
   setPipelinePhase: (phase: PipelinePhase) => void;

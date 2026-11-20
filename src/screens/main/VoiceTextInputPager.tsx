@@ -1,6 +1,9 @@
-import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import React from "react";
 import { AccessibilityInfo, Text, TouchableOpacity, View } from "react-native";
+
+import { ProviderIcon } from "../../components/ProviderIcon";
+import { PROVIDER_LABELS } from "../../constants/models";
+import { PhosphorIcon } from "../../design-system/PhosphorIcon";
 import {
   fitOrbTransportSize,
   getOrbTransportLayout,
@@ -13,6 +16,15 @@ import { VoiceTextInputPagerProps } from "./voiceTextInputPager/types";
 import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager";
 
 export type { InputSurface } from "./voiceTextInputPager/types";
+
+function formatCountdown(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const rest = String(seconds % 60).padStart(2, "0");
+  return hours
+    ? `${hours}:${String(minutes).padStart(2, "0")}:${rest}`
+    : `${minutes}:${rest}`;
+}
 
 export function VoiceTextInputPager({
   colors,
@@ -50,9 +62,10 @@ export function VoiceTextInputPager({
   rtl = false,
   showTransportLabels = true,
   phaseTimingProgress,
-  speechStartProgress,
+  processingProgress,
   maxOrbSize,
   statusLabel,
+  activity,
   t,
   transportLabels,
   visualPhase,
@@ -88,7 +101,7 @@ export function VoiceTextInputPager({
     readingProgressTiming,
     recordingMaxMs,
     recordingStartedAtMs: recordingStartedAtMs ?? null,
-    speechStartProgress: speechStartProgress ?? null,
+    processingProgress: processingProgress ?? null,
     visualPhase,
   });
   const progress = orbProgressOverride ?? derivedProgress;
@@ -105,16 +118,29 @@ export function VoiceTextInputPager({
     compactPromptNotice &&
     Boolean(onResolvePromptBlock) &&
     promptBlockedActionEnabled;
-  // Announce phase boundaries, not animation frames — the orb replaces the
-  // bar that used to own this announcement.
-  const previousVisualPhase = React.useRef(visualPhase);
+  const provider = activity?.provider;
+  const readyToListen = !promptBlockedMessage && !voiceInputUnavailableMessage;
+  const statusText =
+    visualPhase === "idle" && !readyToListen ? null : activity?.label;
+  const providerName = provider ? PROVIDER_LABELS[provider] : "";
+  const spokenStatus = activity?.providerAfterLabel
+    ? [statusText, providerName].filter(Boolean).join(" ")
+    : [providerName, statusText].filter(Boolean).join(" ");
+  const previousStatus = React.useRef(spokenStatus || statusLabel);
   React.useEffect(() => {
-    if (previousVisualPhase.current === visualPhase) {
-      return;
+    const announcement = spokenStatus || statusLabel;
+    if (previousStatus.current !== announcement) {
+      previousStatus.current = announcement;
+      AccessibilityInfo.announceForAccessibility(announcement);
     }
-    previousVisualPhase.current = visualPhase;
-    AccessibilityInfo.announceForAccessibility(statusLabel);
-  }, [statusLabel, visualPhase]);
+  }, [spokenStatus, statusLabel]);
+  const recordingTime = progress.recordingSecondsLeft;
+  const timeLabel = recordingTime === undefined
+    ? null
+    : t("orbTimeRemaining", { time: formatCountdown(recordingTime) });
+  const providerIcon = provider ? (
+    <ProviderIcon provider={provider} color={colors.text} size="compact" />
+  ) : null;
 
   const handleViewportLayout = (
     event: Parameters<typeof pager.handleLayout>[0],
@@ -134,6 +160,25 @@ export function VoiceTextInputPager({
       style={[styles.root, footer ? styles.rootWithFooter : null]}
       testID="voice-text-input-stage"
     >
+      {statusText && (isActive || pager.activeSurface === "voice") ? (
+        <View
+          accessible
+          accessibilityLabel={[spokenStatus, timeLabel].filter(Boolean).join(" · ")}
+          style={styles.activity}
+          testID="orb-activity"
+        >
+          {!activity?.providerAfterLabel && providerIcon}
+          <Text style={[styles.activityText, { color: colors.text }]}>
+            {statusText}
+          </Text>
+          {activity?.providerAfterLabel && providerIcon}
+          {timeLabel && (
+            <Text style={[styles.activityTimer, { color: colors.textSecondary }]}>
+              {timeLabel}
+            </Text>
+          )}
+        </View>
+      ) : null}
       <View
         testID="voice-text-input-viewport"
         onLayout={handleViewportLayout}

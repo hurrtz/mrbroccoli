@@ -65,6 +65,9 @@ framework or hiding platform behavior behind excessive abstraction.
 - `VoiceOrb` normally presents the phase action glyph. During Hands-free
   post-speech silence it may replace that glyph with the tabular countdown
   number while retaining the same measured circular core and progress ring.
+  The first and overtime laps both start at twelve o’clock and move clockwise.
+  Red overlays the completed ink on the second lap. Pausing retains the reading
+  arc, and the primary glyph becomes Play.
 - `PhosphorIcon.tsx` is the application glyph boundary and maps semantic sizes
   to Phosphor's regular-weight icons.
 - `AppFontProvider.tsx` owns app-font loading and the typography provider.
@@ -76,12 +79,11 @@ framework or hiding platform behavior behind excessive abstraction.
 
 - `VoiceOrb` is the stable home-stage affordance, including blocked states; it
   must not be exchanged for a legacy full-width CTA. One continuous
-  double-width ring represents the recording window, the whole-turn estimate
-  from submission to first speech, or spoken-reply read position, with a track
-  plus red counter-clockwise tail after the turn estimate. Interpolation belongs on the
-  Reanimated UI thread so streamed-content renders cannot reduce ring frame
-  rate; callers provide semantic values and remaining durations, never a JS
-  animation interval. A timing may target a measured boundary short of one, so
+  double-width ring represents the recording window, time to first speech or
+  text-only completion, and spoken-reply position. After the estimate the
+  full dark ring stays visible. A second red lap starts at twelve o’clock and
+  runs clockwise. Reanimated interpolates estimated turn and clip times on
+  the UI thread. Recording publishes the measured time remaining each second. A timing may target a measured boundary short of one, so
   speaking can interpolate within the current clip without claiming an
   incomplete reply is finished. Its approved anatomy is core disc, one
   screen-coloured gap, and one thick ring; adjacent SVG strokes must never be

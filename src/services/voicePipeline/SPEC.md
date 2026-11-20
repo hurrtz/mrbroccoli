@@ -144,6 +144,11 @@ participant call.
 
 ## Response and Speech
 
+When provider speech is used, the transport reports request start and audio
+response headers for the active request. Home uses these stages and the
+provider selected for that turn or replay to describe speech preparation.
+A cached or local clip uses the preparation state until playback starts.
+
 The final response uses hosted `streamChat`. Local response generation is not
 part of this pipeline. Stream chunks update the transcript only after the
 context-leak guard accepts them.

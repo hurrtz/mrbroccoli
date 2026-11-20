@@ -1,12 +1,14 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 import { useReplyReplayController } from "./voicePipeline/useReplyReplayController";
 import { useVoiceCaptureHandler } from "./voicePipeline/useVoiceCaptureHandler";
 import { useVoiceLiveActivity } from "./voicePipeline/useVoiceLiveActivity";
+import type { SpeechTransferStage } from "../services/voicePipeline/types";
 import type { CouncilProgress } from "../services/ulraMode";
 import type { VoicePhaseProgress } from "../types";
 import type {
   PipelinePhase,
+  SpeechTransfer,
   UseVoicePipelineParams,
   UseVoicePipelineResult,
 } from "./voicePipeline/types";
@@ -22,6 +24,18 @@ export type {
 export function useVoicePipeline(
   params: UseVoicePipelineParams,
 ): UseVoicePipelineResult {
+  const [speechTransfer, setSpeechTransfer] = useState<SpeechTransfer | null>(
+    null,
+  );
+  const ttsProvider = params.ttsProvider;
+  const reportSpeechTransfer = useCallback(
+    (stage: SpeechTransferStage | null) => {
+      setSpeechTransfer(
+        stage && ttsProvider ? { stage, provider: ttsProvider } : null,
+      );
+    },
+    [ttsProvider],
+  );
   const [pipelinePhase, setPipelinePhase] = useState<PipelinePhase>("idle");
   const [streamingText, setStreamingText] = useState("");
   const [phaseProgress, setPhaseProgress] = useState<VoicePhaseProgress | null>(
@@ -51,6 +65,7 @@ export function useVoicePipeline(
   } = useReplyReplayController({
     activeConversation: params.activeConversation,
     updateMessage: params.updateMessage,
+    onSpeechTransfer: reportSpeechTransfer,
     isBusy,
     isRecording: params.isRecording,
     language: params.language,
@@ -72,6 +87,7 @@ export function useVoicePipeline(
   });
 
   const { handleVoiceCaptureDone } = useVoiceCaptureHandler({
+    onSpeechTransfer: reportSpeechTransfer,
     ...params,
     abortRef,
     handleRepeatLastReply,
@@ -84,6 +100,7 @@ export function useVoicePipeline(
   });
 
   return {
+    speechTransfer,
     councilProgress,
     pipelinePhase,
     setPipelinePhase,

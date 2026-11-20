@@ -124,12 +124,12 @@ describe("getMainScreenViewModel", () => {
     expect(viewModel.isActive).toBe(true);
   });
 
-  it("keeps paused playback in the speaking visual state", () => {
+  it.each(["speaking", "idle"] as const)("keeps paused playback visible after the pipeline becomes %s", (pipelinePhase) => {
     const viewModel = getMainScreenViewModel({
       activeConversation: null,
       isRecording: false,
       model: "gpt-5.4",
-      pipelinePhase: "speaking",
+      pipelinePhase,
       player: {
         isActivelyPlaying: false,
         isPlaybackPaused: true,
@@ -143,6 +143,75 @@ describe("getMainScreenViewModel", () => {
     });
 
     expect(viewModel.visualPhase).toBe("speaking");
+  });
+
+  it("shows the provider actually transferring fallback audio for a local primary", () => {
+    const view = getMainScreenViewModel({
+      activeConversation: null,
+      isRecording: false,
+      model: "gpt-5.4",
+      pipelinePhase: "synthesizing",
+      player: {
+        isActivelyPlaying: false,
+        isPlaybackPaused: false,
+        isPlaying: false,
+      },
+      provider: "openai",
+      settings: { ...DEFAULT_SETTINGS, ttsMode: "kokoro" },
+      speechTransfer: { stage: "receiving-audio", provider: "gemini" },
+      streamingText: "",
+      t,
+      ttsProvider: "openai",
+    });
+    expect(view.activity).toMatchObject({
+      label: "orbSendingAudio",
+      provider: "gemini",
+    });
+  });
+
+  it("uses the captured STT provider and the active Council synthesizer across settings changes", () => {
+    const base = {
+      activeConversation: null,
+      isRecording: false,
+      model: "gpt-5.4",
+      player: {
+        isActivelyPlaying: false,
+        isPlaybackPaused: false,
+        isPlaying: false,
+      },
+      provider: "openai" as const,
+      settings: {
+        ...DEFAULT_SETTINGS,
+        sttMode: "provider" as const,
+        sttProvider: "gemini" as const,
+      },
+      streamingText: "",
+      t,
+      ttsProvider: null,
+    };
+    const progress = {
+      startedAt: 10,
+      progress: 0,
+      elapsedMs: 0,
+      estimatedMs: 100,
+      sampleCount: 0,
+      learned: false,
+      overEstimate: false,
+      provider: "openai" as const,
+    };
+    const stt = getMainScreenViewModel({
+      ...base,
+      pipelinePhase: "transcribing",
+      phaseProgress: { ...progress, phase: "transcribing" },
+    });
+    expect(stt.activity.provider).toBe("openai");
+    const council = getMainScreenViewModel({
+      ...base,
+      pipelinePhase: "thinking",
+      phaseProgress: { ...progress, phase: "thinking" },
+      replyProvider: "anthropic",
+    });
+    expect(council.activity.provider).toBe("anthropic");
   });
 
   it("keeps deterministic fixture phase and status presentation aligned", () => {

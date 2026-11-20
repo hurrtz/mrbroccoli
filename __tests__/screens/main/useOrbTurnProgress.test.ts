@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react-native";
+import { act, renderHook } from "@testing-library/react-native";
 
 import { useOrbTurnProgress } from "../../../src/screens/main/useOrbTurnProgress";
 
@@ -13,7 +13,7 @@ describe("useOrbTurnProgress", () => {
         phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
-        speechStartProgress: null,
+        processingProgress: null,
         visualPhase: "idle",
       }),
     );
@@ -33,7 +33,7 @@ describe("useOrbTurnProgress", () => {
         phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: 15_000,
-        speechStartProgress: null,
+        processingProgress: null,
         visualPhase: "recording",
       }),
     );
@@ -41,7 +41,22 @@ describe("useOrbTurnProgress", () => {
     expect(result.current.phaseProgress).toBeCloseTo(0.5);
     expect(result.current.turnProgress).toBe(0);
     expect(result.current.overtime).toBe(0);
-    expect(result.current.phaseProgressTiming).toEqual({ durationMs: 5_000 });
+    expect(result.current.recordingSecondsLeft).toBe(5);
+  });
+
+  it("updates elapsed recording progress even with no new native events", () => {
+    jest.useFakeTimers({ now: 10_000 });
+    try {
+      const { result, unmount } = renderHook(() => useOrbTurnProgress({
+        phaseTimingProgress: null, recordingMaxMs: 900_000,
+        recordingStartedAtMs: 10_000, processingProgress: null, visualPhase: "recording",
+      }));
+      act(() => { jest.advanceTimersByTime(180_000); });
+      expect(result.current.phaseProgress).toBeCloseTo(0.2);
+      unmount();
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   it("tracks the whole turn against the speech-start estimate", () => {
@@ -60,7 +75,7 @@ describe("useOrbTurnProgress", () => {
         },
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
-        speechStartProgress: {
+        processingProgress: {
           elapsedMs: 5_000,
           estimatedMs: 10_000,
           learned: true,
@@ -92,7 +107,7 @@ describe("useOrbTurnProgress", () => {
         phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
-        speechStartProgress: {
+        processingProgress: {
           elapsedMs: 15_000,
           estimatedMs: 10_000,
           learned: true,
@@ -116,7 +131,7 @@ describe("useOrbTurnProgress", () => {
         phaseTimingProgress: null,
         recordingMaxMs: 10_000,
         recordingStartedAtMs: null,
-        speechStartProgress: null,
+        processingProgress: null,
         visualPhase: "speaking",
       }),
     );
@@ -136,7 +151,7 @@ describe("useOrbTurnProgress", () => {
           ...props,
           recordingMaxMs: 10_000,
           recordingStartedAtMs: null,
-          speechStartProgress: null,
+          processingProgress: null,
           visualPhase: "speaking",
         }),
       {

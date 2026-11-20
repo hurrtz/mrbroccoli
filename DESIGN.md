@@ -190,6 +190,12 @@ boundary avoids scattering compatibility defaults through UI and service code.
 
 ## Conversation Structure
 
+A new session carries a one-use first-prompt marker. On submission, the
+conversation store claims it before a background title request can start.
+The title request uses the initial text and the selected reply route. A
+conditional rename protects a title edited while the request was in flight.
+The marker stays local to its original session.
+
 Conversation metadata is loaded first for fast drawers and search. Full records
 hydrate lazily. Each record owns messages, per-conversation overrides, summary,
 branch origin, lock and archive state, usage events, and knowledge
@@ -250,6 +256,11 @@ curated fallbacks. Actual-route metadata is retained so fallback never becomes
 invisible.
 
 ## Speech Design
+
+Capture arms its auto-submit timer and publishes its start and duration
+together. The workspace reads that deadline for both the ring and remaining
+time. Provider speech transfers report request dispatch and successful
+response headers. Playback and pause take precedence once audio is playing.
 
 Gemini dedicated recorded transcription uses inline Interactions audio with
 resource storage disabled; it creates no provider Files API resource. General

@@ -74,14 +74,22 @@ export function useLatencyProgressController({
       return;
     }
 
+    const current = snapshotProgress(active);
+    const overall =
+      activePhase && activeTurn ? snapshotProgress(activeTurn) : undefined;
+    const speechStart = activeSpeechStart
+      ? snapshotProgress(activeSpeechStart)
+      : undefined;
     setPhaseProgress({
       phase: active.phase,
-      ...snapshotProgress(active),
-      overall:
-        activePhase && activeTurn ? snapshotProgress(activeTurn) : undefined,
-      speechStart: activeSpeechStart
-        ? snapshotProgress(activeSpeechStart)
-        : undefined,
+      ...current,
+      provider: active.descriptor.provider,
+      overall,
+      speechStart,
+      processing:
+        activeTurn?.descriptor.spokenRepliesEnabled === false
+          ? (overall ?? current)
+          : speechStart,
     });
   }, [setPhaseProgress]);
 

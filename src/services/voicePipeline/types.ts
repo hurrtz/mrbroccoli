@@ -27,7 +27,10 @@ import type {
   LocalTtsModelId,
 } from "../../constants/localModels";
 
+export type SpeechTransferStage = "sending-text" | "receiving-audio";
+
 export interface PipelineCallbacks {
+  onSpeechTransfer?: (stage: SpeechTransferStage | null) => void;
   onTranscription: (text: string) => string | null | void;
   onContextSummary?: (
     summary: string,

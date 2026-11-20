@@ -226,20 +226,22 @@ collapses the explanatory paragraph for the remainder of that dialog opening;
 the compact form then fits its fields and footer without the body's overflow
 crossing the action area.
 
-`useOrbTurnProgress` takes one clock snapshot whenever semantic voice state
-changes, then supplies the remaining linear durations to `VoiceOrb`. The orb
-uses one Reanimated UI-thread clock for the recording cap, the learned
-route-specific submission-to-first-speech estimate, spoken-clip interpolation,
-and late-tail progress. Per-processing-phase timing remains diagnostic input
-but is deliberately absent from the visual. The single thick ring stays smooth
-while streamed text updates compete on the JS thread and cannot expose a seam
-between adjacent bands.
-Speaking supplies a measured target short of one when only the current clip is
-known; clip starts and stream growth correct that target without making the
-animation a source of playback truth. The estimated deadline swaps completed
-ink for the approved track plus red tail without a JS timer. Pausing cancels
-the active interpolation while preserving the shared value; resuming restarts
-only the remaining distance.
+`useVoiceCaptureLifecycle` publishes the same start time and duration it uses
+for automatic submission. During recording, `useOrbTurnProgress` samples
+elapsed wall time once per second, including time spent in the background.
+The deadline respects the provider's recording duration and upload limits.
+
+During processing, the orb animates the submission-to-first-speech estimate
+on the UI thread. When it expires, the completed ink remains visible under a
+clockwise red second lap. During playback the reel supplies paragraph weights
+and the next clip boundary. Pausing freezes the current interpolation and
+resuming covers only the remaining distance. The player owns the paused state
+even after the network pipeline returns to idle.
+
+The status line uses the active Council or reply participant, search route,
+speech route and player state. Provider speech begins reporting transfers only
+when a request goes to the network. Native synthesis and cached audio use the
+local preparation and playback states.
 
 The isolated `.maestro` screenshot identity may replace the visual phase and
 ring fractions with validated deterministic values. That override enters

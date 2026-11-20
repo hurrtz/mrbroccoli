@@ -105,10 +105,11 @@ describe("TranscriptPreviewCard", () => {
     jest.restoreAllMocks();
   });
 
-  it("keeps message actions without duplicating sheet or workspace controls", () => {
+  it.each([0, 34])("keeps transcript actions visible with a %i-point inset", (bottomInset) => {
     const screen = render(
       <TranscriptPreviewCard
         activeConversationId="conversation-1"
+        bottomInset={bottomInset}
         colors={lightColors}
         messages={[
           {
@@ -155,7 +156,7 @@ describe("TranscriptPreviewCard", () => {
       ),
     ).toEqual(
       expect.objectContaining({
-        paddingBottom: 24,
+        paddingBottom: bottomInset || 8,
         paddingHorizontal: 0,
         paddingTop: 6,
       }),

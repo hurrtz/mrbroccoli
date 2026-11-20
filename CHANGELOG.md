@@ -10,10 +10,28 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+- Added GPT-6.2 Astra and Sol, Claude Fable 5.2, Qwen4-Max, four Gemini 4
+  models, Mistral Large 4, and 15 OpenRouter snapshots including Kimi K3.1 Pro.
+  Recorded transcription gains Scribe v3 and Voxtral 3. Spoken replies gain
+  Voxtral TTS 3 and Eleven v4 and v4 Turbo.
+
 - Fixed an iOS 27 crash that closed the app immediately after launch.
+- The home button shows the active provider and voice activity. Recording shows
+  the time left until auto-send. The red overtime lap starts at twelve o’clock
+  over the completed first lap, and paused speech keeps its position and Play control.
 - Web Search on the home screen requires an enabled search provider in Settings.
 - New conversations get a title after their first prompt. Automatic titles can
   be turned off in App settings. Manually entered titles take precedence.
+- Conversation settings use the full sheet width and scroll to the bottom.
+  The transcript has a smaller bottom inset, and Council replies show their
+  contributing providers in the conversation list.
+- Retrying speech removes the old failure and its actions from the affected reply.
+  Switching speech providers takes effect on retry.
+- Fixed recovery of locked and branched conversations, encrypted backups and
+  interrupted file operations. Saving a message now updates just its conversation.
+- Fixed interrupted native dictation, speech queue handoffs, remote controls and
+  device-specific speech model checks. Turn receipts and connection checks now
+  report the requests and outputs the app actually used.
 
 ## 4.2.0 - 2026-09-26
 

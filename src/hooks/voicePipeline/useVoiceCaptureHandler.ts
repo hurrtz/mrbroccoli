@@ -1,3 +1,4 @@
+import type { PipelineCallbacks } from "../../services/voicePipeline/types";
 import { useCallback, useRef, type Dispatch, type SetStateAction } from "react";
 
 import {
@@ -30,6 +31,7 @@ type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
     messageId?: string,
   ) => Promise<void>;
   lastCompletedReplyRef: React.MutableRefObject<string>;
+  onSpeechTransfer?: PipelineCallbacks["onSpeechTransfer"];
   onReplyCompleted: () => void;
   setCouncilProgress: Dispatch<SetStateAction<CouncilProgress | null>>;
   setPhaseProgress: Dispatch<SetStateAction<VoicePhaseProgress | null>>;
@@ -54,6 +56,7 @@ export function useVoiceCaptureHandler({
   onAttachmentsAccepted,
   onPromptSubmitted,
   onReplyCompleted,
+  onSpeechTransfer,
   player,
   provider,
   providerApiKey,
@@ -163,6 +166,7 @@ export function useVoiceCaptureHandler({
       const conversationForRun = conversationOverride ?? activeConversation;
 
       setCouncilProgress(null);
+      onSpeechTransfer?.(null);
       prepareCaptureForTurn(audioUri);
       if (previousAbortController) {
         await player.stopPlayback();
@@ -265,6 +269,7 @@ export function useVoiceCaptureHandler({
         onAttachmentsAccepted,
         onPromptSubmitted,
         onError: errorHandlers.handlePipelineError,
+        onSpeechTransfer,
         player,
         playbackStartedRef,
         producedAudioRef,
@@ -434,6 +439,7 @@ export function useVoiceCaptureHandler({
         clearLatencyProgress();
         cancelStreamingRender(streamingRenderRunId);
         setCouncilProgress(null);
+        onSpeechTransfer?.(null);
         setStreamingText("");
         setPipelinePhase("idle");
         if (completedSuccessfully) {
@@ -478,6 +484,7 @@ export function useVoiceCaptureHandler({
       onAttachmentsAccepted,
       onPromptSubmitted,
       onReplyCompleted,
+      onSpeechTransfer,
       persistPendingNoticesForUser,
       player,
       provider,

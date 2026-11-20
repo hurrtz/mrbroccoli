@@ -1,3 +1,4 @@
+import type { PipelineCallbacks } from "../../services/voicePipeline/types";
 import { useCallback, useRef, useState } from "react";
 
 import { createVoicePipelineTtsQueue } from "../../services/voicePipeline/ttsQueue";
@@ -29,6 +30,7 @@ type ReplayControllerParams = Pick<
   | "ttsProvider"
 > & {
   isBusy: boolean;
+  onSpeechTransfer?: PipelineCallbacks["onSpeechTransfer"];
   lastCompletedReplyRef: React.MutableRefObject<string>;
   player: AudioPlayer;
 };
@@ -41,6 +43,7 @@ export function useReplyReplayController({
   activeConversation,
   updateMessage,
   isBusy,
+  onSpeechTransfer,
   isRecording,
   language,
   lastCompletedReplyRef,
@@ -89,6 +92,7 @@ export function useReplyReplayController({
       const replayAbortController = new AbortController();
       replayAbortRef.current = replayAbortController;
       setActiveReplayMessageId(messageId ?? null);
+      onSpeechTransfer?.(null);
       setReplayPhase("preparing");
 
       const conversation = conversationRef.current;
@@ -157,6 +161,11 @@ export function useReplyReplayController({
           callbacks: {
             onTranscription: () => undefined,
             onChunk: () => undefined,
+            onSpeechTransfer: (stage) => {
+              if (replaySessionRef.current === replaySession && !replayAbortController.signal.aborted) {
+                onSpeechTransfer?.(stage);
+              }
+            },
             onResponseDone: () => undefined,
             onAudioReady: (audioUri, diagnostics, chunk) => {
               if (replaySessionRef.current !== replaySession) {
@@ -249,6 +258,7 @@ export function useReplyReplayController({
     },
     [
       updateMessage,
+      onSpeechTransfer,
       language,
       player,
       selectedTtsModel,

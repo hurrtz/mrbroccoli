@@ -35,8 +35,9 @@ receive already-derived state and callbacks.
   always represents the current voice phase: idle, recording, transcribing,
   brief thinking, searching, thinking, synthesizing, or speaking. One thick
   continuous ring says one thing at a time: the recording window, the complete
-  turn from submission to first speech, then the spoken reply's read position.
-  Individual processing-phase estimates are not visualized. Past the turn
+  turn from submission to first speech or text-only completion, then the
+  spoken reply's read position. Individual processing-phase estimates are
+  not visualized. Past the turn
   estimate the ring fills with red. Pausing speech preserves the measured read
   position and holds its interpolation until playback resumes. The gap between
   the core disc and the ring is only ever a gap: the screen reads through it in
@@ -163,14 +164,18 @@ receive already-derived state and callbacks.
   voice preview while a reply is paused also performs that full teardown before
   preview audio begins; an unpaused reply or any earlier turn phase remains
   protected from preview interruption.
-- **Decision:** the workspace carries no status line and no session-details
-  sheet. The orb states the phase visually and announces every phase change to
-  assistive technology, the route byline names the response route, the
-  transcript handle names only the surface it opens, and Settings owns the
-  route summary — a permanent row restating all of that was chrome between the
-  satellites and the transcript. Rejected alternative: moving its info control
-  onto the handle or the top bar, which would have kept a surface whose content
-  is available in two other places.
+- A localized line above the orb describes the active operation. An icon
+  identifies the provider doing the work. It follows recording, transcription,
+  search, prompt submission, model thinking and streaming, speech transfer,
+  playback, and pause. Recording also shows the time left until auto-send.
+  Screen readers announce changes of activity without announcing every tick.
+- The processing ring uses the running turn’s output mode. Spoken replies use
+  the time to first speech, and text-only replies use the time to completion.
+  A configured cloud speech fallback shows the provider actually transferring
+  audio even when the primary speech route is local.
+- Processing starts its clockwise ring at twelve o’clock. Overtime draws a
+  second red lap from the same point over the completed first lap. Paused
+  playback keeps the reading arc and shows Play, including transcript replay.
 - The transcript remains the durable record. Streaming text may be projected as
   a temporary assistant message, but only persisted messages become history.
   It reads as one continuous script with a fixed speaker margin, provider or
@@ -250,8 +255,9 @@ receive already-derived state and callbacks.
   an unusable voice route from a prompt block, which stops both routes.
 - Controls that cannot be used at all stay visible but disabled when they are
   part of the fixed home-stage composition: Web Search without a configured
-  provider and image attachment on a route that cannot accept one. Their
-  accessibility label states why, and Settings owns the remedy. Controls that
+  and enabled provider and image attachment on a route that cannot accept one.
+  These controls expose their unavailable state to assistive technology, and
+  the Web Search hint directs the user to Settings. Controls that
   are only briefly unavailable, such as during an active turn, also stay
   visible and disabled.
 - The satellites — Image, Model Council, Web Search, and Hands free — sit in
@@ -366,6 +372,11 @@ unless an explicit product rule says otherwise. The home sheet exposes only
 session overrides and can remove them as a group so the session resumes
 inheriting current and future defaults; the Thinking page owns the standard
 length and tone.
+
+The conversation sheet owns a single horizontal inset. Its scroll view extends
+to the bottom of the sheet, with home-indicator clearance inside the
+scrollable content. Transcript sheets apply their bottom safe area once at
+the end of the message list.
 
 Saved conversation voices compare canonical model identities, so pinning a
 provider alias to its snapshot preserves the selected voice. A different

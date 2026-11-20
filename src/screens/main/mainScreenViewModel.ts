@@ -5,9 +5,12 @@ import {
   Message,
   Provider,
   Settings,
+  VoicePhaseProgress,
   VoiceVisualPhase,
 } from "../../types";
-import { getStatusDisplayData } from "./statusSelectors";
+import type { SpeechTransfer } from "../../hooks/voicePipeline/types";
+import type { ReplayPhase } from "../../hooks/useVoicePipeline";
+import { getOrbActivity, getStatusDisplayData } from "./statusSelectors";
 import { TranslateFn } from "./shared";
 import { getConversationUsageDisplayData } from "./usageSelectors";
 
@@ -28,6 +31,10 @@ interface GetMainScreenViewModelParams {
   streamingText: string;
   t: TranslateFn;
   ttsProvider: Provider | null;
+  replyProvider?: Provider | null;
+  replayPhase?: ReplayPhase;
+  speechTransfer?: SpeechTransfer | null;
+  phaseProgress?: VoicePhaseProgress | null;
   visualPhaseOverride?: VoiceVisualPhase | null;
 }
 
@@ -53,29 +60,27 @@ export function getMainScreenViewModel({
   streamingText,
   t,
   ttsProvider,
+  replyProvider,
+  replayPhase = "idle",
+  speechTransfer,
+  phaseProgress,
   visualPhaseOverride = null,
 }: GetMainScreenViewModelParams) {
   const providerLabel = PROVIDER_LABELS[provider];
+  const waitingForPlayback =
+    pipelinePhase === "speaking" ||
+    (pipelinePhase === "idle" && replayPhase !== "idle");
   const runtimeVisualPhase: VoiceVisualPhase = isRecording
     ? "recording"
-    : pipelinePhase === "transcribing"
-      ? "transcribing"
-      : pipelinePhase === "thinking-briefly"
-        ? "thinking-briefly"
-        : pipelinePhase === "searching"
-          ? "searching"
-          : player.isActivelyPlaying ||
-              (player.isPlaybackPaused && pipelinePhase === "speaking")
-            ? "speaking"
-            : pipelinePhase === "speaking"
-              ? "synthesizing"
-              : pipelinePhase === "synthesizing"
-                ? "synthesizing"
-                : pipelinePhase === "thinking"
-                  ? "thinking"
-                  : "idle";
+    : player.isActivelyPlaying || player.isPlaybackPaused
+      ? "speaking"
+      : waitingForPlayback
+        ? "synthesizing"
+        : pipelinePhase;
   const visualPhase = visualPhaseOverride ?? runtimeVisualPhase;
   const isActive = visualPhase !== "idle";
+  const phaseProvider =
+    phaseProgress?.phase === visualPhase ? phaseProgress.provider : undefined;
 
   const baseMessages = activeConversation?.messages || [];
   const lastAssistantReply =
@@ -111,6 +116,17 @@ export function getMainScreenViewModel({
 
   return {
     isActive,
+    activity: getOrbActivity({
+      phase: visualPhase,
+      paused: player.isPlaybackPaused,
+      streaming: Boolean(streamingText),
+      replyProvider: replyProvider ?? phaseProvider ?? provider,
+      searchProvider: phaseProvider ?? settings.webSearchProvider,
+      speechInputProvider: phaseProvider ?? null,
+      speechOutputProvider: speechTransfer?.provider,
+      speechTransfer: speechTransfer?.stage,
+      t,
+    }),
     lastAssistantReply,
     messages,
     statusDisplay,

@@ -139,6 +139,9 @@ export interface VoiceTimingProgress {
 }
 export interface VoicePhaseProgress extends VoiceTimingProgress {
   phase: VoicePhaseProgressPhase;
+  provider?: Provider | null;
+  /** Time to first speech for spoken turns, or to completion for text-only turns. */
+  processing?: VoiceTimingProgress;
   overall?: VoiceTimingProgress;
   speechStart?: VoiceTimingProgress;
 }

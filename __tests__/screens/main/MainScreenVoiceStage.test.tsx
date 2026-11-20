@@ -106,6 +106,7 @@ jest.mock("react-native-reanimated", () => {
 });
 
 const t = ((key: string, params?: Record<string, unknown>) => {
+  if (key === "orbTimeRemaining") return `${params?.time} left`;
   if (key === "driveSendsIn") {
     return `Sends in ${params?.seconds}…`;
   }
@@ -170,6 +171,25 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
+  it("shows the provider at work above the orb and the remaining capture time", () => {
+    const screen = renderStage(<MainScreenVoiceStage {...createProps({
+      activity: { label: "Searching online", provider: "gemini" },
+      isActive: true, visualPhase: "searching",
+    })} />);
+    expect(within(screen.getByTestId("orb-activity")).getByTestId("provider-icon-gemini", hiddenIconQuery)).toBeTruthy();
+    expect(screen.getByTestId("orb-activity").props.accessibilityLabel).toContain("Searching online");
+    const now = jest.spyOn(Date, "now").mockReturnValue(200_000);
+    try {
+      screen.rerender(<MainScreenVoiceStage {...createProps({
+        activity: { label: "Recording" }, isActive: true, visualPhase: "recording",
+        recordingStartedAtMs: 20_000, recordingMaxMs: 900_000,
+      })} />);
+      expect(screen.getByText("12:00 left")).toBeTruthy();
+    } finally {
+      now.mockRestore();
+    }
+  });
+
   it("centres portrait controls with a bounded orb slot", () => {
     const screen = renderStage(
       <MainScreenVoiceStage
@@ -1050,7 +1070,7 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          speechStartProgress: {
+          processingProgress: {
             elapsedMs: 5_000,
             estimatedMs: 10_000,
             learned: true,
@@ -1079,7 +1099,7 @@ describe("MainScreenVoiceStage composer", () => {
       <MainScreenVoiceStage
         {...createProps({
           isActive: true,
-          speechStartProgress: {
+          processingProgress: {
             elapsedMs: 20_000,
             estimatedMs: 10_000,
             learned: true,

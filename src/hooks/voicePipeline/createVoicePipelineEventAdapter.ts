@@ -63,6 +63,7 @@ type EventAdapterParams = Pick<
     | "updateAssistantTurnReceipt"
   >;
   onError: PipelineCallbacks["onError"];
+  onSpeechTransfer?: PipelineCallbacks["onSpeechTransfer"];
   playbackStartedRef: MutableRefObject<boolean>;
   producedAudioRef: MutableRefObject<boolean>;
   setCouncilProgress: (progress: CouncilProgress | null) => void;
@@ -93,6 +94,7 @@ export function createVoicePipelineEventAdapter({
   onAttachmentsAccepted,
   onPromptSubmitted,
   onError,
+  onSpeechTransfer,
   player,
   playbackStartedRef,
   producedAudioRef,
@@ -379,6 +381,9 @@ export function createVoicePipelineEventAdapter({
       messageState.queueAssistantNotice(notice);
     },
     onLlmStart: handleLlmStarted,
+    onSpeechTransfer: (stage) => {
+      if (isActiveRun()) onSpeechTransfer?.(stage);
+    },
     onCouncilProgress: (progress) => {
       if (!isActiveRun()) {
         return;

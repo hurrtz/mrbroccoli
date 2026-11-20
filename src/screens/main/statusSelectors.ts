@@ -1,7 +1,70 @@
 import { PipelinePhase } from "../../hooks/useVoicePipeline";
-import { InputMode, VoiceVisualPhase } from "../../types";
+import type { SpeechTransferStage } from "../../services/voicePipeline/types";
+import { InputMode, Provider, VoiceVisualPhase } from "../../types";
 
 import { TranslateFn } from "./shared";
+
+export interface OrbActivity {
+  label: string;
+  provider?: Provider | null;
+  providerAfterLabel?: boolean;
+}
+
+export function getOrbActivity({
+  phase,
+  paused,
+  streaming,
+  replyProvider,
+  searchProvider,
+  speechInputProvider,
+  speechOutputProvider,
+  speechTransfer,
+  t,
+}: {
+  phase: VoiceVisualPhase;
+  paused: boolean;
+  streaming: boolean;
+  replyProvider: Provider;
+  searchProvider?: Provider | null;
+  speechInputProvider?: Provider | null;
+  speechOutputProvider?: Provider | null;
+  speechTransfer?: SpeechTransferStage | null;
+  t: TranslateFn;
+}): OrbActivity {
+  switch (phase) {
+    case "recording":
+      return { label: t("orbRecording") };
+    case "transcribing":
+      return { label: t("orbProcessingAudio"), provider: speechInputProvider };
+    case "searching":
+      return { label: t("orbSearching"), provider: searchProvider };
+    case "thinking-briefly":
+      return {
+        label: t("orbSendingPrompt"),
+        provider: replyProvider,
+        providerAfterLabel: true,
+      };
+    case "thinking":
+      return {
+        label: t(streaming ? "orbAnswering" : "thinking"),
+        provider: replyProvider,
+      };
+    case "synthesizing":
+      if (speechOutputProvider && speechTransfer) {
+        return {
+          label: t(
+            speechTransfer === "sending-text" ? "orbReceivingText" : "orbSendingAudio",
+          ),
+          provider: speechOutputProvider,
+        };
+      }
+      return { label: t("orbPreparingSpeech") };
+    case "speaking":
+      return { label: t(paused ? "paused" : "orbPlaying") };
+    case "idle":
+      return { label: t("orbReady") };
+  }
+}
 
 export interface StatusDisplayData {
   actionLabel: string;

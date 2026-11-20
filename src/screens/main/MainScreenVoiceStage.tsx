@@ -7,6 +7,7 @@ import { InputMode, VoiceTimingProgress, VoiceVisualPhase } from "../../types";
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
 import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
+import type { OrbActivity } from "./statusSelectors";
 import type { OrbTurnProgress } from "./useOrbTurnProgress";
 
 interface MainScreenVoiceStageProps {
@@ -48,7 +49,8 @@ interface MainScreenVoiceStageProps {
   recordingMaxMs: number;
   recordingStartedAtMs?: number | null;
   phaseTimingProgress?: VoiceTimingProgress | null;
-  speechStartProgress?: VoiceTimingProgress | null;
+  processingProgress?: VoiceTimingProgress | null;
+  activity?: OrbActivity;
   statusTitle: string;
   t: TranslateFn;
   rtl?: boolean;
@@ -93,8 +95,9 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   recordingMaxMs,
   recordingStartedAtMs = null,
   phaseTimingProgress = null,
-  speechStartProgress = null,
+  processingProgress = null,
   statusTitle,
+  activity,
   t,
   rtl = false,
   visualPhase,
@@ -153,7 +156,8 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
           recordingMaxMs={recordingMaxMs}
           recordingStartedAtMs={recordingStartedAtMs}
           phaseTimingProgress={phaseTimingProgress}
-          speechStartProgress={speechStartProgress}
+          processingProgress={processingProgress}
+          activity={activity}
           statusLabel={statusTitle}
           t={t}
           rtl={rtl}

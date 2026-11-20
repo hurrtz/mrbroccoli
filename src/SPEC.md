@@ -78,7 +78,8 @@ capability-specific contracts are regression-tested at the request boundary.
 - Changing `Conversation` or `Message` requires metadata normalization,
   backup/restore validation, archive formatting, knowledge indexing, and tests
   to be reviewed.
-- User-visible copy changes require all registered dictionaries.
+- User-visible copy changes require all registered dictionaries, including the
+  home activity labels, remaining recording time, and voice accessibility text.
 - Any privacy-sensitive payload must cross its sanitizer or allow-list before
   storage, logs, clipboard, provider requests, or export.
 - Platform-specific behavior belongs behind a service boundary and must be

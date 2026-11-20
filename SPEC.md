@@ -87,12 +87,20 @@ offline conversation mode.
   summary. Continuing from an earlier checkpoint creates a branch rather than
   destroying the later original history.
 
+New conversations and branches can receive a generated title once, after their
+first submitted prompt. The App setting is enabled by default. It uses the
+selected reply provider and the first prompt text. A manual title takes
+precedence, and existing conversations keep their names when opened or restored.
+
 ### Voice
 
 - Input supports push-to-talk and toggle-to-talk. A session-scoped Hands free
   switch wraps either input mode with adaptive voice-activity detection,
   visible and spoken countdown cues, auto-submit, reply playback, and automatic
   re-arming.
+- The home button shows the current activity and identifies the provider handling
+  it. While recording, the time remaining and ring share the auto-send deadline.
+  Paused playback keeps its position and exposes Resume.
 - Speech recognition may use the system recognizer, a downloaded local model,
   or a capability-gated provider route.
 - A single capture may produce multiple final speech-recognition segments.
@@ -145,6 +153,8 @@ offline conversation mode.
   terminology is accepted only by persistence migrations and is never exposed
   by current runtime types, diagnostics, prompts, or UI.
 
+- Search settings choose who may search. The home Web control can pause or
+  resume that selection. Choosing Nobody in Settings disables home activation.
 - Optional past-conversation knowledge retrieves small, source-linked excerpts
   from other eligible conversations on device.
 

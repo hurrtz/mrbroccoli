@@ -507,6 +507,7 @@ export function MainScreen() {
 
   const {
     completedReplyVersion,
+    speechTransfer,
     councilProgress,
     phaseProgress,
     pipelinePhase,
@@ -869,7 +870,6 @@ export function MainScreen() {
     ],
   );
 
-
   const handleResponseModeChange = useMainScreenResponseModeSelection({
     activeResponseMode,
     settings: runtimeSettings,
@@ -897,20 +897,27 @@ export function MainScreen() {
     pipelinePhase,
     storePromoOrbPresentation,
   );
-  const { isActive, lastAssistantReply, messages, statusDisplay, visualPhase } =
-    getMainScreenViewModel({
-      activeConversation,
-      isRecording,
-      model,
-      pipelinePhase: presentationPipelinePhase,
-      player,
-      provider,
-      settings: runtimeSettings,
-      streamingText,
-      t,
-      ttsProvider,
-      visualPhaseOverride: storePromoOrbPresentation?.phase,
-    });
+  const {
+    activity, isActive, lastAssistantReply, messages, statusDisplay, visualPhase,
+  } = getMainScreenViewModel({
+    activeConversation,
+    isRecording,
+    model,
+    pipelinePhase: presentationPipelinePhase,
+    replayPhase,
+    phaseProgress,
+    speechTransfer,
+    replyProvider: councilProgress?.stage === "round"
+      ? councilProgress.activeProvider
+      : councilProgress?.provider,
+    player,
+    provider,
+    settings: runtimeSettings,
+    streamingText,
+    t,
+    ttsProvider,
+    visualPhaseOverride: storePromoOrbPresentation?.phase,
+  });
   const {
     handleAutoRenameConversation,
     handleCloseConversationSettings,
@@ -1223,7 +1230,8 @@ export function MainScreen() {
           rtl: isRtl,
           phaseTimingProgress:
             phaseProgress?.phase === visualPhase ? phaseProgress : null,
-          speechStartProgress: phaseProgress?.speechStart ?? null,
+          processingProgress: phaseProgress?.processing ?? null,
+          activity,
           statusTitle: statusDisplay.actionLabel,
           t,
           visualPhase,

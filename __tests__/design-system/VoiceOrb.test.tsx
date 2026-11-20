@@ -143,6 +143,15 @@ describe("VoiceOrb", () => {
     expect(dangerArcs).toHaveLength(1);
   });
 
+  it("keeps the completed ink under a clockwise overtime arc from twelve o’clock", () => {
+    const screen = renderOrb({ phase: "thinking", phaseProgress: 1, overtime: 0.25 });
+    const circles = screen.UNSAFE_getAllByType(Circle);
+    const ink = circles.find(({ props }) => props.stroke === lightColors.turnInk)!;
+    const late = circles.find(({ props }) => props.stroke === lightColors.danger)!;
+    expect(late.props.transform).toBe(ink.props.transform);
+    expect(ink.props.animatedProps?.strokeOpacity ?? 1).toBe(1);
+  });
+
   it.each([
     ["idle", "mic"],
     ["recording", "stop"],

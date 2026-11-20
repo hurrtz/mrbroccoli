@@ -1,3 +1,4 @@
+import { useEffect, useReducer } from "react";
 import type { VoiceTimingProgress, VoiceVisualPhase } from "../../types";
 
 export interface OrbRingTiming {
@@ -13,6 +14,7 @@ export interface OrbTurnProgress {
   phaseProgress: number;
   turnProgress: number;
   overtime: number;
+  recordingSecondsLeft?: number;
   phaseProgressTiming?: OrbRingTiming;
   turnProgressTiming?: OrbRingTiming;
   overtimeTiming?: OrbRingTiming;
@@ -32,15 +34,13 @@ function clamp01(value: number) {
  * Derives the orb's single progress clock from signals the session already has.
  *
  * Recording uses the recording cap. During processing, the ring measures the
- * whole turn from submission to first speech; it deliberately does not expose
+ * whole turn from submission to first speech or text-only completion. It does not expose
  * per-phase estimates. Past that estimate, overtime rises and the orb fills
  * with red. Speaking carries how much of the reply has been read, so Back and
  * Forward move the arc by what the paragraph they skip actually holds.
  *
- * **Decision:** the speaking arc advances at spoken-clip boundaries rather
- * than on a clock. Neither the native queue nor the speech engine reports a
- * clip's duration, so a per-second fill would be an invented rate; the reel's
- * character weights are a measurement.
+ * Speaking uses the player's measured read position and its estimate through
+ * the current clip. Pausing freezes that interpolation in VoiceOrb.
  */
 export function useOrbTurnProgress({
   phaseTimingProgress: _phaseTimingProgress,
@@ -48,7 +48,7 @@ export function useOrbTurnProgress({
   readingProgressTiming,
   recordingMaxMs,
   recordingStartedAtMs,
-  speechStartProgress,
+  processingProgress,
   visualPhase,
 }: {
   /** Learned clock for the active processing phase. */
@@ -59,9 +59,15 @@ export function useOrbTurnProgress({
   readingProgressTiming?: OrbRingTiming | null;
   recordingMaxMs: number;
   recordingStartedAtMs: number | null;
-  speechStartProgress: VoiceTimingProgress | null;
+  processingProgress: VoiceTimingProgress | null;
   visualPhase: VoiceVisualPhase;
 }): OrbTurnProgress {
+  const [, tick] = useReducer((count: number) => count + 1, 0);
+  useEffect(() => {
+    if (visualPhase !== "recording" || recordingStartedAtMs === null) return;
+    const timer = setInterval(tick, 1000);
+    return () => clearInterval(timer);
+  }, [recordingStartedAtMs, visualPhase]);
   const nowMs = Date.now();
 
   if (visualPhase === "idle") {
@@ -77,10 +83,7 @@ export function useOrbTurnProgress({
       phaseProgress,
       turnProgress: 0,
       overtime: 0,
-      phaseProgressTiming:
-        phaseProgress < 1
-          ? { durationMs: Math.max(0, safeMax - elapsedMs) }
-          : undefined,
+      recordingSecondsLeft: Math.max(0, Math.ceil((safeMax - elapsedMs) / 1000)),
     };
   }
 
@@ -93,31 +96,31 @@ export function useOrbTurnProgress({
     };
   }
 
-  const estimatedMs = speechStartProgress
-    ? Math.max(1000, speechStartProgress.estimatedMs)
+  const estimatedMs = processingProgress
+    ? Math.max(1000, processingProgress.estimatedMs)
     : 0;
-  const elapsedMs = speechStartProgress
-    ? Math.max(0, nowMs - speechStartProgress.startedAt)
+  const elapsedMs = processingProgress
+    ? Math.max(0, nowMs - processingProgress.startedAt)
     : 0;
-  const turnProgress = speechStartProgress
+  const turnProgress = processingProgress
     ? clamp01(elapsedMs / estimatedMs)
     : 0;
-  const overtime = speechStartProgress
+  const overtime = processingProgress
     ? clamp01((elapsedMs - estimatedMs) / estimatedMs)
     : 0;
   const beforeEstimate = Boolean(
-    speechStartProgress && elapsedMs < estimatedMs,
+    processingProgress && elapsedMs < estimatedMs,
   );
   return {
     phaseProgress: turnProgress,
     turnProgress,
     overtime,
     phaseProgressTiming:
-      speechStartProgress && turnProgress < 1
+      processingProgress && turnProgress < 1
         ? { durationMs: Math.max(0, estimatedMs - elapsedMs) }
         : undefined,
     turnProgressTiming:
-      speechStartProgress && turnProgress < 1
+      processingProgress && turnProgress < 1
         ? { durationMs: Math.max(0, estimatedMs - elapsedMs) }
         : undefined,
     overtimeTiming: beforeEstimate
@@ -125,7 +128,7 @@ export function useOrbTurnProgress({
           delayMs: Math.max(0, estimatedMs - elapsedMs),
           durationMs: estimatedMs,
         }
-      : speechStartProgress && overtime < 1
+      : processingProgress && overtime < 1
         ? { durationMs: Math.max(0, estimatedMs * (1 - overtime)) }
         : undefined,
   };

@@ -1,3 +1,4 @@
+import type { SpeechTransferStage } from "./voicePipeline/types";
 import { translate } from "../i18n";
 import {
   createSpeechRequestId,
@@ -216,6 +217,7 @@ export async function synthesizeSpeech(params: {
   speechLanguage?: SpeechLanguage;
   kokoroVoices?: KokoroVoiceSelections;
   diagnostics?: SpeechDiagnosticsContext;
+  onTransferStage?: (stage: SpeechTransferStage) => void;
   abortSignal?: AbortSignal;
 }): Promise<string> {
   const {
@@ -421,6 +423,7 @@ export async function synthesizeSpeech(params: {
 
   try {
     const audioPath = await synthesizeProviderSpeech({
+      onTransferStage: params.onTransferStage,
       text,
       voice,
       provider,

@@ -103,6 +103,7 @@ export function createTtsRouteSelector({
     context?: TtsChunkContext,
   ): Promise<RouteAttemptResult> => {
     const diagnostics = diagnosticsForRoute(route, text, speechLanguage);
+    if (route !== "provider") config.callbacks.onSpeechTransfer?.(null);
 
     if (route === "native") {
       return {
@@ -137,7 +138,7 @@ export function createTtsRouteSelector({
     if (
       route === "provider" &&
       (!ttsProvider ||
-        !providerSupportsTtsLanguage(ttsProvider, speechLanguage))
+        !providerSupportsTtsLanguage(ttsProvider, speechLanguage, ttsModel))
     ) {
       return {
         kind: "error",
@@ -154,6 +155,7 @@ export function createTtsRouteSelector({
 
     try {
       const audio = await synthesizeSpeech({
+        onTransferStage: config.callbacks.onSpeechTransfer,
         text,
         voice: route === "kokoro" ? (diagnostics.voice ?? "") : ttsVoice,
         mode: route,

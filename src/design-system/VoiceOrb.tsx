@@ -120,7 +120,7 @@ function ProgressRing({
   progressColor?: string;
   progress?: number;
   progressTiming?: VoiceOrbRingTiming;
-  /** Overtime: a tail of this fraction fills backwards from 12 o'clock. */
+  /** The second clockwise lap covers the completed first lap in red. */
   tailColor?: string;
   tail?: number;
   tailTiming?: VoiceOrbRingTiming;
@@ -129,13 +129,8 @@ function ProgressRing({
   const circumference = 2 * Math.PI * radius;
   const progressClock = useRingClock(progress, progressTiming, paused);
   const tailClock = useRingClock(tail, tailTiming);
-  const progressVisibility = useRingVisibility(
-    Boolean(tailColor && (tail || tailTiming)),
-    tailTiming?.delayMs,
-  );
   const progressAnimatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circumference * (1 - progressClock.value),
-    strokeOpacity: progressVisibility.value,
   }));
   const tailAnimatedProps = useAnimatedProps(() => ({
     strokeDashoffset: circumference * (1 - tailClock.value),
@@ -151,7 +146,7 @@ function ProgressRing({
         strokeWidth={strokeWidth}
         fill="none"
       />
-      {progressColor && (progress || progressTiming) ? (
+      {progressColor && (progress || progressTiming || paused) ? (
         <AnimatedCircle
           animatedProps={progressAnimatedProps}
           cx={centre}
@@ -165,8 +160,6 @@ function ProgressRing({
         />
       ) : null}
       {tailColor && (tail || tailTiming) ? (
-        // A counter-clockwise circle makes the late tail advance backwards
-        // from twelve o'clock while its value is animated off the JS thread.
         <AnimatedCircle
           animatedProps={tailAnimatedProps}
           cx={centre}
@@ -176,7 +169,7 @@ function ProgressRing({
           strokeWidth={strokeWidth}
           fill="none"
           strokeDasharray={[circumference, circumference]}
-          transform={`rotate(90 ${centre} ${centre})`}
+          transform={`rotate(-90 ${centre} ${centre})`}
         />
       ) : null}
     </>
@@ -230,32 +223,6 @@ function useRingClock(
   }, [clock, delayMs, durationMs, paused, target, value]);
 
   return clock;
-}
-
-/**
- * When an estimate expires the approved design swaps the completed ink for a
- * track plus a red tail. Schedule that discrete swap with the same UI-thread
- * deadline as the tail so JavaScript does not need to wake up at the boundary.
- */
-function useRingVisibility(hidden: boolean, delayMs: number | undefined) {
-  const initiallyHidden = hidden && !delayMs;
-  const visibility = useSharedValue(initiallyHidden ? 0 : 1);
-
-  React.useEffect(() => {
-    cancelAnimation(visibility);
-    visibility.value = 1;
-    if (!hidden) {
-      return () => cancelAnimation(visibility);
-    }
-
-    const hide = withTiming(0, { duration: 1, easing: Easing.linear });
-    visibility.value = delayMs
-      ? withDelay(Math.max(0, Math.round(delayMs)), hide)
-      : hide;
-    return () => cancelAnimation(visibility);
-  }, [delayMs, hidden, visibility]);
-
-  return visibility;
 }
 
 /**
@@ -377,7 +344,7 @@ export function VoiceOrb({
             strokeWidth={BAND * 2}
             trackColor={colors.turnTrack}
             progressColor={colors.turnInk}
-            progress={phaseProgress}
+            progress={late > 0 ? 1 : phaseProgress}
             progressTiming={phaseProgressTiming}
             tailColor={late > 0 || overtimeTiming ? colors.danger : undefined}
             tail={late}

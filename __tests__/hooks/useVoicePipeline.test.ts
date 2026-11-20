@@ -1488,6 +1488,69 @@ describe("useVoicePipeline", () => {
     });
   });
 
+  it("publishes the overall completion clock for a text-only turn", async () => {
+    const params = createParams({ spokenRepliesEnabled: false });
+    const modelGate = createDeferredVoid();
+    jest.mocked(runVoicePipeline).mockImplementation(async ({ callbacks }) => {
+      callbacks.onTranscription("Typed question");
+      callbacks.onLlmStart?.();
+      await modelGate.promise;
+      callbacks.onResponseDone("Typed reply");
+      return "Typed question";
+    });
+    const { result } = renderHook(() => useVoicePipeline(params));
+    let turn!: Promise<void>;
+    await act(async () => {
+      turn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Typed question",
+      });
+    });
+    const timing = result.current.phaseProgress;
+    expect(timing?.overall?.estimatedMs).toBeGreaterThan(0);
+    expect(timing?.processing).toEqual(timing?.overall);
+    await act(async () => {
+      modelGate.resolve();
+      await turn;
+    });
+  });
+
+  it("retains the active speech provider when settings change during a transfer", async () => {
+    const params = createParams({
+      ttsMode: "kokoro",
+      ttsProvider: "gemini",
+      ttsFallbackRoutes: ["provider"],
+    });
+    const gate = createDeferredVoid();
+    let reportTransfer: NonNullable<
+      Parameters<typeof runVoicePipeline>[0]["callbacks"]["onSpeechTransfer"]
+    >;
+    jest.mocked(runVoicePipeline).mockImplementation(async ({ callbacks }) => {
+      reportTransfer = callbacks.onSpeechTransfer!;
+      await gate.promise;
+      return "Question";
+    });
+    const { result, rerender } = renderHook(
+      (current: typeof params) => useVoicePipeline(current),
+      { initialProps: params },
+    );
+    let turn!: Promise<void>;
+    await act(async () => {
+      turn = result.current.handleVoiceCaptureDone({
+        transcriptionOverride: "Question",
+      });
+    });
+    rerender({ ...params, ttsProvider: "openai" });
+    act(() => reportTransfer("receiving-audio"));
+    expect(result.current.speechTransfer).toEqual({
+      stage: "receiving-audio",
+      provider: "gemini",
+    });
+    await act(async () => {
+      gate.resolve();
+      await turn;
+    });
+  });
+
   it("keeps the total progress estimate through playback completion", async () => {
     let onPlaybackStarted: (() => void) | undefined;
     let resolveRun: (() => void) | null = null;
