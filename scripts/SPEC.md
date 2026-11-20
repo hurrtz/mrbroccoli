@@ -181,6 +181,9 @@ the architectural answer for the author.
   replaces its generated `metadata/` and `screenshots/` roots. Fastlane
   configuration remains untouched, while retired campaign images, locales,
   release notes, and version-code changelogs cannot survive a later export.
+- App Store release text starts with the shared localized notes. When a
+  version has an Apple-specific addition, the exporter appends the matching
+  paragraph for every App Store locale. Play receives only the shared notes.
 - The iOS store-promo build targets the arm64 Simulator architecture used by
   the local Apple-silicon capture host; one secret-scanned app is reusable
   across every configured iPhone and iPad simulator.

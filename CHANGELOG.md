@@ -15,6 +15,8 @@ the complete Play Store translations are kept in a dedicated file under
 - iPhone Duo uses the familiar phone layout when folded. Open it in portrait
   to see the conversation sidebar, or in landscape to use the input controls
   and transcript side by side. Your unsent text stays with you as you switch.
+  The [localized App Store additions](docs/app-store-release-additions-4.3.0.md)
+  accompany the [shared release notes](docs/google-play-release-notes-4.3.0.md).
 - Added GPT-6.2 Astra and Sol, Claude Fable 5.2, Qwen4-Max, four Gemini 4
   models, Mistral Large 4, and 15 OpenRouter snapshots including Kimi K3.1 Pro.
   Recorded transcription gains Scribe v3 and Voxtral 3. Spoken replies gain

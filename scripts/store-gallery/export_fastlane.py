@@ -225,13 +225,28 @@ def main() -> int:
     # --- App Store release notes -------------------------------------------
     notes_path = args.release_notes or newest_release_notes()
     notes = parse_release_notes(notes_path) if notes_path else {}
+    apple_additions_path = None
+    apple_additions = {}
+    if notes_path and notes_path.name.startswith("google-play-release-notes-"):
+        candidate = notes_path.with_name(
+            notes_path.name.replace("google-play-release-notes-", "app-store-release-additions-", 1)
+        )
+        if candidate.is_file():
+            apple_additions_path = candidate
+            apple_additions = parse_release_notes(candidate)
     if not notes:
         problems.append("no release notes found; App Store submission needs What's New per locale")
     for play_tag, apple_tag in RELEASE_NOTE_LOCALES.items():
         text = notes.get(play_tag, "").strip()
         if not text:
-            problems.append(f"App Store {apple_tag} has no release note ({play_tag} in {notes_path.name})")
+            problems.append(f"App Store {apple_tag} has no shared release note for {play_tag}")
             continue
+        if apple_additions_path:
+            addition = apple_additions.get(apple_tag)
+            if not addition:
+                problems.append(f"{apple_additions_path.name} has no addition for {apple_tag}")
+                continue
+            text = f"{text}\n\n{addition}"
         if len(text) > APPLE_RELEASE_NOTES_LIMIT:
             problems.append(f"App Store {apple_tag} release note is {len(text)} characters")
             continue
