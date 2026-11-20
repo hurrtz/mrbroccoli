@@ -141,10 +141,10 @@ export function VoiceTextInputPager({
       )
     : 0;
   const contentStyle = [styles.viewportContent, { top: spaceAboveOrb }];
-  const providerName = provider ? PROVIDER_LABELS[provider] : "";
-  const spokenStatus = activity?.providerAfterLabel
-    ? [statusText, providerName].filter(Boolean).join(" ")
-    : [providerName, statusText].filter(Boolean).join(" ");
+  const providerName = provider === "device"
+    ? t("onDeviceSpeech")
+    : provider ? PROVIDER_LABELS[provider] : "";
+  const spokenStatus = [providerName, statusText].filter(Boolean).join(" ");
   const previousStatus = React.useRef(spokenStatus || statusLabel);
   React.useEffect(() => {
     const announcement = spokenStatus || statusLabel;
@@ -157,7 +157,14 @@ export function VoiceTextInputPager({
   const timeLabel = recordingTime === undefined
     ? null
     : t("orbTimeRemaining", { time: formatCountdown(recordingTime) });
-  const providerIcon = provider ? (
+  const providerIcon = provider === "device" ? (
+    <PhosphorIcon
+      color={colors.textSecondary}
+      name="cpu"
+      size="compact"
+      testID="orb-activity-device-icon"
+    />
+  ) : provider ? (
     <ProviderIcon provider={provider} color={colors.textSecondary} size="compact" />
   ) : null;
 
@@ -182,20 +189,14 @@ export function VoiceTextInputPager({
       {showActivity ? (
         <View
           accessible
-          accessibilityLabel={[spokenStatus, timeLabel].filter(Boolean).join(" · ")}
-          style={styles.activity}
+          accessibilityLabel={spokenStatus}
+          style={[styles.activity, { direction: rtl ? "rtl" : "ltr" }]}
           testID="orb-activity"
         >
-          {!activity?.providerAfterLabel && providerIcon}
+          {providerIcon}
           <Text style={[styles.activityText, { color: colors.textSecondary }]}>
             {statusText}
           </Text>
-          {activity?.providerAfterLabel && providerIcon}
-          {timeLabel && (
-            <Text style={[styles.activityTimer, { color: colors.textSecondary }]}>
-              {timeLabel}
-            </Text>
-          )}
         </View>
       ) : null}
       <View
@@ -268,6 +269,7 @@ export function VoiceTextInputPager({
               testID="orb-transport-active"
               transportLabels={transportLabels}
               voiceOrb={{
+                accessibilityValue: timeLabel ? { text: timeLabel } : undefined,
                 coreLabel: showHandsFreeCountdown
                   ? String(handsFreeSilenceCountdownSeconds)
                   : undefined,

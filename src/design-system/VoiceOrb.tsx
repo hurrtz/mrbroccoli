@@ -4,6 +4,7 @@ import {
   StyleSheet,
   Text,
   View,
+  type AccessibilityValue,
   type StyleProp,
   type ViewStyle,
 } from "react-native";
@@ -233,6 +234,7 @@ function useRingClock(
  * also avoids a raster seam between adjacent bands.
  */
 export function VoiceOrb({
+  accessibilityValue,
   coreLabel,
   coreLabelColor,
   paused = false,
@@ -252,6 +254,7 @@ export function VoiceOrb({
   style,
   testID,
 }: {
+  accessibilityValue?: AccessibilityValue;
   /** Temporary state rendered in the orb core instead of the phase glyph. */
   coreLabel?: string;
   /** Optional foreground for a temporary core label. */
@@ -313,6 +316,7 @@ export function VoiceOrb({
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
+      accessibilityValue={accessibilityValue}
       disabled={disabled}
       onPress={onPress}
       onPressIn={onPressIn}

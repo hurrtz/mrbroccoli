@@ -205,11 +205,20 @@ describe("getMainScreenViewModel", () => {
       phaseProgress: { ...progress, phase: "transcribing" },
     });
     expect(stt.activity.provider).toBe("openai");
+    expect(getMainScreenViewModel({ ...base, pipelinePhase: "transcribing" }).activity.provider)
+      .toBe("gemini");
+    const local = getMainScreenViewModel({
+      ...base,
+      pipelinePhase: "transcribing",
+      phaseProgress: { ...progress, phase: "transcribing", provider: null },
+    });
+    expect(local.activity.provider).toBe("device");
     const council = getMainScreenViewModel({
       ...base,
       pipelinePhase: "thinking",
       phaseProgress: { ...progress, phase: "thinking" },
       replyProvider: "anthropic",
+      streamingText: "An answer from the Council",
     });
     expect(council.activity.provider).toBe("anthropic");
   });

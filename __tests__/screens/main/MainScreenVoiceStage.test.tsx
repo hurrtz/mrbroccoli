@@ -5,6 +5,7 @@ import { AccessibilityInfo, Keyboard, StyleSheet, View } from "react-native";
 import { Circle } from "react-native-svg";
 
 import { OrbSatellite } from "../../../src/design-system/OrbSatellite";
+import { PROVIDER_LABELS } from "../../../src/constants/models";
 import { MainScreenVoiceStage } from "../../../src/screens/main/MainScreenVoiceStage";
 import { TranslateFn } from "../../../src/screens/main/shared";
 import { ThemeProvider } from "../../../src/theme/ThemeContext";
@@ -172,20 +173,29 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
-  it("shows the provider at work above the orb and the remaining capture time", () => {
+  it("names the provider before the action and keeps capture time on the button for screen readers", () => {
     const screen = renderStage(<MainScreenVoiceStage {...createProps({
-      activity: { label: "Searching online", provider: "gemini" },
+      activity: { label: "searches online", provider: "gemini" },
       isActive: true, visualPhase: "searching",
     })} />);
     expect(within(screen.getByTestId("orb-activity")).getByTestId("provider-icon-gemini", hiddenIconQuery)).toBeTruthy();
-    expect(screen.getByTestId("orb-activity").props.accessibilityLabel).toContain("Searching online");
+    expect(screen.getByTestId("orb-activity").props.accessibilityLabel)
+      .toBe(`${PROVIDER_LABELS.gemini} searches online`);
+    screen.rerender(<MainScreenVoiceStage {...createProps({
+      activity: { label: "transcribes", provider: "device" },
+      isActive: true, visualPhase: "transcribing",
+    })} />);
+    expect(within(screen.getByTestId("orb-activity")).getByTestId("orb-activity-device-icon", hiddenIconQuery)).toBeTruthy();
     const now = jest.spyOn(Date, "now").mockReturnValue(200_000);
     try {
       screen.rerender(<MainScreenVoiceStage {...createProps({
-        activity: { label: "Recording" }, isActive: true, visualPhase: "recording",
+        activity: { label: "listening" }, isActive: true, visualPhase: "recording",
         recordingStartedAtMs: 20_000, recordingMaxMs: 900_000,
       })} />);
-      expect(screen.getByText("12:00 left")).toBeTruthy();
+      expect(screen.queryByText("12:00 left")).toBeNull();
+      expect(screen.getByTestId("orb-activity").props.accessibilityLabel).toBe("listening");
+      expect(screen.getByTestId("voice-orb-active").props.accessibilityValue)
+        .toEqual({ text: "12:00 left" });
     } finally {
       now.mockRestore();
     }
@@ -251,7 +261,7 @@ describe("MainScreenVoiceStage composer", () => {
     const screen = renderStage(
       <MainScreenVoiceStage
         {...createProps({
-          activity: { label: "Ready to listen" },
+          activity: { label: "ready" },
           footer: <OrbSatellite icon="image" label="Image" />,
         })}
       />,
@@ -263,8 +273,11 @@ describe("MainScreenVoiceStage composer", () => {
       alignContent: "center",
       marginBottom: styleOf("voice-text-input-footer").marginTop,
     });
-    expect(StyleSheet.flatten(screen.getByText("Ready to listen").props.style))
-      .toMatchObject(StyleSheet.flatten(screen.getByText("Image").props.style));
+    const { textTransform, ...captionStyle } = StyleSheet.flatten(screen.getByText("Image").props.style);
+    const statusStyle = StyleSheet.flatten(screen.getByText("ready").props.style);
+    expect(textTransform).toBe("uppercase");
+    expect(statusStyle).toMatchObject(captionStyle);
+    expect(statusStyle.textTransform).toBeUndefined();
     const transportHeight = styleOf("orb-transport-idle").height;
     const orbSize = styleOf("voice-orb-idle").height;
     const lowerClearance = transportHeight - orbSize;

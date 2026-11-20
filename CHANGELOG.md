@@ -18,9 +18,11 @@ the complete Play Store translations are kept in a dedicated file under
   including its published recording limits and supported languages.
 
 - Fixed an iOS 27 crash that closed the app immediately after launch.
-- The home button shows the active provider and voice activity. Recording shows
-  the time left until auto-send. The red overtime lap starts at twelve o’clock
-  over the completed first lap, and paused speech keeps its position and Play control.
+- The home button shows short activity captions with the responsible provider's
+  icon before its action. The recording ring tracks time until auto-send and
+  screen readers can read the time left on the button. The red overtime lap
+  starts at twelve o’clock over the completed first lap, and paused speech
+  keeps its position and Play control.
 - The activity label above the home button matches the spacing and typography
   of the controls below it.
 - Web Search on the home screen requires an enabled search provider in Settings.

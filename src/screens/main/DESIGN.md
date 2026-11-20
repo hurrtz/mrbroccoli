@@ -238,10 +238,13 @@ and the next clip boundary. Pausing freezes the current interpolation and
 resuming covers only the remaining distance. The player owns the paused state
 even after the network pipeline returns to idle.
 
-The status line uses the active Council or reply participant, search route,
-speech route and player state. Provider speech begins reporting transfers only
-when a request goes to the network. Native synthesis and cached audio use the
-local preparation and playback states.
+The activity line puts the responsible provider first in the locale's reading
+order. Transcription uses the captured speech-input route, search uses its own
+provider, and prompt receipt and streaming use the reply or active Council
+provider. The intervening wait belongs to the app. Speech transfers identify
+the provider that receives text and returns audio. Native synthesis and cached
+audio use the local preparation and playback states. The recording timer is
+available on the button as a screen-reader value.
 
 The isolated `.maestro` screenshot identity may replace the visual phase and
 ring fractions with validated deterministic values. That override enters

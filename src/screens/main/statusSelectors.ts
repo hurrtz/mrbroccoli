@@ -6,8 +6,7 @@ import { TranslateFn } from "./shared";
 
 export interface OrbActivity {
   label: string;
-  provider?: Provider | null;
-  providerAfterLabel?: boolean;
+  provider?: Provider | "device" | null;
 }
 
 export function getOrbActivity({
@@ -26,7 +25,7 @@ export function getOrbActivity({
   streaming: boolean;
   replyProvider: Provider;
   searchProvider?: Provider | null;
-  speechInputProvider?: Provider | null;
+  speechInputProvider?: OrbActivity["provider"];
   speechOutputProvider?: Provider | null;
   speechTransfer?: SpeechTransferStage | null;
   t: TranslateFn;
@@ -35,20 +34,15 @@ export function getOrbActivity({
     case "recording":
       return { label: t("orbRecording") };
     case "transcribing":
-      return { label: t("orbProcessingAudio"), provider: speechInputProvider };
+      return { label: t("orbTranscribing"), provider: speechInputProvider };
     case "searching":
       return { label: t("orbSearching"), provider: searchProvider };
     case "thinking-briefly":
-      return {
-        label: t("orbSendingPrompt"),
-        provider: replyProvider,
-        providerAfterLabel: true,
-      };
+      return { label: t("orbReceivingPrompt"), provider: replyProvider };
     case "thinking":
-      return {
-        label: t(streaming ? "orbAnswering" : "thinking"),
-        provider: replyProvider,
-      };
+      return streaming
+        ? { label: t("orbAnswering"), provider: replyProvider }
+        : { label: t("orbReceivingReply") };
     case "synthesizing":
       if (speechOutputProvider && speechTransfer) {
         return {
@@ -60,7 +54,7 @@ export function getOrbActivity({
       }
       return { label: t("orbPreparingSpeech") };
     case "speaking":
-      return { label: t(paused ? "paused" : "orbPlaying") };
+      return { label: t(paused ? "orbPaused" : "orbPlaying") };
     case "idle":
       return { label: t("orbReady") };
   }

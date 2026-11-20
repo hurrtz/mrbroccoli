@@ -81,6 +81,8 @@ export function getMainScreenViewModel({
   const isActive = visualPhase !== "idle";
   const phaseProvider =
     phaseProgress?.phase === visualPhase ? phaseProgress.provider : undefined;
+  const configuredSpeechInput =
+    settings.sttMode === "provider" ? settings.sttProvider : "device";
 
   const baseMessages = activeConversation?.messages || [];
   const lastAssistantReply =
@@ -122,7 +124,9 @@ export function getMainScreenViewModel({
       streaming: Boolean(streamingText),
       replyProvider: replyProvider ?? phaseProvider ?? provider,
       searchProvider: phaseProvider ?? settings.webSearchProvider,
-      speechInputProvider: phaseProvider ?? null,
+      speechInputProvider: phaseProvider === undefined
+        ? configuredSpeechInput
+        : phaseProvider ?? "device",
       speechOutputProvider: speechTransfer?.provider,
       speechTransfer: speechTransfer?.stage,
       t,

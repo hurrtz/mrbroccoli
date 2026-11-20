@@ -50,11 +50,15 @@ initial default, but must not permanently couple those settings.
   into every locale. This keeps a feature's copy reviewable without weakening
   dictionary completeness.
 - `workspaceTranslations.ts` owns the route header, orb satellite and
-  transport labels, provider activity, recording time left, automatic naming,
+  transport labels, actor-specific activity captions, accessible recording
+  time left, automatic naming,
   attachment-popover copy, and the conversation-settings
   sentence. That sentence prefixes the localized Hands free state only while
   the session loop is enabled; length, tone, and voice remain unlabelled values
   separated by middle dots.
+- Activity captions preserve the supplied capitalization. Provider verbs
+  follow the icon and are spoken after the provider name. Waiting for the
+  response uses the app's voice.
 - Interpolation placeholders and plural/select shapes must remain consistent
   across locales.
 - Product spelling remains “Mr Broccoli” in every locale unless a deliberate

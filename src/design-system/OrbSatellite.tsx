@@ -175,6 +175,7 @@ const styles = StyleSheet.create({
   label: {
     ...textStyles.orbCaption,
     textAlign: "center",
+    textTransform: "uppercase",
   },
   disabled: {
     opacity: 0.38,

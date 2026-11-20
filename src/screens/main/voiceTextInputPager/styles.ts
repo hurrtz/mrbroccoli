@@ -23,7 +23,6 @@ export const voiceTextInputPagerStyles = StyleSheet.create({
     minHeight: 36,
   },
   activityText: { ...textStyles.orbCaption, flexShrink: 1, textAlign: "center" },
-  activityTimer: { ...textStyles.orbCaption, fontVariant: ["tabular-nums"] },
   rootWithFooter: {
     justifyContent: "center",
   },

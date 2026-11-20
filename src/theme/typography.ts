@@ -64,7 +64,6 @@ export const textStyles = {
     fontSize: 9,
     lineHeight: 12,
     letterSpacing: 0.75,
-    textTransform: "uppercase",
   },
   controlLabel: {
     fontFamily: fonts.mono,

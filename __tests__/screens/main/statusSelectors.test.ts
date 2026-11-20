@@ -1,4 +1,56 @@
-import { getStatusDisplayData } from "../../../src/screens/main/statusSelectors";
+import { translate } from "../../../src/i18n";
+import { getOrbActivity, getStatusDisplayData } from "../../../src/screens/main/statusSelectors";
+
+describe("home activity captions", () => {
+  type ActivityInput = Parameters<typeof getOrbActivity>[0];
+  const states: {
+    phase: ActivityInput["phase"];
+    details?: Partial<Pick<ActivityInput, "paused" | "streaming" | "speechTransfer">>;
+    actor?: ActivityInput["replyProvider"];
+    de: string;
+    en: string;
+  }[] = [
+    { phase: "idle", de: "bereit", en: "ready" },
+    { phase: "recording", de: "höre zu", en: "listening" },
+    { phase: "transcribing", actor: "elevenlabs", de: "transkribiert", en: "transcribes" },
+    { phase: "thinking-briefly", actor: "anthropic", de: "empfängt", en: "receives" },
+    { phase: "searching", actor: "gemini", de: "sucht online", en: "searches online" },
+    { phase: "thinking", de: "empfange", en: "receive" },
+    {
+      phase: "thinking", details: { streaming: true }, actor: "anthropic",
+      de: "antwortet", en: "responds",
+    },
+    { phase: "synthesizing", de: "bereite Sprache vor", en: "preparing speech" },
+    {
+      phase: "synthesizing", details: { speechTransfer: "sending-text" }, actor: "openai",
+      de: "empfängt Text", en: "receives text",
+    },
+    {
+      phase: "synthesizing", details: { speechTransfer: "receiving-audio" }, actor: "openai",
+      de: "sendet Audio", en: "sends audio",
+    },
+    { phase: "speaking", de: "spiele ab", en: "playing" },
+    { phase: "speaking", details: { paused: true }, de: "Pause", en: "pause" },
+  ];
+
+  it.each(states)('attributes "$en" to the active route in both languages', (state) => {
+    for (const language of ["de", "en"] as const) {
+      const activity = getOrbActivity({
+        phase: state.phase,
+        paused: false,
+        streaming: false,
+        speechInputProvider: "elevenlabs",
+        replyProvider: "anthropic",
+        searchProvider: "gemini",
+        speechOutputProvider: "openai",
+        ...state.details,
+        t: (key) => translate(language, key),
+      });
+      expect(activity.label).toBe(state[language]);
+      expect(activity.provider).toBe(state.actor);
+    }
+  });
+});
 
 describe("statusSelectors", () => {
   it("builds idle state labels from message count and input mode", () => {

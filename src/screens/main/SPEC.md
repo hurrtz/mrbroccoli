@@ -166,11 +166,13 @@ receive already-derived state and callbacks.
   protected from preview interruption.
 - A localized line above the orb describes the active operation. It uses the
   same caption typography as the controls below. Its distance from the ring
-  mirrors the lower control row when the stage has room. An icon
-  identifies the provider doing the work. It follows recording, transcription,
-  search, prompt submission, model thinking and streaming, speech transfer,
-  playback, and pause. Recording also shows the time left until auto-send.
-  Screen readers announce changes of activity without announcing every tick.
+  mirrors the lower control row when the stage has room. The actor's icon
+  precedes transcription, prompt receipt, web search, streamed answers, and
+  both directions of speech transfer. On-device transcription uses the device
+  glyph. Ready, listening, waiting for a reply, speech preparation, playback
+  and pause use the app's own voice. The caption preserves localized casing.
+  During recording, the button exposes the time left as its accessibility
+  value. Screen readers announce changes of activity.
 - The processing ring uses the running turn’s output mode. Spoken replies use
   the time to first speech, and text-only replies use the time to completion.
   A configured cloud speech fallback shows the provider actually transferring
