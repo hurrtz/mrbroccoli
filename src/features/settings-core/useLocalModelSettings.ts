@@ -15,6 +15,7 @@ import { useLocalization } from "../../i18n";
 import {
   evaluateLocalModelEligibility,
   getLocalModelBenchmarkResults,
+  localModelBenchmarkMatchesDevice,
   probeLocalDeviceCapabilities,
   type LocalDeviceSnapshot,
   type LocalModelBenchmarkResult,
@@ -105,9 +106,19 @@ export function useLocalModelSettings({
   const [installs, setInstalls] = React.useState<
     Partial<Record<LocalModelId, LocalModelInstallStatus>>
   >({});
-  const [benchmarks, setBenchmarks] = React.useState<
+  const [storedBenchmarks, setBenchmarks] = React.useState<
     Partial<Record<LocalModelId, LocalModelBenchmarkResult>>
   >({});
+  const benchmarks = React.useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(storedBenchmarks).filter(
+          ([, benchmark]) =>
+            snapshot && localModelBenchmarkMatchesDevice(benchmark, snapshot),
+        ),
+      ) as typeof storedBenchmarks,
+    [snapshot, storedBenchmarks],
+  );
   const [errors, setErrors] = React.useState<
     Partial<Record<LocalModelId, LocalModelActionError>>
   >({});

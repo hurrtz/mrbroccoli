@@ -75,7 +75,7 @@ export function localModelBenchmarkMatchesDevice(
 ) {
   return (
     benchmark?.catalogVersion === LOCAL_MODEL_CATALOG_VERSION &&
-    benchmark?.device.platform === snapshot.platform &&
+    benchmark?.device?.platform === snapshot.platform &&
     benchmark.device.architecture === snapshot.architecture &&
     benchmark.device.osVersion === snapshot.osVersion &&
     benchmark.device.physicalMemoryBytes === snapshot.physicalMemoryBytes

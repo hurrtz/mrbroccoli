@@ -18,6 +18,10 @@ last_validated_sha: 7db5c94
 
 # Settings Feature Specification
 
+Persisted speech model test results apply only to the matching catalog, OS
+version, architecture, platform and physical memory. Settings require a fresh
+test after any of those change.
+
 ## Purpose
 
 Settings exposes deep control without placing provider machinery on the main

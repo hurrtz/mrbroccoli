@@ -39,6 +39,7 @@ import {
   resetRuntimeCapabilityOverridesForTests,
 } from "../../src/services/runtimeCapabilityOverrides";
 import { getLocalCatalogInstallStatuses } from "../../src/services/localSpeechModelManager";
+import { LOCAL_MODEL_CATALOG_VERSION } from "../../src/constants/localModels";
 import { getLocalModelBenchmarkResults } from "../../src/services/localDeviceCapabilities";
 
 const NativeDialogType = NativeDialog as unknown as React.ComponentType<any>;
@@ -717,6 +718,8 @@ describe("SettingsModal", () => {
     jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({
       "kokoro-multilingual": {
         status: "viable",
+        catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
+        device: { platform: "ios", architecture: "arm64", osVersion: "26.6", physicalMemoryBytes: 8 * 1024 ** 3 },
       },
     } as never);
     const onPreviewVoice = jest.fn(async () => undefined);
@@ -767,6 +770,37 @@ describe("SettingsModal", () => {
     );
   });
 
+  it("requires a new model test after an OS upgrade", async () => {
+    jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({
+      "kokoro-multilingual": {
+        installed: true,
+        path: "/models/kokoro",
+        verified: true,
+      },
+    });
+    jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({
+      "kokoro-multilingual": {
+        status: "viable",
+        catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
+        device: {
+          platform: "ios",
+          architecture: "arm64",
+          osVersion: "25",
+          physicalMemoryBytes: 8 * 1024 ** 3,
+        },
+      },
+    } as never);
+    const screen = renderSettingsModal({ focusTab: "tts" });
+    await waitFor(() =>
+      expect(
+        screen.getByTestId("local-model-test-kokoro-multilingual"),
+      ).toBeTruthy(),
+    );
+    expect(
+      screen.queryByTestId("local-model-viable-kokoro-multilingual"),
+    ).toBeNull();
+  });
+
   it("keeps a functional but slower Kokoro benchmark selectable", async () => {
     jest.mocked(getLocalCatalogInstallStatuses).mockResolvedValue({
       "kokoro-multilingual": {
@@ -778,6 +812,8 @@ describe("SettingsModal", () => {
     jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({
       "kokoro-multilingual": {
         status: "below-target",
+        catalogVersion: LOCAL_MODEL_CATALOG_VERSION,
+        device: { platform: "ios", architecture: "arm64", osVersion: "26.6", physicalMemoryBytes: 8 * 1024 ** 3 },
       },
     } as never);
     const onUpdate = jest.fn();
