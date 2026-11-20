@@ -1,10 +1,15 @@
 import React from "react";
-import { Modal as RNModal, StyleSheet, Text } from "react-native";
+import { Modal as RNModal, StyleSheet, Text, useWindowDimensions } from "react-native";
 import { fireEvent } from "@testing-library/react-native";
 
 import { SettingsSheet } from "../../src/features/settings/settings-primitives/SettingsSheet";
 import { lightColors } from "../../src/theme/colors";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
+
+jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
+  __esModule: true,
+  default: jest.fn(() => ({ width: 390, height: 844, scale: 3, fontScale: 1 })),
+}));
 
 describe("SettingsSheet", () => {
   function renderSheet(onClose = jest.fn()) {
@@ -52,5 +57,15 @@ describe("SettingsSheet", () => {
 
     fireEvent.press(handle);
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it.each([1, 1.8])("fits the portrait heading at font scale %s", (fontScale) => {
+    jest.mocked(useWindowDimensions).mockReturnValue({
+      width: 390, height: 844, scale: 3, fontScale,
+    });
+    const { screen } = renderSheet();
+    expect(screen.getByText("Voice settings").props.numberOfLines).toBe(
+      fontScale > 1 ? undefined : 1,
+    );
   });
 });

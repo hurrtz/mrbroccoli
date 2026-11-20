@@ -256,7 +256,7 @@ export const de = {
   adaptiveLength: "Antwortlänge",
   responseTone: "Antwortstil",
   homeStyleChipLabel: ({ tone, length }) => `Stil — ${tone} · ${length}`,
-  styleSheetTitle: "Gesprächseinstellungen",
+  styleSheetTitle: "Gesprächs\u00adeinstellungen",
   styleSheetSubtitle:
     "Passe Antworten und Sprachausgabe nur für dieses Gespräch an.",
   openStyleSheet: "Gesprächseinstellungen öffnen",

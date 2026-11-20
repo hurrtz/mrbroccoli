@@ -30,8 +30,9 @@ export function SheetHeader({
   title: string;
 }) {
   const { colors } = useTheme();
-  const { height, width } = useWindowDimensions();
+  const { fontScale, height, width } = useWindowDimensions();
   const isPortrait = height > width;
+  const wrapCopy = isPortrait && fontScale > 1;
 
   return (
     <View
@@ -56,14 +57,14 @@ export function SheetHeader({
         <Text
           accessibilityRole="header"
           ellipsizeMode="tail"
-          numberOfLines={1}
+          numberOfLines={wrapCopy ? undefined : 1}
           style={[styles.title, { color: colors.text }]}
         >
           {title}
         </Text>
         {subtitle ? (
           <Text
-            numberOfLines={2}
+            numberOfLines={wrapCopy ? undefined : 2}
             style={[styles.subtitle, { color: colors.textSecondary }]}
           >
             {subtitle}
@@ -90,11 +91,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 78,
     paddingBottom: 12,
-    paddingHorizontal: 60,
+    paddingHorizontal: 16,
     position: "relative",
   },
   dialogHeader: {
     minHeight: 56,
+    paddingHorizontal: 60,
     paddingBottom: 10,
     paddingTop: 10,
   },

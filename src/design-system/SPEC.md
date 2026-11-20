@@ -159,7 +159,9 @@ framework or hiding platform behavior behind excessive abstraction.
   the sheet card adds no separate top inset, and the parent sheet attaches
   pull-down dismissal to that header. There is no redundant close icon. In
   landscape, where the sheet becomes a dialog and cannot drag, the header
-  substitutes a labelled close icon.
+  substitutes a labelled close icon. Enlarged portrait titles and subtitles wrap
+  inside the sheet’s content gutter. Landscape headers reserve space for the
+  close button.
 - `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
   whose sheet deliberately does not use the generic elevated dialog surface or
   padding. The caller still owns safe-area clearance and must keep the default

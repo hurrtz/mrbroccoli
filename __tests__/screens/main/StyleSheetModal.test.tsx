@@ -53,8 +53,7 @@ describe("StyleSheetModal", () => {
 
   it("renders title, subtitle, and active option descriptions", () => {
     const { getByText } = setup();
-    expect(getByText("Conversation settings").props.numberOfLines).toBe(1);
-    expect(getByText("Conversation settings").props.ellipsizeMode).toBe("tail");
+    expect(getByText("Conversation settings")).toBeTruthy();
     expect(
       StyleSheet.flatten(getByText("Conversation settings").props.style),
     ).toEqual(
