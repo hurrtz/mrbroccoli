@@ -27,8 +27,11 @@ STT/TTS capability, speech languages, voice defaults, and voice directories.
 
 `src/constants/models.ts`, picker helpers, route normalization, request
 services, and release validation derive from this manifest. `data/providers/`
-contains broader researched catalogue material; being present there does not
-make a model or provider executable in the app.
+contains attributed model cards for every curated answering route, along with
+broader vendor research. OpenRouter cards identify both the public alias and
+canonical snapshot and carry the gateway's own published limits and base rates.
+Public vendor speech capability and the app's wired transports are recorded
+independently.
 
 ## Runtime Provider Set
 
@@ -81,6 +84,8 @@ gateway counterpart has its own documented effort range and default. Grok 4.7
 and DeepSeek V4.1 Flash remain their providers' current answering models.
 Existing usable direct and gateway routes retain their IDs. OpenRouter accepts
 its public model aliases on settings import and stores their canonical snapshots.
+xAI recorded transcription stores and sends `grok-voice-transcribe-2.0`. The
+previous app identifier and the retired 1.0 model resolve to the same model.
 
 Gemini 4 Neon and Hydrogen support low, medium, high and extra-high thinking,
 with a high default. Carbon and Argon support low, medium and high, with a medium

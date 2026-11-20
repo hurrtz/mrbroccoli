@@ -10,6 +10,8 @@ this file is a human-readable reference for product and maintenance decisions.
 
 - Runtime providers must be useful for the voice-first conversation loop.
 - Dedicated web-search and web-data vendors are no longer runtime providers.
+- Every curated answering route has a sourced model card. OpenRouter cards store
+  the published public alias, canonical snapshot, base token prices and limits.
 - Model pickers are curated. They intentionally exclude retired,
   redundant alias, wrong-endpoint, coding-only, image/video-only, Chinese-only, and
   Mandarin-only rows.
@@ -93,7 +95,8 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Transparency: final-stream router metadata records the selected upstream,
   routed model, attempts, strategy, and any OpenRouter context compression in
   the turn receipt.
-- STT/TTS/web search: not runtime-exposed through this gateway.
+- The app uses this gateway for chat. OpenRouter also publishes routed
+  transcription and synthesis APIs. [Audio endpoints](https://openrouter.ai/blog/announcements/announcing-audio-apis/)
 
 ### Anthropic (`anthropic`)
 
@@ -152,7 +155,10 @@ validation, API-key storage, setup-guide routing, and web-search dispatch:
 - Web search: xAI Responses API with `web_search`; search mode maps to
   `max_turns`. Requests set `store: false`. Grok 4.6 search fallback uses low
   effort and at least 4,096 output tokens for reasoning headroom.
-- STT picker: standalone xAI `grok-stt` route.
+- Recorded transcription uses `grok-voice-transcribe-2.0` with the multipart
+  file last. Both the previous `grok-stt` setting and retired 1.0 ID resolve to
+  this model. It accepts recordings up to 500 MB and all 19 language choices.
+  [Recorded transcription](https://docs.x.ai/developers/model-capabilities/audio/speech-to-text)
 - TTS picker: standalone xAI `text-to-speech` route, backed by the Grok TTS
   service catalog entry.
 
