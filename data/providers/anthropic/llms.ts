@@ -1,6 +1,80 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
 export const llms = providerContext.defineLlms([
+  ...[
+    {
+      modelId: "claude-fable-5-2",
+      publicName: "Claude Fable 5.2",
+      inputUsd: 8,
+      outputUsd: 40,
+    },
+    {
+      modelId: "claude-opus-5-5",
+      publicName: "Claude Opus 5.5",
+      inputUsd: 4,
+      outputUsd: 20,
+    },
+    {
+      modelId: "claude-sonnet-5-5",
+      publicName: "Claude Sonnet 5.5",
+      inputUsd: 2,
+      outputUsd: 10,
+    },
+    {
+      modelId: "claude-haiku-5-5",
+      publicName: "Claude Haiku 5.5",
+      inputUsd: 0.1,
+      outputUsd: 0.5,
+    },
+    {
+      modelId: "claude-fable-5-1",
+      publicName: "Claude Fable 5.1",
+      inputUsd: 10,
+      outputUsd: 50,
+    },
+    {
+      modelId: "claude-sonnet-5",
+      publicName: "Claude Sonnet 5",
+      inputUsd: 2,
+      outputUsd: 10,
+    },
+    {
+      modelId: "claude-opus-5",
+      publicName: "Claude Opus 5",
+      inputUsd: 5,
+      outputUsd: 25,
+    },
+    {
+      modelId: "claude-fable-5",
+      publicName: "Claude Fable 5",
+      inputUsd: 10,
+      outputUsd: 50,
+    },
+  ].map(({ modelId, publicName, inputUsd, outputUsd }) =>
+    providerContext.llm({
+      modelId,
+      publicName,
+      ...modelTokenTerms({
+        contextTokens: 1_000_000,
+        outputTokens: 128_000,
+        inputUsd,
+        outputUsd,
+      }),
+      status: "Available on the Claude API",
+      notes:
+        modelId === "claude-fable-5-2"
+          ? "Anthropic retains data for 30 days on this model unless the organization has express authorization for zero retention."
+          : "Messages accepts text and image input and produces text. Effort uses output_config.",
+      officialSources: [
+        `https://platform.claude.com/docs/en/models/${modelId.slice("claude-".length)}/overview`,
+        "https://platform.claude.com/docs/en/models/overview",
+      ],
+      supportsRealtime: false,
+      supportsBatch: true,
+      languageSupport: null,
+    }),
+  ),
   providerContext.llm(
     {
       "providerId": "anthropic",

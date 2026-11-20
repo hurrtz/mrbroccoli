@@ -12,6 +12,7 @@ export const providerDefinition = defineProviderDefinition(
       "tts": "unsupported"
     },
     "officialSources": [
+      "https://platform.claude.com/docs/en/models/overview",
       "https://platform.claude.com/docs/en/about-claude/models/overview",
       "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-8",
       "https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-7",
@@ -46,7 +47,7 @@ export const providerDefinition = defineProviderDefinition(
       "regionSplitRecommended": false
     },
     "summaries": {
-      "pricing": "Latest direct models: Opus 4.8 $5 / million input tokens and $25 / million output tokens; Sonnet 4.6 $3 / $15; Haiku 4.5 $1 / $5. Batch API is 50% off input and output pricing. Prompt caching multipliers are public: 5-minute cache writes 1.25x, 1-hour cache writes 2x, cache hits 0.1x. US-only inference_geo pricing is 1.1x for Opus 4.6 and newer models.",
+      "pricing": "Standard short text requests per million input and output tokens cost USD 8 and 40 on Fable 5.2, USD 4 and 20 on Opus 5.5, USD 2 and 10 on Sonnet 5.5, and USD 0.10 and 0.50 on Haiku 5.5. Prompt caching, batch, routing and longer requests have separate terms.",
       "limits": "Standard request body limit 32 MB; Message Batches 256 MB; Files API 500 MB per file and 500 GB total organization storage. PDFs up to 600 pages per request, or 100 pages on 200k-context models. Images up to 600 per request, or 100 on 200k-context models. Batch jobs can take up to 24 hours. Exact RPM/ITPM/OTPM values should be treated as live policy.",
       "region": "Anthropic publishes a supported-country list for API access. The direct API supports inference_geo controls with global default behavior and US-only inference controls. Files API beta is first-party only and is not supported on Amazon Bedrock or Google Vertex AI.",
       "sttLanguages": "Unsupported on first-party public API.",

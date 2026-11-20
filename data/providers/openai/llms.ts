@@ -1,6 +1,71 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
 export const llms = providerContext.defineLlms([
+  ...[
+    {
+      modelId: "gpt-6.2-astra",
+      publicName: "GPT-6.2 Astra",
+      inputUsd: 8,
+      outputUsd: 40,
+    },
+    {
+      modelId: "gpt-6.2-sol",
+      publicName: "GPT-6.2 Sol",
+      inputUsd: 2,
+      outputUsd: 10,
+    },
+    {
+      modelId: "gpt-6.1-terra",
+      publicName: "GPT-6.1 Terra",
+      inputUsd: 1,
+      outputUsd: 5,
+    },
+    {
+      modelId: "gpt-6.1-sol",
+      publicName: "GPT-6.1 Sol",
+      inputUsd: 2,
+      outputUsd: 10,
+    },
+    {
+      modelId: "gpt-6-astra",
+      publicName: "GPT-6 Astra",
+      inputUsd: 10,
+      outputUsd: 50,
+    },
+    {
+      modelId: "gpt-6-sol",
+      publicName: "GPT-6 Sol",
+      inputUsd: 2,
+      outputUsd: 10,
+    },
+    {
+      modelId: "gpt-6-luna",
+      publicName: "GPT-6 Luna",
+      inputUsd: 0.1,
+      outputUsd: 0.5,
+    },
+  ].map(({ modelId, publicName, inputUsd, outputUsd }) =>
+    providerContext.llm({
+      modelId,
+      publicName,
+      ...modelTokenTerms({
+        contextTokens: 1_050_000,
+        outputTokens: 128_000,
+        inputUsd,
+        outputUsd,
+      }),
+      status: "Available on the OpenAI API",
+      notes:
+        "Text and image input, text output. Chat Completions and Responses support streaming.",
+      officialSources: [
+        `https://developers.openai.com/api/docs/models/${modelId}`,
+      ],
+      supportsRealtime: false,
+      supportsBatch: true,
+      languageSupport: null,
+    }),
+  ),
   providerContext.llm(
     {
       "modelId": "gpt-5.6-sol",

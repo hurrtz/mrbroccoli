@@ -12,6 +12,8 @@ export const providerDefinition = defineProviderDefinition(
       "tts": "native"
     },
     "officialSources": [
+      "https://developers.openai.com/api/docs/models/gpt-6.2-astra",
+      "https://developers.openai.com/api/docs/models/gpt-6.2-sol",
       "https://developers.openai.com/api/docs/models",
       "https://developers.openai.com/api/docs/models/all",
       "https://developers.openai.com/api/reference/resources/models/methods/list/",
@@ -50,7 +52,7 @@ export const providerDefinition = defineProviderDefinition(
       "regionSplitRecommended": true
     },
     "summaries": {
-      "pricing": "Public first-party pricing exists for GPT-5.4 family, GPT-4.1 family, realtime voice, transcription, and legacy TTS. Batch API pricing is publicly documented at 50% off standard rates over 24 hours. Public numeric pricing for gpt-4o-mini-tts was not surfaced in the opened official pages, so treat that model's exact price as unknown until re-verified.",
+      "pricing": "GPT-6.2 Astra costs USD 8 per million text input tokens and USD 40 per million output tokens. GPT-6.2 Sol costs USD 2 and USD 10 respectively. Each model card lists its own rates and supported service tiers. Audio models use separate pricing.",
       "limits": "Speech-to-text uploads are limited to 25 MB. Realtime sessions are capped at 60 minutes. Speech generation input is capped at 4,096 characters. gpt-4o-mini-tts has a 2,000-token input cap. Custom voices are limited to 20 per organization; sample audio must be 30 seconds or less and uploads are capped at 10 MiB.",
       "region": "Data residency is configured per project. US and Europe support regional storage + processing; Australia, Canada, India, Japan, Singapore, South Korea, UAE, and UK are storage-only in the opened docs. Region-specific domains are documented (for example, eu.api.openai.com and us.api.openai.com), and feature caveats apply by region.",
       "sttLanguages": "Official speech-to-text docs list 57 supported languages for current STT models, while also noting the underlying model family was trained on 98 languages. Whisper translation is documented only into English.",

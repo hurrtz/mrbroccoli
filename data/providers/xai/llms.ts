@@ -1,6 +1,27 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
 export const llms = providerContext.defineLlms([
+  providerContext.llm({
+    modelId: "grok-4.7",
+    publicName: "Grok 4.7",
+    status: "Available on the xAI API",
+    ...modelTokenTerms({
+      contextTokens: 500_000,
+      inputUsd: 2,
+      outputUsd: 6,
+      priceBasis: "Standard requests below 200K prompt tokens",
+    }),
+    notes:
+      "Text and image input, text output. The direct rate is USD 4 per million input tokens and USD 12 per million output tokens above the 200K threshold.",
+    officialSources: [
+      "https://docs.x.ai/developers/models/grok-4.7",
+      "https://docs.x.ai/developers/release-notes",
+    ],
+    supportsRealtime: false,
+    supportsBatch: true,
+    languageSupport: null,
+  }),
   providerContext.llm(
     {
       "modelId": "grok-4.6",

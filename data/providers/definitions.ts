@@ -39,6 +39,64 @@ type CatalogModelInput<TModel extends CatalogModelDocument> = Omit<
 > &
   Partial<Pick<TModel, ProviderScopedModelFields>>;
 
+/** Standard short-request token rates and limits for one published model card. */
+export function modelTokenTerms({
+  contextTokens,
+  outputTokens,
+  inputUsd,
+  outputUsd,
+  priceBasis = "Standard text requests",
+}: {
+  contextTokens: number;
+  outputTokens?: number;
+  inputUsd: number;
+  outputUsd: number;
+  priceBasis?: string;
+}): Pick<
+  CatalogLlm,
+  "pricingSummary" | "limitsSummary" | "constraints" | "priceMeasurements"
+> {
+  const constraints: CatalogLlm["constraints"] = [
+    {
+      metric: "context_tokens",
+      comparator: "=",
+      value: contextTokens,
+      unit: "tokens",
+      scope: "model",
+      sourceText: `Context window of ${contextTokens.toLocaleString("en-US")} tokens.`,
+    },
+  ];
+  if (outputTokens !== undefined) {
+    constraints.push({
+      metric: "other",
+      comparator: "<=",
+      value: outputTokens,
+      unit: "tokens",
+      scope: "output",
+      sourceText: `Maximum output of ${outputTokens.toLocaleString("en-US")} tokens.`,
+    });
+  }
+  return {
+    constraints,
+    limitsSummary: constraints
+      .map((constraint) => constraint.sourceText)
+      .join(" "),
+    pricingSummary: `${priceBasis}. USD ${inputUsd} per million input tokens and USD ${outputUsd} per million output tokens.`,
+    priceMeasurements: [
+      {
+        unit: "million_input_tokens",
+        amountUsd: inputUsd,
+        sourceText: `${priceBasis}. USD ${inputUsd} per million input tokens.`,
+      },
+      {
+        unit: "million_output_tokens",
+        amountUsd: outputUsd,
+        sourceText: `${priceBasis}. USD ${outputUsd} per million output tokens.`,
+      },
+    ],
+  };
+}
+
 export function defineProvider<T extends CatalogProvider>(provider: T) {
   return provider;
 }
