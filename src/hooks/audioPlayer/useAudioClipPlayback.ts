@@ -167,7 +167,7 @@ export function useAudioClipPlayback(params: {
           diagnostics,
           onPlaybackStarted,
         });
-        nativeAudioQueuePendingCountRef.current += 1;
+        nativeAudioQueuePendingCountRef.current = nativeAudioQueueContextsRef.current.size;
         recordSpeechDiagnostic({
           requestId: diagnostics?.requestId,
           source: diagnostics?.source ?? "unknown",

@@ -55,10 +55,7 @@ export function useNativeAudioQueuePlayback(params: {
           generation !== playbackGenerationRef.current
         ) {
           nativeAudioQueueContextsRef.current.delete(itemId);
-          nativeAudioQueuePendingCountRef.current = Math.max(
-            0,
-            nativeAudioQueuePendingCountRef.current - 1,
-          );
+          nativeAudioQueuePendingCountRef.current = nativeAudioQueueContextsRef.current.size;
           updatePendingPlaybackState();
           return;
         }
@@ -74,10 +71,7 @@ export function useNativeAudioQueuePlayback(params: {
         }
       } catch (error) {
         nativeAudioQueueContextsRef.current.delete(itemId);
-        nativeAudioQueuePendingCountRef.current = Math.max(
-          0,
-          nativeAudioQueuePendingCountRef.current - 1,
-        );
+        nativeAudioQueuePendingCountRef.current = nativeAudioQueueContextsRef.current.size;
         recordSpeechDiagnostic({
           requestId: diagnostics?.requestId,
           source: diagnostics?.source ?? "unknown",

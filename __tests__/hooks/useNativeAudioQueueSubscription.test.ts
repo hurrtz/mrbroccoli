@@ -158,6 +158,13 @@ describe("useNativeAudioQueueSubscription", () => {
         uri: "file:///tmp/broken.m4a",
         message: "Unsupported audio.",
       });
+      nativeAudioQueueListener?.({ type: "drained" });
+      nativeAudioQueueListener?.({ type: "finished", itemId: "old-generation" });
+      nativeAudioQueueListener?.({ type: "started", itemId: "old-generation" });
+      expect(nativeAudioQueueContextsRef.current.has("next")).toBe(true);
+      expect(nativeAudioQueuePendingCountRef.current).toBe(1);
+      expect(currentAudioRef.current).toBeNull();
+      expect(finalizeDrainedState).not.toHaveBeenCalled();
       nativeAudioQueueListener?.({
         type: "started",
         itemId: "next",

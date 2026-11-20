@@ -75,6 +75,8 @@ conversation, edition, provider, or fallback policy.
   competing starts reject without tearing down that owner. A failed new start
   rolls back only its own audio engine/session and partial output inside the
   recorder; the bridge must not unconditionally clear an existing recorder.
+- A native drain covers only clips already handed to native playback. Pending
+  JavaScript clips retain their generation, diagnostics, and callbacks.
 - Queue callbacks are generation-safe: completion from an obsolete item cannot
   advance or resurrect a cleared queue.
 - The Sherpa iOS TTS bridge checks both its optional TTS wrapper and its

@@ -65,66 +65,70 @@ export function useNativeAudioQueueSubscription(params: {
         ? nativeAudioQueueContextsRef.current.get(itemId)
         : undefined;
 
+      // Native events can outlive their JS generation. Only registered items
+      // own playback state; a native drain can precede the next JS enqueue.
+      if (
+        event.type === "drained" &&
+        nativeAudioQueueContextsRef.current.size > 0
+      ) {
+        return;
+      }
       switch (event.type) {
         case "started": {
-          if (context) {
-            currentAudioRef.current = {
-              generation: context.generation,
-              id: itemId,
-              uri: context.uri,
-              diagnostics: context.diagnostics,
-            };
-          }
+          if (!context) return;
+          currentAudioRef.current = {
+            generation: context.generation,
+            id: itemId,
+            uri: context.uri,
+            diagnostics: context.diagnostics,
+          };
           hasSeenAudioPlayingRef.current = true;
           playingRef.current = true;
           nativeAudioQueuePlayingRef.current = true;
           setNativeAudioQueuePlaying(true);
-          context?.onPlaybackStarted?.();
+          context.onPlaybackStarted?.();
           recordSpeechDiagnostic({
             requestId:
-              context?.diagnostics?.requestId ?? event.requestId ?? undefined,
+              context.diagnostics?.requestId ?? event.requestId ?? undefined,
             source:
-              context?.diagnostics?.source ??
+              context.diagnostics?.source ??
               (event.source as SpeechDiagnosticsContext["source"] | null) ??
               "unknown",
             stage: "playback-started",
-            provider: context?.diagnostics?.provider ?? null,
-            providerModel: context?.diagnostics?.providerModel ?? null,
+            provider: context.diagnostics?.provider ?? null,
+            providerModel: context.diagnostics?.providerModel ?? null,
           });
           updatePendingPlaybackState();
           break;
         }
         case "finished":
         case "failed": {
-          if (context) {
-            recordSpeechDiagnostic({
-              requestId:
-                context.diagnostics?.requestId ?? event.requestId ?? undefined,
-              source:
-                context.diagnostics?.source ??
-                (event.source as SpeechDiagnosticsContext["source"] | null) ??
-                "unknown",
-              stage:
-                event.type === "finished"
-                  ? "playback-finished"
-                  : "playback-stopped",
-              provider: context.diagnostics?.provider ?? null,
-              providerModel: context.diagnostics?.providerModel ?? null,
-              message:
-                event.type === "failed"
-                  ? (event.message ?? undefined)
-                  : undefined,
-            });
-          }
-
-          if (itemId) {
-            nativeAudioQueueContextsRef.current.delete(itemId);
-          }
-          nativeAudioQueuePendingCountRef.current = Math.max(
-            0,
-            nativeAudioQueuePendingCountRef.current - 1,
-          );
-          if (nativeAudioQueuePendingCountRef.current === 0) {
+          if (!context) return;
+          recordSpeechDiagnostic({
+            requestId:
+              context.diagnostics?.requestId ?? event.requestId ?? undefined,
+            source:
+              context.diagnostics?.source ??
+              (event.source as SpeechDiagnosticsContext["source"] | null) ??
+              "unknown",
+            stage:
+              event.type === "finished"
+                ? "playback-finished"
+                : "playback-stopped",
+            provider: context.diagnostics?.provider ?? null,
+            providerModel: context.diagnostics?.providerModel ?? null,
+            message:
+              event.type === "failed"
+                ? (event.message ?? undefined)
+                : undefined,
+          });
+          nativeAudioQueueContextsRef.current.delete(itemId);
+          nativeAudioQueuePendingCountRef.current =
+            nativeAudioQueueContextsRef.current.size;
+          if (
+            currentAudioRef.current?.id === itemId ||
+            nativeAudioQueuePendingCountRef.current === 0
+          ) {
             currentAudioRef.current = null;
             hasSeenAudioPlayingRef.current = false;
             playingRef.current = false;
@@ -132,14 +136,6 @@ export function useNativeAudioQueueSubscription(params: {
             setNativeAudioQueuePlaying(false);
           }
           updatePendingPlaybackState();
-          if (
-            !cancelledRef.current &&
-            !playbackPausedRef.current &&
-            nativeAudioQueuePendingCountRef.current === 0 &&
-            nativeQueueRef.current.length > 0
-          ) {
-            void playNextNative();
-          }
           break;
         }
         case "stopped": {
@@ -152,7 +148,6 @@ export function useNativeAudioQueueSubscription(params: {
           nativeAudioQueuePlayingRef.current = false;
           setNativeAudioQueuePlaying(false);
           nativeAudioQueuePendingCountRef.current = 0;
-          nativeAudioQueueContextsRef.current.clear();
           updatePendingPlaybackState();
 
           if (
