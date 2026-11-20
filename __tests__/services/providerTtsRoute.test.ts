@@ -123,6 +123,7 @@ describe("synthesizeProviderSpeech", () => {
         text: "Привіт",
         voice: "voice-123",
         provider: "mistral",
+        providerModel: "voxtral-mini-tts-2603",
         apiKey: "mistral-test",
         language: "en",
         speechLanguage: "uk",

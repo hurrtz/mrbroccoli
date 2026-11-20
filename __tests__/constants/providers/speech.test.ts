@@ -10,7 +10,30 @@ import {
   providerUsesTtsVoiceDirectory,
 } from "../../../src/constants/providers/speech";
 
+import {
+  providerSupportsSttLanguage,
+  providerSupportsTtsLanguage,
+} from "../../../src/constants/providerSpeechLanguages";
+
 describe("speech provider constants", () => {
+  it("exposes Hungarian and Urdu only for the ElevenLabs speech models that support them", () => {
+    expect(providerSupportsTtsLanguage("elevenlabs", "ur", "eleven_v4_turbo")).toBe(true);
+    expect(providerSupportsTtsLanguage("elevenlabs", "ur", "eleven_v4")).toBe(true);
+    expect(providerSupportsTtsLanguage("elevenlabs", "ur", "eleven_v3")).toBe(true);
+    expect(providerSupportsTtsLanguage("elevenlabs", "ur", "eleven_flash_v2_5")).toBe(false);
+    expect(providerSupportsTtsLanguage("elevenlabs", "hu", "eleven_flash_v2_5")).toBe(true);
+    expect(providerSupportsTtsLanguage("elevenlabs", "hu", "eleven_multilingual_v2")).toBe(false);
+  });
+
+  it("checks the selected Voxtral generation before offering a language", () => {
+    expect(providerSupportsSttLanguage("mistral", "uk", "voxtral-mini-transcribe-3-0")).toBe(true);
+    expect(providerSupportsSttLanguage("mistral", "uk", "voxtral-mini-2602")).toBe(false);
+    expect(providerSupportsTtsLanguage("mistral", "uk", "voxtral-mini-tts-3-0")).toBe(true);
+    expect(providerSupportsTtsLanguage("mistral", "uk", "voxtral-mini-tts-2603")).toBe(false);
+    expect(providerSupportsSttLanguage("mistral", "ur", "voxtral-small-transcribe-3-0")).toBe(false);
+    expect(providerSupportsTtsLanguage("mistral", "ur", "voxtral-mini-tts-3-0")).toBe(true);
+  });
+
   it("uses catalog labels for exact STT model matches", () => {
     expect(getSttModelLabel("openai", "gpt-4o-mini-transcribe-2025-12-15")).toBe(
       "GPT-4o mini Transcribe",
@@ -34,20 +57,27 @@ describe("speech provider constants", () => {
   it("surfaces Gemini audio transcription and the Mistral STT model", () => {
     expect(getProviderSttModelOptions("gemini")).toEqual([
       { id: "gemini-3.5-transcribe", name: "Gemini 3.5 Transcribe" },
+      { id: "gemini-4-neon", name: "Gemini 4 Neon" },
+      { id: "gemini-4-hydrogen", name: "Gemini 4 Hydrogen" },
+      { id: "gemini-4-carbon", name: "Gemini 4 Carbon" },
+      { id: "gemini-4-argon", name: "Gemini 4 Argon" },
       { id: "gemini-3.8-flash", name: "Gemini 3.8 Flash" },
-      { id: "gemini-3.7-flash", name: "Gemini 3.7 Flash" },
       { id: "gemini-3.6-flash", name: "Gemini 3.6 Flash" },
-      { id: "gemini-3.5-flash", name: "Gemini 3.5 Flash" },
       { id: "gemini-3.5-flash-lite", name: "Gemini 3.5 Flash Lite" },
     ]);
     expect(PROVIDER_DEFAULT_STT_MODELS.gemini).toBe("gemini-3.6-flash");
     expect(getProviderSttModelOptions("mistral")).toEqual(
-      [{ id: "voxtral-mini-2602", name: "Voxtral Mini Transcribe 2" }],
+      [
+        { id: "voxtral-mini-transcribe-3-0", name: "Voxtral Mini Transcribe 3" },
+        { id: "voxtral-small-transcribe-3-0", name: "Voxtral Small Transcribe 3" },
+        { id: "voxtral-mini-2602", name: "Voxtral Mini Transcribe 2" },
+      ],
     );
     expect(getProviderSttModelOptions("elevenlabs")).toEqual([
+      { id: "scribe_v3", name: "Scribe v3" },
       { id: "scribe_v2", name: "Scribe v2" },
     ]);
-    expect(PROVIDER_DEFAULT_STT_MODELS.elevenlabs).toBe("scribe_v2");
+    expect(PROVIDER_DEFAULT_STT_MODELS.elevenlabs).toBe("scribe_v3");
   });
 
   it("offers no Qwen speech routes after the DashScope speech retirement", () => {

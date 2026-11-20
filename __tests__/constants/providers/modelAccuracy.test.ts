@@ -21,6 +21,19 @@ function providerModelIds(provider: Provider) {
 
 describe("provider model accuracy", () => {
   it.each<[Provider, string, string]>([
+    ["openai", "gpt-6.2-astra", "GPT-6.2 Astra"],
+    ["openai", "gpt-6.2-sol", "GPT-6.2 Sol"],
+    ["openai", "gpt-6.1-terra", "GPT-6.1 Terra"],
+    ["anthropic", "claude-fable-5-2", "Claude Fable 5.2"],
+    ["anthropic", "claude-haiku-5-5", "Claude Haiku 5.5"],
+    ["anthropic", "claude-sonnet-5-5", "Claude Sonnet 5.5"],
+    ["alibaba-qwen-dashscope", "qwen4-max", "Qwen4-Max"],
+    ["mistral", "mistral-large-4-0", "Mistral Large 4"],
+    ["gemini", "gemini-4-neon", "Gemini 4 Neon"],
+    ["openrouter", "openai/gpt-6.2-sol-20261117", "OpenAI · GPT-6.2 Sol"],
+    ["openrouter", "moonshotai/kimi-k3.1-pro-20261023", "Moonshot · Kimi K3.1 Pro"],
+    ["openrouter", "qwen/qwen4-max-20261115", "Qwen · Qwen4-Max"],
+    ["openrouter", "google/gemini-4-hydrogen-20261112", "Google · Gemini 4 Hydrogen"],
     ["openai", "gpt-6-astra", "GPT-6 Astra"],
     ["openai", "gpt-6-sol", "GPT-6 Sol"],
     ["openai", "gpt-6-luna", "GPT-6 Luna"],
@@ -167,7 +180,7 @@ describe("provider model accuracy", () => {
     expect(PROVIDER_DEFAULT_MODELS.gemini).toBe("gemini-3.6-flash");
   });
 
-  it("uses current Mistral models and avoids deprecated model rows", () => {
+  it("uses current Mistral defaults and retains saved predecessor models", () => {
     expect(providerModelIds("mistral")).toEqual(
       expect.arrayContaining([
         "mistral-medium-3-5",
@@ -184,11 +197,11 @@ describe("provider model accuracy", () => {
         "magistral-small-2509",
       ]),
     );
-    expect(PROVIDER_DEFAULT_MODELS.mistral).toBe("mistral-medium-3-5");
-    expect(DEFAULT_PROVIDER_STT_MODELS.mistral).toBe("voxtral-mini-2602");
+    expect(PROVIDER_DEFAULT_MODELS.mistral).toBe("mistral-large-4-0");
+    expect(DEFAULT_PROVIDER_STT_MODELS.mistral).toBe("voxtral-mini-transcribe-3-0");
     expect(
       PROVIDER_STT_MODEL_OPTIONS.mistral?.map((model) => model.id),
-    ).toEqual(["voxtral-mini-2602"]);
+    ).toEqual(["voxtral-mini-transcribe-3-0", "voxtral-small-transcribe-3-0", "voxtral-mini-2602"]);
   });
 
   it("surfaces current Qwen picker models", () => {
@@ -218,22 +231,22 @@ describe("provider model accuracy", () => {
   });
 
   it("exposes Mistral's current Voxtral speech model", () => {
-    expect(DEFAULT_PROVIDER_TTS_MODELS.mistral).toBe("voxtral-mini-tts-2603");
+    expect(DEFAULT_PROVIDER_TTS_MODELS.mistral).toBe("voxtral-mini-tts-3-0");
     expect(
       PROVIDER_TTS_MODEL_OPTIONS.mistral?.map((model) => model.id),
-    ).toEqual(["voxtral-mini-tts-2603"]);
+    ).toContain("voxtral-mini-tts-3-0");
   });
 
   it("exposes current ElevenLabs conversational TTS models", () => {
     expect(PROVIDER_DEFAULT_MODELS.elevenlabs).toBe("");
-    expect(DEFAULT_PROVIDER_STT_MODELS.elevenlabs).toBe("scribe_v2");
+    expect(DEFAULT_PROVIDER_STT_MODELS.elevenlabs).toBe("scribe_v3");
     expect(
       PROVIDER_STT_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),
-    ).toEqual(["scribe_v2"]);
+    ).toEqual(["scribe_v3", "scribe_v2"]);
     expect(DEFAULT_PROVIDER_TTS_MODELS.elevenlabs).toBe("eleven_flash_v2_5");
     expect(
       PROVIDER_TTS_MODEL_OPTIONS.elevenlabs?.map((model) => model.id),
-    ).toEqual(["eleven_flash_v2_5", "eleven_multilingual_v2", "eleven_v3"]);
+    ).toEqual(["eleven_v4", "eleven_v4_turbo", "eleven_flash_v2_5", "eleven_multilingual_v2", "eleven_v3"]);
   });
 
   it("keeps the OpenAI picker aligned with its current callable endpoint", () => {

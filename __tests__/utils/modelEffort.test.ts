@@ -60,7 +60,7 @@ describe("model effort metadata", () => {
       expect(getModelEffortRequestBody(provider, model, effort)).toEqual(
         provider === "anthropic"
           ? { output_config: { effort } }
-          : { reasoning_effort: effort },
+          : provider === "openrouter" ? { reasoning: { effort } } : { reasoning_effort: effort },
       );
     }
   });
@@ -330,4 +330,14 @@ it.each(["qwen3.8-max-0902", "qwen3.8-flash"])("sends explicit stateless reasoni
   for (const effort of [undefined, "none", "low", "medium", "xhigh"]) {
     expect(getModelEffortRequestBody("alibaba-qwen-dashscope", model, effort)).toEqual({ reasoning_effort: effort ?? "xhigh", preserve_thinking: false });
   }
+});
+
+it("sends the documented effective November reasoning levels", () => {
+  expect(getModelEffortRequestBody("openai", "gpt-6.2-sol", "max")).toEqual({ reasoning_effort: "max" });
+  expect(getModelEffortOptions("openai", "gpt-6.2-sol").map(({ id }) => id)).not.toContain("none");
+  expect(getModelEffortRequestBody("anthropic", "claude-fable-5-2", "high")).toEqual({ output_config: { effort: "high" } });
+  expect(getModelEffortRequestBody("gemini", "gemini-4-neon", "xhigh")).toEqual({ generationConfig: { thinkingConfig: { thinkingLevel: "XHIGH" } } });
+  expect(getModelEffortRequestBody("alibaba-qwen-dashscope", "qwen4-max", "high")).toEqual({ reasoning_effort: "high", preserve_thinking: false });
+  expect(getModelEffortOptions("mistral", "mistral-large-4-0").map(({ id }) => id)).toEqual(["low", "medium", "high"]);
+  expect(getModelEffortRequestBody("openrouter", "openai/gpt-6.2-astra-20261117", "xhigh")).toEqual({ reasoning: { effort: "xhigh" } });
 });

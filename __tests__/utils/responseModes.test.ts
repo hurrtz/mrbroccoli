@@ -160,17 +160,17 @@ describe("response mode selectors", () => {
 
     expect(modes[0].route).toEqual({
       provider: "gemini",
-      model: "gemini-3.8-flash",
+      model: "gemini-4-neon",
       effort: "high",
     });
     expect(modes[1].route).toEqual({
       provider: "gemini",
-      model: "gemini-3.7-flash",
+      model: "gemini-4-hydrogen",
       effort: "high",
     });
     expect(modes[2].route).toEqual({
       provider: "gemini",
-      model: "gemini-3.6-flash",
+      model: "gemini-4-carbon",
       effort: "medium",
     });
   });
@@ -273,4 +273,10 @@ describe("existing-access-only Gemini 2.5 models", () => {
     expect(selectable).toContain("gemini-2.5-pro");
     expect(selectable).not.toContain("gemini-2.5-flash");
   });
+});
+
+
+it("migrates the retired direct Gemini IDs to their actual serving models", () => {
+  expect(migrateProviderModelAlias("gemini", "gemini-3.7-flash")).toBe("gemini-3.8-flash");
+  expect(migrateProviderModelAlias("gemini", "gemini-3.5-flash")).toBe("gemini-3.6-flash");
 });

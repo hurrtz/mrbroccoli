@@ -33,7 +33,7 @@ function getAnthropicMaxOutputTokens(model: string, effort?: string) {
   if (
     resolvedEffort === "max" ||
     resolvedEffort === "xhigh" ||
-    ((model === "claude-fable-5" || model === "claude-fable-5-1") &&
+    (model.startsWith("claude-fable-5") &&
       resolvedEffort === "high")
   ) {
     return ANTHROPIC_LONG_OUTPUT_TOKENS;

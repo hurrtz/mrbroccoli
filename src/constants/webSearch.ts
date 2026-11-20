@@ -79,7 +79,7 @@ export const WEB_SEARCH_PROVIDER_MODELS: Record<WebSearchProvider, string> = {
   "alibaba-qwen-dashscope": "qwen3.7-plus-2026-05-26",
   gemini: "gemini-3.6-flash",
   xai: "grok-4.3",
-  mistral: "mistral-medium-3-5",
+  mistral: "mistral-large-4-0",
 };
 export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
   WebSearchProvider,
@@ -96,9 +96,9 @@ export const WEB_SEARCH_PROVIDER_MODEL_CANDIDATES: Record<
     "qwen3.6-flash-2026-04-16",
     "qwen3.5-flash-2026-02-23",
   ],
-  gemini: ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-3.7-flash", "gemini-3.5-flash", "gemini-3.5-flash-lite"],
+  gemini: ["gemini-3.6-flash", "gemini-3.8-flash", "gemini-4-hydrogen", "gemini-3.5-flash-lite"],
   xai: ["grok-4.3", "grok-4.6", "grok-4.5"],
-  mistral: ["mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512"],
+  mistral: ["mistral-large-4-0", "mistral-small-2603"],
 };
 export const WEB_SEARCH_MAX_SOURCES = 5;
 export const WEB_SEARCH_RESULT_LIMIT = 5;

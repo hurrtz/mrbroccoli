@@ -2,6 +2,36 @@ import { providerContext } from "./provider";
 
 export const tts = providerContext.defineTtsModels([
   providerContext.tts({
+    modelId: "voxtral-mini-tts-3-0",
+    publicName: "Voxtral TTS 3",
+    status: "Public preview",
+    limitsSummary: null,
+    notes: "Accepts existing voice IDs and the audio/speech endpoint.",
+    officialSources: [
+      "https://docs.mistral.ai/models/voxtral-mini-tts-3-0",
+      "https://docs.mistral.ai/studio/audio/migrate-from-voxtral-2",
+      "https://docs.mistral.ai/studio/audio/specs-and-limits/languages",
+    ],
+    supportsRealtime: true,
+    supportsBatch: null,
+    priceMeasurements: [
+      {
+        amountUsd: 13,
+        unit: "million_characters",
+        sourceText: "USD 13 per million characters.",
+      },
+    ],
+    constraints: [],
+    languageSupport: {
+      rawText: "35 languages, 50+ regional dialects.",
+      isMultilingual: true,
+      languageCount: 35,
+      voiceCount: null,
+      listedLanguages: [],
+      notes: [],
+    },
+  }),
+  providerContext.tts({
     modelId: "voxtral-mini-tts-2603",
     publicName: "Voxtral Mini TTS 26.03",
     aliases: [],

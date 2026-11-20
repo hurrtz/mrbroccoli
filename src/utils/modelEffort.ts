@@ -1,3 +1,4 @@
+import { GEMINI_REDIRECTED_FLASH_MODELS } from "../constants/providers/runtimeManifest";
 import { PROVIDER_MODELS } from "../constants/models";
 import type { ModelEffortConfig, ModelEffortOption } from "../constants/models";
 import { translate, type TranslationKey } from "../i18n";
@@ -28,7 +29,9 @@ export function getModelEffortConfig(
   provider: Provider,
   model: string,
 ): ModelEffortConfig | undefined {
-  return PROVIDER_MODELS[provider]?.find((entry) => entry.id === model)?.effort;
+  const current =
+    provider === "gemini" ? GEMINI_REDIRECTED_FLASH_MODELS[model] ?? model : model;
+  return PROVIDER_MODELS[provider]?.find((entry) => entry.id === current)?.effort;
 }
 
 export function getModelEffortOptions(
@@ -228,9 +231,9 @@ export function getModelEffortRequestBody(
         enable_thinking: value === "enabled",
       };
     case "reasoning-effort":
-      return {
-        reasoning_effort: value,
-      };
+      return provider === "openrouter"
+        ? { reasoning: { effort: value } }
+        : { reasoning_effort: value };
     case "gemini-thinking-level":
       return {
         generationConfig: {

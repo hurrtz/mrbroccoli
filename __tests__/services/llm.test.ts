@@ -143,7 +143,7 @@ describe("streamChat", () => {
     const body = JSON.parse((fetch as jest.Mock).mock.calls[0][1].body);
     expect(body.model).toBe(model);
     if (modelEffort) {
-      expect(body.reasoning_effort).toBe(modelEffort);
+      expect(provider === "openrouter" ? body.reasoning.effort : body.reasoning_effort).toBe(modelEffort);
     }
     expect(body.temperature).toBeUndefined();
     expect(body.max_tokens).toBeUndefined();
@@ -334,7 +334,7 @@ describe("streamChat", () => {
     expect(JSON.parse(request.body)).toEqual(
       expect.objectContaining({
         model: "openai/gpt-5.6-sol-20260709",
-        reasoning_effort: "high",
+        reasoning: { effort: "high" },
         provider: {
           data_collection: "deny",
           require_parameters: true,
@@ -1961,6 +1961,7 @@ describe("validateProviderConnection", () => {
     expect(options.headers["x-goog-api-key"]).toBe("gemini-test-key");
     expect(options.headers.Authorization).toBeUndefined();
     const body = JSON.parse(options.body);
+    expect(body.store).toBe(false);
     expect(body.systemInstruction.parts[0].text).toContain(
       "validating a provider connection",
     );

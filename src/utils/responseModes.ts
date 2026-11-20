@@ -15,6 +15,7 @@ import {
   ResponseModeSelections,
   Settings,
 } from "../types";
+import { GEMINI_REDIRECTED_FLASH_MODELS } from "../constants/providers/runtimeManifest";
 import { normalizeResponseModeRouteEffort } from "./modelEffort";
 import { hasProviderCredentialForCapability } from "./providerCredentials";
 import { isRuntimeCapabilityConfigurationDisabled } from "../services/runtimeCapabilityOverrides";
@@ -25,6 +26,25 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   Record<Provider, Record<string, string>>
 > = {
   openrouter: {
+    "google/gemini-4-neon": "google/gemini-4-neon-20261118",
+    "openai/gpt-6.2-astra": "openai/gpt-6.2-astra-20261117",
+    "openai/gpt-6.2-sol": "openai/gpt-6.2-sol-20261117",
+    "qwen/qwen4-max": "qwen/qwen4-max-20261115",
+    "google/gemini-4-hydrogen": "google/gemini-4-hydrogen-20261112",
+    "google/gemini-4-carbon": "google/gemini-4-carbon-20261110",
+    "anthropic/claude-fable-5.2": "anthropic/claude-fable-5.2-20261109",
+    "openai/gpt-6.1-terra": "openai/gpt-6.1-terra-20261026",
+    "moonshotai/kimi-k3.1-pro": "moonshotai/kimi-k3.1-pro-20261023",
+    "deepseek/deepseek-v4.1-flash-1017": "deepseek/deepseek-v4.1-flash-20261017",
+    "google/gemini-4-argon": "google/gemini-4-argon-20261013",
+    "anthropic/claude-haiku-5.5": "anthropic/claude-haiku-5.5-20261007",
+    "mistralai/mistral-large-4-0": "mistralai/mistral-large-4-0-20261006",
+    "openai/gpt-6.1-sol": "openai/gpt-6.1-sol-20260929",
+    "anthropic/claude-sonnet-5.5": "anthropic/claude-sonnet-5.5-20260928",
+    "openai/gpt-6-luna": "openai/gpt-6-luna-20260922",
+    "openai/gpt-6-sol": "openai/gpt-6-sol-20260922",
+    "anthropic/claude-opus-5.5": "anthropic/claude-opus-5.5-20260921",
+    "x-ai/grok-4.7": "x-ai/grok-4.7-20260916",
     "x-ai/grok-4.6": "x-ai/grok-4.6-20260810",
   },
   // DeepSeek retired V4 Flash and only temporarily routes its name to V4.1.
@@ -43,6 +63,12 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
     "gpt-realtime-2.1": "gpt-5.6-sol",
     "gpt-realtime-2.1-mini": "gpt-5.4-mini-2026-03-17",
   },
+  mistral: {
+    "mistral-large-4": "mistral-large-4-0",
+    "voxtral-mini-transcribe-3": "voxtral-mini-transcribe-3-0",
+    "voxtral-small-transcribe-3": "voxtral-small-transcribe-3-0",
+    "voxtral-mini-tts-3": "voxtral-mini-tts-3-0",
+  },
   "alibaba-qwen-dashscope": {
     "qwen3.8-max": "qwen3.8-max-0902",
     "qwen3.8-max-2026-09-02": "qwen3.8-max-0902",
@@ -57,6 +83,7 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
     "qwen-flash": "qwen-flash-2025-07-28",
   },
   gemini: {
+    ...GEMINI_REDIRECTED_FLASH_MODELS,
     "gemini-3.1-flash-live-preview": "gemini-2.5-flash",
     // Deprecated TTS previews; Google names the 3.8 TTS models as replacements.
     "gemini-2.5-flash-preview-tts": "gemini-3.8-flash-lite-tts",

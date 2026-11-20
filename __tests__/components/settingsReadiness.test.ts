@@ -100,11 +100,15 @@ describe("settings readiness", () => {
     expectStatus(readiness.listen, "broken");
   });
 
-  it("marks provider STT broken when the explicit language is unsupported", () => {
+  it.each([
+    ["voxtral-mini-2602", "broken"],
+    ["voxtral-mini-transcribe-3-0", "ready"],
+  ] as const)("evaluates Ukrainian transcription readiness for %s", (model, expected) => {
     const settings = withSettings({
       sttMode: "provider",
       sttProvider: "mistral",
       sttLanguage: "uk",
+      providerSttModels: { ...DEFAULT_SETTINGS.providerSttModels, mistral: model },
       apiKeys: {
         ...DEFAULT_SETTINGS.apiKeys,
         mistral: "mistral-test-key",
@@ -118,7 +122,7 @@ describe("settings readiness", () => {
       searchProviders: [],
     });
 
-    expectStatus(readiness.listen, "broken");
+    expectStatus(readiness.listen, expected);
   });
 
   it("marks spoken replies off when spoken replies are disabled", () => {
@@ -214,6 +218,7 @@ describe("settings readiness", () => {
     const baseSettings = withSettings({
       ttsMode: "provider",
       ttsProvider: "mistral",
+      providerTtsModels: { ...DEFAULT_SETTINGS.providerTtsModels, mistral: "voxtral-mini-tts-2603" },
       ttsListenLanguages: ["uk"],
       apiKeys: {
         ...DEFAULT_SETTINGS.apiKeys,

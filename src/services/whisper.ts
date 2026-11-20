@@ -109,7 +109,7 @@ export async function transcribeAudio(params: {
 
   if (
     speechLanguage !== "auto" &&
-    !providerSupportsSttLanguage(provider, speechLanguage)
+    !providerSupportsSttLanguage(provider, speechLanguage, providerModel)
   ) {
     throw new Error(
       translate(language, "speechLanguageUnsupportedByProvider", {
@@ -125,6 +125,8 @@ export async function transcribeAudio(params: {
     capability: "stt",
     provider,
     requestedModel: providerModel,
+    isCompatible: (model) =>
+      providerSupportsSttLanguage(provider, speechLanguage, model),
   });
   const result = await executeProviderModelRequest({
     abortSignal,

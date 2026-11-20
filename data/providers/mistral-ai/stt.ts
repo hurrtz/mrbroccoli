@@ -1,6 +1,69 @@
 import { providerContext } from "./provider";
 
 export const stt = providerContext.defineSttModels([
+  ...[
+    {
+      modelId: "voxtral-mini-transcribe-3-0",
+      publicName: "Voxtral Mini Transcribe 3",
+      perMinute: 0.0035,
+    },
+    {
+      modelId: "voxtral-small-transcribe-3-0",
+      publicName: "Voxtral Small Transcribe 3",
+      perMinute: 0.004,
+    },
+  ].map(({ modelId, publicName, perMinute }) =>
+    providerContext.stt({
+      modelId,
+      publicName,
+      status: "Public preview",
+      limitsSummary:
+        "Audio transcription accepts files up to 500 MB and 60 minutes.",
+      notes:
+        "Recorded-file transcription using the multipart audio/transcriptions API.",
+      officialSources: [
+        `https://docs.mistral.ai/models/${modelId}`,
+        "https://docs.mistral.ai/studio/audio/speech-to-text/transcribe-files",
+        "https://docs.mistral.ai/resources/known-limitations",
+        "https://docs.mistral.ai/studio/audio/specs-and-limits/languages",
+      ],
+      supportsRealtime: false,
+      supportsBatch: null,
+      priceMeasurements: [
+        {
+          amountUsd: perMinute,
+          unit: "minute",
+          sourceText: `USD ${perMinute} per minute of recorded audio.`,
+        },
+      ],
+      constraints: [
+        {
+          metric: "file_size_bytes",
+          comparator: "<=",
+          value: 500_000_000,
+          unit: "bytes",
+          scope: "audio transcription",
+          sourceText: "Maximum audio file size 500 MB.",
+        },
+        {
+          metric: "duration_seconds",
+          comparator: "<=",
+          value: 3600,
+          unit: "seconds",
+          scope: "audio transcription",
+          sourceText: "Maximum audio duration 60 minutes.",
+        },
+      ],
+      languageSupport: {
+        rawText: "53 languages.",
+        isMultilingual: true,
+        languageCount: 53,
+        voiceCount: null,
+        listedLanguages: [],
+        notes: [],
+      },
+    }),
+  ),
   providerContext.stt(
     {
       "providerId": "mistral-ai",

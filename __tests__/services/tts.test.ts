@@ -511,6 +511,7 @@ describe("synthesizeSpeech", () => {
     );
     expect(options.headers["x-goog-api-key"]).toBe("gemini-test-key");
     const body = JSON.parse(options.body);
+    expect(body.store).toBe(false);
     expect(
       body.generationConfig.speechConfig.voiceConfig.prebuiltVoiceConfig
         .voiceName,
@@ -724,7 +725,7 @@ describe("synthesizeSpeech", () => {
     expect(body.output_format).toBeUndefined();
   });
 
-  it("calls Mistral Voxtral TTS with a saved voice slug", async () => {
+  it.each(["voxtral-mini-tts-3-0", "voxtral-mini-tts-2603"])("calls %s with a saved Mistral voice slug", async (providerModel) => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: () => Promise.resolve({ audio_data: "ZmFrZQ==" }),
@@ -735,7 +736,7 @@ describe("synthesizeSpeech", () => {
       voice: "voice-123",
       mode: "provider",
       provider: "mistral",
-      providerModel: "voxtral-mini-tts-2603",
+      providerModel,
       apiKey: "mistral-test-key",
       language: "de",
     });
@@ -745,7 +746,7 @@ describe("synthesizeSpeech", () => {
     expect(url).toBe("https://api.mistral.ai/v1/audio/speech");
     expect(options.headers.Authorization).toBe("Bearer mistral-test-key");
     expect(JSON.parse(options.body)).toEqual({
-      model: "voxtral-mini-tts-2603",
+      model: providerModel,
       input: "Hallo Welt",
       voice_id: "voice-123",
       response_format: "mp3",

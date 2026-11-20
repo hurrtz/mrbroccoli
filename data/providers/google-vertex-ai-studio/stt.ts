@@ -1,6 +1,48 @@
 import { providerContext } from "./provider";
 
 export const stt = providerContext.defineSttModels([
+  ...[
+    "gemini-4-neon",
+    "gemini-4-hydrogen",
+    "gemini-4-carbon",
+    "gemini-4-argon",
+    "gemini-3.8-flash",
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+  ].map((modelId) =>
+    providerContext.stt({
+      modelId,
+      publicName: modelId
+        .replace(/^gemini-/, "Gemini ")
+        .replace(
+          /-([a-z])/g,
+          (_, letter: string) => " " + letter.toUpperCase(),
+        ),
+      status: "Generally available",
+      limitsSummary: "14 MB raw audio for the app's inline request.",
+      notes:
+        "GenerateContent uses base64 inline audio and a transcription instruction.",
+      officialSources: [
+        "https://aistudio.google.com/docs/audio",
+        "https://aistudio.google.com/docs/changelog",
+      ],
+      supportsRealtime: false,
+      supportsBatch: false,
+      priceMeasurements: [],
+      constraints: [
+        {
+          metric: "file_size_bytes",
+          comparator: "<=",
+          value: 14_000_000,
+          unit: "bytes",
+          scope: "file",
+          sourceText:
+            "App raw-audio ceiling for the 20 MB total inline request including base64 and JSON.",
+        },
+      ],
+      languageSupport: null,
+    }),
+  ),
   providerContext.stt({
     modelId: "gemini-3.5-transcribe",
     publicName: "Gemini 3.5 Transcribe",

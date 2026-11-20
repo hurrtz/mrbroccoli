@@ -290,11 +290,11 @@ describe("transcribeAudio", () => {
     expect(url).toBe("https://api.mistral.ai/v1/audio/transcriptions");
     const [, options] = (fetch as jest.Mock).mock.calls[0];
     expect(Array.from((options.body as FormData).entries())).toEqual(
-      expect.arrayContaining([["language", "de"]]),
+      expect.arrayContaining([["model", "voxtral-mini-transcribe-3-0"], ["language", "de"]]),
     );
   });
 
-  it("uses ElevenLabs Scribe v2 with its multipart field and API-key header", async () => {
+  it.each([undefined, "scribe_v2"])("uses the configured Scribe ID in its multipart request (%s)", async (providerModel) => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -306,6 +306,7 @@ describe("transcribeAudio", () => {
       fileUri: "/tmp/recording.m4a",
       mode: "provider",
       provider: "elevenlabs",
+      providerModel,
       apiKey: "elevenlabs-test",
       language: "en",
     });
@@ -317,7 +318,7 @@ describe("transcribeAudio", () => {
       "xi-api-key": "elevenlabs-test",
     });
     expect(Array.from((options.body as FormData).entries())).toEqual(
-      expect.arrayContaining([["model_id", "scribe_v2"]]),
+      expect.arrayContaining([["model_id", providerModel ?? "scribe_v3"]]),
     );
     expect(require("expo-file-system").File.createdUris).toEqual([
       "/tmp/recording.m4a",
@@ -351,7 +352,7 @@ describe("transcribeAudio", () => {
     );
   });
 
-  it.each(["gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.8-flash"])("uses %s audio input for STT with an AI Studio key", async (providerModel) => {
+  it.each(["gemini-3.5-flash", "gemini-3.7-flash", "gemini-3.8-flash", "gemini-4-neon", "gemini-4-hydrogen", "gemini-4-carbon", "gemini-4-argon"])("uses %s audio input for STT with an AI Studio key", async (providerModel) => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
       json: async () => ({
@@ -375,6 +376,7 @@ describe("transcribeAudio", () => {
     });
 
     expect(result).toBe("Hello from Gemini STT");
+    expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body).store).toBe(false);
     expect(JSON.parse((fetch as jest.Mock).mock.calls[0][1].body)).not.toHaveProperty("generationConfig.temperature");
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
     expect(url).toBe(

@@ -152,7 +152,6 @@ export async function transcribeWithGoogleSpeechProvider(
     config,
     fileUri,
     language,
-    provider,
     providerModel,
     speechLanguage,
   } = params;
@@ -201,6 +200,7 @@ export async function transcribeWithGoogleSpeechProvider(
               },
             }
           : {
+              store: false,
               contents: [
                 {
                   role: "user",

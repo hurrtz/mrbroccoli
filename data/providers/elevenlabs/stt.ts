@@ -2,6 +2,38 @@ import { providerContext } from "./provider";
 
 export const stt = providerContext.defineSttModels([
   providerContext.stt({
+    modelId: "scribe_v3",
+    publicName: "Scribe v3",
+    status: "Generally available",
+    limitsSummary: "Recorded file uploads must be smaller than 5 GB.",
+    notes: "The recorded-file endpoint accepts the same request as Scribe v2.",
+    officialSources: [
+      "https://elevenlabs.io/docs/overview/models",
+      "https://elevenlabs.io/docs/api-reference/speech-to-text/convert",
+    ],
+    supportsRealtime: false,
+    supportsBatch: false,
+    priceMeasurements: [],
+    constraints: [
+      {
+        metric: "file_size_bytes",
+        comparator: "<=",
+        value: 4_999_999_999,
+        unit: "bytes",
+        scope: "file",
+        sourceText: "Uploaded files must be smaller than 5 GB.",
+      },
+    ],
+    languageSupport: {
+      rawText: "90+ languages.",
+      isMultilingual: true,
+      languageCount: 90,
+      voiceCount: 0,
+      listedLanguages: [],
+      notes: [],
+    },
+  }),
+  providerContext.stt({
     modelId: "scribe_v2",
     publicName: "Scribe v2",
     aliases: [],
@@ -9,7 +41,7 @@ export const stt = providerContext.defineSttModels([
     limitsSummary:
       "Recorded audio and video files up to 3 GB and 10 hours are supported.",
     notes:
-      "Current batch transcription model used by Mr Broccoli for recorded speech-to-text. Language detection is automatic.",
+      "Previous recorded-audio model retained for existing selections. Language detection is automatic.",
     officialSources: [
       "https://elevenlabs.io/docs/overview/models",
       "https://elevenlabs.io/docs/overview/capabilities/speech-to-text",

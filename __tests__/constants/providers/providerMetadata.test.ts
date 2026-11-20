@@ -64,7 +64,7 @@ describe("provider metadata constants", () => {
     );
   });
 
-  it("surfaces stable Gemini 3 picker models from the runtime manifest", () => {
+  it("surfaces stable Gemini models and omits the redirected Flash alias", () => {
     expect(
       PROVIDER_MODELS.gemini.find((model) => model.id === "gemini-3.6-flash")
         ?.name,
@@ -72,7 +72,7 @@ describe("provider metadata constants", () => {
     expect(
       PROVIDER_MODELS.gemini.find((model) => model.id === "gemini-3.5-flash")
         ?.name,
-    ).toBe("Gemini 3.5 Flash");
+    ).toBeUndefined();
     expect(
       PROVIDER_MODELS.gemini.find(
         (model) => model.id === "gemini-3.5-flash-lite",

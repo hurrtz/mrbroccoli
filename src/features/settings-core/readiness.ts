@@ -97,7 +97,11 @@ function getListenReadiness(
     !provider ||
     !context.sttProviders.includes(provider) ||
     !hasConfiguredKey(settings, provider) ||
-    !providerSupportsSttLanguage(provider, settings.sttLanguage)
+    !providerSupportsSttLanguage(
+      provider,
+      settings.sttLanguage,
+      settings.providerSttModels[provider],
+    )
   ) {
     return status("broken");
   }
@@ -180,7 +184,11 @@ function getSpeakReadiness(
       return (
         providerReady &&
         !!provider &&
-        providerSupportsTtsLanguage(provider, language)
+        providerSupportsTtsLanguage(
+          provider,
+          language,
+          settings.providerTtsModels[provider],
+        )
       );
     }),
   );
@@ -196,7 +204,11 @@ function getSpeakReadiness(
         ? localReady
         : !!provider &&
           settings.ttsListenLanguages.every((language) =>
-            providerSupportsTtsLanguage(provider, language),
+            providerSupportsTtsLanguage(
+              provider,
+              language,
+              settings.providerTtsModels[provider],
+            ),
           );
 
   return hasUnavailableFallback || !primarySupportsEveryLanguage

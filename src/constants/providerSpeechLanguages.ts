@@ -3,31 +3,43 @@ import { RUNTIME_PROVIDER_MANIFEST } from "./providers/runtimeManifest";
 
 export function getProviderSttLanguages(
   provider: Provider,
+  model?: string,
 ): readonly SpeechLanguage[] {
   const stt = RUNTIME_PROVIDER_MANIFEST[provider].stt;
-  return stt.support === "provider" ? (stt.languages ?? []) : [];
+  return (
+    stt.models.find(({ id }) => id === model)?.speechLanguages ??
+    stt.languages ??
+    []
+  );
 }
 
 export function providerSupportsSttLanguage(
   provider: Provider,
   language: SttLanguage,
+  model?: string,
 ) {
   return (
     language === "auto" ||
-    getProviderSttLanguages(provider).includes(language)
+    getProviderSttLanguages(provider, model).includes(language)
   );
 }
 
 export function getProviderTtsLanguages(
   provider: Provider,
+  model?: string,
 ): readonly SpeechLanguage[] {
   const tts = RUNTIME_PROVIDER_MANIFEST[provider].tts;
-  return tts.support === "provider" ? (tts.languages ?? []) : [];
+  return (
+    tts.models.find(({ id }) => id === model)?.speechLanguages ??
+    tts.languages ??
+    []
+  );
 }
 
 export function providerSupportsTtsLanguage(
   provider: Provider,
   language: SpeechLanguage,
+  model?: string,
 ) {
-  return getProviderTtsLanguages(provider).includes(language);
+  return getProviderTtsLanguages(provider, model).includes(language);
 }

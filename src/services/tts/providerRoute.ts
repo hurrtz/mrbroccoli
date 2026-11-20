@@ -304,7 +304,7 @@ export async function synthesizeProviderSpeech(params: {
     );
   }
 
-  if (!providerSupportsTtsLanguage(provider, speechLanguage)) {
+  if (!providerSupportsTtsLanguage(provider, speechLanguage, providerModel)) {
     throw new Error(
       translate(language, "speechLanguageUnsupportedByProvider", {
         provider: PROVIDER_LABELS[provider],
@@ -337,6 +337,7 @@ export async function synthesizeProviderSpeech(params: {
     provider,
     requestedModel,
     isCompatible: (model) =>
+      providerSupportsTtsLanguage(provider, speechLanguage, model) &&
       ttsVoiceSupportsModel(provider, selectedVoice, model),
   });
   const result = await executeProviderModelRequest({
@@ -440,6 +441,7 @@ export async function synthesizeProviderSpeech(params: {
               "x-goog-api-key": requireProviderKey(provider, apiKey, language),
             },
             body: JSON.stringify({
+              store: false,
               contents: [
                 {
                   parts: [

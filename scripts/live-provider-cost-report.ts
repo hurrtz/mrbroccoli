@@ -159,6 +159,60 @@ const PINNED_RELEASE_PRICING: Record<
     note?: string;
   }
 > = {
+  "openai:gpt-6.2-astra": {
+    rates: { million_input_tokens: 8, million_output_tokens: 40 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6.2-astra",
+  },
+  "openai:gpt-6.2-sol": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6.2-sol",
+  },
+  "openai:gpt-6.1-sol": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+  },
+  "openai:gpt-6.1-terra": {
+    rates: { million_input_tokens: 1, million_output_tokens: 5 },
+    source: "https://developers.openai.com/api/docs/models/gpt-6.1-terra",
+  },
+  "anthropic:claude-fable-5-2": {
+    rates: { million_input_tokens: 8, million_output_tokens: 40 },
+    source: "https://platform.claude.com/docs/en/models/overview",
+  },
+  "anthropic:claude-sonnet-5-5": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://platform.claude.com/docs/en/models/overview",
+  },
+  "anthropic:claude-haiku-5-5": {
+    rates: { million_input_tokens: 0.1, million_output_tokens: 0.5 },
+    source: "https://platform.claude.com/docs/en/models/overview",
+  },
+  "mistral:mistral-large-4-0": {
+    rates: { million_input_tokens: 0.7, million_output_tokens: 2.1 },
+    source: "https://docs.mistral.ai/models/mistral-large-4-0",
+  },
+  "alibaba-qwen-dashscope:qwen4-max": {
+    rates: { million_input_tokens: 1.413, million_output_tokens: 4.24 },
+    source: "https://docs.modelstudio.console.alibabacloud.com/en/model-studio/qwen4-max",
+  },
+  "gemini:gemini-4-neon": {
+    rates: { million_input_tokens: 3, million_output_tokens: 15 },
+    source: "https://aistudio.google.com/docs/whats-new-gemini-4-neon",
+  },
+  "gemini:gemini-4-hydrogen": {
+    rates: { million_input_tokens: 1.5, million_output_tokens: 7.5 },
+    source: "https://aistudio.google.com/docs/whats-new-gemini-4-hydrogen",
+  },
+  "gemini:gemini-4-carbon": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://aistudio.google.com/docs/whats-new-gemini-4-carbon",
+    note: "Introductory rate through November 30, 2026. Standard rates double December 1.",
+  },
+  "gemini:gemini-4-argon": {
+    rates: { million_input_tokens: 2, million_output_tokens: 10 },
+    source: "https://aistudio.google.com/docs/whats-new-gemini-4-argon",
+    note: "Introductory rate through November 30, 2026. Standard rates double December 1.",
+  },
   "openai:gpt-6-astra": {
     rates: { million_input_tokens: 10, million_output_tokens: 50 },
     source: "https://developers.openai.com/api/docs/models/gpt-6-astra",

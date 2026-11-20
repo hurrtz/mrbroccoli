@@ -78,6 +78,7 @@ function buildGeminiGenerateContentBody(params: {
   systemPrompt: string;
 }) {
   const body = {
+    store: false,
     systemInstruction: {
       parts: [{ text: params.systemPrompt }],
     },

@@ -8,7 +8,7 @@ const MODEL_SOURCES = [
 function ttsModel(params: {
   id: string;
   name: string;
-  characterLimit: number;
+  characterLimit?: number;
   languageCount: number;
   languageSummary: string;
   notes: string;
@@ -18,24 +18,28 @@ function ttsModel(params: {
     publicName: params.name,
     aliases: [],
     status: "Documented active/current",
-    limitsSummary: `${params.characterLimit.toLocaleString("en-US")} characters per text-to-speech request.`,
+    limitsSummary: params.characterLimit
+      ? `${params.characterLimit.toLocaleString("en-US")} characters per text-to-speech request.`
+      : null,
     notes: params.notes,
     officialSources: MODEL_SOURCES,
     supportsRealtime: true,
     supportsBatch: false,
     priceMeasurements: [],
-    constraints: [
-      {
-        metric: "other",
-        comparator: "<=",
-        value: params.characterLimit,
-        unit: "other",
-        scope: "text-to-speech request",
-        sourceText: `${params.name}: ${params.characterLimit.toLocaleString(
-          "en-US",
-        )} character limit.`,
-      },
-    ],
+    constraints: params.characterLimit
+      ? [
+          {
+            metric: "other",
+            comparator: "<=",
+            value: params.characterLimit,
+            unit: "other",
+            scope: "text-to-speech request",
+            sourceText: `${params.name}: ${params.characterLimit.toLocaleString(
+              "en-US",
+            )} character limit.`,
+          },
+        ]
+      : [],
     languageSupport: {
       rawText: params.languageSummary,
       isMultilingual: true,
@@ -48,6 +52,21 @@ function ttsModel(params: {
 }
 
 export const tts = providerContext.defineTtsModels([
+  ttsModel({
+    id: "eleven_v4",
+    name: "Eleven v4",
+    languageCount: 90,
+    languageSummary: "90+ languages.",
+    characterLimit: 10_000,
+    notes: "Expressive single-speaker synthesis through Create speech.",
+  }),
+  ttsModel({
+    id: "eleven_v4_turbo",
+    name: "Eleven v4 Turbo",
+    languageCount: 90,
+    languageSummary: "90+ languages.",
+    notes: "Low-latency synthesis in the Eleven v4 family.",
+  }),
   ttsModel({
     id: "eleven_flash_v2_5",
     name: "Eleven Flash v2.5",

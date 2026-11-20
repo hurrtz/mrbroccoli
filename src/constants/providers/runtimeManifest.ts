@@ -35,6 +35,7 @@ export interface RuntimeModelSpec {
   releaseDate?: string;
   effort?: RuntimeModelEffortConfig;
   supportsInstructions?: boolean;
+  speechLanguages?: readonly SpeechLanguage[];
   supportsImageInput?: boolean;
   /**
    * The provider only serves this model to accounts that already used it.
@@ -143,6 +144,16 @@ export interface RuntimeProviderManifestEntry {
   tts: RuntimeTtsManifest;
 }
 
+const ELEVENLABS_MULTILINGUAL_V2_LANGUAGES: readonly SpeechLanguage[] = [
+  "en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "cs", "pl", "tr", "sv",
+];
+const ELEVENLABS_FLASH_LANGUAGES: readonly SpeechLanguage[] = [
+  ...ELEVENLABS_MULTILINGUAL_V2_LANGUAGES, "hu",
+];
+const ELEVENLABS_EXPRESSIVE_LANGUAGES: readonly SpeechLanguage[] = [
+  ...ELEVENLABS_FLASH_LANGUAGES, "ur",
+];
+
 const WHISPER_WELL_SUPPORTED_LANGUAGES =
   "Afrikaans, Arabic, Armenian, Azerbaijani, Belarusian, Bosnian, Bulgarian, Catalan, Chinese, Croatian, Czech, Danish, Dutch, English, Estonian, Finnish, French, Galician, German, Greek, Hebrew, Hindi, Hungarian, Icelandic, Indonesian, Italian, Japanese, Kannada, Kazakh, Korean, Latvian, Lithuanian, Macedonian, Malay, Marathi, Maori, Nepali, Norwegian, Persian, Polish, Portuguese, Romanian, Russian, Serbian, Slovak, Slovenian, Spanish, Swahili, Swedish, Tagalog, Tamil, Thai, Turkish, Ukrainian, Urdu, Vietnamese, and Welsh.";
 
@@ -219,6 +230,12 @@ const GEMINI_THINKING_LEVEL_OPTIONS: RuntimeModelEffortOption[] = [
     label: "High",
     localizedLabels: { de: "Hoch" },
     transportValue: "HIGH",
+  },
+  {
+    id: "xhigh",
+    label: "Extra high",
+    localizedLabels: { de: "Sehr hoch" },
+    transportValue: "XHIGH",
   },
 ];
 
@@ -449,6 +466,10 @@ const MISTRAL_ADJUSTABLE_REASONING_EFFORT = effortConfig(
   ["none", "high"],
 );
 
+const MISTRAL_LARGE_4_EFFORT = effortConfig("reasoning-effort", "high", [
+  "low", "medium", "high",
+]);
+
 const OPENROUTER_FULL_REASONING_EFFORT = effortConfig(
   "reasoning-effort",
   "medium",
@@ -458,6 +479,16 @@ const OPENROUTER_HIGH_REASONING_EFFORT = effortConfig(
   "reasoning-effort",
   "high",
   ["low", "medium", "high", "xhigh", "max"],
+);
+const OPENROUTER_GEMINI_4_HIGH_EFFORT = effortConfig(
+  "reasoning-effort",
+  "high",
+  ["low", "medium", "high", "xhigh"],
+);
+const OPENROUTER_GEMINI_4_MEDIUM_EFFORT = effortConfig(
+  "reasoning-effort",
+  "medium",
+  ["low", "medium", "high"],
 );
 const OPENROUTER_GEMINI_REASONING_EFFORT = effortConfig(
   "reasoning-effort",
@@ -526,6 +557,12 @@ function catalogModelSpecs(
     .map((model) => namedModel(model.modelId, model.publicName));
 }
 
+// Google serves these IDs as aliases of their successors on every API request.
+export const GEMINI_REDIRECTED_FLASH_MODELS: Readonly<Record<string, string>> = {
+  "gemini-3.7-flash": "gemini-3.8-flash",
+  "gemini-3.5-flash": "gemini-3.6-flash",
+};
+
 export const RUNTIME_PROVIDER_ORDER = [
   "openai",
   "openrouter",
@@ -569,6 +606,22 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       realtimeModelIds: ["gpt-realtime-2.1", "gpt-realtime-2.1-mini"],
       realtimeTransport: "openai-realtime",
       models: [
+        withEffort(
+          namedModel("gpt-6.2-astra", "GPT-6.2 Astra", "2026-11-17"),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel("gpt-6.2-sol", "GPT-6.2 Sol", "2026-11-17"),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel("gpt-6.1-terra", "GPT-6.1 Terra", "2026-10-26"),
+          OPENAI_GPT_6_EFFORT,
+        ),
+        withEffort(
+          namedModel("gpt-6.1-sol", "GPT-6.1 Sol", "2026-09-29"),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
         withEffort(
           namedModel("gpt-6-astra", "GPT-6 Astra"),
           OPENAI_GPT_6_ASTRA_EFFORT,
@@ -717,6 +770,134 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
         "anthropic/claude-sonnet-5-20260630",
       ],
       models: [
+        withEffort(
+          namedModel(
+            "openai/gpt-6.2-astra-20261117",
+            "OpenAI · GPT-6.2 Astra",
+            "2026-11-17",
+          ),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-fable-5.2-20261109",
+            "Anthropic · Claude Fable 5.2",
+            "2026-11-09",
+          ),
+          OPENROUTER_HIGH_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-4-neon-20261118",
+            "Google · Gemini 4 Neon",
+            "2026-11-18",
+          ),
+          OPENROUTER_GEMINI_4_HIGH_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "openai/gpt-6.2-sol-20261117",
+            "OpenAI · GPT-6.2 Sol",
+            "2026-11-17",
+          ),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "openai/gpt-6.1-terra-20261026",
+            "OpenAI · GPT-6.1 Terra",
+            "2026-10-26",
+          ),
+          OPENAI_GPT_6_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "openai/gpt-6.1-sol-20260929",
+            "OpenAI · GPT-6.1 Sol",
+            "2026-09-29",
+          ),
+          OPENAI_GPT_6_ASTRA_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-sonnet-5.5-20260928",
+            "Anthropic · Claude Sonnet 5.5",
+            "2026-09-28",
+          ),
+          OPENROUTER_HIGH_REASONING_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "anthropic/claude-haiku-5.5-20261007",
+            "Anthropic · Claude Haiku 5.5",
+            "2026-10-07",
+          ),
+          effortConfig("reasoning-effort", "medium", [
+            "low",
+            "medium",
+            "high",
+            "xhigh",
+            "max",
+          ]),
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-4-hydrogen-20261112",
+            "Google · Gemini 4 Hydrogen",
+            "2026-11-12",
+          ),
+          OPENROUTER_GEMINI_4_HIGH_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-4-carbon-20261110",
+            "Google · Gemini 4 Carbon",
+            "2026-11-10",
+          ),
+          OPENROUTER_GEMINI_4_MEDIUM_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "google/gemini-4-argon-20261013",
+            "Google · Gemini 4 Argon",
+            "2026-10-13",
+          ),
+          OPENROUTER_GEMINI_4_MEDIUM_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "qwen/qwen4-max-20261115",
+            "Qwen · Qwen4-Max",
+            "2026-11-15",
+          ),
+          effortConfig("reasoning-effort", "high", [
+            "none",
+            "low",
+            "high",
+            "xhigh",
+          ]),
+        ),
+        withEffort(
+          namedModel(
+            "mistralai/mistral-large-4-0-20261006",
+            "Mistral · Mistral Large 4",
+            "2026-10-06",
+          ),
+          MISTRAL_LARGE_4_EFFORT,
+        ),
+        withEffort(
+          namedModel(
+            "deepseek/deepseek-v4.1-flash-20261017",
+            "DeepSeek · DeepSeek V4.1 Flash (October 17)",
+            "2026-10-17",
+          ),
+          effortConfig("reasoning-effort", "high", ["low", "high", "max"]),
+        ),
+        namedModel(
+          "moonshotai/kimi-k3.1-pro-20261023",
+          "Moonshot · Kimi K3.1 Pro",
+          "2026-10-23",
+        ),
         withEffort(namedModel("anthropic/claude-opus-5.5-20260921", "Anthropic · Claude Opus 5.5"), effortConfig("reasoning-effort", "medium", ["low", "medium", "high", "xhigh", "max"])),
         withEffort(namedModel("x-ai/grok-4.7-20260916", "xAI · Grok 4.7"), XAI_GROK_46_EFFORT),
         withEffort(namedModel("openai/gpt-6-sol-20260922", "OpenAI · GPT-6 Sol"), OPENAI_GPT_6_EFFORT),
@@ -834,10 +1015,22 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       ],
       models: [
         withEffort(
-          namedModel("claude-fable-5-1", "Claude Fable 5.1"),
+          namedModel("claude-fable-5-2", "Claude Fable 5.2", "2026-11-09"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
         ),
         withEffort(namedModel("claude-opus-5-5", "Claude Opus 5.5"), ANTHROPIC_MEDIUM_DEFAULT_OUTPUT_EFFORT),
+        withEffort(
+          namedModel("claude-sonnet-5-5", "Claude Sonnet 5.5", "2026-09-28"),
+          ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
+        ),
+        withEffort(
+          namedModel("claude-haiku-5-5", "Claude Haiku 5.5", "2026-10-07"),
+          ANTHROPIC_MEDIUM_DEFAULT_OUTPUT_EFFORT,
+        ),
+        withEffort(
+          namedModel("claude-fable-5-1", "Claude Fable 5.1"),
+          ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
+        ),
         withEffort(
           namedModel("claude-sonnet-5", "Claude Sonnet 5"),
           ANTHROPIC_EXTENDED_OUTPUT_EFFORT,
@@ -886,18 +1079,29 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "gemini-3.6-flash",
       fallbackModelIds: [
         "gemini-3.6-flash",
-        "gemini-3.5-flash",
+        "gemini-3.8-flash",
         "gemini-3.5-flash-lite",
       ],
       models: [
-        withEffort(namedModel("gemini-3.8-flash", "Gemini 3.8 Flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
-        withEffort(namedModel("gemini-3.7-flash", "Gemini 3.7 Flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
         withEffort(
-          model("gemini-3.6-flash"),
-          geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
+          namedModel("gemini-4-neon", "Gemini 4 Neon", "2026-11-18"),
+          geminiThinkingEffort("high", ["low", "medium", "high", "xhigh"]),
         ),
         withEffort(
-          model("gemini-3.5-flash"),
+          namedModel("gemini-4-hydrogen", "Gemini 4 Hydrogen", "2026-11-12"),
+          geminiThinkingEffort("high", ["low", "medium", "high", "xhigh"]),
+        ),
+        withEffort(
+          namedModel("gemini-4-carbon", "Gemini 4 Carbon", "2026-11-10"),
+          geminiThinkingEffort("medium", ["low", "medium", "high"]),
+        ),
+        withEffort(
+          namedModel("gemini-4-argon", "Gemini 4 Argon", "2026-10-13"),
+          geminiThinkingEffort("medium", ["low", "medium", "high"]),
+        ),
+        withEffort(namedModel("gemini-3.8-flash", "Gemini 3.8 Flash"), geminiThinkingEffort("high", ["low", "medium", "high"])),
+        withEffort(
+          model("gemini-3.6-flash"),
           geminiThinkingEffort("medium", ["minimal", "low", "medium", "high"]),
         ),
         withEffort(
@@ -949,15 +1153,17 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "gemini-3.6-flash",
       fallbackModelIds: [
         "gemini-3.6-flash",
-        "gemini-3.5-flash",
+        "gemini-3.8-flash",
         "gemini-3.5-flash-lite",
       ],
       models: [
         namedModel("gemini-3.5-transcribe", "Gemini 3.5 Transcribe"),
+        namedModel("gemini-4-neon", "Gemini 4 Neon", "2026-11-18"),
+        namedModel("gemini-4-hydrogen", "Gemini 4 Hydrogen", "2026-11-12"),
+        namedModel("gemini-4-carbon", "Gemini 4 Carbon", "2026-11-10"),
+        namedModel("gemini-4-argon", "Gemini 4 Argon", "2026-10-13"),
         namedModel("gemini-3.8-flash", "Gemini 3.8 Flash"),
-        namedModel("gemini-3.7-flash", "Gemini 3.7 Flash"),
         namedModel("gemini-3.6-flash", "Gemini 3.6 Flash"),
-        namedModel("gemini-3.5-flash", "Gemini 3.5 Flash"),
         namedModel("gemini-3.5-flash-lite", "Gemini 3.5 Flash Lite"),
       ],
       languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja"],
@@ -1090,7 +1296,17 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "deepseek-flash",
       fallbackModelIds: ["deepseek-flash", "deepseek-v4-pro"],
       models: [
-        withEffort({ ...namedModel("deepseek-flash", "DeepSeek V4.1 Flash"), supportsImageInput: true }, DEEPSEEK_THINKING_EFFORT),
+        withEffort(
+          {
+            ...namedModel(
+              "deepseek-flash",
+              "DeepSeek V4.1 Flash (October 17)",
+              "2026-10-17",
+            ),
+            supportsImageInput: true,
+          },
+          DEEPSEEK_THINKING_EFFORT,
+        ),
         withEffort(namedModel("deepseek-v4-pro", "DeepSeek V4 Pro"), DEEPSEEK_THINKING_EFFORT),
       ],
     },
@@ -1110,9 +1326,13 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       supportsImageInput: true,
       transport: "openai-compatible",
       endpoint: "https://api.mistral.ai/v1/chat/completions",
-      defaultModel: "mistral-medium-3-5",
-      fallbackModelIds: ["mistral-medium-3-5", "mistral-small-2603", "mistral-large-2512"],
+      defaultModel: "mistral-large-4-0",
+      fallbackModelIds: ["mistral-large-4-0", "mistral-small-2603"],
       models: [
+        withEffort(
+          namedModel("mistral-large-4-0", "Mistral Large 4", "2026-11-05"),
+          MISTRAL_LARGE_4_EFFORT,
+        ),
         withEffort(namedModel("mistral-medium-3-5", "Mistral Medium 3.5"), MISTRAL_ADJUSTABLE_REASONING_EFFORT),
         withEffort(model("mistral-small-2603"), MISTRAL_ADJUSTABLE_REASONING_EFFORT),
         model("mistral-large-2512"),
@@ -1125,25 +1345,61 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "multipart",
       endpoint: "https://api.mistral.ai/v1/audio/transcriptions",
-      defaultModel: "voxtral-mini-2602",
-      fallbackModelIds: ["voxtral-mini-2602"],
-      models: [namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2")],
-      languages: ["en", "de", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja"],
-      languageNote: "The current Voxtral Mini Transcribe 2 route supports English, Chinese, Hindi, Spanish, Arabic, French, Portuguese, Russian, German, Japanese, Korean, Italian, and Dutch.",
+      defaultModel: "voxtral-mini-transcribe-3-0",
+      fallbackModelIds: ["voxtral-mini-transcribe-3-0", "voxtral-small-transcribe-3-0"],
+      models: [
+        namedModel("voxtral-mini-transcribe-3-0", "Voxtral Mini Transcribe 3"),
+        namedModel("voxtral-small-transcribe-3-0", "Voxtral Small Transcribe 3"),
+        {
+          ...namedModel("voxtral-mini-2602", "Voxtral Mini Transcribe 2"),
+          speechLanguages: [
+            "en",
+            "de",
+            "hi",
+            "es",
+            "fr",
+            "it",
+            "pt",
+            "pt-BR",
+            "ru",
+            "zh-CN",
+            "ar",
+            "ja",
+          ],
+        },
+      ],
+      languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "hu", "cs", "pl", "tr", "sv"],
+      languageNote: "Voxtral 3 file transcription supports 53 languages and can detect the recorded language.",
     },
     tts: {
       support: "provider",
       transport: "binary",
       endpoint: "https://api.mistral.ai/v1/audio/speech",
       requestFormat: "mistral-speech",
-      defaultModel: "voxtral-mini-tts-2603",
-      fallbackModelIds: ["voxtral-mini-tts-2603"],
-      models: [namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03")],
-      languages: ["en", "de", "hi", "es", "fr", "it", "pt", "pt-BR", "ar"],
+      defaultModel: "voxtral-mini-tts-3-0",
+      fallbackModelIds: ["voxtral-mini-tts-3-0"],
+      models: [
+        namedModel("voxtral-mini-tts-3-0", "Voxtral TTS 3"),
+        {
+          ...namedModel("voxtral-mini-tts-2603", "Voxtral Mini TTS 26.03"),
+          speechLanguages: [
+            "en",
+            "de",
+            "hi",
+            "es",
+            "fr",
+            "it",
+            "pt",
+            "pt-BR",
+            "ar",
+          ],
+        },
+      ],
+      languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "hu", "cs", "pl", "tr", "sv", "ur"],
       voiceOptions: [],
       voiceDirectory: "mistral",
       requiresVoice: true,
-      languageNote: "Voxtral TTS supports English, French, Spanish, Portuguese, Italian, Dutch, German, Hindi, and Arabic. Mr Broccoli loads preset and custom voices from Mistral automatically.",
+      languageNote: "Voxtral TTS 3 supports 35 languages. Select a preset or account voice for the requested language. Mr Broccoli loads preset and custom voices from Mistral automatically.",
     },
   },
   elevenlabs: {
@@ -1159,11 +1415,11 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       support: "provider",
       transport: "multipart",
       endpoint: "https://api.elevenlabs.io/v1/speech-to-text",
-      defaultModel: "scribe_v2",
-      fallbackModelIds: ["scribe_v2"],
-      models: [namedModel("scribe_v2", "Scribe v2")],
+      defaultModel: "scribe_v3",
+      fallbackModelIds: ["scribe_v3", "scribe_v2"],
+      models: [namedModel("scribe_v3", "Scribe v3", "2026-11-10"), namedModel("scribe_v2", "Scribe v2")],
       languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "hu", "cs", "pl", "tr", "sv", "ur"],
-      languageNote: "Scribe v2 automatically detects and transcribes more than 90 languages.",
+      languageNote: "Scribe v3 and v2 automatically detect and transcribe more than 90 languages.",
     },
     tts: {
       support: "provider",
@@ -1175,17 +1431,31 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultVoice: "21m00Tcm4TlvDq8ikWAM",
       voiceFallback: "21m00Tcm4TlvDq8ikWAM",
       models: [
+        {
+          ...namedModel("eleven_v4", "Eleven v4"),
+          speechLanguages: ELEVENLABS_EXPRESSIVE_LANGUAGES,
+        },
+        {
+          ...namedModel("eleven_v4_turbo", "Eleven v4 Turbo"),
+          speechLanguages: ELEVENLABS_EXPRESSIVE_LANGUAGES,
+        },
         namedModel("eleven_flash_v2_5", "Eleven Flash v2.5"),
-        namedModel("eleven_multilingual_v2", "Eleven Multilingual v2"),
-        namedModel("eleven_v3", "Eleven v3"),
+        {
+          ...namedModel("eleven_multilingual_v2", "Eleven Multilingual v2"),
+          speechLanguages: ELEVENLABS_MULTILINGUAL_V2_LANGUAGES,
+        },
+        {
+          ...namedModel("eleven_v3", "Eleven v3"),
+          speechLanguages: ELEVENLABS_EXPRESSIVE_LANGUAGES,
+        },
       ],
-      languages: ["en", "de", "uk", "hi", "es", "fr", "it", "pt", "pt-BR", "ru", "zh-CN", "ar", "ja", "cs", "pl", "tr", "sv"],
+      languages: [...ELEVENLABS_FLASH_LANGUAGES],
       voiceOptions: [
         voice("21m00Tcm4TlvDq8ikWAM", "Janet (built-in)", { de: "Janet (integriert)" }),
       ],
       voiceDirectory: "elevenlabs",
       requiresVoice: true,
-      languageNote: "ElevenLabs Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli uses a built-in premade voice when the configured key cannot read the account voice library.",
+      languageNote: "Eleven v4 and v4 Turbo support more than 90 languages, Flash v2.5 supports 32 languages, Multilingual v2 supports 29, and Eleven v3 supports more than 70. Mr Broccoli uses a built-in premade voice when the configured key cannot read the account voice library.",
     },
   },
   "alibaba-qwen-dashscope": {
@@ -1204,6 +1474,15 @@ export const RUNTIME_PROVIDER_MANIFEST: Record<
       defaultModel: "qwen3.6-flash-2026-04-16",
       fallbackModelIds: ["qwen3.6-flash-2026-04-16", "qwen3.7-plus-2026-05-26", "qwen3.5-flash-2026-02-23"],
       models: [
+        withEffort(
+          namedModel("qwen4-max", "Qwen4-Max", "2026-11-16"),
+          effortConfig("qwen-reasoning-effort", "high", [
+            "none",
+            "low",
+            "high",
+            "xhigh",
+          ]),
+        ),
         withEffort(namedModel("qwen3.8-max-0902", "Qwen3.8-Max"), effortConfig("qwen-reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
         withEffort(namedModel("qwen3.8-flash", "Qwen3.8-Flash"), effortConfig("qwen-reasoning-effort", "xhigh", ["none", "low", "medium", "xhigh"])),
         withEffort(namedModel("qwen3.7-flash-2026-07-15", "Qwen3.7-Flash"), QWEN_THINKING_EFFORT),
