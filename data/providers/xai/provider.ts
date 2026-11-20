@@ -13,6 +13,9 @@ export const providerDefinition = defineProviderDefinition(
     },
     "officialSources": [
       "https://docs.x.ai/developers/models",
+      "https://docs.x.ai/developers/models/grok-4.7",
+      "https://docs.x.ai/developers/model-capabilities/audio/speech-to-text",
+      "https://docs.x.ai/developers/pricing",
       "https://docs.x.ai/developers/models/grok-4.5",
       "https://docs.x.ai/developers/models/grok-4.3",
       "https://docs.x.ai/developers/rest-api-reference",
@@ -49,13 +52,13 @@ export const providerDefinition = defineProviderDefinition(
       "regionSplitRecommended": true
     },
     "summaries": {
-      "pricing": "LLMs are token-priced; Grok 4.5 is $2.00/1M input and $6.00/1M output for short-context requests, Voice Agent is $0.05/min, and TTS is $15.00/1M characters.",
-      "limits": "Voice Agent: 100 concurrent sessions/team, 30-minute max session. TTS: 600 RPM, 10 concurrent requests/team on the dedicated page; text input max 15,000 chars/request. Text streaming uses SSE. Image input for image-capable LLMs is capped at 20 MiB per image and jpg/jpeg/png.",
+      "pricing": "Grok 4.7 starts at USD 2 per million input tokens and USD 6 per million output tokens. Recorded REST transcription costs USD 0.10 per hour and streaming transcription costs USD 0.20 per hour. TTS costs USD 15 per million characters.",
+      "limits": "Recorded transcription accepts files up to 500 MB. Standalone TTS accepts up to 60,000 characters per request and 50 concurrent bidirectional streaming sessions per team.",
       "region": "Global endpoint https://api.x.ai routes automatically; regional endpoints are available, with docs explicitly showing eu-west-1 and noting regional failures fail closed rather than falling back. Voice/TTS pricing pages currently list us-east-1 availability.",
-      "sttLanguages": "Unknown for a public standalone STT API. Voice Agent is multilingual in marketing language, but developer docs do not publish a standalone STT language matrix.",
+      "sttLanguages": "Grok Voice Transcribe 2.0 transcribes at least 38 languages and can follow language changes within a recording.",
       "ttsLanguages": "Official TTS docs list 20 named languages/locale variants plus auto-detect.",
       "freeTier": "Unknown in developer docs. Quickstart says to create an account and load credits; the public API marketing pages say 'free to start' / 'no credit card required', but no durable developer free-tier quota is documented.",
-      "integrationNotes": "Use /v1/language-models or the Management API model-list endpoint for live discovery. Prefer Responses API over deprecated Chat Completions. Treat STT as partial because public developer docs expose voice-agent audio input but not a standalone transcriptions API. Use /v1/tts/voices for live voice discovery."
+      "integrationNotes": "Use the published model list or the Management API for team-specific discovery. Standalone recorded transcription uses multipart POST /v1/stt. Speech synthesis uses POST /v1/tts, with built-in voices listed at GET /v1/tts/voices."
     },
     "sources": [
       {

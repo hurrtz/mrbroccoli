@@ -71,8 +71,9 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
 };
 
 export function migrateProviderModelAlias(provider: Provider, model: string) {
-  if (provider === "openrouter") {
-    return getCatalogModelForAppProvider(provider, model, "llm")?.modelId ?? model;
+  if (provider === "openrouter" || provider === "xai") {
+    const service = provider === "openrouter" ? "llm" : "stt";
+    return getCatalogModelForAppProvider(provider, model, service)?.modelId ?? model;
   }
   return PROVIDER_MODEL_ALIAS_MIGRATIONS[provider]?.[model] ?? model;
 }

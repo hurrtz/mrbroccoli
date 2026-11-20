@@ -56,7 +56,7 @@ describe("provider language notes", () => {
         "text-to-speech",
         "en",
       ),
-    ).toBe("5 voices across 20 languages.");
+    ).toBe("Supports 20 languages.");
   });
 
   it("builds an exact STT upload limit note from catalog constraints", () => {

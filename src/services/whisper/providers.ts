@@ -241,9 +241,11 @@ export async function transcribeWithXaiRestSttProvider(
     fileUri,
     language,
     provider,
+    providerModel,
     speechLanguage,
   } = params;
   const formData = new FormData();
+  formData.append("model", providerModel || config.defaultModel);
   if (speechLanguage !== "auto") {
     formData.append("format", "true");
     formData.append(

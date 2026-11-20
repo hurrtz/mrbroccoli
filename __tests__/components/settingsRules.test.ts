@@ -120,7 +120,7 @@ describe("settingsRules", () => {
       "xai",
     ]);
 
-    expect(nextProviderSttModels?.xai).toBe("grok-stt");
+    expect(nextProviderSttModels?.xai).toBe("grok-voice-transcribe-2.0");
   });
 
   it("leaves a valid provider voice selection untouched", () => {

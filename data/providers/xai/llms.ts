@@ -13,7 +13,7 @@ export const llms = providerContext.defineLlms([
       priceBasis: "Standard requests below 200K prompt tokens",
     }),
     notes:
-      "Text and image input, text output. The direct rate is USD 4 per million input tokens and USD 12 per million output tokens above the 200K threshold.",
+      "Text and image input, text output. The direct rate is USD 4 per million input tokens and USD 12 per million output tokens once the prompt reaches 200,000 tokens.",
     officialSources: [
       "https://docs.x.ai/developers/models/grok-4.7",
       "https://docs.x.ai/developers/release-notes",

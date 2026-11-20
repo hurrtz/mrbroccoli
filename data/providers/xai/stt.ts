@@ -13,12 +13,13 @@ export const stt = providerContext.defineSttModels([
       ],
       "status": "Documented active/current",
       "catalogScope": "Mostly exhaustive",
-      "pricingSummary": "$0.05 / minute ($3.00 / hour), plus tool invocation charges when tools are used.",
+      "pricingSummary": "Grok Voice 3.0 charges USD 0.08 per minute of speech-to-speech audio. Text input and server-side tools are billed separately.",
       "limitsSummary": "100 concurrent sessions/team, max session duration 30 minutes. Supports bidirectional audio and text over WebSocket. Audio chunks are base64-encoded.",
       "regionSummary": "Dedicated page lists cluster us-east-1.",
-      "languagesSummary": "No official standalone STT language matrix in developer docs. Marketing page calls it multilingual.",
-      "notes": "This is not a standalone transcription model. Treat as partial STT support only: good for live conversational speech input, not a documented public /transcriptions-style API.",
+      "languagesSummary": "Live conversational model with multilingual speech input.",
+      "notes": "Speech-to-speech sessions use the realtime API. Recorded transcription has a separate REST model.",
       "officialSources": [
+        "https://docs.x.ai/developers/pricing",
         "https://docs.x.ai/developers/models/voice-agent-api",
         "https://docs.x.ai/developers/model-capabilities/audio/voice-agent",
         "https://docs.x.ai/developers/rest-api-reference/inference/voice",
@@ -29,9 +30,9 @@ export const stt = providerContext.defineSttModels([
       "supportsBatch": false,
       "priceMeasurements": [
         {
-          "amountUsd": 0.05,
+          "amountUsd": 0.08,
           "unit": "minute",
-          "sourceText": "Per minute $0.05 / min ($3.00 / hr)"
+          "sourceText": "USD 0.08 per minute of speech-to-speech audio"
         }
       ],
       "constraints": [
@@ -53,7 +54,7 @@ export const stt = providerContext.defineSttModels([
         }
       ],
       "languageSupport": {
-        "rawText": "Marketing page says multilingual; developer docs do not publish a standalone STT language list.",
+        "rawText": "Multilingual conversational speech input.",
         "isMultilingual": true,
         "languageCount": 0,
         "voiceCount": 5,
@@ -66,54 +67,50 @@ export const stt = providerContext.defineSttModels([
       }
     }
   ),
-  providerContext.stt(
-    {
-      "providerId": "xai",
-      "providerName": "xAI",
-      "service": "stt",
-      "modelId": "grok-stt",
-      "publicName": "Grok Speech-to-Text",
-      "aliases": [],
-      "status": "Documented active/current",
-      "catalogScope": "Mostly exhaustive",
-      "pricingSummary": "$0.10/hr batch transcription, $0.20/hr streaming transcription.",
-      "limitsSummary": "Multipart batch endpoint POST /v1/stt. Streaming variant exposed over WebSocket. Exact per-request file size limit not published in the April 2026 release notes.",
-      "regionSummary": "Hosted at https://api.x.ai.",
-      "languagesSummary": "25 languages with speaker diarization, word-level timestamps, and multichannel input support.",
-      "notes": "Standalone STT endpoint introduced April 2026. Request is multipart/form-data with a 'file' field; response is JSON with a 'text' field. Docs do not name a specific model ID, so 'grok-stt' is used internally.",
-      "officialSources": [
-        "https://docs.x.ai/developers/model-capabilities/audio/voice",
-        "https://docs.x.ai/developers/rest-api-reference/inference/voice"
+  providerContext.stt({
+    modelId: "grok-voice-transcribe-2.0",
+    publicName: "Grok Voice Transcribe 2.0",
+    aliases: ["grok-stt", "grok-voice-transcribe-1.0"],
+    status: "Current. The 1.0 model retired October 2, 2026 and requests redirect to 2.0.",
+    pricingSummary: "USD 0.10 per hour of recorded audio and USD 0.20 per hour of streaming audio.",
+    limitsSummary: "Recorded files can contain up to 500 MB. The file must be the final multipart field.",
+    regionSummary: "Hosted at https://api.x.ai.",
+    languagesSummary: "At least 38 languages with automatic language detection.",
+    notes: "POST /v1/stt accepts a model, an optional language and a file. Streaming uses the separate WebSocket endpoint.",
+    officialSources: [
+      "https://docs.x.ai/developers/model-capabilities/audio/speech-to-text",
+      "https://docs.x.ai/developers/release-notes",
+      "https://docs.x.ai/developers/pricing",
+    ],
+    openAiCompatible: false,
+    supportsRealtime: true,
+    supportsBatch: true,
+    priceMeasurements: [
+      { amountUsd: 0.10, unit: "hour", sourceText: "Recorded REST transcription costs USD 0.10 per hour." },
+      { amountUsd: 0.20, unit: "hour", sourceText: "Streaming transcription costs USD 0.20 per hour." },
+    ],
+    constraints: [{
+      metric: "file_size_bytes",
+      comparator: "<=",
+      value: 500_000_000,
+      unit: "bytes",
+      scope: "recorded file",
+      sourceText: "The REST endpoint accepts files up to 500 MB.",
+    }],
+    languageSupport: {
+      rawText: "The published list covers at least 38 languages and supports language changes within a recording.",
+      isMultilingual: true,
+      languageCount: 38,
+      voiceCount: null,
+      listedLanguages: [
+        "Arabic", "Bosnian", "Bulgarian", "Cantonese", "Catalan", "Chinese (Mandarin)",
+        "Croatian", "Czech", "Danish", "Dutch", "English", "Filipino", "Finnish", "French",
+        "German", "Greek", "Hindi", "Hungarian", "Indonesian", "Italian", "Japanese", "Korean",
+        "Macedonian", "Malay", "Norwegian (Bokmål)", "Persian", "Polish", "Portuguese",
+        "Romanian", "Russian", "Slovak", "Spanish", "Swedish", "Thai", "Turkish",
+        "Ukrainian", "Urdu", "Vietnamese",
       ],
-      "openAiCompatible": false,
-      "supportsRealtime": true,
-      "supportsBatch": true,
-      "priceMeasurements": [
-        {
-          "amountUsd": 0.10,
-          "unit": "hour",
-          "sourceText": "Batch transcription $0.10 / hour"
-        },
-        {
-          "amountUsd": 0.20,
-          "unit": "hour",
-          "sourceText": "Streaming transcription $0.20 / hour"
-        }
-      ],
-      "constraints": [],
-      "languageSupport": {
-        "rawText": "25 languages with speaker diarization, word-level timestamps, and multichannel input.",
-        "isMultilingual": true,
-        "languageCount": 25,
-        "voiceCount": null,
-        "listedLanguages": [],
-        "notes": [
-          "speaker diarization",
-          "word-level timestamps",
-          "multichannel input",
-          "batch and streaming modes"
-        ]
-      }
-    }
-  ),
+      notes: ["Speaker diarization", "Word timestamps", "Multichannel input"],
+    },
+  }),
 ]);

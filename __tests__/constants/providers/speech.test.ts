@@ -91,11 +91,14 @@ describe("speech provider constants", () => {
   it("surfaces newly wired catalog-backed STT providers through the runtime manifest", () => {
     expect(getProviderSttModelOptions("xai")).toEqual([
       {
-        id: "grok-stt",
-        name: "Grok Speech-to-Text",
+        id: "grok-voice-transcribe-2.0",
+        name: "Grok Voice Transcribe 2.0",
       },
     ]);
-    expect(PROVIDER_DEFAULT_STT_MODELS.xai).toBe("grok-stt");
+    expect(PROVIDER_DEFAULT_STT_MODELS.xai).toBe("grok-voice-transcribe-2.0");
+    for (const language of ["uk", "hu", "ur"] as const) {
+      expect(providerSupportsSttLanguage("xai", language, "grok-voice-transcribe-2.0")).toBe(true);
+    }
   });
 
   it("uses catalog labels for exact TTS model matches", () => {

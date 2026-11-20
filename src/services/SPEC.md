@@ -71,6 +71,10 @@ transcript is sent verbatim; delivery instructions travel as a
 raw L16 PCM receives a WAV header, avoiding a doubled header. The 3.1 preview
 keeps the generateContent prompt path.
 
+xAI recorded transcription sends the named serving model and places the file
+last in the multipart request. An optional language hint enables number
+formatting. The service uses the 500 MB published upload limit before transport.
+
 OpenAI `gpt-transcribe` uses repeated multipart `languages[]` hints and never
 the legacy singular `language`; auto-detection omits hints. Legacy file
 transcribers keep their existing language and diarization contracts.

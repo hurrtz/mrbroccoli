@@ -475,6 +475,7 @@ describe("transcribeAudio", () => {
       json: async () => ({ text: "Hello from xAI STT" }),
     });
 
+    const onModelResolved = jest.fn();
     const result = await transcribeAudio({
       fileUri: "/tmp/recording.m4a",
       mode: "provider",
@@ -482,10 +483,12 @@ describe("transcribeAudio", () => {
       providerModel: "grok-stt",
       apiKey: "xai-test",
       language: "en",
-      speechLanguage: "en",
+      speechLanguage: "uk",
+      onModelResolved,
     });
 
     expect(result).toBe("Hello from xAI STT");
+    expect(onModelResolved).toHaveBeenCalledWith("grok-voice-transcribe-2.0");
     expect(MockWebSocket.instances).toHaveLength(0);
 
     const [url, options] = (fetch as jest.Mock).mock.calls[0];
@@ -493,11 +496,12 @@ describe("transcribeAudio", () => {
     expect(options.headers.Authorization).toBe("Bearer xai-test");
     const parts = Array.from((options.body as FormData).entries());
 
-    expect(parts.slice(0, 2)).toEqual([
+    expect(parts.slice(0, -1)).toEqual([
+      ["model", "grok-voice-transcribe-2.0"],
       ["format", "true"],
-      ["language", "en"],
+      ["language", "uk"],
     ]);
-    expect(parts[2][0]).toBe("file");
+    expect(parts[parts.length - 1][0]).toBe("file");
   });
 
   it("lets xAI auto-detect STT without forcing formatting or a language", async () => {
@@ -518,7 +522,7 @@ describe("transcribeAudio", () => {
 
     const [, options] = (fetch as jest.Mock).mock.calls[0];
     const parts = Array.from((options.body as FormData).entries());
-    expect(parts.map(([key]) => key)).toEqual(["file"]);
+    expect(parts.map(([key]) => key)).toEqual(["model", "file"]);
   });
 
   it("rejects an explicitly unsupported provider STT language before upload", async () => {
@@ -526,14 +530,14 @@ describe("transcribeAudio", () => {
       transcribeAudio({
         fileUri: "/tmp/recording.m4a",
         mode: "provider",
-        provider: "xai",
-        providerModel: "grok-stt",
+        provider: "mistral",
+        providerModel: "voxtral-mini-2602",
         apiKey: "xai-test",
         language: "en",
         speechLanguage: "uk",
       }),
     ).rejects.toThrow(
-      "xAI does not officially support Ukrainian for this speech route.",
+      "Mistral does not officially support Ukrainian for this speech route.",
     );
 
     expect(fetch).not.toHaveBeenCalled();
@@ -565,21 +569,21 @@ describe("transcribeAudio", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("rejects uploads that exceed an exact catalog file-size limit before any upload", async () => {
-    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({
-      exists: true,
-      size: 26_000_000,
-    });
+  it.each([
+    { provider: "openai", size: 25_000_001, limitMb: 25 },
+    { provider: "xai", size: 500_000_001, limitMb: 500 },
+  ] as const)("rejects $provider recordings over $limitMb MB before upload", async ({ provider, size, limitMb }) => {
+    (FileSystem.getInfoAsync as jest.Mock).mockResolvedValue({ exists: true, size });
 
     await expect(
       transcribeAudio({
         fileUri: "/tmp/recording.m4a",
         mode: "provider",
-        provider: "openai",
-        apiKey: "sk-test",
+        provider,
+        apiKey: "test-key",
         language: "en",
       }),
-    ).rejects.toThrow(/too long for .* speech-to-text \(max 25 MB\)/);
+    ).rejects.toThrow(`(max ${limitMb} MB)`);
 
     expect(fetch).not.toHaveBeenCalled();
   });

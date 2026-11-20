@@ -1,5 +1,5 @@
 import * as FileSystem from "expo-file-system/legacy";
-import { getCatalogConstraintsForAppProvider } from "../catalog/appProviders";
+import { getCatalogConstraintsForAppProvider, getCatalogModelForAppProvider } from "../catalog/appProviders";
 import { getStrictestCatalogMaxConstraint } from "../catalog";
 import { PROVIDER_LABELS, getSttModelLabel } from "../constants/models";
 import { translate } from "../i18n";
@@ -73,7 +73,7 @@ export async function transcribeAudio(params: {
     fileUri,
     mode,
     provider,
-    providerModel,
+    providerModel: selectedModel,
     localModelId,
     apiKey,
     language,
@@ -107,6 +107,9 @@ export async function transcribeAudio(params: {
     );
   }
 
+  const providerModel = provider === "xai" && selectedModel
+    ? getCatalogModelForAppProvider(provider, selectedModel, "stt")?.modelId ?? selectedModel
+    : selectedModel;
   if (
     speechLanguage !== "auto" &&
     !providerSupportsSttLanguage(provider, speechLanguage, providerModel)

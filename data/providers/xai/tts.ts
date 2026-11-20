@@ -9,10 +9,10 @@ export const tts = providerContext.defineTtsModels([
     catalogScope: "Mostly exhaustive",
     pricingSummary: "$15.00 / 1M characters.",
     limitsSummary:
-      "Unary requests accept up to 15,000 characters. The WebSocket endpoint has no total text limit, caps each text.delta at 15,000 characters, and allows 50 concurrent sessions per team.",
+      "Unary requests accept up to 60,000 characters. The WebSocket endpoint has no total text limit, caps each text.delta at 60,000 characters, and allows 50 concurrent sessions per team.",
     regionSummary: "Hosted at https://api.x.ai.",
     languagesSummary:
-      "20 listed languages/locale variants plus auto-detect; 5 voices.",
+      "20 listed languages or locale variants plus automatic detection. Built-in and user-owned voices are discoverable through the API.",
     notes:
       "POST /v1/tts uses text, voice_id, and language without a model field. Use /v1/tts/voices for live voice discovery.",
     officialSources: [
@@ -34,10 +34,10 @@ export const tts = providerContext.defineTtsModels([
       {
         metric: "other",
         comparator: "<=",
-        value: 15000,
+        value: 60_000,
         unit: "other",
         scope: "unary request",
-        sourceText: "Max text length 15,000 characters per request.",
+        sourceText: "Max text length 60,000 characters per request.",
       },
       {
         metric: "concurrency",
@@ -54,7 +54,7 @@ export const tts = providerContext.defineTtsModels([
         "Auto-detect, English, Arabic (Egypt), Arabic (Saudi Arabia), Arabic (United Arab Emirates), Bengali, Chinese (Simplified), French, German, Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (Brazil), Portuguese (Portugal), Russian, Spanish (Mexico), Spanish (Spain), Turkish, Vietnamese.",
       isMultilingual: true,
       languageCount: 20,
-      voiceCount: 5,
+      voiceCount: null,
       listedLanguages: [
         "en",
         "ar-EG",
@@ -79,7 +79,7 @@ export const tts = providerContext.defineTtsModels([
       ],
       notes: [
         "auto-detect supported",
-        "five voices: ara, eve, leo, rex, sal",
+        "live provider-owned voice directory",
         "inline expressive tags supported",
       ],
     },
