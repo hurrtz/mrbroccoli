@@ -56,8 +56,16 @@ tags:
     element:
       id: speech-diagnostics-row
     direction: DOWN
+- tapOn:
+    id: speech-diagnostics-row
+- assertVisible:
+    id: speech-diagnostics-sheet
 - takeScreenshot:
     path: ${PLATFORM}/locales/${LOCALE}/settings-app-02
+- tapOn:
+    id: speech-diagnostics-sheet-header-handle
+- assertNotVisible:
+    id: speech-diagnostics-sheet
 - scrollUntilVisible:
     element:
       id: app-theme
