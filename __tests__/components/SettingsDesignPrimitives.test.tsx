@@ -35,10 +35,10 @@ jest.mock("react-native-gesture-handler", () => {
   };
 });
 
-function wrap(children: React.ReactNode) {
+function wrap(children: React.ReactNode, language: "en" | "ar" = "en") {
   return render(
     <ThemeProvider mode="light">
-      <LocalizationProvider language="en">{children}</LocalizationProvider>
+      <LocalizationProvider language={language}>{children}</LocalizationProvider>
     </ThemeProvider>,
   );
 }
@@ -121,6 +121,18 @@ describe("settings design primitives", () => {
       paddingVertical: 8,
     });
   });
+
+  it.each(["en", "ar"] as const)(
+    "lets the native %s layout resolve the value’s trailing alignment",
+    (language) => {
+      const screen = wrap(
+        <SettingsRow label="Theme" value="System" />,
+        language,
+      );
+      const { textAlign } = StyleSheet.flatten(screen.getByText("System").props.style);
+      expect(textAlign).toBe("right");
+    },
+  );
 
   it("expresses selected, locked, and removable route states accessibly", () => {
     const onSelect = jest.fn();

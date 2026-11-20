@@ -159,10 +159,9 @@ export function ConversationDrawerSearch({
   onClearSearch,
 }: ConversationDrawerSearchProps) {
   const { colors } = useTheme();
-  const { isRtl, t } = useLocalization();
+  const { t } = useLocalization();
   const insets = useSafeAreaInsets();
   const hint = t("searchConversationsPlaceholder");
-  const textAlign = isRtl ? "right" : "left";
 
   return (
     <View
@@ -198,7 +197,7 @@ export function ConversationDrawerSearch({
               style={[
                 styles.searchText,
                 styles.searchHint,
-                { color: colors.textMuted, textAlign },
+                { color: colors.textMuted },
               ]}
             >
               {hint}
@@ -216,7 +215,7 @@ export function ConversationDrawerSearch({
               styles.searchText,
               styles.searchInput,
               !searchQuery && StyleSheet.absoluteFill,
-              { color: colors.text, textAlign },
+              { color: colors.text },
             ]}
             returnKeyType="search"
           />

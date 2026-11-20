@@ -211,8 +211,8 @@ capability healthy. The UI shows the capability that was actually tested.
   semantics; local-model removal remains an explicit swipe action. Removing a
   selected speech model atomically returns that capability to its system route.
 - Setting labels and empty-state instructions wrap within their rows. Short
-  labels keep the compact row height. A trailing value uses at most 44% of the
-  text column, keeping the action name readable beside its controls.
+  labels keep the compact row height. Values align at the locale’s trailing
+  edge and use at most 44% of the text column, keeping the action name readable.
 - Provider connection rows expose capability and aggregate health at a glance;
   credential inputs and detailed validation belong to the selected provider's
   focus-isolated sheet rather than expanding the overview list in place.

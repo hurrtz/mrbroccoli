@@ -90,13 +90,7 @@ export function SettingsRow({
         {value ? (
           <Text
             numberOfLines={1}
-            style={[
-              styles.value,
-              {
-                color: colors.textSecondary,
-                textAlign: isRtl ? "left" : "right",
-              },
-            ]}
+            style={[styles.value, { color: colors.textSecondary }]}
           >
             {value}
           </Text>
@@ -204,5 +198,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.body,
     fontSize: 14,
     lineHeight: 20,
+    textAlign: "right",
   },
 });

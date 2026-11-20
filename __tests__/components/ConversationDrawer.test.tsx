@@ -368,11 +368,11 @@ describe("ConversationDrawer", () => {
   });
 
   it.each([
-    ["uk", "Пошук за назвами, моделями й текстом повідомлень", "left"],
-    ["ar", "البحث في العناوين والنماذج ونص الرسالة", "right"],
+    ["uk", "Пошук за назвами, моделями й текстом повідомлень"],
+    ["ar", "البحث في العناوين والنماذج ونص الرسالة"],
   ] as const)(
     "wraps the %s search hint while preserving a single-line editor",
-    (language, hint, alignment) => {
+    (language, hint) => {
       const screen = renderConversationDrawer({}, language);
       const input = screen.getByTestId("conversation-drawer-search-input");
       const hintText = screen.getByText(hint, { includeHiddenElements: true });
@@ -382,7 +382,10 @@ describe("ConversationDrawer", () => {
       expect(input.props.returnKeyType).toBe("search");
       expect(hintText.props.numberOfLines).toBeUndefined();
       expect(hintText.props.accessibilityElementsHidden).toBe(true);
-      expect(StyleSheet.flatten(hintText.props.style).textAlign).toBe(alignment);
+      for (const element of [hintText, input]) {
+        const { textAlign } = StyleSheet.flatten(element.props.style);
+        expect(textAlign ?? "auto").toBe("auto");
+      }
 
       fireEvent.changeText(input, "travel");
       expect(screen.queryByText(hint, { includeHiddenElements: true })).toBeNull();

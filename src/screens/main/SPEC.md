@@ -298,9 +298,9 @@ receive already-derived state and callbacks.
   New control as the phone drawer. It has no backdrop, close action, or menu
   button; selection and New keep it mounted. Its header also retains the global
   Settings entry.
-- The drawer and sidebar search field displays its full translated hint across
-  as many lines as needed. Entering a query uses the native single-line field
-  and its Search key.
+- The drawer and sidebar search field displays its full translated hint from
+  the locale’s leading edge across as many lines as needed. Entering a query
+  uses the native single-line field and its Search key.
 - An expanded iPhone in portrait uses the regular portrait sidebar and
   transcript sheet. In landscape its input stage and inline transcript each
   occupy half the usable window, with both panels inside the system insets.
