@@ -219,10 +219,11 @@ the architectural answer for the author.
   cost-ceiling contract before any paid request.
 - The paid provider matrix is run only for an explicit new-version request and
   derives its coverage from the runtime provider manifest.
-- Release cost reports pin standard token prices for new direct models when
-  the researched catalogue lacks pricing, including GPT-6 Astra and Claude
-  Fable 5.2, Gemini 4, Mistral Large 4 and Qwen4-Max. These estimates stay separate from provider-reported costs and
-  the pre-request reservation; model additions do not authorize live calls.
+- Release cost estimates use the selected direct or routed model's researched
+  rates, including Singapore for the default Qwen deployment. A small set of
+  older models keeps separate release prices where the model card lacks suitable
+  measurements. Reports prefer costs actually supplied by the provider and
+  preserve the pre-request reservation.
   The current full matrix reserves USD 2.0615; an existing USD 1 configured
   ceiling still aborts before provider requests. No stored cost ceiling is
   increased by a catalogue update.

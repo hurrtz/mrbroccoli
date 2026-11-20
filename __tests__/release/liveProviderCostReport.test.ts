@@ -42,7 +42,7 @@ describe("live provider cost report", () => {
   it.each([
     { provider: "openai", model: "gpt-6-astra" },
     { provider: "anthropic", model: "claude-fable-5-1" },
-  ] as const)("accounts for $model using pinned standard token rates", ({ provider, model }) => {
+  ] as const)("accounts for $model using its catalogued standard token rates", ({ provider, model }) => {
     const step: LiveProviderMatrixStep = {
       id: `llm:${provider}:${model}:low`,
       kind: "llm",
@@ -62,6 +62,29 @@ describe("live provider cost report", () => {
       fullyAccounted: true,
       accountedUsd: 0.015,
       upperBoundUsd: 0.02,
+    });
+  });
+
+  it.each([
+    { provider: "openrouter", model: "qwen/qwen4-max-20261115", usd: 0.0018525 },
+    { provider: "alibaba-qwen-dashscope", model: "qwen4-max", usd: 0.00195 },
+  ] as const)("prices $provider against its own Qwen4-Max route", ({ provider, model, usd }) => {
+    const step: LiveProviderMatrixStep = {
+      id: `llm:${provider}:${model}:low`,
+      kind: "llm",
+      provider,
+      model,
+      effort: "low",
+      reservedUsd: 0.004,
+    };
+    const tracker = createLiveProviderCostTracker([step]);
+    tracker.startStep(step);
+    tracker.recordProviderResponse(step, { usage: { input_tokens: 1_000, output_tokens: 100 } });
+    tracker.finishStep(step, { passed: true });
+    expect(tracker.buildReport().steps[0]).toMatchObject({
+      costSource: "catalog-estimate",
+      fullyAccounted: true,
+      accountedUsd: usd,
     });
   });
 
@@ -212,9 +235,13 @@ describe("live provider cost report", () => {
   });
 
   it("keeps the reservation as an upper bound when pricing is incomplete", () => {
-    const tracker = createLiveProviderCostTracker([openRouterStep]);
-    tracker.startStep(openRouterStep);
-    tracker.finishStep(openRouterStep, {
+    const unpricedStep = {
+      ...openRouterStep,
+      model: "example/new-upstream-without-published-rates",
+    };
+    const tracker = createLiveProviderCostTracker([unpricedStep]);
+    tracker.startStep(unpricedStep);
+    tracker.finishStep(unpricedStep, {
       passed: false,
       fallbackUsage: {
         inputTokens: 10,

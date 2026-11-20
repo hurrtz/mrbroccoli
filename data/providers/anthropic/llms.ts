@@ -60,6 +60,9 @@ export const llms = providerContext.defineLlms([
         outputTokens: 128_000,
         inputUsd,
         outputUsd,
+        ...(modelId === "claude-haiku-5-5"
+          ? { priceBasis: "Standard prompts up to 100,000 tokens" }
+          : {}),
       }),
       status: "Available on the Claude API",
       notes:
