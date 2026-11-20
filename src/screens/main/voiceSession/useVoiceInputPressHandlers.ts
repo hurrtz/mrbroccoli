@@ -122,14 +122,6 @@ export function useVoiceInputPressHandlers({
       },
     });
 
-    if (
-      !isRecording &&
-      !isPlaying &&
-      !isBusy &&
-      !ensureVoiceSessionReady()
-    ) {
-      return;
-    }
     if (playbackCanPause || isPlaybackPaused) {
       await togglePlaybackPause();
       return;
@@ -140,6 +132,10 @@ export function useVoiceInputPressHandlers({
     }
     if (isPlaying) {
       await stopPlayback();
+      return;
+    }
+
+    if (!isRecording && !ensureVoiceSessionReady()) {
       return;
     }
 

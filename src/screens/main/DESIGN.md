@@ -135,6 +135,11 @@ speech-active flag through `MainScreenVoiceStage` to `VoiceTextInputPager`,
 which replaces the recording glyph with the remaining seconds only during the
 post-speech silence window.
 
+The recorder owns the microphone and its deadline from the moment capture
+starts. Changing Listening settings mid-turn applies to the next recording.
+Submission uses the captured input route and its current credential, so
+removing a credential takes effect immediately.
+
 ## Adaptive iPad Composition
 
 `MainScreen` resolves one resize-aware `IpadLayout` from the current window,

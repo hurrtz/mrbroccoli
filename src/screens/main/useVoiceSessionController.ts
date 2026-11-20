@@ -68,26 +68,38 @@ export function useVoiceSessionController({
     ttsApiKey,
     ttsProvider,
   });
-  const maxRecordingMs = useMemo(() => {
-    const sttModel = sttProvider
-      ? settings.providerSttModels?.[sttProvider] ||
-        PROVIDER_DEFAULT_STT_MODELS[sttProvider] ||
-        ""
-      : "";
-    return getMaxRecordingMs({
-      sttMode: settings.sttMode,
-      sttProvider,
-      sttModel,
-    });
-  }, [settings.providerSttModels, settings.sttMode, sttProvider]);
+  const selectedSttModel = sttProvider
+    ? settings.providerSttModels?.[sttProvider] ||
+      PROVIDER_DEFAULT_STT_MODELS[sttProvider] || ""
+    : "";
+  const captureRoute = useMemo(() => ({
+    sttMode: settings.sttMode,
+    sttLanguage: settings.sttLanguage,
+    sttProvider,
+    selectedSttModel,
+    localSttModelId: settings.localSttModelId,
+  }), [
+    settings.sttMode,
+    settings.sttLanguage,
+    settings.localSttModelId,
+    sttProvider,
+    selectedSttModel,
+  ]);
+  const maxRecordingMs = useMemo(() => getMaxRecordingMs({
+    sttMode: captureRoute.sttMode,
+    sttProvider: captureRoute.sttProvider,
+    sttModel: captureRoute.selectedSttModel,
+  }), [captureRoute]);
   const {
     cancelVoiceCapture,
+    recordingWindow,
     hasActiveVoiceCaptureNow,
     startVoiceCapture,
     stopVoiceCapture,
   } = useVoiceCaptureLifecycle({
     allowBackgroundStart: () =>
       handsFreeEnabledRef.current && settings.sttMode === "provider",
+    captureRoute,
     isRecording,
     maxRecordingMs,
     nativeStt,
@@ -350,7 +362,8 @@ export function useVoiceSessionController({
     handleInterruptPlayback,
     handleToggleHandsFree: toggleHandsFree,
     handleTogglePress,
-    maxRecordingMs,
+    maxRecordingMs: recordingWindow?.durationMs ?? maxRecordingMs,
+    recordingStartedAtMs: recordingWindow?.startedAtMs ?? null,
     resetVoiceSessionState,
   };
 }

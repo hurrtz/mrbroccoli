@@ -97,6 +97,7 @@ describe("useVoiceSessionController", () => {
         inputMode: "toggle-to-talk" as const,
         spokenRepliesEnabled: true,
         sttMode: "provider" as const,
+        sttLanguage: "auto" as const,
         ttsMode: "provider" as const,
         providerSttModels: {} as Record<string, string>,
       },
@@ -202,10 +203,10 @@ describe("useVoiceSessionController", () => {
     expect(params.recorder.startRecording).not.toHaveBeenCalled();
   });
 
-  it("resumes paused playback from the main voice control", async () => {
+  it("resumes a paused reply when recording a new turn is unavailable", async () => {
     const player = {
       isPlaybackPaused: true,
-      isPlaying: true,
+      isPlaying: false,
       pausePlayback: jest.fn(async () => true),
       resetCancellation: jest.fn(),
       resumePlayback: jest.fn(async () => true),
@@ -214,7 +215,7 @@ describe("useVoiceSessionController", () => {
       waitForDrain: jest.fn(async () => undefined),
       waitForPlaybackRouteSettle: jest.fn(async () => undefined),
     };
-    const { result } = renderController({ player });
+    const { result } = renderController({ player, sttApiKey: "" });
 
     await act(async () => {
       await result.current.handleTogglePress();
@@ -834,6 +835,7 @@ describe("useVoiceSessionController", () => {
       expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
       expect(params.handleVoiceCaptureDone).toHaveBeenCalledWith({
         audioUri: "file://voice.m4a",
+        captureRoute: expect.objectContaining({ sttMode: "provider", sttProvider: "openai" }),
       });
     } finally {
       jest.useRealTimers();

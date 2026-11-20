@@ -1,6 +1,7 @@
 import { MutableRefObject } from "react";
 
 import { PipelinePhase } from "../../../hooks/useVoicePipeline";
+import type { VoiceCaptureRequest } from "../../../hooks/voicePipeline/types";
 import type { ReplayPhase } from "../../../hooks/useVoicePipeline";
 import { Provider, Settings } from "../../../types";
 import type { SpeechDiagnosticsContext } from "../../../services/speech/diagnostics";
@@ -55,11 +56,7 @@ export interface UseVoiceSessionControllerParams {
   availableSttProviders: Provider[];
   availableTtsProviders: Provider[];
   completedReplyVersion: number;
-  handleVoiceCaptureDone: (params: {
-    audioUri?: string;
-    inputSource?: "voice" | "text";
-    transcriptionOverride?: string;
-  }) => Promise<void>;
+  handleVoiceCaptureDone: (params: VoiceCaptureRequest) => Promise<void>;
   isBusy: boolean;
   isRecording: boolean;
   lastCompletedReplyRef: MutableRefObject<string>;
@@ -84,6 +81,7 @@ export interface UseVoiceSessionControllerParams {
     | "responseModes"
     | "spokenRepliesEnabled"
     | "sttMode"
+    | "sttLanguage"
     | "ttsMode"
     | "providerSttModels"
   >;

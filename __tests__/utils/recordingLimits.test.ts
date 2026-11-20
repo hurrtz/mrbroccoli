@@ -38,6 +38,14 @@ describe("getMaxRecordingMs", () => {
     expect(ms).toBeLessThan(13 * 60 * 1000);
   });
 
+  it("also respects the provider's maximum recording duration", () => {
+    expect(getMaxRecordingMs({
+      sttMode: "provider",
+      sttProvider: "elevenlabs",
+      sttModel: "scribe_v2",
+    })).toBe(10 * 60 * 60 * 1000);
+  });
+
   it("falls back when the provider/model has no documented size limit", () => {
     expect(
       getMaxRecordingMs({

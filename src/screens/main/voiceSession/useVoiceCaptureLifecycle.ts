@@ -1,7 +1,11 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AppState } from "react-native";
 import { recordDebugLogEvent } from "../../../services/debugLogCapture";
 import { cleanupCapturedAudio } from "../../../services/voicePipeline/cleanup";
+import type {
+  CaptureTranscriptionRoute,
+  VoiceCaptureRequest,
+} from "../../../hooks/voicePipeline/types";
 import type { SttBackendMode } from "../../../types";
 
 import type { ShowToastFn, TranslateFn } from "../shared";
@@ -20,17 +24,14 @@ export const MAX_RECORDING_MS = 150000;
 
 interface UseVoiceCaptureLifecycleParams {
   allowBackgroundStart?: boolean | (() => boolean);
+  captureRoute?: CaptureTranscriptionRoute;
   isRecording?: boolean;
   maxRecordingMs?: number;
   nativeStt: NativeSpeechRecognizerController;
   onCaptureStopAbandoned?: () => void;
   onCaptureStopStarted?: () => void;
   player: AudioPlayerController;
-  processCapturedVoiceTurn: (params: {
-    audioUri?: string;
-    inputSource?: "voice" | "text";
-    transcriptionOverride?: string;
-  }) => Promise<void>;
+  processCapturedVoiceTurn: (params: VoiceCaptureRequest) => Promise<void>;
   recorder: AudioRecorderController;
   showToast: ShowToastFn;
   sttMode: SttBackendMode;
@@ -39,6 +40,7 @@ interface UseVoiceCaptureLifecycleParams {
 
 export function useVoiceCaptureLifecycle({
   allowBackgroundStart = false,
+  captureRoute,
   isRecording = false,
   maxRecordingMs = MAX_RECORDING_MS,
   nativeStt,
@@ -51,9 +53,17 @@ export function useVoiceCaptureLifecycle({
   sttMode,
   t,
 }: UseVoiceCaptureLifecycleParams) {
+  const [recordingWindow, setRecordingWindow] = useState<{
+    startedAtMs: number;
+    durationMs: number;
+  } | null>(null);
   const capturePreparationRef = useRef<Promise<boolean> | null>(null);
   const recordingStartedRef = useRef<Promise<boolean> | null>(null);
   const captureActiveRef = useRef(false);
+  const captureOwnerRef = useRef<{
+    mode: SttBackendMode;
+    route?: CaptureTranscriptionRoute;
+  } | null>(null);
   const captureGenerationRef = useRef(0);
   const cancelInFlightRef = useRef<Promise<void> | null>(null);
   const stopInFlightRef = useRef<Promise<void> | null>(null);
@@ -65,6 +75,7 @@ export function useVoiceCaptureLifecycle({
   const stopVoiceCaptureRef = useRef<() => Promise<void>>(async () => {});
 
   const clearMaxDurationTimer = useCallback(() => {
+    setRecordingWindow(null);
     if (maxDurationTimerRef.current) {
       clearTimeout(maxDurationTimerRef.current);
       maxDurationTimerRef.current = null;
@@ -79,6 +90,8 @@ export function useVoiceCaptureLifecycle({
     }
     if (
       recordingStartedRef.current ||
+      stopInFlightRef.current ||
+      cancelInFlightRef.current ||
       captureActiveRef.current ||
       isRecording
     ) {
@@ -87,6 +100,7 @@ export function useVoiceCaptureLifecycle({
 
     const captureGeneration = captureGenerationRef.current + 1;
     captureGenerationRef.current = captureGeneration;
+    captureOwnerRef.current = { mode: sttMode, route: captureRoute };
     recordDebugLogEvent({
       event: "voice-capture-start-requested",
       payload: {
@@ -173,6 +187,7 @@ export function useVoiceCaptureLifecycle({
 
       // Arm the auto-stop only after recording is actually running.
       clearMaxDurationTimer();
+      setRecordingWindow({ startedAtMs: Date.now(), durationMs: maxRecordingMs });
       maxDurationTimerRef.current = setTimeout(() => {
         maxDurationTimerRef.current = null;
         recordDebugLogEvent({
@@ -194,6 +209,7 @@ export function useVoiceCaptureLifecycle({
   }, [
     clearMaxDurationTimer,
     allowBackgroundStart,
+    captureRoute,
     isRecording,
     maxRecordingMs,
     nativeStt,
@@ -205,6 +221,8 @@ export function useVoiceCaptureLifecycle({
   ]);
 
   const performStopVoiceCapture = useCallback(async () => {
+    const owner = captureOwnerRef.current;
+    const captureMode = owner?.mode ?? sttMode;
     const captureGeneration = captureGenerationRef.current;
     const captureWasCancelled = () =>
       captureGenerationRef.current !== captureGeneration;
@@ -213,7 +231,7 @@ export function useVoiceCaptureLifecycle({
     recordDebugLogEvent({
       event: "voice-capture-stop-requested",
       payload: {
-        sttMode,
+        sttMode: captureMode,
       },
     });
 
@@ -247,7 +265,7 @@ export function useVoiceCaptureLifecycle({
           level: "warn",
           payload: {
             reason: "start-promise-rejected",
-            sttMode,
+            sttMode: captureMode,
           },
         });
         return;
@@ -258,12 +276,16 @@ export function useVoiceCaptureLifecycle({
       }
     }
 
+    // A press-out during startup can precede the timer installed by startVoiceCapture.
+    if (!captureWasCancelled()) {
+      clearMaxDurationTimer();
+    }
     if (!captureActiveRef.current && !isRecording && !captureWasCancelled()) {
       recordDebugLogEvent({
         event: "voice-capture-stop-ignored",
         payload: {
           reason: "capture-not-active",
-          sttMode,
+          sttMode: captureMode,
         },
       });
       return;
@@ -275,14 +297,14 @@ export function useVoiceCaptureLifecycle({
     }
 
     try {
-      if (sttMode === "native") {
+      if (captureMode === "native") {
         const transcription = await nativeStt.stopRecognition();
 
         if (captureWasCancelled()) {
           recordDebugLogEvent({
             event: "voice-capture-stop-superseded",
             payload: {
-              sttMode,
+              sttMode: captureMode,
             },
           });
           return;
@@ -292,11 +314,12 @@ export function useVoiceCaptureLifecycle({
           recordDebugLogEvent({
             event: "voice-capture-transcription-ready",
             payload: {
-              sttMode,
+              sttMode: captureMode,
               textLength: transcription.trim().length,
             },
           });
           void processCapturedVoiceTurn({
+            captureRoute: owner?.route,
             inputSource: "voice",
             transcriptionOverride: transcription,
           });
@@ -306,7 +329,7 @@ export function useVoiceCaptureLifecycle({
             event: "voice-capture-transcription-missing",
             level: "warn",
             payload: {
-              sttMode,
+              sttMode: captureMode,
             },
           });
           showToast(t("couldntCatchThatTryAgain"));
@@ -323,7 +346,7 @@ export function useVoiceCaptureLifecycle({
           event: "voice-capture-stop-superseded",
           payload: {
             hadAudioUri: Boolean(uri),
-            sttMode,
+            sttMode: captureMode,
           },
         });
         return;
@@ -333,18 +356,18 @@ export function useVoiceCaptureLifecycle({
         recordDebugLogEvent({
           event: "voice-capture-audio-ready",
           payload: {
-            sttMode,
+            sttMode: captureMode,
             uri,
           },
         });
-        void processCapturedVoiceTurn({ audioUri: uri });
+        void processCapturedVoiceTurn({ audioUri: uri, captureRoute: owner?.route });
       } else {
         onCaptureStopAbandoned?.();
         recordDebugLogEvent({
           event: "voice-capture-audio-missing",
           level: "warn",
           payload: {
-            sttMode,
+            sttMode: captureMode,
           },
         });
         showToast(t("couldntCatchThatTryAgain"));
@@ -398,6 +421,7 @@ export function useVoiceCaptureLifecycle({
       return cancelInFlightRef.current;
     }
 
+    const captureMode = captureOwnerRef.current?.mode ?? sttMode;
     const preparationPromise = capturePreparationRef.current;
     const startPromise = recordingStartedRef.current;
     const shouldCancel =
@@ -417,7 +441,7 @@ export function useVoiceCaptureLifecycle({
       recordDebugLogEvent({
         event: "voice-capture-cancel-requested",
         payload: {
-          sttMode,
+          sttMode: captureMode,
         },
       });
 
@@ -451,7 +475,7 @@ export function useVoiceCaptureLifecycle({
       }
 
       captureActiveRef.current = false;
-      if (sttMode === "native") {
+      if (captureMode === "native") {
         await nativeStt.abortRecognition();
       } else {
         const uri = await recorder.stopRecording();
@@ -461,7 +485,7 @@ export function useVoiceCaptureLifecycle({
       recordDebugLogEvent({
         event: "voice-capture-cancelled",
         payload: {
-          sttMode,
+          sttMode: captureMode,
         },
       });
     })().finally(() => {
@@ -480,6 +504,7 @@ export function useVoiceCaptureLifecycle({
   useEffect(() => clearMaxDurationTimer, [clearMaxDurationTimer]);
 
   return {
+    recordingWindow,
     cancelVoiceCapture,
     hasActiveVoiceCaptureNow,
     startVoiceCapture,

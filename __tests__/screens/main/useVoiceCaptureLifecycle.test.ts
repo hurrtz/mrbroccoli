@@ -18,6 +18,10 @@ import { cleanupCapturedAudio } from "../../../src/services/voicePipeline/cleanu
 
 function buildParams(overrides: Record<string, unknown> = {}) {
   const player = {
+    enqueueAudio: jest.fn(),
+    resetCancellation: jest.fn(),
+    speakText: jest.fn(),
+    waitForDrain: jest.fn(async () => undefined),
     isPlaybackPaused: false,
     isPlaying: false,
     pausePlayback: jest.fn(async () => true),
@@ -92,6 +96,36 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
 
     expect(params.recorder.startRecording).toHaveBeenCalledTimes(1);
     AppState.currentState = previousAppState;
+  });
+
+  it("stops and transcribes with the original route after Listening settings change", async () => {
+    const params = buildParams();
+    const capturedRoute = {
+      sttMode: "provider" as const,
+      sttLanguage: "de" as const,
+      sttProvider: "mistral" as const,
+      selectedSttModel: "voxtral-example",
+    };
+    const { result, rerender } = renderHook(
+      (mode: "native" | "provider") => useVoiceCaptureLifecycleImplementation({
+        ...params,
+        maxRecordingMs: 1_000,
+        sttMode: mode,
+        captureRoute: { ...capturedRoute, sttMode: mode },
+      }),
+      { initialProps: "provider" as "native" | "provider" },
+    );
+    await act(async () => { await result.current.startVoiceCapture(); });
+    rerender("native");
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(params.recorder.stopRecording).toHaveBeenCalledTimes(1);
+    expect(params.nativeStt.stopRecognition).not.toHaveBeenCalled();
+    expect(params.processCapturedVoiceTurn).toHaveBeenCalledWith({
+      audioUri: "file:///tmp/recording.wav",
+      captureRoute: capturedRoute,
+    });
   });
 
   it("auto-stops at the max duration and still transcribes the captured audio", async () => {
@@ -268,6 +302,11 @@ describe("useVoiceCaptureLifecycle auto-stop", () => {
       await Promise.all([start, stop]);
     });
 
+    expect(result.current.recordingWindow).toBeNull();
+    await act(async () => {
+      jest.advanceTimersByTime(MAX_RECORDING_MS);
+    });
+    expect(params.showToast).not.toHaveBeenCalled();
     expect(nativeStt.startRecognition).toHaveBeenCalledTimes(1);
     expect(nativeStt.stopRecognition).toHaveBeenCalledTimes(1);
     expect(params.processCapturedVoiceTurn).toHaveBeenCalledWith({

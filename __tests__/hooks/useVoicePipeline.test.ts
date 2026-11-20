@@ -925,6 +925,34 @@ describe("useVoicePipeline", () => {
     );
   });
 
+  it.each(["current-test-key", ""])(
+    "uses the capture route and its current credential after switching Listening",
+    async (currentKey) => {
+      const getSttApiKeyForProvider = jest.fn(() => currentKey);
+      const params = createParams({ getSttApiKeyForProvider });
+      const { result } = renderHook(() => useVoicePipeline(params));
+      await act(async () => {
+        await result.current.handleVoiceCaptureDone({
+          audioUri: "file:///captured.m4a",
+          captureRoute: {
+            sttMode: "provider",
+            sttProvider: "mistral",
+            selectedSttModel: "voxtral-example",
+            sttLanguage: "de",
+          },
+        });
+      });
+      expect(getSttApiKeyForProvider).toHaveBeenCalledWith("mistral");
+      expect(runVoicePipeline).toHaveBeenCalledWith(expect.objectContaining({
+        sttProvider: "mistral",
+        sttModel: "voxtral-example",
+        sttMode: "provider",
+        sttLanguage: "de",
+        sttApiKey: currentKey,
+      }));
+    },
+  );
+
   it("passes the first submitted prompt to naming even when context is cancelled before the model starts", async () => {
     const prompt: Message = {
       id: "submitted-prompt",

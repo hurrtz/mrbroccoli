@@ -11,15 +11,8 @@ const SIZE_SAFETY_FACTOR = 0.9;
 // Generous fallback when no provider upload limit is known (native STT, or a
 // model without a documented size cap).
 export const FALLBACK_MAX_RECORDING_MS = 15 * 60 * 1000;
-const MIN_MAX_RECORDING_MS = 30_000;
 
-/**
- * Largest single-turn recording duration that stays safely under the active STT
- * model's upload size limit. Derived from the catalog `file_size_bytes`
- * constraint and the worst-case recording bitrate, so it adapts per provider/
- * model and only auto-stops shortly before an upload would actually overflow.
- * Falls back to a generous default when there is no known limit.
- */
+/** Bound each turn by both the route's maximum duration and its upload size. */
 export function getMaxRecordingMs(params: {
   sttMode: SttBackendMode;
   sttProvider: Provider | null;
@@ -29,20 +22,21 @@ export function getMaxRecordingMs(params: {
     return FALLBACK_MAX_RECORDING_MS;
   }
 
+  const constraints = getCatalogConstraintsForAppProvider(
+    params.sttProvider,
+    params.sttModel,
+    "stt",
+  );
   const maxBytes = getStrictestCatalogMaxConstraint(
-    getCatalogConstraintsForAppProvider(
-      params.sttProvider,
-      params.sttModel,
-      "stt",
-    ),
-    "file_size_bytes",
+    constraints, "file_size_bytes",
   )?.value;
+  const maxSeconds = getStrictestCatalogMaxConstraint(
+    constraints, "duration_seconds",
+  )?.value;
+  const limits = [
+    maxBytes && (maxBytes * SIZE_SAFETY_FACTOR * 1000) / RECORDING_BYTES_PER_SECOND,
+    maxSeconds && maxSeconds * 1000,
+  ].filter((limit): limit is number => typeof limit === "number" && limit > 0);
 
-  if (!maxBytes || maxBytes <= 0) {
-    return FALLBACK_MAX_RECORDING_MS;
-  }
-
-  const safeMs =
-    ((maxBytes * SIZE_SAFETY_FACTOR) / RECORDING_BYTES_PER_SECOND) * 1000;
-  return Math.max(MIN_MAX_RECORDING_MS, Math.round(safeMs));
+  return limits.length ? Math.floor(Math.min(...limits)) : FALLBACK_MAX_RECORDING_MS;
 }

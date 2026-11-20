@@ -45,7 +45,13 @@ export type PipelinePhase =
 
 export type ReplayPhase = "idle" | "preparing" | "speaking";
 
+export type CaptureTranscriptionRoute = Pick<
+  UseVoicePipelineParams,
+  "sttMode" | "sttLanguage" | "sttProvider" | "selectedSttModel" | "localSttModelId"
+>;
+
 export interface VoiceCaptureRequest {
+  captureRoute?: CaptureTranscriptionRoute;
   attachments?: MessageImageAttachment[];
   audioUri?: string;
   conversationOverride?: Conversation;
@@ -104,6 +110,7 @@ export interface UseVoicePipelineParams {
   sttLanguage: SttLanguage;
   sttProvider: Provider | null;
   sttApiKey: string;
+  getSttApiKeyForProvider?: (provider: Provider) => string;
   selectedSttModel: string;
   localSttModelId?: LocalSttModelId | null;
   ttsMode: TtsBackendMode;

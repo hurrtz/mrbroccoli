@@ -15,6 +15,7 @@ import { getProviderModelName } from "../constants/models";
 import { getLocalModel } from "../constants/localModels";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
+import type { Provider } from "../types";
 import { resolveIpadLayout } from "../utils/ipadLayout";
 import { MainScreenPresentation } from "./main/MainScreenPresentation";
 import {
@@ -401,10 +402,11 @@ export function MainScreen() {
     selectedTtsVoice,
     t,
   ]);
-  const isRecording =
-    runtimeSettings.sttMode === "native"
-      ? nativeStt.isRecording
-      : recorder.isRecording;
+  const isRecording = nativeStt.isRecording || recorder.isRecording;
+  const getSttApiKeyForProvider = React.useCallback(
+    (captureProvider: Provider) => runtimeSettings.apiKeys[captureProvider].trim(),
+    [runtimeSettings.apiKeys],
+  );
   const speechInputUnavailable = isSpeechInputUnavailable({
     hasProviderCredential: sttProvider
       ? hasProviderCredentialForCapability(sttProvider, sttApiKey, "stt")
@@ -415,10 +417,6 @@ export function MainScreen() {
     sttProvider,
   });
 
-  const recordingStartedAtMs = React.useMemo(
-    () => (isRecording ? Date.now() : null),
-    [isRecording],
-  );
   const { dismissToast, showToast, toast } = useMainScreenToastController();
   const authenticateLockedSession = React.useCallback(
     async (
@@ -543,6 +541,7 @@ export function MainScreen() {
     sttLanguage: runtimeSettings.sttLanguage,
     sttProvider,
     sttApiKey,
+    getSttApiKeyForProvider,
     selectedSttModel,
     localSttModelId: runtimeSettings.localSttModelId,
     selectedTtsModel,
@@ -744,6 +743,7 @@ export function MainScreen() {
     handleToggleHandsFree,
     handleTogglePress,
     maxRecordingMs,
+    recordingStartedAtMs,
     resetVoiceSessionState,
   } = useVoiceSessionController({
     abortRef,

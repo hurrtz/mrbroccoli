@@ -75,6 +75,7 @@ export function useVoiceCaptureHandler({
   showToast,
   spokenRepliesEnabled,
   sttApiKey,
+  getSttApiKeyForProvider,
   sttLanguage,
   sttMode,
   sttProvider,
@@ -125,6 +126,7 @@ export function useVoiceCaptureHandler({
     async ({
       attachments,
       audioUri,
+      captureRoute,
       conversationOverride,
       existingUserMessageId,
       messagesOverride,
@@ -132,6 +134,18 @@ export function useVoiceCaptureHandler({
       inputSource = transcriptionOverride ? "text" : "voice",
       turnId: requestedTurnId,
     }: VoiceCaptureRequest) => {
+      const route = captureRoute ?? {
+        sttMode,
+        sttLanguage,
+        sttProvider,
+        selectedSttModel,
+        localSttModelId,
+      };
+      // A recording keeps its input route. Re-read credentials at submission so
+      // removing a key in Settings also revokes it for an in-progress capture.
+      const captureApiKey = route.sttProvider && getSttApiKeyForProvider
+        ? getSttApiKeyForProvider(route.sttProvider)
+        : route.sttProvider === sttProvider ? sttApiKey : "";
       const previousAbortController = abortRef.current;
       const runId = activeCaptureRunRef.current + 1;
       activeCaptureRunRef.current = runId;
@@ -259,7 +273,7 @@ export function useVoiceCaptureHandler({
         responseLength,
         responseTone,
         setCouncilProgress,
-        selectedSttModel,
+        selectedSttModel: route.selectedSttModel,
         selectedTtsModel,
         selectedTtsVoice,
         localTtsModelId,
@@ -267,8 +281,8 @@ export function useVoiceCaptureHandler({
         setStreamingText,
         spokenRepliesEnabled,
         state,
-        sttMode,
-        sttProvider,
+        sttMode: route.sttMode,
+        sttProvider: route.sttProvider,
         streaming: {
           beginStreamingRender,
           cancelStreamingRender,
@@ -310,12 +324,12 @@ export function useVoiceCaptureHandler({
           modelEffort,
           provider,
           providerApiKey,
-          sttMode,
-          sttLanguage,
-          sttProvider,
-          sttApiKey,
-          sttModel: selectedSttModel,
-          localSttModelId,
+          sttMode: route.sttMode,
+          sttLanguage: route.sttLanguage,
+          sttProvider: route.sttProvider,
+          sttApiKey: captureApiKey,
+          sttModel: route.selectedSttModel,
+          localSttModelId: route.localSttModelId,
           ttsMode,
           ttsProvider,
           ttsApiKey,
@@ -490,6 +504,7 @@ export function useVoiceCaptureHandler({
       spokenRepliesEnabled,
       startLatencyProgress,
       sttApiKey,
+      getSttApiKeyForProvider,
       sttLanguage,
       sttMode,
       sttProvider,
