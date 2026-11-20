@@ -13,7 +13,7 @@ import {
   type LocalModelDefinition,
 } from "../../../constants/localModels";
 import {
-  APP_DATA_BACKUP_MAX_BYTES,
+  ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES,
   APP_DATA_BACKUP_MIN_PASSPHRASE_LENGTH,
   AppDataBackupError,
   decryptAppDataBackup,
@@ -498,7 +498,7 @@ export function DataPrivacySettingsPage({
       pickedUri = asset.uri;
       if (
         typeof asset.size === "number" &&
-        asset.size > APP_DATA_BACKUP_MAX_BYTES
+        asset.size > ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES
       ) {
         throw new AppDataBackupError("too-large");
       }

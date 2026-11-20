@@ -9,7 +9,7 @@ import { Modal as NativeDialog } from "../../src/design-system/NativeControls";
 import { LocalizationProvider } from "../../src/i18n";
 import * as AppDataBackupService from "../../src/services/appDataBackup";
 import {
-  APP_DATA_BACKUP_MAX_BYTES,
+  ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES,
   serializeAppDataBackup,
   type AppDataBackup,
   type AppDataBackupCreation,
@@ -566,7 +566,7 @@ describe("DataPrivacySettingsPage", () => {
       assets: [
         {
           name: "backup.encrypted",
-          size: 512,
+          size: 52 * 1024 * 1024,
           uri: "file:///cache/backup.encrypted",
           mimeType: "application/octet-stream",
           lastModified: 1_000,
@@ -667,7 +667,7 @@ describe("DataPrivacySettingsPage", () => {
       assets: [
         {
           name: "huge.json",
-          size: APP_DATA_BACKUP_MAX_BYTES + 1,
+          size: ENCRYPTED_APP_DATA_BACKUP_MAX_BYTES + 1,
           uri: "file:///cache/huge.json",
           mimeType: "application/json",
           lastModified: 1_000,
