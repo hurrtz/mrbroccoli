@@ -9,7 +9,7 @@ import {
   getProviderSpeechLanguageCode,
 } from "../../utils/speechLanguage";
 import { getSpeechLanguageDefinition } from "../../constants/speechLanguages";
-import { fetchWithTimeout } from "./abort";
+import { fetchWithDeadline } from "../networkFetch";
 import { getProviderSttTimeoutMs } from "./config";
 import type {
   GoogleSpeechTranscriptionConfig,
@@ -29,6 +29,42 @@ interface SharedProviderParams {
   speechLanguage: SttLanguage;
   provider: Provider;
   providerModel?: string;
+}
+
+async function fetchTranscription(
+  params: SharedProviderParams,
+  input: string,
+  init: RequestInit,
+) {
+  const { provider, language } = params;
+  try {
+    return await fetchWithDeadline(
+      input,
+      init,
+      getProviderSttTimeoutMs(provider),
+      () => createSttTimeoutError({ provider, language }),
+      async (response) => {
+        if (!response.ok) {
+          throw buildProviderHttpError({
+            provider,
+            language,
+            status: response.status,
+            errorText: await response.text(),
+            action: "transcription",
+          });
+        }
+        return response.json();
+      },
+      params.abortSignal,
+    );
+  } catch (error) {
+    throw normalizeProviderTransportError({
+      provider,
+      language,
+      error,
+      action: "transcription",
+    });
+  }
 }
 
 function appendRecordedAudio(formData: FormData, fileUri: string) {
@@ -67,7 +103,6 @@ export async function transcribeWithMultipartProvider(
   },
 ) {
   const {
-    abortSignal,
     apiKey,
     config,
     fileUri,
@@ -94,45 +129,15 @@ export async function transcribeWithMultipartProvider(
     );
   }
 
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    const resolvedApiKey = requireProviderKey(provider, apiKey, language);
-    response = await fetchWithTimeout(
-      config.endpoint,
-      {
-        method: "POST",
-        headers:
-          provider === "elevenlabs"
-            ? { "xi-api-key": resolvedApiKey }
-            : { Authorization: `Bearer ${resolvedApiKey}` },
-        body: formData,
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText,
-      action: "transcription",
-    });
-  }
-
-  const data = await response.json();
+  const resolvedApiKey = requireProviderKey(provider, apiKey, language);
+  const data = await fetchTranscription(params, config.endpoint, {
+    method: "POST",
+    headers:
+      provider === "elevenlabs"
+        ? { "xi-api-key": resolvedApiKey }
+        : { Authorization: `Bearer ${resolvedApiKey}` },
+    body: formData,
+  });
   const text = data.text?.trim();
   return text ? text : null;
 }
@@ -143,7 +148,6 @@ export async function transcribeWithGoogleSpeechProvider(
   },
 ) {
   const {
-    abortSignal,
     apiKey,
     config,
     fileUri,
@@ -163,80 +167,63 @@ export async function transcribeWithGoogleSpeechProvider(
     encoding: "base64",
   });
   const mimeType = getFileAudioMimeType(fileUri);
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    response = await fetchWithTimeout(
-      usesInteractions && config.interactionsEndpoint
-        ? config.interactionsEndpoint
-        : `${config.endpointBase.replace(/\/$/, "")}/${encodeURIComponent(
-        selectedModel.replace(/^models\//, ""),
-      )}:generateContent`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-goog-api-key": aiStudioCredentials.apiKey,
-        },
-        body: JSON.stringify(usesInteractions ? {
-          model: selectedModel,
-          store: false,
-          input: [{ type: "audio", data: audioData, mime_type: mimeType }],
-          generation_config: {
-            transcription_config: {
-              mode: { type: "verbatim" },
-              ...(speechLanguage === "auto" ? {} : {
-                language_codes: [getSpeechLanguageDefinition(speechLanguage).nativeLocale],
-              }),
-            },
-          },
-        } : {
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text:
-                    speechLanguage === "auto"
-                      ? "Transcribe the speech in this audio exactly. Return only the transcript in the spoken language and do not translate or add commentary."
-                      : `Transcribe the speech in this audio exactly. The expected language is ${getSpeechLanguageDefinition(speechLanguage).nativeLocale}. Return only the transcript in that language and do not translate or add commentary.`,
+  const data = await fetchTranscription(
+    params,
+    usesInteractions && config.interactionsEndpoint
+      ? config.interactionsEndpoint
+      : `${config.endpointBase.replace(/\/$/, "")}/${encodeURIComponent(
+          selectedModel.replace(/^models\//, ""),
+        )}:generateContent`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": aiStudioCredentials.apiKey,
+      },
+      body: JSON.stringify(
+        usesInteractions
+          ? {
+              model: selectedModel,
+              store: false,
+              input: [{ type: "audio", data: audioData, mime_type: mimeType }],
+              generation_config: {
+                transcription_config: {
+                  mode: { type: "verbatim" },
+                  ...(speechLanguage === "auto"
+                    ? {}
+                    : {
+                        language_codes: [
+                          getSpeechLanguageDefinition(speechLanguage)
+                            .nativeLocale,
+                        ],
+                      }),
                 },
+              },
+            }
+          : {
+              contents: [
                 {
-                  inlineData: {
-                    mimeType,
-                    data: audioData,
-                  },
+                  role: "user",
+                  parts: [
+                    {
+                      text:
+                        speechLanguage === "auto"
+                          ? "Transcribe the speech in this audio exactly. Return only the transcript in the spoken language and do not translate or add commentary."
+                          : `Transcribe the speech in this audio exactly. The expected language is ${getSpeechLanguageDefinition(speechLanguage).nativeLocale}. Return only the transcript in that language and do not translate or add commentary.`,
+                    },
+                    {
+                      inlineData: {
+                        mimeType,
+                        data: audioData,
+                      },
+                    },
+                  ],
                 },
               ],
             },
-          ],
-        }),
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText,
-      action: "transcription",
-    });
-  }
-
-  const data = await response.json();
+      ),
+    },
+  );
   const text = usesInteractions
     ? extractGeminiInteractionTranscription(data)
     : extractGeminiTranscription(data);
@@ -249,7 +236,6 @@ export async function transcribeWithXaiRestSttProvider(
   },
 ) {
   const {
-    abortSignal,
     apiKey,
     config,
     fileUri,
@@ -267,43 +253,13 @@ export async function transcribeWithXaiRestSttProvider(
   }
   appendRecordedAudio(formData, fileUri);
 
-  let response: Awaited<ReturnType<typeof fetch>>;
-
-  try {
-    response = await fetchWithTimeout(
-      config.endpoint,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
-        },
-        body: formData,
-      },
-      getProviderSttTimeoutMs(provider),
-      () => createSttTimeoutError({ provider, language }),
-      abortSignal,
-    );
-  } catch (error) {
-    throw normalizeProviderTransportError({
-      provider,
-      language,
-      error,
-      action: "transcription",
-    });
-  }
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw buildProviderHttpError({
-      provider,
-      language,
-      status: response.status,
-      errorText,
-      action: "transcription",
-    });
-  }
-
-  const data = await response.json();
+  const data = await fetchTranscription(params, config.endpoint, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${requireProviderKey(provider, apiKey, language)}`,
+    },
+    body: formData,
+  });
   const text = typeof data?.text === "string" ? data.text.trim() : "";
   return text ? text : null;
 }

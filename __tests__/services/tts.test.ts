@@ -253,6 +253,37 @@ describe("synthesizeSpeech", () => {
     expect(body.input).toBe("Hello world");
   });
 
+  it("cancels a preview while the audio body is still arriving", async () => {
+    const controller = new AbortController();
+    let bodyStarted!: () => void;
+    const reading = new Promise<void>((resolve) => {
+      bodyStarted = resolve;
+    });
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      blob: () => {
+        bodyStarted();
+        return new Promise(() => undefined);
+      },
+    });
+    const synthesis = synthesizeSpeech({
+      text: "Read the body",
+      voice: "alloy",
+      mode: "provider",
+      provider: "openai",
+      apiKey: "test",
+      language: "en",
+      abortSignal: controller.signal,
+    }).then(
+      () => "finished",
+      (error) => error.name,
+    );
+    await reading;
+    controller.abort();
+    expect((fetch as jest.Mock).mock.calls[0][1].signal.aborted).toBe(true);
+    expect(await synthesis).toBe("AbortError");
+  });
+
   it("records an aborted provider preview as cancelled instead of failed", async () => {
     const controller = new AbortController();
     let markFetchStarted: (() => void) | null = null;

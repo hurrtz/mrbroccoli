@@ -19,7 +19,6 @@ import {
   buildTtsRequestError,
   buildWavAudioFileFromPcm,
   createTtsTimeoutError,
-  fetchWithTimeout,
   getGeminiAudioPart,
   getGeminiInteractionsAudio,
   getProviderTtsTimeoutMs,
@@ -32,8 +31,11 @@ import {
   writeBlobAudioFile,
   writeBase64AudioFile,
 } from "./shared";
+import { fetchWithDeadline } from "../networkFetch";
 import { getProviderModelCandidates } from "../providerModelCandidates";
 import { executeProviderModelRequest } from "../providerResilience";
+
+type TransferStageCallback = (stage: "sending-text" | "receiving-audio") => void;
 
 const TTS_RETRY_DELAYS_MS = [400, 1200];
 
@@ -94,16 +96,19 @@ async function withTransientTtsRetries<T>(request: () => Promise<T>) {
   throw new Error("Speech synthesis retry loop ended unexpectedly.");
 }
 
-async function fetchTtsWithRetries(params: {
+async function fetchTtsWithRetries<T>(params: {
   abortSignal?: AbortSignal;
   init: RequestInit;
   input: RequestInfo | URL;
   language: AppLanguage;
   provider: Provider;
   timeoutMs: number;
+  consume: (response: Response) => Promise<T>;
+  onTransferStage?: TransferStageCallback;
 }) {
-  return withTransientTtsRetries(async () => {
-    const response = await fetchWithTimeout(
+  return withTransientTtsRetries(() => {
+    if (!params.abortSignal?.aborted) params.onTransferStage?.("sending-text");
+    return fetchWithDeadline(
       params.input,
       params.init,
       params.timeoutMs,
@@ -112,20 +117,20 @@ async function fetchTtsWithRetries(params: {
           provider: params.provider,
           language: params.language,
         }),
+      async (response) => {
+        if (!response.ok) {
+          throw buildTtsRequestError({
+            provider: params.provider,
+            status: response.status,
+            errorText: await response.text(),
+            language: params.language,
+          });
+        }
+        params.onTransferStage?.("receiving-audio");
+        return params.consume(response);
+      },
       params.abortSignal,
     );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw buildTtsRequestError({
-        provider: params.provider,
-        status: response.status,
-        errorText,
-        language: params.language,
-      });
-    }
-
-    return response;
   });
 }
 
@@ -271,6 +276,7 @@ export async function synthesizeProviderSpeech(params: {
   nextText?: string;
   abortSignal?: AbortSignal;
   onModelResolved?: (model: string) => void;
+  onTransferStage?: TransferStageCallback;
 }) {
   const {
     text,
@@ -285,6 +291,7 @@ export async function synthesizeProviderSpeech(params: {
     nextText,
     abortSignal,
     onModelResolved,
+    onTransferStage,
   } = params;
   const config = TTS_PROVIDER_CONFIGS[provider];
   const timeoutMs = getProviderTtsTimeoutMs(text, provider);
@@ -352,7 +359,8 @@ export async function synthesizeProviderSpeech(params: {
         config.interactionsEndpoint &&
         config.interactionsModelIds.includes(selectedModel)
       ) {
-        const response = await fetchTtsWithRetries({
+        const data = await fetchTtsWithRetries({
+          consume: (response) => response.json(),
           input: config.interactionsEndpoint,
           init: {
             method: "POST",
@@ -393,11 +401,12 @@ export async function synthesizeProviderSpeech(params: {
             }),
           },
           timeoutMs,
+          onTransferStage,
           provider,
           language,
           abortSignal,
         });
-        const audio = getGeminiInteractionsAudio(await response.json());
+        const audio = getGeminiInteractionsAudio(data);
 
         if (!audio) {
           throw new Error(
@@ -421,7 +430,8 @@ export async function synthesizeProviderSpeech(params: {
       }
 
       if (config.kind === "gemini") {
-        const response = await fetchTtsWithRetries({
+        const data = await fetchTtsWithRetries({
+          consume: (response) => response.json(),
           input: `${config.endpointBase}/${selectedModel}:generateContent`,
           init: {
             method: "POST",
@@ -456,12 +466,12 @@ export async function synthesizeProviderSpeech(params: {
             }),
           },
           timeoutMs,
+          onTransferStage,
           provider,
           language,
           abortSignal,
         });
 
-        const data = await response.json();
         const audioPart = getGeminiAudioPart(data);
         const pcmBase64 = audioPart?.data;
 
@@ -500,7 +510,7 @@ export async function synthesizeProviderSpeech(params: {
         speechLanguage,
       });
 
-      const response = await fetchTtsWithRetries({
+      const request = {
         input: getBinaryTtsEndpoint({
           endpoint: config.endpoint,
           requestFormat: config.requestFormat,
@@ -515,13 +525,17 @@ export async function synthesizeProviderSpeech(params: {
           body: JSON.stringify(requestBody),
         },
         timeoutMs,
+        onTransferStage,
         provider,
         language,
         abortSignal,
-      });
+      };
 
       if (config.requestFormat === "mistral-speech") {
-        const data = await response.json();
+        const data = await fetchTtsWithRetries({
+          ...request,
+          consume: (response) => response.json(),
+        });
         const audioData = data?.audio_data;
 
         if (typeof audioData !== "string" || !audioData) {
@@ -536,7 +550,10 @@ export async function synthesizeProviderSpeech(params: {
       }
 
       return writeBlobAudioFile(
-        await response.blob(),
+        await fetchTtsWithRetries({
+          ...request,
+          consume: (response) => response.blob(),
+        }),
         getBinaryTtsFileExtension(config.requestFormat),
       );
     },

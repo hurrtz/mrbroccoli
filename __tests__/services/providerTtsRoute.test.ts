@@ -28,6 +28,34 @@ describe("synthesizeProviderSpeech", () => {
     jest.clearAllMocks();
   });
 
+  it("reports sending and receiving in order before consuming a provider audio body", async () => {
+    const stages: string[] = [];
+    (fetch as jest.Mock).mockImplementationOnce(async () => {
+      stages.push("headers");
+      return {
+        ok: true,
+        blob: async () => {
+          stages.push("body");
+          return new Blob(["sample"]);
+        },
+      };
+    });
+    await synthesizeProviderSpeech({
+      text: "Test",
+      provider: "xai",
+      voice: "eve",
+      apiKey: "test",
+      language: "en",
+      onTransferStage: (stage) => stages.push(stage),
+    });
+    expect(stages).toEqual([
+      "sending-text",
+      "headers",
+      "receiving-audio",
+      "body",
+    ]);
+  });
+
   it("uses the merged xAI grok-speech route with the documented payload", async () => {
     (fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
@@ -173,5 +201,4 @@ describe("synthesizeProviderSpeech", () => {
 
     expect(fetch).toHaveBeenCalledTimes(1);
   });
-
 });

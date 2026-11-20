@@ -369,15 +369,34 @@ export function hasGeminiGoogleSearchResult(data: unknown) {
   );
 }
 
-function extractMistralOutputText(data: unknown): string {
-  if (!data || typeof data !== "object") {
-    return "";
-  }
-
-  const outputs = [
+function getMistralEntries(data: unknown): Record<string, unknown>[] {
+  if (!data || typeof data !== "object") return [];
+  return [
     ...("outputs" in data && Array.isArray(data.outputs) ? data.outputs : []),
     ...("entries" in data && Array.isArray(data.entries) ? data.entries : []),
-  ];
+  ].filter((entry) => entry && typeof entry === "object");
+}
+
+export function hasMistralWebSearchResult(data: unknown) {
+  return getMistralEntries(data).some((entry) => {
+    if (entry.type === "tool.execution" && entry.name === "web_search")
+      return true;
+    return (
+      entry.type === "message.output" &&
+      Array.isArray(entry.content) &&
+      entry.content.some(
+        (chunk) =>
+          chunk?.type === "tool_reference" &&
+          chunk.tool === "web_search" &&
+          typeof chunk.url === "string" &&
+          chunk.url.trim(),
+      )
+    );
+  });
+}
+
+function extractMistralOutputText(data: unknown): string {
+  const outputs = getMistralEntries(data);
   const parts: string[] = [];
 
   for (const output of outputs) {

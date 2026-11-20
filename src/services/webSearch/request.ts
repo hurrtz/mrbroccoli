@@ -11,7 +11,7 @@ import type { AppLanguage } from "../../types";
 import { getModelEffortConfig } from "../../utils/modelEffort";
 import { resolveQwenApiEndpoint } from "../../utils/qwenRegion";
 import { requireProviderKey } from "../llm/shared";
-import { networkFetch } from "../networkFetch";
+import { fetchWithDeadline } from "../networkFetch";
 import {
   buildProviderHttpError,
   ProviderRequestError,
@@ -20,6 +20,7 @@ import { executeProviderModelRequest } from "../providerResilience";
 import {
   hasAnthropicWebSearchResult,
   hasGeminiGoogleSearchResult,
+  hasMistralWebSearchResult,
   hasSuccessfulWebSearchCall,
 } from "./resultNormalizer";
 import type { RawWebSearchResponse, WebSearchRequestParams } from "./types";
@@ -62,83 +63,6 @@ function getRequestWebSearchModel(params: WebSearchRequestParams) {
   return params.model?.trim() || getWebSearchProviderModel(params.provider);
 }
 
-async function fetchWithTimeout<T>(
-  input: RequestInfo | URL,
-  init: RequestInit,
-  timeoutMs: number,
-  onTimeout: () => Error,
-  consume: (response: Response) => Promise<T>,
-  abortSignal?: AbortSignal,
-) {
-  if (abortSignal?.aborted) {
-    throw abortSignal.reason instanceof Error
-      ? abortSignal.reason
-      : new Error("Aborted");
-  }
-  const controller = new AbortController();
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  let timedOut = false;
-  let rejectAbort!: (reason: Error) => void;
-  const abortPromise = new Promise<never>((_, reject) => {
-    rejectAbort = reject;
-  });
-  const handleAbort = () => {
-    controller.abort(abortSignal?.reason);
-    rejectAbort(
-      abortSignal?.reason instanceof Error
-        ? abortSignal.reason
-        : new Error("Aborted"),
-    );
-  };
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      timedOut = true;
-      controller.abort();
-      reject(onTimeout());
-    }, timeoutMs);
-  });
-
-  abortSignal?.addEventListener("abort", handleAbort, { once: true });
-
-  const fetchPromise = networkFetch(input, {
-    ...init,
-    signal: controller.signal,
-  })
-    .then(consume)
-    .catch((error) => {
-      if (
-        error instanceof Error &&
-        (error.name === "AbortError" ||
-          error.message.toLowerCase().includes("aborted"))
-      ) {
-        if (timedOut) {
-          throw onTimeout();
-        }
-
-        if (abortSignal?.aborted) {
-          throw abortSignal.reason instanceof Error
-            ? abortSignal.reason
-            : new Error(
-                typeof abortSignal.reason === "string"
-                  ? abortSignal.reason
-                  : "Aborted",
-              );
-        }
-      }
-
-      throw error;
-    });
-
-  try {
-    return await Promise.race([fetchPromise, timeoutPromise, abortPromise]);
-  } finally {
-    abortSignal?.removeEventListener("abort", handleAbort);
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-  }
-}
-
 function buildWebSearchTimeoutError(
   provider: WebSearchProvider,
   language: AppLanguage,
@@ -163,7 +87,7 @@ async function fetchJsonWebSearch(
     body: unknown;
   },
 ) {
-  const data = await fetchWithTimeout(
+  const data = await fetchWithDeadline(
     request.url,
     {
       method: "POST",
@@ -252,6 +176,7 @@ async function searchWithOpenAi(params: WebSearchRequestParams) {
     headers: buildBearerHeaders(params),
     body: {
       model,
+      store: false,
       input: [
         {
           role: "user",
@@ -366,6 +291,7 @@ async function searchWithQwen(params: WebSearchRequestParams) {
     headers: buildBearerHeaders(params),
     body: {
       model,
+      store: false,
       input: buildPromptForProvider(params),
       tools: [{ type: "web_search" }],
       tool_choice: "required",
@@ -475,7 +401,7 @@ async function searchWithXai(params: WebSearchRequestParams) {
 async function searchWithMistral(params: WebSearchRequestParams) {
   const model = getRequestWebSearchModel(params);
 
-  return fetchJsonWebSearch(params, {
+  const response = await fetchJsonWebSearch(params, {
     url: "https://api.mistral.ai/v1/conversations",
     model,
     headers: buildBearerHeaders(params),
@@ -486,6 +412,14 @@ async function searchWithMistral(params: WebSearchRequestParams) {
       store: false,
     },
   });
+  if (!hasMistralWebSearchResult(response.data)) {
+    throw new Error(
+      translate(params.language, "providerWebSearchNotRun", {
+        provider: PROVIDER_LABELS[params.provider],
+      }),
+    );
+  }
+  return response;
 }
 
 async function requestWebSearchOnce(params: WebSearchRequestParams) {

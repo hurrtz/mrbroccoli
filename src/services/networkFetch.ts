@@ -46,14 +46,18 @@ export async function networkFetch(
   const method = (init?.method ?? "GET").toUpperCase();
   const requestId = nextNetworkRequestId();
   const startedAtMs = Date.now();
-  const turnId = debugLogCapture.getDebugTurnIdForSignal?.(init?.signal) ?? null;
+  const turnId =
+    debugLogCapture.getDebugTurnIdForSignal?.(init?.signal) ?? null;
   debugLogCapture.recordDebugLogEvent({
     event: "network-request-started",
     payload: { ...endpoint, method, requestId, turnId },
   });
 
   try {
-    const response = await (expoFetch ?? globalThis.fetch)(normalizedInput, init);
+    const response = await (expoFetch ?? globalThis.fetch)(
+      normalizedInput,
+      init,
+    );
     debugLogCapture.recordDebugLogEvent({
       event: "network-request-completed",
       level: response.ok ? "info" : "warn",
@@ -83,5 +87,59 @@ export async function networkFetch(
       },
     });
     throw error;
+  }
+}
+
+/** Keep cancellation and the deadline active until the provider body has been consumed. */
+export async function fetchWithDeadline<T>(
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs: number,
+  onTimeout: () => Error,
+  consume: (response: Response) => Promise<T>,
+  signal?: AbortSignal,
+): Promise<T> {
+  const abortError = () => {
+    if (signal?.reason instanceof Error) return signal.reason;
+    const error = new Error(
+      typeof signal?.reason === "string" ? signal.reason : "Aborted",
+    );
+    error.name = "AbortError";
+    return error;
+  };
+  if (signal?.aborted) throw abortError();
+
+  const controller = new AbortController();
+  let rejectInterrupted!: (error: Error) => void;
+  const interrupted = new Promise<never>((_, reject) => {
+    rejectInterrupted = reject;
+  });
+  const interrupt = (error: Error) => {
+    rejectInterrupted(error);
+    controller.abort();
+  };
+  const handleAbort = () => interrupt(abortError());
+  signal?.addEventListener("abort", handleAbort, { once: true });
+  const timer = setTimeout(() => interrupt(onTimeout()), timeoutMs);
+
+  try {
+    return await Promise.race([
+      interrupted,
+      networkFetch(input, { ...init, signal: controller.signal }).then(consume),
+    ]);
+  } catch (error) {
+    // Native fetch can abort its own transport before our timer fires.
+    if (
+      !controller.signal.aborted &&
+      error instanceof Error &&
+      (error.name === "AbortError" ||
+        error.message.toLowerCase().includes("aborted"))
+    ) {
+      throw onTimeout();
+    }
+    throw error;
+  } finally {
+    signal?.removeEventListener("abort", handleAbort);
+    clearTimeout(timer);
   }
 }

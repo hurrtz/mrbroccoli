@@ -113,6 +113,7 @@ describe("webSearch", () => {
         body: expect.stringContaining('"search_context_size":"high"'),
       }),
     );
+    expect(fetchBody().store).toBe(false);
     expect(fetchBody().tool_choice).toBe("required");
     expect(result).toEqual(
       expect.objectContaining({
@@ -359,6 +360,7 @@ describe("webSearch", () => {
         ],
       },
       assertBody: (body: Record<string, unknown>) => {
+        expect(body.store).toBe(false);
         expect(body.model).toBe("qwen3.7-plus-2026-05-26");
         expect(body.tools).toEqual([{ type: "web_search" }]);
         expect(body.tool_choice).toBe("required");
@@ -452,6 +454,7 @@ describe("webSearch", () => {
               },
               {
                 type: "tool_reference",
+                tool: "web_search",
                 title: "Mistral search result",
                 url: "https://example.com/mistral-search",
               },
@@ -526,6 +529,28 @@ describe("webSearch", () => {
 
     expect(result).toBeNull();
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects an ordinary Mistral answer without a web search execution or citation", async () => {
+    (fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({
+        outputs: [
+          {
+            type: "message.output",
+            content: [{ type: "text", text: "A guess" }],
+          },
+        ],
+      }),
+    });
+    await expect(
+      searchWeb({
+        provider: "mistral",
+        apiKey: "test",
+        language: "en",
+        query: "Latest news?",
+      }),
+    ).rejects.toThrow("without running web search");
   });
 
   it("rejects a Qwen response that did not run the web search tool", async () => {

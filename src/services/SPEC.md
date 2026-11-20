@@ -32,9 +32,10 @@ navigation or render UI.
 
 ### Intelligence and provider integration
 
-Gemini and xAI search set `store: false`; Qwen Responses uses
-`reasoning.effort: none`. Gemini recorded-audio transcription omits deprecated
-sampling parameters. Request-shape tests cover these provider boundaries.
+OpenAI, Qwen, Gemini, Mistral, and xAI search opt out of provider resource
+storage. Mistral evidence requires a web-search execution or a provider-issued
+search citation. Qwen Responses uses `reasoning.effort: none`.
+Gemini recorded-audio transcription omits deprecated sampling parameters.
 
 
 - `llm.ts` and `llm/` route hosted text generation and internal model tasks.
@@ -52,6 +53,10 @@ Grok 4.6 search reserves 4,096 output tokens with low effort so a short
 evidence brief has reasoning headroom; the existing 4.3 default remains.
 
 ### Speech and voice turns
+
+Provider transcription and synthesis deadlines cover response headers and the
+complete JSON, error text, or audio body. Cancelling a turn also interrupts
+those reads on transports that do not reject their pending body promise.
 
 Gemini 3.5 Transcribe sends inline audio to Interactions with `store: false`,
 verbatim mode, and optional BCP-47 hints. Only completed model-output text

@@ -1,5 +1,6 @@
 import * as FileSystem from "expo-file-system/legacy";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { transcribeWithMultipartProvider } from "../../src/services/whisper/providers";
 import { transcribeAudio } from "../../src/services/whisper";
 import { getProviderSttTimeoutMs } from "../../src/services/whisper/config";
 import { resetProviderModelHealthForTests } from "../../src/services/providerResilience";
@@ -174,6 +175,50 @@ describe("transcribeAudio", () => {
     expect(parts.some(([key]) => key === "language")).toBe(false);
     expect(parts.filter(([key]) => key === "languages[]")).toEqual(speechLanguage === "auto" ? [] : [["languages[]", "en"]]);
   });
+
+  it.each([true, false])(
+    "times out while reading the transcription body (HTTP success %s)",
+    async (ok) => {
+      jest.useFakeTimers();
+      try {
+        let bodyStarted!: () => void;
+        const reading = new Promise<void>((resolve) => {
+          bodyStarted = resolve;
+        });
+        const read = () => {
+          bodyStarted();
+          return new Promise(() => undefined);
+        };
+        (fetch as jest.Mock).mockResolvedValueOnce({
+          ok,
+          status: ok ? 200 : 503,
+          json: read,
+          text: read,
+        });
+        const request = transcribeWithMultipartProvider({
+          fileUri: "/tmp/recording.m4a",
+          provider: "openai",
+          apiKey: "test",
+          language: "en",
+          speechLanguage: "auto",
+          config: {
+            kind: "multipart",
+            endpoint: "https://example.com/transcribe",
+            defaultModel: "whisper-1",
+          },
+        }).then(
+          () => "finished",
+          (error) => error.message,
+        );
+        await reading;
+        await jest.advanceTimersByTimeAsync(getProviderSttTimeoutMs("openai"));
+        expect((fetch as jest.Mock).mock.calls[0][1].signal.aborted).toBe(true);
+        expect(await request).toMatch(/too long/i);
+      } finally {
+        jest.useRealTimers();
+      }
+    },
+  );
 
   it("uses a shorter STT timeout budget for OpenAI than the generic provider default", () => {
     expect(getProviderSttTimeoutMs("openai")).toBe(45000);

@@ -16,7 +16,6 @@ import {
   extractProviderErrorMessage,
   type ProviderFailureKind,
 } from "../providerErrors";
-import { networkFetch } from "../networkFetch";
 
 export const PROVIDER_TTS_MAX_INPUT_CHARS = 3500;
 export const PROVIDER_TTS_TARGET_CHUNK_CHARS = 600;
@@ -377,63 +376,6 @@ export function getProviderTtsTargetChunkChars(provider?: Provider | null) {
     ? PROVIDER_TTS_CHUNK_CHAR_LIMITS[provider] ??
         PROVIDER_TTS_TARGET_CHUNK_CHARS
     : PROVIDER_TTS_TARGET_CHUNK_CHARS;
-}
-
-export async function fetchWithTimeout(
-  input: RequestInfo | URL,
-  init: RequestInit,
-  timeoutMs: number,
-  onTimeout: () => Error,
-  abortSignal?: AbortSignal,
-) {
-  const controller = new AbortController();
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  const handleCallerAbort = () => {
-    controller.abort();
-  };
-
-  if (abortSignal) {
-    if (abortSignal.aborted) {
-      controller.abort();
-    } else {
-      abortSignal.addEventListener("abort", handleCallerAbort);
-    }
-  }
-  const timeoutPromise = new Promise<never>((_, reject) => {
-    timeoutId = setTimeout(() => {
-      controller.abort();
-      reject(onTimeout());
-    }, timeoutMs);
-  });
-
-  const fetchPromise = networkFetch(input, {
-    ...init,
-    signal: controller.signal,
-  }).catch((error) => {
-    if (
-      error instanceof Error &&
-      (error.name === "AbortError" ||
-        error.message.toLowerCase().includes("aborted"))
-    ) {
-      if (abortSignal?.aborted) {
-        const abortError = new Error("TTS request aborted.");
-        abortError.name = "AbortError";
-        throw abortError;
-      }
-      throw onTimeout();
-    }
-
-    throw error;
-  });
-
-  try {
-    return await Promise.race([fetchPromise, timeoutPromise]);
-  } finally {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    abortSignal?.removeEventListener("abort", handleCallerAbort);
-  }
 }
 
 export async function writeBlobAudioFile(
