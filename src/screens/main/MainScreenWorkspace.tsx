@@ -1,5 +1,6 @@
 import React from "react";
 import { StyleSheet, Text, useWindowDimensions, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BackgroundTaskBar } from "../../design-system/BackgroundTaskBar";
 import {
@@ -369,6 +370,7 @@ export function MainScreenWorkspace({
   visualPhase,
   voiceStage,
 }: MainScreenWorkspaceProps) {
+  const insets = useSafeAreaInsets();
   const { fontScale, height: windowHeight } = useWindowDimensions();
   const useAccessibilityCompactLayout =
     fontScale >= ACCESSIBILITY_COMPACT_FONT_SCALE;
@@ -551,6 +553,7 @@ export function MainScreenWorkspace({
               <TranscriptPreviewCard
                 colors={colors}
                 contentMaxWidth={720}
+                bottomInset={insets.bottom}
                 preferredHeight={Math.round(windowHeight * 0.85)}
                 presentation="canvas"
                 {...transcript}
@@ -732,6 +735,7 @@ export function MainScreenWorkspace({
       >
         <TranscriptPreviewCard
           colors={colors}
+          bottomInset={insets.bottom}
           preferredHeight={Math.round(windowHeight * 0.85)}
           presentation="canvas"
           {...transcript}
@@ -869,6 +873,7 @@ const workspaceStyles = StyleSheet.create({
   // A 64pt grab-and-close target around the grip and visible title.
   transcriptSheetCard: {
     gap: 0,
+    paddingBottom: 0,
     paddingHorizontal: 18,
     paddingTop: 0,
   },

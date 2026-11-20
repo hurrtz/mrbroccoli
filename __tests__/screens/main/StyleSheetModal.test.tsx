@@ -107,6 +107,10 @@ describe("StyleSheetModal", () => {
 
     expect(UNSAFE_getByType(Modal).props.animationType).toBe("none");
     expect(drawerStyle.width).toBe("100%");
+    expect(drawerStyle.paddingBottom).toBe(0);
+    expect(StyleSheet.flatten(getByTestId("conversation-settings-drawer").props.style)).toMatchObject({
+      paddingHorizontal: 0, paddingBottom: 0,
+    });
     expect(drawerStyle.borderTopLeftRadius).toBe(24);
     expect(drawerStyle.borderTopRightRadius).toBe(24);
   });

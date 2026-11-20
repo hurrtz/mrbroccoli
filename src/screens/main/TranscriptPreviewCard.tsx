@@ -43,6 +43,7 @@ interface TranscriptPreviewCardProps {
   onShareMessage?: (message: Message) => void;
   onReportMessage?: (message: Message) => void;
   presentation?: "card" | "canvas";
+  bottomInset?: number;
   preferredHeight?: number;
   scrollEnabled?: boolean;
   replayPhase?: "idle" | "preparing" | "speaking";
@@ -72,6 +73,7 @@ export function TranscriptPreviewCard({
   onShareMessage,
   onReportMessage,
   presentation = "card",
+  bottomInset = 0,
   preferredHeight,
   scrollEnabled = false,
   replayPhase = "idle",
@@ -202,6 +204,7 @@ export function TranscriptPreviewCard({
             usesPortraitSheetPresentation
               ? styles.portraitSheetTranscriptContent
               : null,
+            bottomInset > 0 ? { paddingBottom: Math.max(8, bottomInset) } : null,
           ]}
           messageSelectionEnabled
           scrollEnabled={scrollEnabled}

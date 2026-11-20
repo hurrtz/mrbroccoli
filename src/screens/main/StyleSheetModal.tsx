@@ -1,4 +1,5 @@
 import React from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, View, useWindowDimensions } from "react-native";
 
 import {
@@ -67,6 +68,7 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
   const { colors } = useTheme();
   const { t } = useLocalization();
   const { height, width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isLandscape = width > height;
   const drawerMaxHeight = Math.max(280, height - (isLandscape ? 12 : 44));
 
@@ -82,6 +84,7 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
           shadowColor: colors.glow,
         },
       ]}
+      contentStyle={styles.styleSheetBody}
       keyboardAvoiding
       maxHeight={drawerMaxHeight}
       onClose={onClose}
@@ -97,6 +100,8 @@ export const StyleSheetModal = React.memo(function StyleSheetModal({
         contentContainerStyle={[
           styles.styleSheetScrollContent,
           isLandscape ? styles.styleSheetScrollContentLandscape : null,
+          { paddingBottom: Math.max(insets.bottom, isLandscape ? 12 : 16),
+            paddingLeft: Math.max(insets.left, 16), paddingRight: Math.max(insets.right, 16) },
         ]}
         keyboardDismissMode={isLandscape ? "on-drag" : "interactive"}
         showsVerticalScrollIndicator={false}

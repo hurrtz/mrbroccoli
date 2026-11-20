@@ -191,12 +191,12 @@ export const styles = StyleSheet.create({
   previewTranscriptContent: {
     paddingTop: 8,
     paddingHorizontal: 4,
-    paddingBottom: 18,
+    paddingBottom: 8,
   },
   portraitSheetTranscriptContent: {
     paddingTop: 6,
     paddingHorizontal: 0,
-    paddingBottom: 24,
+    paddingBottom: 8,
   },
   voiceDock: {
     flex: 1,
@@ -277,6 +277,7 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   styleSheetCard: {
+    paddingBottom: 0,
     width: "100%",
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
@@ -288,19 +289,21 @@ export const styles = StyleSheet.create({
     shadowRadius: 30,
     elevation: 12,
   },
+  styleSheetBody: {
+    minHeight: 0,
+    paddingHorizontal: 0,
+    paddingBottom: 0,
+  },
   styleSheetScroll: {
     flexShrink: 1,
   },
   styleSheetScrollContent: {
     gap: 18,
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 20,
+    paddingTop: 12,
   },
   styleSheetScrollContentLandscape: {
     gap: 12,
-    paddingTop: 12,
-    paddingBottom: 14,
+    paddingTop: 8,
   },
   styleSheetGroup: {
     gap: 8,
