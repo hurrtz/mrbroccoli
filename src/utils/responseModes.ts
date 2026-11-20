@@ -1,3 +1,4 @@
+import { getCatalogModelForAppProvider } from "../catalog/appProviders";
 import {
   PROVIDER_DEFAULT_MODELS,
   PROVIDER_MODELS,
@@ -25,28 +26,6 @@ export const LEGACY_RESPONSE_MODE_ORDER = ["quick", "normal", "deep"] as const;
 const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
   Record<Provider, Record<string, string>>
 > = {
-  openrouter: {
-    "google/gemini-4-neon": "google/gemini-4-neon-20261118",
-    "openai/gpt-6.2-astra": "openai/gpt-6.2-astra-20261117",
-    "openai/gpt-6.2-sol": "openai/gpt-6.2-sol-20261117",
-    "qwen/qwen4-max": "qwen/qwen4-max-20261115",
-    "google/gemini-4-hydrogen": "google/gemini-4-hydrogen-20261112",
-    "google/gemini-4-carbon": "google/gemini-4-carbon-20261110",
-    "anthropic/claude-fable-5.2": "anthropic/claude-fable-5.2-20261109",
-    "openai/gpt-6.1-terra": "openai/gpt-6.1-terra-20261026",
-    "moonshotai/kimi-k3.1-pro": "moonshotai/kimi-k3.1-pro-20261023",
-    "deepseek/deepseek-v4.1-flash-1017": "deepseek/deepseek-v4.1-flash-20261017",
-    "google/gemini-4-argon": "google/gemini-4-argon-20261013",
-    "anthropic/claude-haiku-5.5": "anthropic/claude-haiku-5.5-20261007",
-    "mistralai/mistral-large-4-0": "mistralai/mistral-large-4-0-20261006",
-    "openai/gpt-6.1-sol": "openai/gpt-6.1-sol-20260929",
-    "anthropic/claude-sonnet-5.5": "anthropic/claude-sonnet-5.5-20260928",
-    "openai/gpt-6-luna": "openai/gpt-6-luna-20260922",
-    "openai/gpt-6-sol": "openai/gpt-6-sol-20260922",
-    "anthropic/claude-opus-5.5": "anthropic/claude-opus-5.5-20260921",
-    "x-ai/grok-4.7": "x-ai/grok-4.7-20260916",
-    "x-ai/grok-4.6": "x-ai/grok-4.6-20260810",
-  },
   // DeepSeek retired V4 Flash and only temporarily routes its name to V4.1.
   deepseek: {
     "deepseek-v4-flash": "deepseek-flash",
@@ -92,6 +71,9 @@ const PROVIDER_MODEL_ALIAS_MIGRATIONS: Partial<
 };
 
 export function migrateProviderModelAlias(provider: Provider, model: string) {
+  if (provider === "openrouter") {
+    return getCatalogModelForAppProvider(provider, model, "llm")?.modelId ?? model;
+  }
   return PROVIDER_MODEL_ALIAS_MIGRATIONS[provider]?.[model] ?? model;
 }
 

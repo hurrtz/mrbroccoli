@@ -24,4 +24,4 @@ export const PROVIDER_DOCUMENTS = defineProviderDocuments([
   XaiDocument,
 ]);
 
-export const PROVIDER_CATALOG_UPDATED_AT = "2026-08-15";
+export const PROVIDER_CATALOG_UPDATED_AT = "2026-11-20";

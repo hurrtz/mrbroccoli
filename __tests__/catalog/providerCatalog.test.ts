@@ -1,6 +1,9 @@
 import fs from "fs";
 import path from "path";
 
+import { migrateProviderModelAlias } from "../../src/utils/responseModes";
+import { RUNTIME_PROVIDER_MANIFEST } from "../../src/constants/providers/runtimeManifest";
+
 import {
   getCatalogModel,
   getCatalogProvider,
@@ -11,14 +14,62 @@ import {
 } from "../../src/catalog";
 
 describe("provider catalog", () => {
+  it("resolves an attributed research record for each curated direct or routed answering model", () => {
+    const missing: string[] = [];
+    for (const provider of Object.values(RUNTIME_PROVIDER_MANIFEST)) {
+      for (const { id } of provider.llm.models) {
+        const model = getCatalogModel(provider.catalogProviderId, id, "llm");
+        if (!model?.officialSources.length) missing.push(id);
+      }
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it("migrates each published gateway alias to its curated snapshot", () => {
+    for (const { id } of RUNTIME_PROVIDER_MANIFEST.openrouter.llm.models) {
+      const card = getCatalogModel("openrouter", id, "llm");
+      const aliases = card?.aliases ?? [];
+      expect(aliases.length).toBeGreaterThan(0);
+      for (const alias of aliases) {
+        expect(migrateProviderModelAlias("openrouter", alias)).toBe(id);
+      }
+    }
+  });
+
+  it("reports public routed speech without exposing an unwired gateway picker", () => {
+    const publicSupport = getCatalogProvider("openrouter")?.verifiedSupport;
+    expect(publicSupport?.stt).toBe("routed");
+    expect(publicSupport?.tts).toBe("routed");
+    expect(RUNTIME_PROVIDER_MANIFEST.openrouter.stt.models).toEqual([]);
+    expect(RUNTIME_PROVIDER_MANIFEST.openrouter.tts.models).toEqual([]);
+  });
+
+  it("looks up a routed snapshot and its public alias with gateway pricing and limits", () => {
+    const snapshot = getCatalogModel("openrouter", "openai/gpt-6.2-astra-20261117", "llm");
+    expect(getCatalogModel("openrouter", "openai/gpt-6.2-astra", "llm")).toBe(snapshot);
+    expect(snapshot).toMatchObject({
+      publicName: "OpenAI · GPT-6.2 Astra",
+      priceMeasurements: expect.arrayContaining([
+        expect.objectContaining({ unit: "million_input_tokens", amountUsd: 8 }),
+        expect.objectContaining({ unit: "million_output_tokens", amountUsd: 40 }),
+      ]),
+      constraints: expect.arrayContaining([
+        expect.objectContaining({ metric: "context_tokens", value: 1_050_000 }),
+      ]),
+      officialSources: expect.arrayContaining([
+        "https://openrouter.ai/api/v1/models/openai/gpt-6.2-astra-20261117/endpoints",
+      ]),
+    });
+  });
+
   it("matches the normalized provider and model counts in the flattened catalog", () => {
     expect(getCatalogStats()).toEqual({
       providerCount: 9,
-      modelCount: 115,
+      modelCount: 188,
       serviceCounts: {
-        llm: 69,
-        stt: 27,
-        tts: 19,
+        llm: 140,
+        stt: 28,
+        tts: 20,
       },
     });
   });
