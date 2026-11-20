@@ -1,228 +1,146 @@
 import { providerContext } from "./provider";
 
+const pricing = "https://api-docs.deepseek.com/quick_start/pricing/";
+const changes = "https://api-docs.deepseek.com/updates/";
+
+function tokenPrices(input: number, cachedInput: number, output: number) {
+  const rates = [
+    { unit: "million_input_tokens", label: "cache-miss input", peak: input },
+    { unit: "million_input_tokens", label: "cached input", peak: cachedInput },
+    { unit: "million_output_tokens", label: "output", peak: output },
+  ] as const;
+  return rates.flatMap(({ unit, label, peak }) => [
+    {
+      unit,
+      amountUsd: peak,
+      sourceText: `Peak price per million ${label} tokens.`,
+    },
+    {
+      unit,
+      amountUsd: peak / 2,
+      sourceText: `Off-peak price per million ${label} tokens.`,
+    },
+  ]);
+}
+
+const currentModels = [
+  {
+    modelId: "deepseek-flash",
+    publicName: "DeepSeek V4.1 Flash (October 17)",
+    aliases: ["deepseek-v4-flash", "deepseek-v4-flash-vision-exp"],
+    notes:
+      "Serves V4.1-Flash-1017 with text and image input. DeepSeek temporarily routes the retired V4 Flash names to this model.",
+    concurrency: 2500,
+    input: 0.3,
+    cachedInput: 0.006,
+    output: 1.2,
+  },
+  {
+    modelId: "deepseek-v4-pro",
+    publicName: "DeepSeek V4 Pro",
+    aliases: [],
+    notes:
+      "Serves V4-Pro-0813 with text input. The September change log confirms continued direct availability.",
+    concurrency: 500,
+    input: 1.32,
+    cachedInput: 0.044,
+    output: 3.96,
+  },
+];
+
 export const llms = providerContext.defineLlms([
-  providerContext.llm(
-    {
-      "providerId": "deepseek",
-      "providerName": "Deepseek",
-      "service": "llm",
-      "modelId": "deepseek-chat",
-      "publicName": "DeepSeek Chat",
-      "aliases": [],
-      "status": "Documented active/current",
-      "catalogScope": "Mostly exhaustive",
-      "pricingSummary": "$0.028/M input cache-hit, $0.28/M input cache-miss, $0.42/M output.",
-      "limitsSummary": "128K context. Default max output 4K, maximum 8K.",
-      "regionSummary": "No region selector documented. Privacy policy says data may be processed/stored in the PRC.",
-      "languagesSummary": "No official per-language list. Multilingual general LLM, but no API language matrix is published.",
-      "notes": "Canonical stable public ID. Official docs say it currently maps to DeepSeek-V3.2 non-thinking mode. Can also enable thinking via the thinking parameter on chat completions. Supports JSON output, tool calls, chat prefix completion beta, and FIM beta.",
-      "officialSources": [
-        "https://api-docs.deepseek.com/",
-        "https://api-docs.deepseek.com/quick_start/pricing",
-        "https://api-docs.deepseek.com/api/create-chat-completion",
-        "https://api-docs.deepseek.com/guides/thinking_mode",
-        "https://api-docs.deepseek.com/guides/tool_calls"
-      ],
-      "openAiCompatible": true,
-      "supportsRealtime": true,
-      "supportsBatch": false,
-      "priceMeasurements": [
-        {
-          "amountUsd": 0.028,
-          "unit": "million_input_tokens",
-          "sourceText": "1M INPUT TOKENS (CACHE HIT) $0.028"
-        },
-        {
-          "amountUsd": 0.28,
-          "unit": "million_input_tokens",
-          "sourceText": "1M INPUT TOKENS (CACHE MISS) $0.28"
-        },
-        {
-          "amountUsd": 0.42,
-          "unit": "million_output_tokens",
-          "sourceText": "1M OUTPUT TOKENS $0.42"
-        }
-      ],
-      "constraints": [
-        {
-          "metric": "context_tokens",
-          "comparator": "=",
-          "value": 128000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "CONTEXT LENGTH 128K"
-        },
-        {
-          "metric": "other",
-          "comparator": "=",
-          "value": 4000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "MAX OUTPUT DEFAULT: 4K"
-        },
-        {
-          "metric": "other",
-          "comparator": "<=",
-          "value": 8000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "MAXIMUM: 8K"
-        },
-        {
-          "metric": "other",
-          "comparator": "<=",
-          "value": 128,
-          "unit": "other",
-          "scope": "model",
-          "sourceText": "A max of 128 functions are supported."
-        },
-        {
-          "metric": "session_duration_seconds",
-          "comparator": "<=",
-          "value": 600,
-          "unit": "seconds",
-          "scope": "streaming",
-          "sourceText": "If the request has not started inference after 10 minutes, the server will close the connection."
-        }
-      ],
-      "languageSupport": {
-        "rawText": "No official API language matrix published.",
-        "isMultilingual": true,
-        "languageCount": 0,
-        "voiceCount": 0,
-        "listedLanguages": [],
-        "notes": [
-          "language list unknown",
-          "no speech output",
-          "general multilingual LLM inferred from product positioning, not from a formal API language matrix"
-        ]
-      }
-    }
+  ...currentModels.map(
+    ({
+      modelId,
+      publicName,
+      aliases,
+      notes,
+      concurrency,
+      input,
+      cachedInput,
+      output,
+    }) =>
+      providerContext.llm({
+        modelId,
+        publicName,
+        aliases,
+        status: "Documented active/current",
+        pricingSummary: `At peak, one million cached input tokens cost USD ${cachedInput}, other input costs USD ${input} and output costs USD ${output}. Off-peak rates are half. Peak windows are 01:00–04:00 and 06:00–10:00 UTC on weekdays outside Chinese public holidays.`,
+        limitsSummary: `1M-token context, up to 384K output tokens and ${concurrency} concurrent requests.`,
+        notes,
+        officialSources: [
+          pricing,
+          changes,
+          "https://api-docs.deepseek.com/api/create-chat-completion/",
+        ],
+        supportsRealtime: true,
+        supportsBatch: null,
+        priceMeasurements: tokenPrices(input, cachedInput, output),
+        constraints: [
+          {
+            metric: "context_tokens",
+            comparator: "~",
+            value: 1_000_000,
+            unit: "tokens",
+            scope: "model",
+            sourceText: "1M-token context window.",
+          },
+          {
+            metric: "other",
+            comparator: "<=",
+            value: 393_216,
+            unit: "tokens",
+            scope: "output",
+            sourceText: "Chat Completions allows at most 393,216 output tokens (384K).",
+          },
+          {
+            metric: "concurrency",
+            comparator: "<=",
+            value: concurrency,
+            unit: "count",
+            scope: "account",
+            sourceText: `${concurrency} concurrent model requests.`,
+          },
+        ],
+        languageSupport: null,
+      }),
   ),
-  providerContext.llm(
+  ...[
     {
-      "providerId": "deepseek",
-      "providerName": "Deepseek",
-      "service": "llm",
-      "modelId": "deepseek-reasoner",
-      "publicName": "DeepSeek Reasoner",
-      "aliases": [],
-      "status": "Documented active/current",
-      "catalogScope": "Mostly exhaustive",
-      "pricingSummary": "$0.14/M input cache-hit, $0.55/M input cache-miss, $2.19/M output.",
-      "limitsSummary": "128K context. Default max output 32K, maximum 64K. Thinking output is exposed via reasoning_content.",
-      "regionSummary": "No region selector documented. Privacy policy says data may be processed/stored in the PRC.",
-      "languagesSummary": "No official per-language list. Multilingual general LLM, but no API language matrix is published.",
-      "notes": "Canonical stable public ID. Official docs say it currently maps to DeepSeek-V3.2 thinking mode. Supports JSON output, tool calls, chat prefix completion beta. FIM beta is not supported. Several generation controls are ignored or unsupported in thinking mode.",
-      "officialSources": [
-        "https://api-docs.deepseek.com/",
-        "https://api-docs.deepseek.com/quick_start/pricing",
-        "https://api-docs.deepseek.com/guides/thinking_mode",
-        "https://api-docs.deepseek.com/api/create-chat-completion"
-      ],
-      "openAiCompatible": true,
-      "supportsRealtime": true,
-      "supportsBatch": false,
-      "priceMeasurements": [
-        {
-          "amountUsd": 0.14,
-          "unit": "million_input_tokens",
-          "sourceText": "1M INPUT TOKENS (CACHE HIT) $0.14"
-        },
-        {
-          "amountUsd": 0.55,
-          "unit": "million_input_tokens",
-          "sourceText": "1M INPUT TOKENS (CACHE MISS) $0.55"
-        },
-        {
-          "amountUsd": 2.19,
-          "unit": "million_output_tokens",
-          "sourceText": "1M OUTPUT TOKENS $2.19"
-        }
-      ],
-      "constraints": [
-        {
-          "metric": "context_tokens",
-          "comparator": "=",
-          "value": 128000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "CONTEXT LENGTH 128K"
-        },
-        {
-          "metric": "other",
-          "comparator": "=",
-          "value": 32000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "max_tokens: Default to 32K"
-        },
-        {
-          "metric": "other",
-          "comparator": "<=",
-          "value": 64000,
-          "unit": "tokens",
-          "scope": "model",
-          "sourceText": "max_tokens: maximum to 64K"
-        },
-        {
-          "metric": "session_duration_seconds",
-          "comparator": "<=",
-          "value": 600,
-          "unit": "seconds",
-          "scope": "streaming",
-          "sourceText": "If the request has not started inference after 10 minutes, the server will close the connection."
-        }
-      ],
-      "languageSupport": {
-        "rawText": "No official API language matrix published.",
-        "isMultilingual": true,
-        "languageCount": 0,
-        "voiceCount": 0,
-        "listedLanguages": [],
-        "notes": [
-          "language list unknown",
-          "no speech output",
-          "reasoning model with exposed reasoning_content"
-        ]
-      }
-    }
-  ),
-  providerContext.llm(
+      modelId: "deepseek-chat",
+      publicName: "DeepSeek Chat (legacy alias)",
+      status: "Discontinued",
+      notes:
+        "Former non-thinking alias. DeepSeek announced its discontinuation for July 24, 2026.",
+    },
     {
-      "providerId": "deepseek",
-      "providerName": "Deepseek",
-      "service": "llm",
-      "modelId": "deepseek-coder",
-      "publicName": "DeepSeek Coder (legacy alias)",
-      "aliases": [],
-      "status": "Unknown",
-      "catalogScope": "Unknown",
-      "pricingSummary": "Unknown current pricing; not listed on the current supported-model pricing page.",
-      "limitsSummary": "Unknown current limits; historical docs tied it to merged V2.5 behavior.",
-      "regionSummary": "Same provider-level region/privacy caveats apply if still accepted.",
-      "languagesSummary": "Not applicable beyond general code/text use.",
-      "notes": "Historical public alias. On 2024-09-05 DeepSeek documented that deepseek-coder and deepseek-chat both pointed to DeepSeek-V2.5 for backward compatibility. It is not listed on the current pricing page that the docs identify as the source for currently supported models, so it should not be exposed in a stable picker.",
-      "officialSources": [
-        "https://api-docs.deepseek.com/updates",
-        "https://api-docs.deepseek.com/quick_start/pricing"
-      ],
-      "openAiCompatible": true,
-      "supportsRealtime": true,
-      "supportsBatch": false,
-      "priceMeasurements": [],
-      "constraints": [],
-      "languageSupport": {
-        "rawText": "Legacy alias; current support unclear.",
-        "isMultilingual": false,
-        "languageCount": 0,
-        "voiceCount": 0,
-        "listedLanguages": [],
-        "notes": [
-          "legacy alias",
-          "do not expose in stable picker"
-        ]
-      }
-    }
+      modelId: "deepseek-reasoner",
+      publicName: "DeepSeek Reasoner (legacy alias)",
+      status: "Discontinued",
+      notes:
+        "Former thinking alias. DeepSeek announced its discontinuation for July 24, 2026.",
+    },
+    {
+      modelId: "deepseek-coder",
+      publicName: "DeepSeek Coder (legacy alias)",
+      status: "Historical",
+      notes:
+        "The September 2024 change log mapped this name to V2.5. The current model list omits it.",
+    },
+  ].map(({ modelId, publicName, status, notes }) =>
+    providerContext.llm({
+      modelId,
+      publicName,
+      status,
+      notes,
+      limitsSummary: null,
+      pricingSummary: "Historical alias without a published current price.",
+      officialSources: [changes, pricing],
+      supportsRealtime: null,
+      supportsBatch: null,
+      priceMeasurements: [],
+      constraints: [],
+      languageSupport: null,
+    }),
   ),
 ]);

@@ -1077,7 +1077,7 @@ describe("streamChat", () => {
 
     await streamChat({
       messages: mockMessages,
-      model: "deepseek-chat",
+      model: "deepseek-flash",
       provider: "deepseek",
       apiKey: "deepseek-test-key",
       assistantInstructions: "",

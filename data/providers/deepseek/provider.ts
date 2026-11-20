@@ -3,13 +3,13 @@ import { createProviderContext, defineProviderDefinition } from "../definitions"
 export const providerDefinition = defineProviderDefinition(
   {
     "providerId": "deepseek",
-    "providerName": "Deepseek",
+    "providerName": "DeepSeek",
     "categoryName": "Foundation model API provider",
     "hq": "Hangzhou, China (inference from legal entity name; official privacy policy states only that the registered address is in China)",
     "verifiedSupport": {
       "llm": "native",
-      "stt": "unsupported",
-      "tts": "unsupported"
+      "stt": "native",
+      "tts": "native"
     },
     "officialSources": [
       "https://api-docs.deepseek.com/",
@@ -21,30 +21,40 @@ export const providerDefinition = defineProviderDefinition(
       "https://api-docs.deepseek.com/quick_start/rate_limit",
       "https://api-docs.deepseek.com/faq",
       "https://api-docs.deepseek.com/guides/anthropic_api",
-      "https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html"
+      "https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html",
+      "https://api-docs.deepseek.com/updates/",
+      "https://api-docs.deepseek.com/news/news261113/",
+      "https://api-docs.deepseek.com/guides/asr/",
+      "https://api-docs.deepseek.com/api/asr/",
+      "https://api-docs.deepseek.com/guides/tts/",
+      "https://api-docs.deepseek.com/api/tts/"
     ],
     "integration": {
-      "catalogType": "Small hosted alias catalog with a models endpoint; canonical IDs are stable aliases that can be repointed to newer underlying model versions",
+      "catalogType": "Hosted chat models and standalone speech endpoints. Chat IDs can receive new model versions.",
       "coverage": "Mostly exhaustive",
       "hasDynamicCatalog": true,
       "needsLiveDiscovery": true,
-      "supportsSpeech": false,
+      "supportsSpeech": true,
       "lowConfidence": false,
       "openAiCompatible": true,
       "protocols": [
         "rest",
-        "sse"
+        "sse",
+        "websocket"
       ],
       "regionSplitRecommended": false
     },
     "summaries": {
-      "pricing": "Current official pricing page lists only deepseek-chat and deepseek-reasoner. deepseek-chat: $0.028/M input cache-hit, $0.28/M input cache-miss, $0.42/M output. deepseek-reasoner: $0.14/M input cache-hit, $0.55/M input cache-miss, $2.19/M output. Context caching is enabled by default.",
-      "limits": "Current pricing page states 128K context for both public model IDs. deepseek-chat max output: default 4K, maximum 8K. deepseek-reasoner max output: default 32K, maximum 64K. Rate limits are dynamic rather than fixed. If a queued request has not started inference after 10 minutes, the server closes the connection.",
+      "pricing": "Per million tokens at peak, Flash costs $0.006 for cached input, $0.30 for other input and $1.20 for output. Pro costs $0.044, $1.32 and $3.96 respectively. Off-peak chat rates are half these prices. ASR lists $0.116 per audio hour and TTS $0.45 per 10,000 billed characters. Limited-time speech rates are $0.058 and $0.225 respectively.",
+      "limits": "Both chat models support a 1M-token context and up to 384K output tokens. Flash allows 2,500 concurrent requests and Pro allows 500. ASR accepts up to 8 MiB and 120 seconds per file. TTS accepts up to 10,000 billed characters per request or session.",
       "region": "Official privacy policy says personal data may be stored outside the user's country and that DeepSeek directly collects, processes, and stores personal data in the PRC. No public API region selector or data-residency option was found.",
-      "sttLanguages": "Unsupported: no official public STT API documentation found.",
-      "ttsLanguages": "Unsupported: no official public TTS API documentation found.",
+      "sttLanguages": "ASR automatically detects 21 languages, including English, German, Chinese and Cantonese.",
+      "ttsLanguages": "TTS automatically detects ten languages and offers the Stella and Tide voices.",
       "freeTier": "Unknown for API. Open Platform terms say DeepSeek may provide free quota during internal testing or other activities and that users may request more free quota, but no standing public free-tier schedule was found.",
-      "integrationNotes": "Best app integration is via OpenAI-compatible chat completions over REST, with optional SSE streaming. Anthropic-format compatibility is also documented. Use stable picker IDs deepseek-chat and deepseek-reasoner, but rely on live discovery and docs checks because these IDs are movable aliases to newer underlying versions."
+      "integrationNotes": "Chat supports OpenAI-compatible Chat Completions, Responses, Anthropic Messages and streamed output. Standalone ASR accepts complete audio files. TTS accepts full text over HTTP or incremental text over WebSocket. The app exposes the DeepSeek chat models.",
+      "activeModels": {
+        "llm": "DeepSeek V4.1 Flash (October 17) [deepseek-flash]\nDeepSeek V4 Pro [deepseek-v4-pro]"
+      }
     },
     "sources": [
       {
@@ -96,7 +106,7 @@ export const providerDefinition = defineProviderDefinition(
         "url": "https://api-docs.deepseek.com/guides/thinking_mode",
         "title": "Thinking Mode | DeepSeek API Docs",
         "type": "official",
-        "lastUpdated": "2025-12-01",
+        "lastUpdated": null,
         "usedFor": [
           "models",
           "limits",
@@ -163,6 +173,70 @@ export const providerDefinition = defineProviderDefinition(
         "usedFor": [
           "free-tier",
           "developer-terms"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/updates/",
+        "title": "DeepSeek API change log",
+        "type": "official",
+        "lastUpdated": null,
+        "usedFor": [
+          "models",
+          "retirements"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/news/news261113/",
+        "title": "DeepSeek application API release",
+        "type": "official",
+        "lastUpdated": "2026-11-13",
+        "usedFor": [
+          "integration",
+          "speech",
+          "web-search"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/guides/asr/",
+        "title": "Speech to Text guide",
+        "type": "official",
+        "lastUpdated": null,
+        "usedFor": [
+          "pricing",
+          "languages",
+          "limits"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/api/asr/",
+        "title": "Speech to Text API",
+        "type": "official",
+        "lastUpdated": null,
+        "usedFor": [
+          "protocols",
+          "speech"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/guides/tts/",
+        "title": "Text to Speech guide",
+        "type": "official",
+        "lastUpdated": null,
+        "usedFor": [
+          "pricing",
+          "languages",
+          "voices",
+          "limits"
+        ]
+      },
+      {
+        "url": "https://api-docs.deepseek.com/api/tts/",
+        "title": "Text to Speech API",
+        "type": "official",
+        "lastUpdated": null,
+        "usedFor": [
+          "protocols",
+          "speech"
         ]
       }
     ]

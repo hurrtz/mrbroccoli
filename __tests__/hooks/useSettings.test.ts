@@ -864,15 +864,15 @@ describe("useSettings", () => {
     await flushSettingsLoad();
 
     await act(async () => {
-      result.current.updateProviderModel("deepseek", "deepseek-chat");
+      result.current.updateProviderModel("deepseek", "deepseek-v4-pro");
     });
 
     expect(AsyncStorage.setItem).toHaveBeenCalledWith(
       "@mrbroccoli/settings",
-      expect.stringContaining('"deepseek":"deepseek-chat"'),
+      expect.stringContaining('"deepseek":"deepseek-v4-pro"'),
     );
     expect(result.current.settings.providerModels.deepseek).toBe(
-      "deepseek-chat",
+      "deepseek-v4-pro",
     );
   });
 

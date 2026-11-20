@@ -1,3 +1,4 @@
+import { getProviderCapabilities } from "../../src/features/settings-core/providerSupport";
 import {
   getAppProviderForCatalogProviderId,
   getCatalogConstraintsForAppProvider,
@@ -69,6 +70,47 @@ describe("app provider catalog bridge", () => {
 
     expect(PROVIDER_CATALOG_VERIFIED_SUPPORT.openai.tts).toBe("native");
     expect(PROVIDER_CATALOG_VERIFIED_SUPPORT.xai.stt).toBe("native");
+  });
+
+  it("catalogues DeepSeek's standalone speech APIs while exposing only chat in the app", () => {
+    expect(getProviderCapabilities("deepseek")).toEqual(["llm"]);
+    expect(getCatalogProviderForAppProvider("deepseek")?.verifiedSupport).toEqual(
+      {
+        llm: "native",
+        stt: "native",
+        tts: "native",
+      },
+    );
+    const asr = getCatalogModelForAppProvider("deepseek", "/v1/tools/asr", "stt");
+    expect(asr?.supportsRealtime).toBe(false);
+    expect(asr?.languageSupport?.languageCount).toBe(21);
+    expect(asr?.constraints).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ metric: "duration_seconds", value: 120 }),
+        expect.objectContaining({
+          metric: "file_size_bytes",
+          value: 8 * 1024 * 1024,
+        }),
+      ]),
+    );
+    const tts = getCatalogModelForAppProvider("deepseek", "/v1/tools/tts", "tts");
+    expect(tts?.languageSupport).toMatchObject({
+      languageCount: 10,
+      voiceCount: 2,
+    });
+    expect(tts?.supportsRealtime).toBe(true);
+    expect(tts?.priceMeasurements[0]).toMatchObject({
+      amountUsd: 45,
+      unit: "million_characters",
+    });
+    expect(
+      getCatalogModelForAppProvider("deepseek", "deepseek-v4-flash", "llm")
+        ?.modelId,
+    ).toBe("deepseek-flash");
+    expect(
+      getCatalogModelForAppProvider("deepseek", "deepseek-reasoner", "llm")
+        ?.status,
+    ).toBe("Discontinued");
   });
 
   it("exposes provider-level discovery hints and model accessors", () => {
