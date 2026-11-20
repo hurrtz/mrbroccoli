@@ -1,6 +1,6 @@
-import { fetchWithTimeout } from "../../src/services/whisper/abort";
+import { fetchWithDeadline } from "../../src/services/networkFetch";
 
-describe("fetchWithTimeout", () => {
+describe("fetchWithDeadline", () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
@@ -16,11 +16,12 @@ describe("fetchWithTimeout", () => {
     const fetchSpy = jest.spyOn(global, "fetch");
 
     await expect(
-      fetchWithTimeout(
+      fetchWithDeadline(
         "https://example.test",
         {},
         45_000,
         () => new Error("Timed out"),
+        (response) => response.text(),
         controller.signal,
       ),
     ).rejects.toMatchObject({ name: "AbortError" });
@@ -35,11 +36,12 @@ describe("fetchWithTimeout", () => {
     });
 
     await expect(
-      fetchWithTimeout(
+      fetchWithDeadline(
         "https://example.test",
         {},
         45_000,
         () => new Error("Timed out"),
+        (response) => response.text(),
       ),
     ).rejects.toThrow("Invalid request");
 
