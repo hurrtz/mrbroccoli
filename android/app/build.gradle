@@ -111,7 +111,10 @@ android {
     }
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
+            def localDebugKeystore = file('debug.keystore')
+            if (localDebugKeystore.isFile()) {
+                storeFile localDebugKeystore
+            }
             storePassword 'android'
             keyAlias 'androiddebugkey'
             keyPassword 'android'

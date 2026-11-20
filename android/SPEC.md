@@ -108,6 +108,10 @@ The verified AAB and diagnostic evidence are archived under
 
 ## Verification
 
+A developer's existing `android/app/debug.keystore` continues to sign debug
+builds. A fresh checkout uses the Android Gradle Plugin’s standard debug
+keystore, including for instrumented tests.
+
 - JVM tests cover pure queue, backup, service-state, and waveform logic.
 - Instrumentation tests exercise the native runtime, including playback and
   lifecycle races, on an attached emulator or device.
