@@ -188,6 +188,9 @@ the architectural answer for the author.
   device/runtime, source commit, dirty-source fingerprint, and whether the
   artifact was built or reused. A reused artifact is never attributed to the
   current source fingerprint without build evidence.
+- The npm postinstall normalizes Sherpa podspec paths before CocoaPods hashes
+  the spec. This and the iOS source guards also run when the optional external
+  runtime build is absent.
 - The espeak-free installer also applies the reviewed iOS archive-helper patch:
   it skips only empty, `.`, or `./` tar-root records, then permits only relative
   regular files or directories without traversal or links; direct validation

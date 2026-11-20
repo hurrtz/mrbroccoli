@@ -52,6 +52,8 @@ TypeScript owns product policy; native modules expose focused capabilities.
   passphrase-encrypted portable backups.
 - `MrBroccoliArchiveDirectory` exposes the user-visible archive destination
   while preserving app-owned file lifecycle.
+- Sherpa header and library search paths use the Xcode Pods directory so the
+  committed CocoaPods lockfile also installs from a different checkout.
 - The Sherpa archive helper skips only empty, `.`, or `./` tar-root records;
   all remaining entries must be relative regular files or directories without
   traversal or links. Archive-relative validation happens before the helper

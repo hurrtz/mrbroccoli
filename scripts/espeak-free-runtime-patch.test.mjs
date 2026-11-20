@@ -229,3 +229,25 @@ test("iOS TTS patch rejects a null OfflineTts handle before querying it", () => 
     /Unsupported react-native-sherpa-onnx TTS wrapper/,
   );
 });
+
+test("Sherpa emits the same Xcode search paths from two different checkout roots", async () => {
+  const { execFileSync } = await import("node:child_process");
+  const { applySherpaPodspecSearchPathPatch } = await import("./espeak-free-runtime-patch.mjs");
+  const spec = [
+    'pod_root = ARGV.fetch(0)',
+    'header_search_paths = [%Q{"#{pod_root}/ios"}]',
+    'library_search_paths_ios = [%Q{"#{pod_root}/ios/device"}]',
+    'library_search_paths_sim = [%Q{"#{pod_root}/ios/simulator"}]',
+    's = Struct.new(:pod_target_xcconfig).new',
+    '  s.pod_target_xcconfig = {',
+    '    "paths" => [header_search_paths, library_search_paths_ios, library_search_paths_sim].flatten',
+    '  }',
+    'puts s.pod_target_xcconfig["paths"]',
+  ].join("\n");
+  const patched = applySherpaPodspecSearchPathPatch(spec);
+  assert.equal(applySherpaPodspecSearchPathPatch(patched), patched);
+  const run = (root) => execFileSync("ruby", ["-e", patched, root], { encoding: "utf8" });
+  const result = run("/tmp/first checkout/node_modules/react-native-sherpa-onnx");
+  assert.equal(result, run("/tmp/second/node_modules/react-native-sherpa-onnx"));
+  assert.ok(result.includes('"$(PODS_ROOT)/../../node_modules/react-native-sherpa-onnx/ios/simulator"'));
+});

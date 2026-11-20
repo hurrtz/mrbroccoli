@@ -33,6 +33,7 @@ import { homedir } from "node:os";
 import { resolve } from "node:path";
 
 import {
+  applySherpaPodspecSearchPathPatch,
   applyIosArchiveEntryValidationPatch,
   applyIosTtsNullHandlePatch,
   hasIosArchiveEntryValidationGuard,
@@ -138,6 +139,16 @@ function requireFile(path, hint) {
   return path;
 }
 
+// The podspec contains checkout-specific absolute paths, including in the
+// user target. Normalize them before CocoaPods calculates its spec checksum.
+const podspecPath = requireFile(resolve(wrapperRoot, "SherpaOnnx.podspec"), "install npm dependencies first");
+const originalPodspec = readFileSync(podspecPath, "utf8");
+const portablePodspec = applySherpaPodspecSearchPathPatch(originalPodspec);
+if (originalPodspec !== portablePodspec) {
+  if (verifyInstalled) fail("Sherpa podspec paths are unstaged. Run npm install.");
+  if (!checkOnly) writeFileSync(podspecPath, portablePodspec);
+}
+
 if (verifyInstalled) {
   const installed = [
     ...ANDROID_ABIS.map(({ abi }) =>
@@ -205,6 +216,40 @@ if (verifyInstalled) {
   process.exit(0);
 }
 
+if (!checkOnly) {
+  if (!existsSync(wrapperRoot)) {
+    fail(`wrapper not installed at ${wrapperRoot}; run npm install first`);
+  }
+
+  const originalIosArchiveHelper = readFileSync(
+    requireFile(
+      IOS_ARCHIVE_HELPER,
+      "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+    ),
+    "utf8",
+  );
+  const patchedIosArchiveHelper = applyIosArchiveEntryValidationPatch(
+    originalIosArchiveHelper,
+  );
+  if (patchedIosArchiveHelper !== originalIosArchiveHelper) {
+    writeFileSync(IOS_ARCHIVE_HELPER, patchedIosArchiveHelper);
+    console.log("ios: archive entry-validation guard installed");
+  }
+
+  const originalIosTtsWrapper = readFileSync(
+    requireFile(
+      IOS_TTS_WRAPPER,
+      "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
+    ),
+    "utf8",
+  );
+  const patchedIosTtsWrapper = applyIosTtsNullHandlePatch(originalIosTtsWrapper);
+  if (patchedIosTtsWrapper !== originalIosTtsWrapper) {
+    writeFileSync(IOS_TTS_WRAPPER, patchedIosTtsWrapper);
+    console.log("ios: TTS null-handle guard installed");
+  }
+}
+
 const androidSources = ANDROID_ABIS.map(({ abi, build }) => ({
   abi,
   libraries: ANDROID_LIBRARIES.map((name) =>
@@ -241,38 +286,6 @@ if (checkOnly) {
     "espeak-free runtime: sources present and free of eSpeak NG markers",
   );
   process.exit(0);
-}
-
-if (!existsSync(wrapperRoot)) {
-  fail(`wrapper not installed at ${wrapperRoot}; run npm install first`);
-}
-
-const originalIosArchiveHelper = readFileSync(
-  requireFile(
-    IOS_ARCHIVE_HELPER,
-    "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
-  ),
-  "utf8",
-);
-const patchedIosArchiveHelper = applyIosArchiveEntryValidationPatch(
-  originalIosArchiveHelper,
-);
-if (patchedIosArchiveHelper !== originalIosArchiveHelper) {
-  writeFileSync(IOS_ARCHIVE_HELPER, patchedIosArchiveHelper);
-  console.log("ios: archive entry-validation guard installed");
-}
-
-const originalIosTtsWrapper = readFileSync(
-  requireFile(
-    IOS_TTS_WRAPPER,
-    "reinstall react-native-sherpa-onnx, then run npm run espeak-free:install",
-  ),
-  "utf8",
-);
-const patchedIosTtsWrapper = applyIosTtsNullHandlePatch(originalIosTtsWrapper);
-if (patchedIosTtsWrapper !== originalIosTtsWrapper) {
-  writeFileSync(IOS_TTS_WRAPPER, patchedIosTtsWrapper);
-  console.log("ios: TTS null-handle guard installed");
 }
 
 for (const { abi, libraries } of androidSources) {

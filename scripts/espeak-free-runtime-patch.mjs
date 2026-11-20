@@ -276,3 +276,16 @@ export function applyIosTtsNullHandlePatch(source) {
   }
   return source.replace(IOS_TTS_OPTIONAL_ONLY_GUARD, IOS_TTS_NULL_HANDLE_GUARD);
 }
+
+export function applySherpaPodspecSearchPathPatch(source) {
+  const insertion = "  s.pod_target_xcconfig = {";
+  const normalize = `  [header_search_paths, library_search_paths_ios, library_search_paths_sim].each do |paths|
+    paths.map! { |path| path.gsub(pod_root, '$(PODS_ROOT)/../../node_modules/react-native-sherpa-onnx') }
+  end
+`;
+  if (source.includes(normalize)) return source;
+  if (!source.includes(insertion)) {
+    throw new Error("Sherpa podspec search paths changed; review its build settings.");
+  }
+  return source.replace(insertion, normalize + insertion);
+}
