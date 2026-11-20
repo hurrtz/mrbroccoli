@@ -50,12 +50,14 @@ Eight LLM-capable provider routes:
 
 ElevenLabs is available as a dedicated speech provider. OpenAI, Anthropic,
 Google Gemini, xAI, Mistral, and Alibaba Qwen offer provider-native web search.
-Kimi K3 remains available through OpenRouter.
+Kimi K3 and K3.1 Pro are available through OpenRouter. The dated catalogue
+audit lists the supported models, saved-selection migrations and provider
+sources. [November 2026 provider audit](docs/provider-audit-2026-11-20.md)
 
-Voice input and spoken replies are not tied to any single provider:
+Listening and speaking can use separate providers.
 
 - Speech-to-text prefers the device's native system recognizer. Downloadable
-  Whisper Tiny runs locally, while OpenAI, Gemini, Mistral, xAI, Qwen, and
+  Whisper Tiny runs locally, while OpenAI, Gemini, Mistral, xAI, and
   ElevenLabs remain available as capability-gated provider alternatives.
 - Text-to-speech uses the device's native voices by default. Downloadable Kokoro
   and language-specific Piper voices run locally, while OpenAI, Gemini, xAI,

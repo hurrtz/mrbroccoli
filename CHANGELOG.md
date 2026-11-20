@@ -14,6 +14,8 @@ the complete Play Store translations are kept in a dedicated file under
   models, Mistral Large 4, and 15 OpenRouter snapshots including Kimi K3.1 Pro.
   Recorded transcription gains Scribe v3 and Voxtral 3. Spoken replies gain
   Voxtral TTS 3 and Eleven v4 and v4 Turbo.
+- Saved xAI transcription selections now use Grok Voice Transcribe 2.0,
+  including its published recording limits and supported languages.
 
 - Fixed an iOS 27 crash that closed the app immediately after launch.
 - The home button shows the active provider and voice activity. Recording shows
