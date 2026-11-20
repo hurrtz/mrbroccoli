@@ -1,6 +1,36 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
+const mistralText = { supportsRealtime: false, supportsBatch: true, languageSupport: null };
+
 export const llms = providerContext.defineLlms([
+  providerContext.llm({
+    ...mistralText,
+    modelId: "mistral-large-4-0",
+    publicName: "Mistral Large 4",
+    aliases: ["mistral-large-4"],
+    status: "Generally available",
+    ...modelTokenTerms({ contextTokens: 1_000_000, inputUsd: 0.7, outputUsd: 2.1 }),
+    notes: "Multimodal chat and function calling. Reasoning defaults to high and supports low and medium. Cached input costs USD 0.07 per million tokens.",
+    officialSources: [
+      "https://docs.mistral.ai/models/mistral-large-4-0",
+      "https://docs.mistral.ai/inference/conversations/reasoning",
+    ],
+  }),
+  providerContext.llm({
+    ...mistralText,
+    modelId: "mistral-medium-3-5",
+    publicName: "Mistral Medium 3.5",
+    status: "Deprecated October 31, 2026",
+    ...modelTokenTerms({
+      contextTokens: 256_000, inputUsd: 1.5, outputUsd: 7.5, priceBasis: "Published launch rates",
+    }),
+    notes: "Mistral identifies Large 4 as the replacement for this saved model.",
+    officialSources: [
+      "https://docs.mistral.ai/models/mistral-medium-3-5-26-04",
+      "https://mistral.ai/news/vibe-remote-agents-mistral-medium-3-5/",
+    ],
+  }),
   providerContext.llm(
     {
       "providerId": "mistral-ai",

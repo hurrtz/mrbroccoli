@@ -12,6 +12,8 @@ export const providerDefinition = defineProviderDefinition(
       "tts": "native"
     },
     "officialSources": [
+      "https://docs.modelstudio.console.alibabacloud.com/en/model-studio/qwen4-max",
+      "https://www.alibabacloud.com/help/en/model-studio/text-generation-model",
       "https://www.alibabacloud.com/help/en/model-studio/models",
       "https://www.alibabacloud.com/help/en/model-studio/base-url",
       "https://www.alibabacloud.com/help/en/model-studio/regions/",
@@ -44,12 +46,12 @@ export const providerDefinition = defineProviderDefinition(
     },
     "summaries": {
       "pricing": "LLM pricing is mostly per-token and often tiered by request size; speech pricing is per second (ASR) or per 10K characters / tokens (TTS). Batch LLM pricing is documented at 50% of real-time cost.",
-      "limits": "Hard limits vary by model. Verified examples: short-file ASR <=10 MB and <=5 minutes; long-file ASR <=2 GB and <=12 hours; Qwen-Omni-Realtime sessions last up to 120 minutes; Qwen-TTS-Realtime has 8,192-token context with 512 max input / 7,680 max output.",
+      "limits": "Qwen4-Max has a 1,000,000-token context and a maximum of 131,072 output tokens with thinking disabled or 262,144 with thinking enabled. Speech limits vary by model: short-file ASR <=10 MB and <=5 minutes; long-file ASR <=2 GB and <=12 hours; Qwen-Omni-Realtime sessions last up to 120 minutes; Qwen-TTS-Realtime has 8,192-token context with 512 max input / 7,680 max output.",
       "region": "The provider has region-specific endpoints, model availability, and storage/compute locality: Global/US, International/Singapore, EU/Frankfurt, Hong Kong, and Chinese Mainland/Beijing appear across the docs.",
       "sttLanguages": "Qwen3 ASR Realtime explicitly lists 29 languages including Chinese variants, English, Japanese, German, Korean, Russian, French, Portuguese, Arabic, Italian, Spanish, Hindi, Indonesian, Thai, Turkish, Ukrainian, Vietnamese, Czech, Danish, Filipino, Finnish, Icelandic, Malay, Norwegian, Polish, and Swedish. Paraformer/Fun-ASR have separate language coverage.",
       "ttsLanguages": "Main Qwen3 TTS models explicitly list Chinese (Mandarin), English, Spanish, Russian, Italian, French, Korean, Japanese, German, and Portuguese. qwen3-tts-flash additionally lists several Chinese dialect variants.",
       "freeTier": "Model Studio documents limited starter free quotas for some international/global models and some realtime speech/TTS entries, typically valid for 90 days after activation. Chinese Mainland pages commonly state no free quota.",
-      "integrationNotes": "Use stable canonical IDs in pickers and hide -latest and snapshot IDs by default. Mr Broccoli stores the selected Singapore, US, or Beijing region alongside the API key in SecureStore and routes each direct request to the matching DashScope host. The current app STT/TTS transports support Singapore and Beijing; US-region keys remain available for chat and web search."
+      "integrationNotes": "Mr Broccoli stores the selected Singapore, US, or Beijing region alongside the API key in SecureStore. Chat and web search use the matching regional DashScope host. Current Qwen-Audio recognition and synthesis services require different transports from the retired speech snapshots."
     },
     "sources": [
       {

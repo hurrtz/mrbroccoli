@@ -1,6 +1,95 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
+const geminiApi = "https://aistudio.google.com/docs";
+const geminiText = {
+  regionSummary: "Gemini Developer API availability depends on the project tier and supported region.",
+  supportsRealtime: false,
+  supportsBatch: true,
+  languageSupport: null,
+};
+
+function gemini4({
+  name, inputUsd, outputUsd, priceBasis, thinking, subsequentRates,
+}: {
+  name: string;
+  inputUsd: number;
+  outputUsd: number;
+  priceBasis: string;
+  thinking: string;
+  subsequentRates?: string;
+}) {
+  const modelId = `gemini-4-${name.toLowerCase()}`;
+  const terms = modelTokenTerms({
+    contextTokens: 1_048_576, outputTokens: 1_048_576, inputUsd, outputUsd, priceBasis,
+  });
+  return providerContext.llm({
+    ...geminiText,
+    modelId,
+    publicName: `Gemini 4 ${name}`,
+    status: "Documented active/current",
+    ...terms,
+    pricingSummary: [terms.pricingSummary, subsequentRates].filter(Boolean).join(" "),
+    constraints: [
+      ...terms.constraints,
+      {
+        metric: "other", comparator: "<=", value: 65_536, unit: "tokens",
+        scope: "synchronous output", sourceText: "Default synchronous output cap of 65,536 tokens.",
+      },
+    ],
+    limitsSummary: "Input and output share 1,048,576 tokens. Synchronous output defaults to a 65,536-token limit. Long Decode can spend the remaining context on output.",
+    notes: `Accepts text, images, audio, video and PDFs. ${thinking}`,
+    officialSources: [`${geminiApi}/models/${modelId}`, `${geminiApi}/whats-new-${modelId}`, `${geminiApi}/pricing`],
+  });
+}
+
+const highThinking = "Thinking defaults to high and also supports low, medium and extra high.";
+const introductoryGemini4 = {
+  inputUsd: 2,
+  outputUsd: 10,
+  priceBasis: "Standard introductory rates through November 30, 2026",
+  subsequentRates: "From December 1, 2026, the rates are USD 4 per million input and USD 20 per million output tokens.",
+  thinking: "Thinking defaults to medium and also supports low and high.",
+};
+
 export const llms = providerContext.defineLlms([
+  gemini4({
+    name: "Neon", inputUsd: 3, outputUsd: 15,
+    priceBasis: "Standard paid Gemini Developer API", thinking: highThinking,
+  }),
+  gemini4({
+    name: "Hydrogen", inputUsd: 1.5, outputUsd: 7.5,
+    priceBasis: "Standard paid Gemini Developer API, with a separate free tier", thinking: highThinking,
+  }),
+  gemini4({ name: "Carbon", ...introductoryGemini4 }),
+  gemini4({ name: "Argon", ...introductoryGemini4 }),
+  providerContext.llm({
+    ...geminiText,
+    modelId: "gemini-3.8-flash",
+    publicName: "Gemini 3.8 Flash",
+    aliases: ["gemini-3.7-flash"],
+    status: "Documented active/current",
+    ...modelTokenTerms({
+      contextTokens: 1_048_576, outputTokens: 65_536, inputUsd: 0.75, outputUsd: 3.75,
+      priceBasis: "Standard introductory rates through December 31, 2026",
+    }),
+    pricingSummary: "Standard introductory rates are USD 0.75 per million input and USD 3.75 per million output tokens through December 31, 2026. From January 1, 2027, they are USD 1.50 and USD 7.50.",
+    notes: "Stable multimodal Flash model. Google routes Gemini 3.7 Flash API requests here.",
+    officialSources: [`${geminiApi}/models/gemini-3.8-flash`, `${geminiApi}/pricing`, `${geminiApi}/deprecations`],
+  }),
+  providerContext.llm({
+    ...geminiText,
+    modelId: "gemini-3.1-pro-preview",
+    publicName: "Gemini 3.1 Pro Preview",
+    status: "Public preview",
+    ...modelTokenTerms({
+      contextTokens: 1_048_576, outputTokens: 65_536, inputUsd: 2, outputUsd: 12,
+      priceBasis: "Standard requests up to 200,000 input tokens",
+    }),
+    pricingSummary: "Up to 200,000 input tokens the rates are USD 2 per million input and USD 12 per million output tokens. Above that threshold they are USD 4 and USD 18.",
+    notes: "Multimodal Pro preview available through generateContent.",
+    officialSources: [`${geminiApi}/models/gemini-3.1-pro-preview`, `${geminiApi}/pricing`, `${geminiApi}/deprecations`],
+  }),
   providerContext.llm(
     {
       "providerId": "google-vertex-ai-studio",
@@ -15,7 +104,7 @@ export const llms = providerContext.defineLlms([
       "limitsSummary": "1,048,576 max input tokens; 65,536 max output tokens.",
       "regionSummary": "Available through Gemini API model endpoints; use configured regional routing where required.",
       "languagesSummary": "Multimodal general-purpose LLM; no fixed language list published on the model page.",
-      "notes": "Current stable Gemini Flash picker entry. Supports the existing generateContent path for text output and defaults to medium thinking.",
+      "notes": "Stable Gemini Flash model for generateContent. Thinking defaults to medium.",
       "officialSources": [
         "https://ai.google.dev/gemini-api/docs/models/gemini-3.6-flash",
         "https://ai.google.dev/gemini-api/docs/latest-model",
@@ -66,14 +155,15 @@ export const llms = providerContext.defineLlms([
       "aliases": [
         "gemini-3-flash-preview"
       ],
-      "status": "Documented active/current",
+      "status": "Redirects to Gemini 3.6 Flash",
       "catalogScope": "Dynamic/non-exhaustive",
-      "pricingSummary": "See Gemini API pricing for current token rates; the model page documents Gemini 3.5 Flash as the stable version of the Gemini 3 Flash line.",
+      "pricingSummary": "API requests to Gemini 3.5 Flash route to Gemini 3.6 Flash. See the Gemini API pricing and deprecation tables.",
       "limitsSummary": "1,048,576 max input tokens; 65,536 max output tokens.",
       "regionSummary": "Available through Gemini API model endpoints; use configured regional routing where required.",
       "languagesSummary": "Multimodal general-purpose LLM; no fixed language list published on the model page.",
-      "notes": "Current stable Gemini 3 Flash-family picker entry. Supports the existing generateContent path for text output.",
+      "notes": "Google routes this saved endpoint to Gemini 3.6 Flash.",
       "officialSources": [
+        "https://aistudio.google.com/docs/deprecations",
         "https://ai.google.dev/gemini-api/docs/models/gemini-3.5-flash",
         "https://ai.google.dev/gemini-api/docs/models",
         "https://ai.google.dev/gemini-api/docs/interactions-overview"

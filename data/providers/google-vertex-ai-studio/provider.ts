@@ -12,6 +12,9 @@ export const providerDefinition = defineProviderDefinition(
       "tts": "native"
     },
     "officialSources": [
+      "https://aistudio.google.com/docs/models",
+      "https://aistudio.google.com/docs/pricing",
+      "https://aistudio.google.com/docs/deprecations",
       "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models",
       "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/learn/model-versions",
       "https://cloud.google.com/vertex-ai/generative-ai/pricing",
@@ -48,13 +51,13 @@ export const providerDefinition = defineProviderDefinition(
       "regionSplitRecommended": true
     },
     "summaries": {
-      "pricing": "LLMs are token-priced on Vertex AI pricing pages; Cloud STT is minute-priced; Gemini-TTS is token-priced; classic Cloud TTS is character-priced. Batch/flex discounts are public for several Gemini LLMs, and Cloud STT V2 dynamic batch is discounted.",
-      "limits": "Gemini 2.5 text models generally expose 1,048,576 input-token context and 65,535 default output tokens. Gemini Live has 128k context, 15-minute default audio-only sessions, and 1,000 concurrent sessions/project on PayGo. Cloud STT has 10 MB / 1 minute synchronous limits and 25 KB per streaming chunk with 5-minute streaming sessions. Gemini-TTS text+prompt total is 8,000 bytes with ~655 seconds output cap; classic Cloud TTS has 5,000 bytes/request.",
+      "pricing": "Gemini Developer API and Vertex AI publish separate token rates. Carbon and Argon have introductory Gemini API pricing through November 30, 2026; Cloud STT is minute-priced; Gemini-TTS is token-priced; classic Cloud TTS is character-priced. Batch/flex discounts are public for several Gemini LLMs, and Cloud STT V2 dynamic batch is discounted.",
+      "limits": "Gemini 4 shares 1,048,576 tokens across input and output, with a default synchronous output cap of 65,536. Gemini 2.5 text models generally expose 1,048,576 input-token context and 65,535 default output tokens. Gemini Live has 128k context, 15-minute default audio-only sessions, and 1,000 concurrent sessions/project on PayGo. Cloud STT has 10 MB / 1 minute synchronous limits and 25 KB per streaming chunk with 5-minute streaming sessions. Gemini-TTS text+prompt total is 8,000 bytes with ~655 seconds output cap; classic Cloud TTS has 5,000 bytes/request.",
       "region": "Use regional endpoints when residency matters. Vertex global endpoints improve availability but do not guarantee in-region ML processing. Cloud TTS and Gemini-TTS support global, US, EU, and several APAC/regional endpoints. Cloud STT V2 documents data residency support including Belgium and Singapore.",
       "sttLanguages": "Cloud STT is broadly multilingual; marketing says 125+ languages, while Chirp 3 product text highlights 85+ languages/variants.",
       "ttsLanguages": "Classic Cloud TTS advertises 380+ voices across 75+ languages/variants. Gemini Live native audio documents 24 languages and 30 voices. Gemini-TTS release notes state 30 speakers across 80+ locales.",
       "freeTier": "Google Cloud offers $300 trial credit for new customers. Cloud STT v1 and classic Cloud TTS have documented free usage tiers; Gemini-TTS pricing page shows no free usage for listed Gemini-TTS entries in the captured pricing section.",
-      "integrationNotes": "Treat Vertex AI Studio as an LLM-first provider with two speech paths: Gemini Live native audio for realtime conversation, and separate Google Cloud speech APIs for canonical STT/TTS. Expose only stable model IDs in pickers; keep preview and legacy/alias IDs out of the default picker."
+      "integrationNotes": "Mr Broccoli uses the Gemini Developer API for chat, search and recorded-audio transcription. Gemini 3.5 Transcribe and both Gemini 3.8 speech synthesis models use Interactions. Other recorded-audio models and Gemini 3.1 TTS Preview use GenerateContent."
     },
     "sources": [
       {

@@ -1,6 +1,123 @@
+import { modelTokenTerms } from "../definitions";
 import { providerContext } from "./provider";
 
+const qwenStudio = "https://www.alibabacloud.com/help/en/model-studio";
+const qwenModels = "https://docs.modelstudio.console.alibabacloud.com/en/model-studio";
+const qwenText = {
+  supportsRealtime: false,
+  supportsBatch: null,
+  languageSupport: null,
+};
+
+function qwenSnapshot({
+  modelId, publicName, alias, inputUsd, outputUsd, outputTokens, priceBasis, otherRates, source,
+}: {
+  modelId: string;
+  publicName: string;
+  alias: string;
+  inputUsd: number;
+  outputUsd: number;
+  outputTokens: number;
+  priceBasis: string;
+  otherRates?: string;
+  source: string;
+}) {
+  const terms = modelTokenTerms({
+    contextTokens: 1_000_000, outputTokens, inputUsd, outputUsd, priceBasis,
+  });
+  return providerContext.llm({
+    ...qwenText,
+    modelId,
+    publicName,
+    aliases: [alias],
+    status: "Documented snapshot",
+    ...terms,
+    pricingSummary: [terms.pricingSummary, otherRates].filter(Boolean).join(" "),
+    notes: `Pinned snapshot for ${alias}. Regional availability and pricing depend on the deployment.`,
+    officialSources: [source, `${qwenStudio}/model-pricing`, `${qwenStudio}/text-generation-model`],
+  });
+}
+
 export const llms = providerContext.defineLlms([
+  providerContext.llm({
+    ...qwenText,
+    modelId: "qwen4-max",
+    publicName: "Qwen4-Max",
+    status: "Documented active/current",
+    ...modelTokenTerms({
+      contextTokens: 1_000_000, outputTokens: 262_144, inputUsd: 1.5, outputUsd: 4.5,
+      priceBasis: "Singapore International deployment, up to 1 million input tokens",
+    }),
+    limitsSummary: "1,000,000-token context. With thinking disabled the input limit is 991,808 and output is 131,072. With thinking enabled the input limit is 983,616 and thinking plus output can use up to 262,144 tokens.",
+    regionSummary: "The Singapore International rate applies to the default app deployment. Global and Beijing deployments charge USD 1.413 per million input and USD 4.24 per million output tokens.",
+    notes: "Accepts text, images and video. Reasoning defaults to high and supports low and extra high. Disable thinking to use the non-reasoning mode.",
+    officialSources: [`${qwenModels}/qwen4-max`, `${qwenStudio}/model-pricing`, `${qwenStudio}/text-generation-model`],
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.8-max-0902",
+    publicName: "Qwen3.8-Max (0902)",
+    alias: "qwen3.8-max",
+    inputUsd: 2, outputUsd: 6, outputTokens: 131_072,
+    priceBasis: "Singapore International deployment, up to 1 million input tokens",
+    otherRates: "Global deployment charges USD 1.65 per million input and USD 4.951 per million output tokens.",
+    source: "https://www.alibabacloud.com/en/notice/model_studio_update_notice_for_qwen38max_models_863",
+  }),
+  providerContext.llm({
+    ...qwenText,
+    modelId: "qwen3.8-flash",
+    publicName: "Qwen3.8-Flash",
+    status: "Documented active/current",
+    ...modelTokenTerms({
+      contextTokens: 1_000_000, outputTokens: 131_072, inputUsd: 0.15, outputUsd: 0.47,
+      priceBasis: "Singapore International deployment, up to 1 million input tokens",
+    }),
+    notes: "Accepts text, images and video. Batch inference is available in Beijing and varies by deployment.",
+    officialSources: [`${qwenModels}/qwen3-8-flash`, `${qwenStudio}/model-pricing`, `${qwenStudio}/text-generation-model`],
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.7-flash-2026-07-15",
+    publicName: "Qwen3.7-Flash (2026-07-15)",
+    alias: "qwen3.7-flash",
+    inputUsd: 0.03, outputUsd: 0.13, outputTokens: 131_072,
+    priceBasis: "Singapore International deployment, up to 32K input tokens",
+    otherRates: "From over 32K through 256K the input and output rates per million tokens are USD 0.10 and 0.40. Above 256K they are USD 0.20 and 0.80.",
+    source: `${qwenStudio}/qwen3-7-flash`,
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.7-plus-2026-05-26",
+    publicName: "Qwen3.7-Plus (2026-05-26)",
+    alias: "qwen3.7-plus",
+    inputUsd: 0.4, outputUsd: 1.6, outputTokens: 131_072,
+    priceBasis: "Singapore International snapshot, up to 256K input tokens",
+    otherRates: "Above 256K the rates are USD 1.20 per million input and USD 4.80 per million output tokens.",
+    source: `${qwenStudio}/qwen3-7-plus`,
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.7-max-2026-05-20",
+    publicName: "Qwen3.7-Max (2026-05-20)",
+    alias: "qwen3.7-max",
+    inputUsd: 2.5, outputUsd: 7.5, outputTokens: 131_072,
+    priceBasis: "Singapore International deployment, up to 1 million input tokens",
+    source: `${qwenModels}/qwen3-7-max`,
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.6-flash-2026-04-16",
+    publicName: "Qwen3.6-Flash (2026-04-16)",
+    alias: "qwen3.6-flash",
+    inputUsd: 0.25, outputUsd: 1.5, outputTokens: 65_536,
+    priceBasis: "Singapore International snapshot, up to 256K input tokens",
+    otherRates: "Above 256K the rates are USD 1 per million input and USD 4 per million output tokens.",
+    source: `${qwenStudio}/qwen3-6-flash`,
+  }),
+  qwenSnapshot({
+    modelId: "qwen3.6-plus-2026-04-02",
+    publicName: "Qwen3.6-Plus (2026-04-02)",
+    alias: "qwen3.6-plus",
+    inputUsd: 0.5, outputUsd: 3, outputTokens: 65_536,
+    priceBasis: "Singapore International snapshot, up to 256K input tokens",
+    otherRates: "Above 256K the rates are USD 2 per million input and USD 6 per million output tokens.",
+    source: `${qwenModels}/qwen3-6-plus`,
+  }),
   providerContext.llm(
     {
       "providerId": "alibaba-qwen-dashscope",
