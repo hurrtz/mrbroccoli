@@ -1,4 +1,7 @@
-import { act, renderHook, waitFor } from "@testing-library/react-native";
+import React from "react";
+import { PipelineNotices } from "../../src/components/chatBubble/PipelineNotices";
+import { renderWithProviders } from "../test-utils/renderWithProviders";
+import { act, fireEvent, renderHook, waitFor } from "@testing-library/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import { createTurnReceipt } from "../../src/services/turnReceipt";
@@ -254,16 +257,17 @@ describe("useVoicePipeline", () => {
       updatedAt: "",
       messages: [original, newer],
     };
+    let refreshNotices: (() => void) | undefined;
     const updateMessage = jest.fn(
       (id: string, update: (message: Message) => Message) => {
         const index = conversation.messages.findIndex(
           (message) => message.id === id,
         );
-        return index < 0
-          ? null
-          : (conversation.messages[index] = update(
-              conversation.messages[index],
-            ));
+        if (index < 0) return null;
+        const changed = update(conversation.messages[index]);
+        conversation.messages[index] = changed;
+        refreshNotices?.();
+        return changed;
       },
     );
     const params = createParams({
@@ -284,12 +288,28 @@ describe("useVoicePipeline", () => {
       .mocked(synthesizeSpeech)
       .mockResolvedValue("file:///successful-retry.wav");
     let retry!: Promise<void>;
-    act(() => {
-      retry = result.current.handleRepeatLastReply(
-        original.content,
-        original.id,
-      );
-    });
+    function TranscriptNotices() {
+      const [message, setMessage] = React.useState(original);
+      refreshNotices = () => setMessage(conversation.messages[0]);
+      return React.createElement(PipelineNotices, {
+        message,
+        onOpenSpeakingSettings: jest.fn(),
+        onRepeat: (reply) => {
+          retry = result.current.handleRepeatLastReply(reply.content, reply.id);
+        },
+      });
+    }
+    const transcript = renderWithProviders(React.createElement(TranscriptNotices));
+    expect(transcript.getByText(failedSpeech.message)).toBeTruthy();
+    expect(transcript.getByLabelText("Speaking settings")).toBeTruthy();
+    fireEvent.press(transcript.getByLabelText("Retry speech"));
+    const expectNoSpeechFailure = () => {
+      expect(transcript.queryByText(failedSpeech.message)).toBeNull();
+      expect(transcript.queryByLabelText("Retry speech")).toBeNull();
+      expect(transcript.queryByLabelText("Speaking settings")).toBeNull();
+      expect(transcript.getByText(warning.message)).toBeTruthy();
+    };
+    expectNoSpeechFailure();
     expect(conversation.messages[0].metadata?.notices).toEqual([warning]);
     await act(async () => {
       playbackGate.resolve();
@@ -298,6 +318,7 @@ describe("useVoicePipeline", () => {
     expect(synthesizeSpeech).toHaveBeenCalledWith(
       expect.objectContaining({ provider: "openai" }),
     );
+    expectNoSpeechFailure();
     expect(conversation.messages[0].metadata?.notices).toEqual([warning]);
     expect(conversation.messages[1].metadata?.notices).toEqual([
       warning,
@@ -310,6 +331,9 @@ describe("useVoicePipeline", () => {
     await act(async () => {
       await result.current.handleRepeatLastReply(original.content, original.id);
     });
+    expect(transcript.getByText("Replacement route unavailable")).toBeTruthy();
+    expect(transcript.getByLabelText("Retry speech")).toBeTruthy();
+    expect(transcript.getByLabelText("Speaking settings")).toBeTruthy();
     expect(conversation.messages[0].metadata?.notices).toEqual([
       warning,
       expect.objectContaining({
