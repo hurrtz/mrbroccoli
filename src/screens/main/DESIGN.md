@@ -278,7 +278,8 @@ iOS the compact workspace is measured in screen coordinates, while the regular
 iPad workspace's enclosing sidebar shell begins below the top safe area.
 Keyboard avoidance adds bottom padding inside the current window on both
 platforms. This keeps the landscape panes inside the window after a Settings
-field opened the Android keyboard in portrait.
+field opened the Android keyboard in portrait. The Android gesture gutter sits
+outside that padding so the transcript handle stays clear of the system bar.
 The sibling layer translates vertically by
 `transportLayout.centreY - transportLayout.height / 2` for the current measured
 orb. This keeps both 44pt targets centred on the orb instead of on the transport

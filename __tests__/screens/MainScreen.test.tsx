@@ -913,11 +913,19 @@ describe("MainScreen", () => {
   it("keeps the Android workspace height tied to the current window after using the keyboard", () => {
     const platform = jest.replaceProperty(Platform, "OS", "android");
     try {
+      const screen = renderWithProviders(<MainScreen />);
+      const keyboardFrame = () => screen.UNSAFE_getByType(KeyboardAvoidingView);
+      expect(StyleSheet.flatten(keyboardFrame().props.style).marginBottom).toBe(10);
       mockUseWindowDimensions.mockReturnValue({
         width: 914, height: 411, scale: 2.625, fontScale: 1,
       });
-      const screen = renderWithProviders(<MainScreen />);
-      expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.behavior).toBe("padding");
+      screen.rerender(
+        <ThemeProvider mode="light">
+          <LocalizationProvider language="en"><MainScreen /></LocalizationProvider>
+        </ThemeProvider>,
+      );
+      expect(keyboardFrame().props.behavior).toBe("padding");
+      expect(StyleSheet.flatten(keyboardFrame().props.style).marginBottom).toBe(8);
     } finally {
       platform.restore();
     }

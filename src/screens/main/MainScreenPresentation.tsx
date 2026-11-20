@@ -70,6 +70,13 @@ export function MainScreenPresentation({
         isLandscape && !ipadLayout.isRegularWidth
           ? styles.defaultLayoutLandscape
           : null,
+        // KeyboardAvoidingView owns paddingBottom. Keep the Android gesture
+        // gutter outside it, including when the keyboard is closed.
+        Platform.OS === "android" && {
+          marginBottom: isLandscape
+            ? styles.defaultLayoutLandscape.paddingBottom
+            : styles.defaultLayout.paddingBottom,
+        },
         ipadLayout.isRegularWidth ? styles.ipadWorkspaceLayout : null,
       ]}
     >
