@@ -105,9 +105,9 @@ framework or hiding platform behavior behind excessive abstraction.
   active toggles use filled accent glyphs plus matching labels, disabled
   controls rest at 38%, and its Image form may replace the glyph with up to
   three thumbnail layers without changing the row geometry. The labels under
-  these controls and the activity above the orb share the same small, tracked
-  monospace caption style. The controls are uppercase. The activity preserves
-  the casing of its localized text.
+  these controls use 9pt uppercase monospace. The activity above the orb uses
+  the same font and tracking at 18pt with a 24pt line height, preserves
+  localized casing, and wraps beside its provider icon.
 - Every interactive target is at least 44 by 44 points, including icon-only
   buttons. A smaller decorative glyph may sit inside that target.
 - Pressed, disabled, selected, destructive, loading, error, and focus states

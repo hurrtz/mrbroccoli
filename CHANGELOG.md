@@ -23,8 +23,8 @@ the complete Play Store translations are kept in a dedicated file under
   screen readers can read the time left on the button. The red overtime lap
   starts at twelve o’clock over the completed first lap, and paused speech
   keeps its position and Play control.
-- The activity label above the home button matches the spacing and typography
-  of the controls below it.
+- The activity label above the home button uses 18pt text and mirrors the
+  spacing of the controls below it.
 - Web Search on the home screen requires an enabled search provider in Settings.
 - New conversations get a title after their first prompt. Automatic titles can
   be turned off in App settings. Manually entered titles take precedence.

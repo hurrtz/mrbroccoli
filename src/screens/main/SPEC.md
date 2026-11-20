@@ -164,8 +164,9 @@ receive already-derived state and callbacks.
   voice preview while a reply is paused also performs that full teardown before
   preview audio begins; an unpaused reply or any earlier turn phase remains
   protected from preview interruption.
-- A localized line above the orb describes the active operation. It uses the
-  same caption typography as the controls below. Its distance from the ring
+- A localized line above the orb describes the active operation. Its 18pt
+  monospaced text is twice the size of the control captions below and scales
+  with the user's text size. Its distance from the ring
   mirrors the lower control row when the stage has room. The actor's icon
   precedes transcription, prompt receipt, web search, streamed answers, and
   both directions of speech transfer. On-device transcription uses the device

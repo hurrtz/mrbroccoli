@@ -257,7 +257,7 @@ describe("MainScreenVoiceStage composer", () => {
     expect(screen.getByTestId("landscape-stage-controls")).toBeTruthy();
   });
 
-  it("matches the captions below the orb and mirrors their clearance as space permits", () => {
+  it("doubles the control caption size above the orb and mirrors the lower clearance as space permits", () => {
     const screen = renderStage(
       <MainScreenVoiceStage
         {...createProps({
@@ -270,13 +270,18 @@ describe("MainScreenVoiceStage composer", () => {
     const styleOf = (testID: string) =>
       StyleSheet.flatten(screen.getByTestId(testID).props.style);
     expect(styleOf("orb-activity")).toMatchObject({
-      alignContent: "center",
+      alignItems: "center",
+      paddingVertical: 12,
       marginBottom: styleOf("voice-text-input-footer").marginTop,
     });
     const { textTransform, ...captionStyle } = StyleSheet.flatten(screen.getByText("Image").props.style);
     const statusStyle = StyleSheet.flatten(screen.getByText("ready").props.style);
     expect(textTransform).toBe("uppercase");
-    expect(statusStyle).toMatchObject(captionStyle);
+    expect(statusStyle).toMatchObject({
+      ...captionStyle,
+      fontSize: captionStyle.fontSize * 2,
+      lineHeight: captionStyle.lineHeight * 2,
+    });
     expect(statusStyle.textTransform).toBeUndefined();
     const transportHeight = styleOf("orb-transport-idle").height;
     const orbSize = styleOf("voice-orb-idle").height;
