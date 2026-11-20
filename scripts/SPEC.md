@@ -221,9 +221,9 @@ the architectural answer for the author.
   derives its coverage from the runtime provider manifest.
 - Release cost reports pin standard token prices for new direct models when
   the researched catalogue lacks pricing, including GPT-6 Astra and Claude
-  Fable 5.1. These estimates stay separate from provider-reported costs and
+  Fable 5.2, Gemini 4, Mistral Large 4 and Qwen4-Max. These estimates stay separate from provider-reported costs and
   the pre-request reservation; model additions do not authorize live calls.
-  The current full matrix reserves USD 1.0195; an existing USD 1 configured
+  The current full matrix reserves USD 2.0615; an existing USD 1 configured
   ceiling still aborts before provider requests. No stored cost ceiling is
   increased by a catalogue update.
 - Android artifact verification checks the archive, signature, package,

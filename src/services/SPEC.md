@@ -35,8 +35,9 @@ navigation or render UI.
 OpenAI, Qwen, Gemini, Mistral, and xAI search opt out of provider resource
 storage. Mistral evidence requires a completed web-search execution or a
 provider-issued search citation. Qwen Responses uses `reasoning.effort: none`.
-Gemini recorded-audio transcription omits deprecated sampling parameters.
-
+Gemini chat, streamed replies, recorded-audio transcription and speech synthesis
+set `store: false` on both Google request transports. Recorded transcription
+omits deprecated sampling parameters.
 
 - `llm.ts` and `llm/` route hosted text generation and internal model tasks.
 - `webSearch.ts` and `webSearch/` decide provider requests and normalize cited

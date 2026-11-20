@@ -43,8 +43,10 @@ Provider-specific headers, endpoints, request bodies, stream parsing, and
 response metadata stay inside `llm/providers/`. Qwen region selection occurs at
 the adapter boundary.
 
-GPT-6 Astra uses Chat Completions with `reasoning_effort`, including `max`.
-Claude Fable 5 and 5.1 use Messages with `output_config.effort`; their adaptive
+GPT-6.2 Astra and Sol use Chat Completions with low through max
+`reasoning_effort`. OpenRouter uses unified `reasoning.effort`. Direct Gemini
+GenerateContent and streamGenerateContent set `store: false`.
+Claude Fable 5, 5.1 and 5.2 use Messages with `output_config.effort`; their adaptive
 thinking is always on, so no explicit thinking configuration is needed. Both
 streaming and internal Fable requests reserve 65,536 output tokens at default
 or explicit `high` effort, as at `xhigh` and `max`, to leave reasoning headroom.

@@ -72,68 +72,44 @@ Gemini offers `gemini-3.5-transcribe` through its manifest-owned Interactions
 endpoint. Other recorded-audio models retain GenerateContent and the existing
 3.6 default.
 
-### Astra and Fable routes
+### Current model and effort contracts
 
-The picker includes `gpt-6-astra` on OpenAI and `claude-fable-5-1` on
-Anthropic. OpenRouter uses the canonical snapshots
-`openai/gpt-6-astra-20260903` and `anthropic/claude-fable-5.1-20260831`.
-All four accept text and images and offer `low`, `medium`, `high`, `xhigh`,
-and `max` effort. Astra defaults to `medium`; Fable 5.1 defaults to `high`.
-Neither offers disabled reasoning. Astra's `max` is passed through unchanged;
-the existing GPT-5.6 Chat Completions downgrade to `xhigh` does not apply.
+The November catalogue includes GPT-6.2 Astra and Sol, GPT-6.1 Terra and Sol,
+Claude Fable 5.2, Sonnet 5.5 and Haiku 5.5, Qwen4-Max, Gemini 4 Neon,
+Hydrogen, Carbon and Argon, and Mistral Large 4. Each direct route and its
+gateway counterpart has its own documented effort range and default. Grok 4.7
+and DeepSeek V4.1 Flash remain their providers' current answering models.
+Existing usable direct and gateway routes retain their IDs. OpenRouter accepts
+its public model aliases on settings import and stores their canonical snapshots.
 
-These additions retain existing provider defaults, fallback lists, and saved
-routes. Model names use provider branding; effort labels reuse the registered
-translations. The current direct IDs have no distinct dated snapshots in the
-[OpenAI model documentation](https://developers.openai.com/api/docs/models/gpt-6-astra)
-or [Claude model documentation](https://platform.claude.com/docs/en/models/fable-5-1/overview).
-OpenRouter snapshots are verified against its public Models and Endpoints APIs.
+Gemini 4 Neon and Hydrogen support low, medium, high and extra-high thinking,
+with a high default. Carbon and Argon support low, medium and high, with a medium
+default. Google's unconditional redirects from Gemini 3.7 Flash to 3.8 Flash,
+and from 3.5 Flash to 3.6 Flash, are normalized on settings load. The original
+effort survives when supported by the serving model.
 
-GPT-6 Sol and Luna use their dateless direct IDs (OpenAI publishes no dated
-snapshot) through Chat Completions with none/low/medium/high/xhigh/max effort
-and a medium default. Their `max` passes through unchanged; the GPT-5.6
-downgrade does not apply. They follow Astra in picker order, so derived OpenAI
-modes are Astra, Sol, and Luna, while `gpt-5.6-sol` stays the default.
+The two GPT-6.2 models and GPT-6.1 Sol accept low through max. GPT-6.1 Terra
+also accepts none. The existing GPT-5.6 downgrade applies only to the older
+Chat Completions contract. Claude Fable 5.2 and Sonnet 5.5 default to high,
+and Haiku 5.5 defaults to medium. Their Messages API effort field is
+`output_config.effort`. Restricted Mythos models and premium execution SKUs
+remain outside the curated picker.
 
-DeepSeek V4.1 Flash (`deepseek-flash`) and V4 Pro expose disabled, low, high,
-and max effort. Enabled thinking sends the selected `reasoning_effort`; high
-remains default. Flash is the default and accepts images; Pro stays text-only.
-DeepSeek retired V4 Flash and only temporarily routes `deepseek-v4-flash` to
-V4.1, so saved selections migrate to `deepseek-flash` with their effort intact.
+Qwen4-Max offers its four distinct settings (none, low, high, extra high) and
+defaults to high. Qwen 3.8 offers none, low, medium and extra high. Both use
+`reasoning_effort` and disable historical reasoning replay. Older routes use
+the previous thinking toggle. Direct Mistral Large 4 always reasons and uses
+low, medium or high (default high). OpenRouter uses unified `reasoning.effort`
+and requires supporting endpoints whenever an effort is selected.
 
-Claude Opus 5 uses the canonical direct `claude-opus-5` ID, high default,
-and low/medium/high/xhigh/max effort through Messages. Existing defaults stay
-unchanged when new answering choices are added.
+Voxtral 3 is the Mistral default for recorded transcription and synthesis.
+The provider's legacy IDs retain their narrower per-model language lists.
+Scribe v3 and v2 both use the recorded-file endpoint. Eleven v4 and v4 Turbo
+use the existing single-voice speech endpoint. Speech model metadata supplies
+the language and upload bounds shown in Settings and used by the service.
 
-Claude Opus 5.5 uses the pinned dateless `claude-opus-5-5` ID with all five
-efforts and a `medium` default, matching Anthropic's omitted-effort
-behavior. It takes Opus 5's slot in picker order so the first three derived
-Anthropic modes stay Fable, Opus, and Sonnet. OpenRouter pins
-`anthropic/claude-opus-5.5-20260921`. It joins no web-search candidate list.
-
-Grok 4.7 uses `grok-4.7` (xAI publishes no dated snapshot) with Grok 4.6's
-low/medium/high/xhigh contract. It leads the xAI picker, so derived xAI modes
-become 4.7, 4.6, and 4.5, while `grok-4.6` stays the default. OpenRouter pins
-`x-ai/grok-4.7-20260916`. It joins no web-search candidate list.
-
-OpenRouter pins `openai/gpt-6-sol-20260922`, `openai/gpt-6-luna-20260922`
-(both none through max, medium default), and
-`deepseek/deepseek-v4.1-flash-20260910` (low/high/max, high default, image
-input). **Decision:** `qwen/qwen3.8-max-prime` is not offered: it is the same
-model as the listed Qwen 3.8 Max snapshot, sold as a higher-throughput SKU at
-twice the price, so it adds no distinct answering choice.
-
-Gemini 3.7/3.8 Flash support chat, recorded audio input, and search. Their
-reasoning choices are low/medium/high only; minimal is never sent.
-
-Qwen 3.8 uses `reasoning_effort` with none/low/medium/xhigh. The max picker
-uses canonical `qwen3.8-max-0902`; Flash retains its undated canonical ID.
-Earlier routes keep their own toggle contract.
-
-OpenRouter adds canonical Opus 5, Gemini 3.8 Flash, Qwen 3.8 Max, and August
-DeepSeek V4 Pro routes. Grok 4.6 uses `x-ai/grok-4.6-20260810` and preserves
-the older saved alias through normalization. Per-model image and effort
-capabilities remain independent of the gateway provider.
+The [November provider audit](../../../docs/provider-audit-2026-11-20.md)
+records sources, dates, route coverage and deprecations for all nine providers.
 
 **Decision:** Qwen offers chat and search only. Alibaba retires every DashScope
 speech snapshot the app used (Qwen3-ASR-Flash and both Qwen3-TTS-Flash
@@ -161,8 +137,8 @@ new voice-directory permission requirement is introduced.
 it is marked `existingAccessOnly`. It stays valid for saved routes, fallback
 normalization, and release testing, but pickers, new-mode suggestions, and
 derived defaults do not offer it unless it is the current selection. Google
-limited Gemini 2.5 Pro, Flash, and Flash-Lite this way on 2026-09-18 with no
-shutdown date. Rejected alternatives: removing the models, which would break
+limited Gemini 2.5 Pro, Flash, and Flash-Lite this way on 2026-09-18.
+Google schedules automatic redirects of 2.5 Pro and Flash for December 1, 2026. Rejected alternatives: removing the models, which would break
 accounts that still have access, and keeping them as ordinary choices, which
 would fail for most new keys.
 
