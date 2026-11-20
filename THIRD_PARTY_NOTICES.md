@@ -237,35 +237,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ```
 
-### @emnapi/core@1.11.2
-Packages (3): @emnapi/core@1.11.2, @emnapi/runtime@1.11.2, @emnapi/wasi-threads@1.2.2
-
-License: MIT
-
-```text
-MIT License
-
-Copyright (c) 2021-present Toyobayashi
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
-
 ### @expo-google-fonts/material-symbols@0.4.48
 License: MIT AND Apache-2.0
 
@@ -322,8 +293,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/cli@57.0.27
-Packages (47): @expo/cli@57.0.27, @expo/config-plugins@57.0.9, @expo/config@57.0.9, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.13, @expo/image-utils@0.11.5, @expo/inline-modules@0.1.7, @expo/json-file@11.0.1, @expo/local-build-cache-provider@57.0.8, @expo/log-box@57.0.4, @expo/metro-config@57.0.12, @expo/metro-file-map@57.0.3, @expo/metro-runtime@57.0.16, @expo/osascript@2.7.1, @expo/package-manager@1.13.1, @expo/plist@0.8.1, @expo/prebuild-config@57.0.16, @expo/router-server@57.0.11, babel-preset-expo@57.0.13, expo-asset@57.0.18, expo-audio@57.0.5, expo-clipboard@57.0.2, expo-constants@57.0.19, expo-crypto@57.0.3, expo-document-picker@57.0.2, expo-file-system@57.0.7, expo-font@57.0.4, expo-glass-effect@57.0.4, expo-image-loader@57.0.1, expo-image-manipulator@57.0.20, expo-image-picker@57.0.20, expo-keep-awake@57.0.2, expo-linking@57.0.11, expo-modules-autolinking@57.0.13, expo-modules-core@57.0.19, expo-modules-jsi@57.1.1, expo-network@57.0.2, expo-secure-store@57.0.4, expo-server@57.0.3, expo-sharing@57.0.22, expo-speech@57.0.3, expo-sqlite@57.0.3, expo-status-bar@57.0.1, expo-symbols@57.0.3, expo@57.0.25
+### @expo/cli@57.0.34
+Packages (48): @expo/cli@57.0.34, @expo/config-plugins@57.0.13, @expo/config@57.0.11, @expo/devtools@57.0.1, @expo/dom-webview@57.0.1, @expo/expo-modules-macros-plugin@0.6.1, @expo/fingerprint@0.20.16, @expo/image-utils@0.11.7, @expo/inline-modules@0.1.9, @expo/json-file@11.0.1, @expo/json-file@11.2.1, @expo/local-build-cache-provider@57.0.10, @expo/log-box@57.0.5, @expo/metro-config@57.0.14, @expo/metro-file-map@57.0.5, @expo/metro-runtime@57.0.18, @expo/osascript@2.8.1, @expo/package-manager@1.14.2, @expo/plist@0.8.2, @expo/prebuild-config@57.0.21, @expo/router-server@57.0.15, babel-preset-expo@57.0.17, expo-asset@57.0.21, expo-audio@57.0.5, expo-clipboard@57.0.2, expo-constants@57.0.24, expo-crypto@57.0.4, expo-document-picker@57.0.3, expo-file-system@57.0.7, expo-font@57.0.4, expo-glass-effect@57.0.5, expo-image-loader@57.0.1, expo-image-manipulator@57.0.22, expo-image-picker@57.0.21, expo-keep-awake@57.0.2, expo-linking@57.0.14, expo-modules-autolinking@57.0.18, expo-modules-core@57.0.26, expo-modules-jsi@57.1.3, expo-network@57.0.3, expo-secure-store@57.0.4, expo-server@57.0.3, expo-sharing@57.0.26, expo-speech@57.0.3, expo-sqlite@57.0.5, expo-status-bar@57.0.1, expo-symbols@57.0.3, expo@57.0.33
 
 License: MIT
 
@@ -380,14 +351,35 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/devcert@1.2.1
-Packages (76): @expo/devcert@1.2.1, @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.20, @expo/ws-tunnel@2.0.0, @napi-rs/wasm-runtime@1.2.2, @react-native/assets-registry@0.86.3, @react-native/babel-plugin-codegen@0.86.3, @react-native/babel-preset@0.86.3, @react-native/codegen@0.86.3, @react-native/community-cli-plugin@0.86.3, @react-native/debugger-shell@0.86.3, @react-native/dev-middleware@0.86.3, @react-native/gradle-plugin@0.86.3, @react-native/jest-preset@0.86.3, @react-native/js-polyfills@0.86.3, @react-native/metro-babel-transformer@0.86.3, @react-native/metro-config@0.86.3, @react-native/normalize-colors@0.74.89, @react-native/normalize-colors@0.86.3, @react-native/virtualized-lists@0.86.3, @tybys/wasm-util@0.10.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, emoji-regex@8.0.0, expo-router@57.0.23, hermes-compiler@250829098.0.17, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-babel-transformer@0.84.5, metro-cache-key@0.84.4, metro-cache-key@0.84.5, metro-cache@0.84.4, metro-cache@0.84.5, metro-config@0.84.4, metro-config@0.84.5, metro-core@0.84.4, metro-core@0.84.5, metro-file-map@0.84.4, metro-file-map@0.84.5, metro-minify-terser@0.84.4, metro-minify-terser@0.84.5, metro-resolver@0.84.4, metro-resolver@0.84.5, metro-runtime@0.84.4, metro-runtime@0.84.5, metro-source-map@0.84.4, metro-source-map@0.84.5, metro-symbolicate@0.84.4, metro-symbolicate@0.84.5, metro-transform-plugins@0.84.4, metro-transform-plugins@0.84.5, metro-transform-worker@0.84.4, metro-transform-worker@0.84.5, metro@0.84.4, metro@0.84.5, natural-compare@1.4.0, ob1@0.84.4, ob1@0.84.5, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, tr46@0.0.3, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
-
+### @expo/devcert@1.2.2
 License: MIT
 
-The installed package declares this SPDX license but does not ship a separate license file.
+```text
+The MIT License (MIT)
 
-### @expo/env@2.4.3
+Copyright (c) 2017 Dave Wasmer
+Copyright (c) 2021-present 650 Industries, Inc. (aka Expo)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### @expo/env@2.4.4
 License: MIT
 
 ```text
@@ -442,8 +434,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/require-utils@57.0.5
-Packages (2): @expo/require-utils@57.0.5, @expo/schema-utils@57.0.2
+### @expo/require-utils@57.0.7
+Packages (3): @expo/require-utils@57.0.7, @expo/schema-utils@57.0.3, @expo/ws-tunnel@2.0.1
 
 License: MIT
 
@@ -470,6 +462,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+### @expo/sdk-runtime-versions@1.0.0
+Packages (72): @expo/sdk-runtime-versions@1.0.0, @expo/ui@57.0.26, @react-native/assets-registry@0.86.3, @react-native/babel-plugin-codegen@0.86.3, @react-native/babel-preset@0.86.3, @react-native/codegen@0.86.3, @react-native/community-cli-plugin@0.86.3, @react-native/debugger-shell@0.86.3, @react-native/dev-middleware@0.86.3, @react-native/gradle-plugin@0.86.3, @react-native/jest-preset@0.86.3, @react-native/js-polyfills@0.86.3, @react-native/metro-babel-transformer@0.86.3, @react-native/metro-config@0.86.3, @react-native/normalize-colors@0.74.89, @react-native/normalize-colors@0.86.3, @react-native/virtualized-lists@0.86.3, babel-plugin-react-compiler@1.0.0, bplist-parser@0.3.1, client-only@0.0.1, emoji-regex@8.0.0, expo-router@57.0.31, hermes-compiler@250829098.0.17, imurmurhash@0.1.4, jest-pnp-resolver@1.2.3, jimp-compact@0.16.1, jsesc@3.1.0, metro-babel-transformer@0.84.4, metro-babel-transformer@0.84.5, metro-cache-key@0.84.4, metro-cache-key@0.84.5, metro-cache@0.84.4, metro-cache@0.84.5, metro-config@0.84.4, metro-config@0.84.5, metro-core@0.84.4, metro-core@0.84.5, metro-file-map@0.84.4, metro-file-map@0.84.5, metro-minify-terser@0.84.4, metro-minify-terser@0.84.5, metro-resolver@0.84.4, metro-resolver@0.84.5, metro-runtime@0.84.4, metro-runtime@0.84.5, metro-source-map@0.84.4, metro-source-map@0.84.5, metro-symbolicate@0.84.4, metro-symbolicate@0.84.5, metro-transform-plugins@0.84.4, metro-transform-plugins@0.84.5, metro-transform-worker@0.84.4, metro-transform-worker@0.84.5, metro@0.84.4, metro@0.84.5, natural-compare@1.4.0, ob1@0.84.4, ob1@0.84.5, react-devtools-core@6.1.5, react-remove-scroll-bar@2.3.8, regenerate-unicode-properties@10.2.2, regenerate@1.4.2, regexpu-core@6.4.0, regjsgen@0.8.0, server-only@0.0.1, standard-navigation@0.0.5, structured-headers@0.4.1, tr46@0.0.3, unicode-canonical-property-names-ecmascript@2.0.1, unicode-match-property-ecmascript@2.0.0, unicode-match-property-value-ecmascript@2.2.1, unicode-property-aliases-ecmascript@2.2.0
+
+License: MIT
+
+The installed package declares this SPDX license but does not ship a separate license file.
 
 ### @expo/spawn-async@1.8.0
 License: MIT
@@ -525,12 +524,96 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### @expo/xcpretty@4.4.5
-Packages (2): @expo/xcpretty@4.4.5, @react-native/debugger-frontend@0.86.3
+### @expo/xcpretty@4.4.7
+License: MIT
 
-License: BSD-3-Clause
+```text
+The MIT License (MIT)
 
-The installed package declares this SPDX license but does not ship a separate license file.
+Copyright (c) 2013-2016 Marin Usalj
+Copyright (c) 2021-present 650 Industries, Inc. (aka Expo)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### @isaacs/nonrecursive-glob-match@1.1.0
+Packages (5): @isaacs/nonrecursive-glob-match@1.1.0, lru-cache@11.5.3, minipass@7.1.3, path-scurry@3.0.0, sax@1.6.0
+
+License: BlueOak-1.0.0
+
+```text
+# Blue Oak Model License
+
+Version 1.0.0
+
+## Purpose
+
+This license gives everyone as much permission to work with
+this software as possible, while protecting contributors
+from liability.
+
+## Acceptance
+
+In order to receive this license, you must agree to its
+rules.  The rules of this license are both obligations
+under that agreement and conditions to your license.
+You must not do anything with this software that triggers
+a rule that you cannot or will not follow.
+
+## Copyright
+
+Each contributor licenses you to do everything with this
+software that would otherwise infringe that contributor's
+copyright in it.
+
+## Notices
+
+You must ensure that everyone who gets a copy of
+any part of this software from you, with or without
+changes, also gets the text of this license or a link to
+<https://blueoakcouncil.org/license/1.0.0>.
+
+## Excuse
+
+If anyone notifies you in writing that you have not
+complied with [Notices](#notices), you can keep your
+license by taking all practical steps to comply within 30
+days after the notice.  If you do not do so, your license
+ends immediately.
+
+## Patent
+
+Each contributor licenses you to do everything with this
+software that would otherwise infringe any patent claims
+they can license or become able to license.
+
+## Reliability
+
+No contributor can revoke this license.
+
+## No Liability
+
+***As far as the law allows, this software comes as is,
+without any warranty or condition, and no contributor
+will be liable to anyone for any damages related to this
+software or this license, under any kind of legal claim.***
+```
 
 ### @isaacs/ttlcache@1.4.1
 License: ISC
@@ -760,7 +843,7 @@ THE SOFTWARE.
 ```
 
 ### @radix-ui/primitive@1.1.4
-Packages (31): @radix-ui/primitive@1.1.4, @radix-ui/primitive@1.1.7, @radix-ui/react-collection@1.1.11, @radix-ui/react-compose-refs@1.1.3, @radix-ui/react-compose-refs@1.1.5, @radix-ui/react-context@1.1.4, @radix-ui/react-context@1.2.2, @radix-ui/react-dialog@1.1.23, @radix-ui/react-direction@1.1.2, @radix-ui/react-dismissable-layer@1.1.19, @radix-ui/react-focus-guards@1.1.6, @radix-ui/react-focus-scope@1.1.16, @radix-ui/react-id@1.1.2, @radix-ui/react-id@1.1.4, @radix-ui/react-portal@1.1.17, @radix-ui/react-presence@1.1.10, @radix-ui/react-presence@1.1.6, @radix-ui/react-primitive@2.1.10, @radix-ui/react-primitive@2.1.7, @radix-ui/react-roving-focus@1.1.14, @radix-ui/react-slot@1.3.0, @radix-ui/react-slot@1.3.3, @radix-ui/react-tabs@1.1.16, @radix-ui/react-use-callback-ref@1.1.2, @radix-ui/react-use-callback-ref@1.1.4, @radix-ui/react-use-controllable-state@1.2.3, @radix-ui/react-use-controllable-state@1.2.6, @radix-ui/react-use-effect-event@0.0.3, @radix-ui/react-use-effect-event@0.0.5, @radix-ui/react-use-layout-effect@1.1.2, @radix-ui/react-use-layout-effect@1.1.4
+Packages (31): @radix-ui/primitive@1.1.4, @radix-ui/primitive@1.2.0, @radix-ui/react-collection@1.1.11, @radix-ui/react-compose-refs@1.1.3, @radix-ui/react-compose-refs@1.1.5, @radix-ui/react-context@1.1.4, @radix-ui/react-context@1.3.0, @radix-ui/react-dialog@1.3.1, @radix-ui/react-direction@1.1.2, @radix-ui/react-dismissable-layer@1.2.1, @radix-ui/react-focus-guards@1.2.0, @radix-ui/react-focus-scope@1.3.1, @radix-ui/react-id@1.1.2, @radix-ui/react-id@1.1.4, @radix-ui/react-portal@1.2.0, @radix-ui/react-presence@1.1.11, @radix-ui/react-presence@1.1.6, @radix-ui/react-primitive@2.1.7, @radix-ui/react-primitive@2.2.0, @radix-ui/react-roving-focus@1.1.14, @radix-ui/react-slot@1.3.0, @radix-ui/react-slot@1.5.0, @radix-ui/react-tabs@1.1.16, @radix-ui/react-use-callback-ref@1.1.2, @radix-ui/react-use-callback-ref@1.1.5, @radix-ui/react-use-controllable-state@1.2.3, @radix-ui/react-use-controllable-state@1.3.0, @radix-ui/react-use-effect-event@0.0.3, @radix-ui/react-use-effect-event@0.0.5, @radix-ui/react-use-layout-effect@1.1.2, @radix-ui/react-use-layout-effect@1.1.4
 
 License: MIT
 
@@ -816,6 +899,11 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
+
+### @react-native/debugger-frontend@0.86.3
+License: BSD-3-Clause
+
+The installed package declares this SPDX license but does not ship a separate license file.
 
 ### @sinclair/typebox@0.27.10
 License: MIT
@@ -1007,7 +1095,7 @@ PERFORMANCE OF THIS SOFTWARE.
 ```
 
 ### @xmldom/xmldom@0.8.13
-Packages (2): @xmldom/xmldom@0.8.13, @xmldom/xmldom@0.9.10
+Packages (2): @xmldom/xmldom@0.8.13, @xmldom/xmldom@0.9.12
 
 License: MIT
 
@@ -1844,7 +1932,7 @@ THE SOFTWARE.
 ```
 
 ### baseline-browser-mapping@2.10.33
-Packages (2): baseline-browser-mapping@2.10.33, xcode@3.0.1
+Packages (2): baseline-browser-mapping@2.10.33, xcode@4.0.0
 
 License: Apache-2.0
 
@@ -2138,7 +2226,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### brace-expansion@5.0.9
+### brace-expansion@5.0.13
 License: MIT
 
 ```text
@@ -5020,7 +5108,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### glob@13.0.6
+### glob@14.0.6
 License: BlueOak-1.0.0
 
 ```text
@@ -5693,7 +5781,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
 ### isexe@2.0.0
-Packages (11): isexe@2.0.0, lru-cache@5.1.1, minimatch@3.1.5, once@1.4.0, semver@6.3.1, semver@7.7.3, semver@7.8.1, semver@7.8.5, which@2.0.2, wrappy@1.0.2, yallist@3.1.1
+Packages (12): isexe@2.0.0, lru-cache@5.1.1, minimatch@3.1.5, once@1.4.0, semver@6.3.1, semver@7.7.3, semver@7.8.1, semver@7.8.5, semver@7.8.6, which@2.0.2, wrappy@1.0.2, yallist@3.1.1
 
 License: ISC
 
@@ -6479,69 +6567,6 @@ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR
 IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ```
 
-### lru-cache@11.5.2
-Packages (4): lru-cache@11.5.2, minipass@7.1.3, path-scurry@2.0.2, sax@1.6.0
-
-License: BlueOak-1.0.0
-
-```text
-# Blue Oak Model License
-
-Version 1.0.0
-
-## Purpose
-
-This license gives everyone as much permission to work with
-this software as possible, while protecting contributors
-from liability.
-
-## Acceptance
-
-In order to receive this license, you must agree to its
-rules.  The rules of this license are both obligations
-under that agreement and conditions to your license.
-You must not do anything with this software that triggers
-a rule that you cannot or will not follow.
-
-## Copyright
-
-Each contributor licenses you to do everything with this
-software that would otherwise infringe that contributor's
-copyright in it.
-
-## Notices
-
-You must ensure that everyone who gets a copy of
-any part of this software from you, with or without
-changes, also gets the text of this license or a link to
-<https://blueoakcouncil.org/license/1.0.0>.
-
-## Excuse
-
-If anyone notifies you in writing that you have not
-complied with [Notices](#notices), you can keep your
-license by taking all practical steps to comply within 30
-days after the notice.  If you do not do so, your license
-ends immediately.
-
-## Patent
-
-Each contributor licenses you to do everything with this
-software that would otherwise infringe any patent claims
-they can license or become able to license.
-
-## Reliability
-
-No contributor can revoke this license.
-
-## No Liability
-
-***As far as the law allows, this software comes as is,
-without any warranty or condition, and no contributor
-will be liable to anyone for any damages related to this
-software or this license, under any kind of legal claim.***
-```
-
 ### makeerror@1.0.12
 Packages (2): makeerror@1.0.12, tmpl@1.0.5
 
@@ -7083,6 +7108,8 @@ THE SOFTWARE.
 ```
 
 ### minimatch@10.2.6
+Packages (2): minimatch@10.2.6, minimatch@11.0.9
+
 License: BlueOak-1.0.0
 
 ```text
@@ -7224,7 +7251,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### nanoid@3.3.18
+### nanoid@3.3.20
 License: MIT
 
 ```text
@@ -7309,7 +7336,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### node-forge@1.4.0
+### node-forge@1.4.3
 License: (BSD-3-Clause OR GPL-2.0)
 
 ```text
@@ -8079,7 +8106,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### postcss@8.5.28
+### postcss@8.5.33
 License: MIT
 
 ```text
@@ -8350,7 +8377,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### react-native-drawer-layout@4.2.10
+### react-native-drawer-layout@4.2.13
 License: MIT
 
 ```text
@@ -9049,8 +9076,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 ```
 
-### source-map-js@1.2.1
-Packages (3): source-map-js@1.2.1, source-map@0.5.7, source-map@0.6.1
+### source-map-js@1.2.4
+Packages (3): source-map-js@1.2.4, source-map@0.5.7, source-map@0.6.1
 
 License: BSD-3-Clause
 
@@ -9784,21 +9811,6 @@ IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 ```
 
-### uuid@11.1.1
-License: MIT
-
-```text
-The MIT License (MIT)
-
-Copyright (c) 2010-2020 Robert Kieffer and other contributors
-
-Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
-
 ### v8-to-istanbul@9.3.0
 License: ISC
 
@@ -10080,7 +10092,7 @@ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH RE
 ```
 
 ### ws@7.5.11
-Packages (2): ws@7.5.11, ws@7.5.13
+Packages (3): ws@7.5.11, ws@7.5.13, ws@7.5.14
 
 License: MIT
 
@@ -10251,33 +10263,6 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-```
-
-### zod@3.25.76
-License: MIT
-
-```text
-MIT License
-
-Copyright (c) 2025 Colin McDonnell
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
 ```
 
 ## Native on-device runtimes
