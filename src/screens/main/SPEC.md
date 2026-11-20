@@ -164,8 +164,12 @@ receive already-derived state and callbacks.
   voice preview while a reply is paused also performs that full teardown before
   preview audio begins; an unpaused reply or any earlier turn phase remains
   protected from preview interruption.
-- A localized line above the orb describes the active operation. Its 18pt
-  monospaced text is twice the size of the control captions below and scales
+- A localized line above the orb or text composer describes the active operation.
+  Switching inputs keeps the caption and controls in place. The composer shows
+  readiness and the progress of sending, searching, waiting and responding.
+  Voice-only operations leave its caption row empty. A working composer
+  remains ready when the microphone route is unavailable. The 18pt
+  monospaced caption is twice the size of the control captions below and scales
   with the user's text size. Its distance from the ring
   mirrors the lower control row when the stage has room. The actor's icon
   precedes transcription, prompt receipt, web search, streamed answers, and

@@ -173,6 +173,106 @@ function createProps(overrides: Record<string, unknown> = {}) {
 }
 
 describe("MainScreenVoiceStage composer", () => {
+  it("keeps the ready caption and stage geometry when switching to the text composer", () => {
+    const screen = renderStage(
+      <MainScreenVoiceStage
+        {...createProps({ activity: { label: "ready" }, footer: <View /> })}
+      />,
+    );
+    const viewport = screen.getByTestId("voice-text-input-viewport");
+    fireEvent(viewport, "layout", {
+      nativeEvent: { layout: { height: 290, width: 390 } },
+    });
+    const styleOf = (id: string) =>
+      StyleSheet.flatten(screen.getByTestId(id).props.style);
+    const initialTop = styleOf("voice-text-input-pager-shell").top;
+    const initialViewport = styleOf("voice-text-input-viewport");
+    expect(screen.getByLabelText("ready")).toBeVisible();
+
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
+    expect(screen.getByPlaceholderText("Type a message")).toBeVisible();
+    expect(screen.getByLabelText("ready")).toBeVisible();
+    expect(styleOf("voice-text-input-pager-shell").top).toBe(initialTop);
+    expect(styleOf("voice-text-input-viewport")).toEqual(initialViewport);
+    fireEvent.press(screen.getByTestId("pager-chevron-left"));
+    expect(screen.getByTestId("voice-orb-idle")).toBeVisible();
+    expect(screen.getByLabelText("ready")).toBeVisible();
+  });
+
+  it("keeps the typed turn's provider labels and reserves the caption row during speech", () => {
+    const props = createProps({
+      initialInputSurface: "text",
+      activity: { label: "ready" },
+      footer: <View />,
+    });
+    const screen = renderStage(<MainScreenVoiceStage {...props} />);
+    const viewportStyle = () =>
+      StyleSheet.flatten(screen.getByTestId("voice-text-input-viewport").props.style);
+    const initialViewport = viewportStyle();
+    const captionStyle = StyleSheet.flatten(screen.getByTestId("orb-activity").props.style);
+    const announce = jest.spyOn(AccessibilityInfo, "announceForAccessibility");
+    try {
+      for (const [phase, label, provider] of [
+        ["thinking-briefly", "receives", "openai"],
+        ["searching", "searches online", "gemini"],
+        ["thinking", "receive", null],
+        ["thinking", "responds", "anthropic"],
+      ] as const) {
+        screen.rerender(
+          <MainScreenVoiceStage {...props} isActive visualPhase={phase} activity={{ label, provider }} />,
+        );
+        const caption = screen.getByTestId("orb-activity");
+        expect(caption.props.accessibilityLabel).toBe(
+          provider ? `${PROVIDER_LABELS[provider]} ${label}` : label,
+        );
+        if (provider) {
+          expect(within(caption).getByTestId(`provider-icon-${provider}`, hiddenIconQuery))
+            .toBeTruthy();
+        }
+      }
+      announce.mockClear();
+      for (const [phase, label] of [
+        ["recording", "listening"],
+        ["transcribing", "transcribes"],
+        ["synthesizing", "preparing speech"],
+        ["synthesizing", "receives text"],
+        ["synthesizing", "sends audio"],
+        ["speaking", "playing"],
+        ["speaking", "pause"],
+      ] as const) {
+        screen.rerender(
+          <MainScreenVoiceStage {...props} isActive visualPhase={phase} activity={{ label }} />,
+        );
+        expect(screen.queryByText(label)).toBeNull();
+        expect(screen.queryByTestId("orb-activity")).toBeNull();
+        const reservedRow = screen.getByTestId("orb-activity", { includeHiddenElements: true });
+        expect(StyleSheet.flatten(reservedRow.props.style)).toEqual(captionStyle);
+        expect(viewportStyle()).toEqual(initialViewport);
+      }
+      expect(announce).not.toHaveBeenCalled();
+      screen.rerender(<MainScreenVoiceStage {...props} />);
+      expect(screen.getByLabelText("ready")).toBeVisible();
+    } finally {
+      announce.mockRestore();
+    }
+  });
+
+  it("shows ready on a usable text composer when only the microphone route is unavailable", () => {
+    const props = createProps({
+      activity: { label: "ready" },
+      voiceInputUnavailableMessage: "Use the text composer",
+    });
+    const screen = renderStage(<MainScreenVoiceStage {...props} />);
+    expect(screen.queryByText("ready")).toBeNull();
+    fireEvent.press(screen.getByTestId("pager-chevron-right"));
+    expect(screen.getByLabelText("ready")).toBeVisible();
+    screen.rerender(
+      <MainScreenVoiceStage {...props} promptBlockedMessage="Configure a reply model" />,
+    );
+    expect(screen.queryByText("ready")).toBeNull();
+    expect(screen.getByTestId("prompt-blocked-notice")).toBeVisible();
+  });
+
   it("names the provider before the action and keeps capture time on the button for screen readers", () => {
     const screen = renderStage(<MainScreenVoiceStage {...createProps({
       activity: { label: "searches online", provider: "gemini" },

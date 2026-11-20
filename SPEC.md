@@ -98,8 +98,10 @@ precedence, and existing conversations keep their names when opened or restored.
   switch wraps either input mode with adaptive voice-activity detection,
   visible and spoken countdown cues, auto-submit, reply playback, and automatic
   re-arming.
-- The home caption names the current activity. Provider actions begin with
-  the responsible provider's icon. While recording, the ring tracks the
+- Voice and text input share a home caption for readiness, prompt delivery,
+  web search and replies. Voice input also shows recording, transcription
+  and spoken output. Provider actions begin with the responsible provider's
+  icon. While recording, the ring tracks the
   auto-send deadline and the button exposes the time left to screen readers.
   Paused playback keeps its position and exposes Resume.
 - Speech recognition may use the system recognizer, a downloaded local model,

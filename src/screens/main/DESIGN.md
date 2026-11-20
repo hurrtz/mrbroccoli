@@ -251,7 +251,11 @@ ring fractions with validated deterministic values. That override enters
 at the presentation boundary after the live hook still runs, never mutates the
 pipeline, and is unavailable to production and development identities.
 
-The workspace owns the status label for the active input surface. The pager
+The pager renders one status row outside the moving pages. Text input uses
+the same readiness, prompt delivery, search and reply captions as voice. Its
+speech-only phases reserve a line at the current text size and stay out of
+screen-reader announcements. A shared prompt block suppresses readiness on
+both pages. A voice-only block suppresses it on the voice page. The pager
 opens on voice and only a deliberate 44pt chevron press or horizontal gesture
 moves it to text; capability checks disable the orb and surface an explicit
 settings notice without changing the selected surface.
@@ -289,7 +293,7 @@ narrow portrait rows two decorative hairlines separate the groups. Compact
 icon-only layouts retain their shorter centred row. Flexbox centers the complete
 orb-or-composer plus composing row rather than assigning tall-screen surplus
 between those parts. The status and footer each have 18pt of separation from
-the stage including its 2pt child gap. When the status is visible, the pager
+the stage including its 2pt child gap. When the status row is reserved, the pager
 also mirrors the transport controls' extension below the ring above it. On
 short screens it gives that extra space back to the orb first. A route notice
 can sit between the primary action and next-turn controls. The text composer

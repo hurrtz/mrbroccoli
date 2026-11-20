@@ -9,6 +9,7 @@ import {
   getOrbTransportLayout,
   OrbTransport,
 } from "../../design-system/OrbTransport";
+import type { VoiceVisualPhase } from "../../types";
 import { useOrbTurnProgress } from "./useOrbTurnProgress";
 import { InputSurfacePages } from "./voiceTextInputPager/InputSurfacePages";
 import { voiceTextInputPagerStyles as styles } from "./voiceTextInputPager/styles";
@@ -16,6 +17,13 @@ import { VoiceTextInputPagerProps } from "./voiceTextInputPager/types";
 import { useInputSurfacePager } from "./voiceTextInputPager/useInputSurfacePager";
 
 export type { InputSurface } from "./voiceTextInputPager/types";
+
+const TEXT_INPUT_PHASES = new Set<VoiceVisualPhase>([
+  "idle",
+  "thinking-briefly",
+  "searching",
+  "thinking",
+]);
 
 function formatCountdown(seconds: number) {
   const hours = Math.floor(seconds / 3600);
@@ -118,14 +126,17 @@ export function VoiceTextInputPager({
     compactPromptNotice &&
     Boolean(onResolvePromptBlock) &&
     promptBlockedActionEnabled;
-  const provider = activity?.provider;
-  const readyToListen = !promptBlockedMessage && !voiceInputUnavailableMessage;
-  const statusText =
-    visualPhase === "idle" && !readyToListen ? null : activity?.label;
-  const showActivity = Boolean(
-    statusText && (isActive || pager.activeSurface === "voice"),
-  );
-  const balanceActivity = showActivity && Boolean(footer);
+  const textSelected = pager.activeSurface === "text";
+  const reserveActivityRow =
+    Boolean(activity) &&
+    (visualPhase !== "idle" || !promptBlockedMessage);
+  const surfaceShowsPhase = textSelected
+    ? TEXT_INPUT_PHASES.has(visualPhase)
+    : visualPhase !== "idle" || !voiceInputUnavailableMessage;
+  const visibleActivity =
+    reserveActivityRow && surfaceShowsPhase ? activity : undefined;
+  const provider = visibleActivity?.provider;
+  const balanceActivity = reserveActivityRow && Boolean(footer);
   // The transport keys extend below the orb. Mirror their footprint above it
   // when there is room, giving space back to the controls on short screens.
   const maximumViewportHeight =
@@ -144,15 +155,16 @@ export function VoiceTextInputPager({
   const providerName = provider === "device"
     ? t("onDeviceSpeech")
     : provider ? PROVIDER_LABELS[provider] : "";
-  const spokenStatus = [providerName, statusText].filter(Boolean).join(" ");
-  const previousStatus = React.useRef(spokenStatus || statusLabel);
+  const spokenStatus = [providerName, visibleActivity?.label]
+    .filter(Boolean).join(" ");
+  const announcement =
+    spokenStatus || (!activity && !textSelected ? statusLabel : "");
+  const previousStatus = React.useRef(announcement);
   React.useEffect(() => {
-    const announcement = spokenStatus || statusLabel;
-    if (previousStatus.current !== announcement) {
-      previousStatus.current = announcement;
-      AccessibilityInfo.announceForAccessibility(announcement);
-    }
-  }, [spokenStatus, statusLabel]);
+    if (previousStatus.current === announcement) return;
+    previousStatus.current = announcement;
+    if (announcement) AccessibilityInfo.announceForAccessibility(announcement);
+  }, [announcement]);
   const recordingTime = progress.recordingSecondsLeft;
   const timeLabel = recordingTime === undefined
     ? null
@@ -186,16 +198,19 @@ export function VoiceTextInputPager({
       style={[styles.root, footer ? styles.rootWithFooter : null]}
       testID="voice-text-input-stage"
     >
-      {showActivity ? (
+      {reserveActivityRow ? (
         <View
-          accessible
-          accessibilityLabel={spokenStatus}
+          accessible={Boolean(visibleActivity)}
+          accessibilityElementsHidden={!visibleActivity}
+          accessibilityLabel={spokenStatus || undefined}
+          importantForAccessibility={visibleActivity ? "auto" : "no-hide-descendants"}
           style={[styles.activity, { direction: rtl ? "rtl" : "ltr" }]}
           testID="orb-activity"
         >
           {providerIcon}
           <Text style={[styles.activityText, { color: colors.textSecondary }]}>
-            {statusText}
+            {/* A blank line follows Dynamic Type even when this phase has no caption. */}
+            {visibleActivity?.label ?? "\u00a0"}
           </Text>
         </View>
       ) : null}

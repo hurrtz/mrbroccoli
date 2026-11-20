@@ -24,7 +24,8 @@ the complete Play Store translations are kept in a dedicated file under
   starts at twelve o’clock over the completed first lap, and paused speech
   keeps its position and Play control.
 - The activity label above the home button uses 18pt text and mirrors the
-  spacing of the controls below it.
+  spacing of the controls below it. Switching to the text composer keeps the
+  label in place. It shows readiness, prompt delivery, search and response progress.
 - Web Search on the home screen requires an enabled search provider in Settings.
 - New conversations get a title after their first prompt. Automatic titles can
   be turned off in App settings. Manually entered titles take precedence.
