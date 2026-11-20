@@ -168,7 +168,8 @@ receive already-derived state and callbacks.
   Switching inputs keeps the caption and controls in place. The composer shows
   readiness and the progress of sending, searching, waiting and responding.
   Voice-only operations leave its caption row empty. A working composer
-  remains ready when the microphone route is unavailable. The 18pt
+  remains ready when the microphone route is unavailable. Opening the keyboard
+  keeps the caption below the conversation settings and above the field. The 18pt
   monospaced caption is twice the size of the control captions below and scales
   with the user's text size. Its distance from the ring
   mirrors the lower control row when the stage has room. The actor's icon

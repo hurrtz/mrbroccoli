@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  KeyboardAvoidingView,
   Modal as RNModal,
   StyleSheet,
   useWindowDimensions,
@@ -15,6 +16,7 @@ import { ThemeProvider } from "../../src/theme/ThemeContext";
 
 let mockDrawerArchivedRevealRequests: number[] = [];
 let mockIsPad = false;
+let mockTopInset = 0;
 let mockPipelinePhase: "idle" | "thinking" = "idle";
 const mockVerifySessionPassword = jest.fn(
   async (_conversationId: string, _password: string) => false,
@@ -76,7 +78,7 @@ jest.mock("react-native-safe-area-context", () => ({
       children,
     );
   },
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => ({ top: mockTopInset, bottom: 0, left: 0, right: 0 }),
 }));
 
 jest.mock("expo-status-bar", () => ({
@@ -628,6 +630,7 @@ describe("MainScreen", () => {
   beforeEach(() => {
     mockDrawerArchivedRevealRequests = [];
     mockIsPad = false;
+    mockTopInset = 0;
     mockPipelinePhase = "idle";
     mockVerifySessionPassword.mockReset();
     mockVerifySessionPassword.mockResolvedValue(false);
@@ -895,6 +898,17 @@ describe("MainScreen", () => {
         "The session was not unlocked, so it was not loaded.",
       );
     });
+  });
+
+  it.each([
+    { name: "phone", width: 402, top: 62, ipad: false, offset: 0 },
+    { name: "regular iPad", width: 1024, top: 24, ipad: true, offset: 24 },
+  ])("fits the workspace to the keyboard on a $name", ({ width, top, ipad, offset }) => {
+    mockIsPad = ipad;
+    mockTopInset = top;
+    mockUseWindowDimensions.mockReturnValue({ width, height: 900, scale: 2, fontScale: 1 });
+    const screen = renderWithProviders(<MainScreen />);
+    expect(screen.UNSAFE_getByType(KeyboardAvoidingView).props.keyboardVerticalOffset).toBe(offset);
   });
 
   it("exposes the exact hydrated locale marker used by store captures", () => {

@@ -270,6 +270,9 @@ enter from the left, including repeated taps around the two-page circle. Arrow
 and swipe navigation change only the visible page; neither focuses the composer
 or opens the keyboard. A direct field action owns keyboard entry, and a layout
 remount restores focus only when that field actually held it.
+The keyboard avoidance offset follows the workspace's coordinate origin. On
+iOS the compact workspace is measured in screen coordinates, while the regular
+iPad workspace's enclosing sidebar shell begins below the top safe area.
 The sibling layer translates vertically by
 `transportLayout.centreY - transportLayout.height / 2` for the current measured
 orb. This keeps both 44pt targets centred on the orb instead of on the transport

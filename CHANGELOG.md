@@ -26,6 +26,7 @@ the complete Play Store translations are kept in a dedicated file under
 - The activity label above the home button uses 18pt text and mirrors the
   spacing of the controls below it. Switching to the text composer keeps the
   label in place. It shows readiness, prompt delivery, search and response progress.
+  Opening the iPhone keyboard keeps the caption clear of conversation settings.
 - Web Search on the home screen requires an enabled search provider in Settings.
 - New conversations get a title after their first prompt. Automatic titles can
   be turned off in App settings. Manually entered titles take precedence.

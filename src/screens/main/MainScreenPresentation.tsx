@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { ConversationDrawer } from "../../components/ConversationDrawer";
 import { Toast } from "../../components/Toast";
@@ -52,6 +52,11 @@ export function MainScreenPresentation({
   toast,
   workspace,
 }: MainScreenPresentationProps) {
+  const insets = useSafeAreaInsets();
+  // The phone workspace is measured from the screen origin. The regular iPad
+  // workspace is measured from its sidebar shell, below the top safe area.
+  const keyboardVerticalOffset =
+    Platform.OS === "ios" && ipadLayout.isRegularWidth ? insets.top : 0;
   const workspaceSurface = (
     <KeyboardAvoidingView
       accessibilityElementsHidden={surfaceTransition.visible}
@@ -59,7 +64,7 @@ export function MainScreenPresentation({
       importantForAccessibility={
         surfaceTransition.visible ? "no-hide-descendants" : "auto"
       }
-      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
+      keyboardVerticalOffset={keyboardVerticalOffset}
       style={[
         styles.defaultLayout,
         isLandscape && !ipadLayout.isRegularWidth
