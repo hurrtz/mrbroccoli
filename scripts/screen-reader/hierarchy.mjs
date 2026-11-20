@@ -8,10 +8,6 @@ const REQUIRED_HOME_CONTROLS = [
   },
   { id: "transcript-handle", label: "Show transcript. No messages yet" },
   {
-    id: "conversation-settings-summary-control",
-    label: "Open conversation settings",
-  },
-  {
     id: "voice-orb-idle",
     label: "Add credentials in Settings before starting a voice session.",
   },
@@ -20,6 +16,7 @@ const REQUIRED_HOME_CONTROLS = [
   { id: "satellite-image", label: "Add image" },
   { id: "satellite-council", label: "Model Council" },
   { id: "satellite-web", label: "Web Search" },
+  { id: "satellite-hands-free", label: "Hands free" },
 ];
 
 export function flattenHierarchy(root) {

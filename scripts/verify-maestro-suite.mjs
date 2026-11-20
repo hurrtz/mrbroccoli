@@ -37,6 +37,8 @@ export const MAESTRO_LOCALIZED_SCREENSHOTS = Object.freeze([
 
 export const RETIRED_MAESTRO_SELECTORS = Object.freeze([
   "Playing — tap to stop",
+  "input-mode-picker-option-drive-session",
+  "satellite-stop",
   "free-edition-status",
   "intro-stepper-dot-3",
   "intro-stepper-dot-4",
@@ -327,15 +329,15 @@ export function validateMaestroSuite(cwd = process.cwd()) {
     'visible: "Cancel"',
     "Not tested",
     "hideKeyboard",
-    "input-mode-picker",
-    "input-mode-picker-option-drive-session",
     "provider-connection-sheet-anthropic-header-handle",
+    "workspace-header-settings",
+    "workspace-header-model",
     "route-byline",
     "route-picker-list",
     "route-picker-row-mode-1",
     "route-picker-row-mode-2",
     "route-picker-row-mode-3",
-    "satellite-stop",
+    "satellite-hands-free",
     "landscape-left-pane",
     "landscape-right-pane",
   ]) {

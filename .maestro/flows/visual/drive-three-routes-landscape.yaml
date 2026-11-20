@@ -1,5 +1,5 @@
 appId: ${APP_ID}
-name: Drive mode with three-route picker in landscape
+name: Hands free with three-route picker in landscape
 tags:
   - visual
   - layout
@@ -43,29 +43,20 @@ tags:
 - tapOn:
     id: settings-back-button
 
-# Select Drive mode through the real settings surface.
-- tapOn:
-    id: settings-overview-row-listening
-- tapOn:
-    id: input-mode-picker
-- assertVisible:
-    id: input-mode-picker-option-drive-session
-- tapOn:
-    id: input-mode-picker-option-drive-session
-- tapOn:
-    id: settings-back-button
 - tapOn:
     id: settings-close-button
 - waitForAnimationToEnd
 - assertNotVisible:
     id: settings-modal-title
 
-# The approved workspace exposes one active-route byline. Open its picker to
-# prove all three derived routes, then close it through the active route.
+# Open the model control in the portrait workspace header to verify the
+# three routes derived from the configured provider.
 - assertVisible:
-    id: route-byline
+    id: workspace-header-settings
+- assertVisible:
+    id: workspace-header-model
 - tapOn:
-    id: route-byline
+    id: workspace-header-model
 - assertVisible:
     id: route-picker-list
 - assertVisible:
@@ -79,7 +70,13 @@ tags:
 - tapOn:
     id: route-picker-row-mode-1
 - assertVisible:
-    id: satellite-stop
+    id: satellite-hands-free
+    checked: false
+- tapOn:
+    id: satellite-hands-free
+- assertVisible:
+    id: satellite-hands-free
+    checked: true
 - takeScreenshot:
     path: ${PLATFORM}/visual/drive-three-routes-portrait
 - setOrientation: LANDSCAPE_LEFT
@@ -90,7 +87,13 @@ tags:
 - assertVisible:
     id: route-byline
 - assertVisible:
-    id: satellite-stop
+    id: satellite-hands-free
+    checked: true
 - takeScreenshot:
     path: ${PLATFORM}/visual/drive-three-routes-landscape
+- tapOn:
+    id: satellite-hands-free
+- assertVisible:
+    id: satellite-hands-free
+    checked: false
 - setOrientation: PORTRAIT

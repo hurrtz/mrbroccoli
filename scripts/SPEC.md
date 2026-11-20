@@ -79,12 +79,16 @@ workspace. It must not wait for onboarding, edition selection, or local-model
 setup before exercising settings, locales, layout, or accessibility.
 The screen-reader hierarchy gate follows the current home-screen contract: it
 checks the blocked voice orb, circular voice/text pager controls,
-conversation controls, transcript peek, and all three satellite actions by
+conversation list, transcript peek, and all four satellite actions by
 stable IDs and exact English accessible names before accepting TalkBack or
 VoiceOver evidence. Removed design-system controls must be dropped from that
 contract in the same change that removes them from the workspace.
 The smoke flow covers the empty provider-first workspace, Settings overview,
 App & diagnostics, and landscape without any first-run detour.
+The configured portrait header exposes conversation settings and the model
+picker. The landscape regression opens the three-route picker, enables Hands free from
+the home switch, and verifies that it stays enabled through rotation and can
+be disabled from the landscape control.
 Flows that edit nested Settings sheets dismiss the software keyboard and, on
 platforms where that action leaves the modal open, the owning sheet before
 navigating the parent frame, so system input overlays cannot consume the next

@@ -15,7 +15,6 @@ const requiredControls = [
     "Add credentials in Settings before starting a voice session. Configure credentials",
   ],
   ["transcript-handle", "Show transcript. No messages yet"],
-  ["conversation-settings-summary-control", "Open conversation settings"],
   [
     "voice-orb-idle",
     "Add credentials in Settings before starting a voice session.",
@@ -25,6 +24,7 @@ const requiredControls = [
   ["satellite-image", "Add image"],
   ["satellite-council", "Model Council"],
   ["satellite-web", "Web Search"],
+  ["satellite-hands-free", "Hands free"],
 ];
 
 function hierarchyWithControls(overrides = []) {

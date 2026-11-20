@@ -204,6 +204,15 @@ test("rejects selectors from the retired standalone Device page", () => {
   );
 });
 
+test("rejects the retired Drive input mode and stop satellite", () => {
+  assert.deepEqual(
+    findRetiredMaestroSelectors(
+      "input-mode-picker-option-drive-session\nsatellite-stop\nsatellite-hands-free",
+    ),
+    ["input-mode-picker-option-drive-session", "satellite-stop"],
+  );
+});
+
 test("rejects retired intro selectors, screenshots, and titles", () => {
   assert.deepEqual(
     findRetiredMaestroSelectors(`
