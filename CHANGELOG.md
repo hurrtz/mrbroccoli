@@ -10,14 +10,14 @@ the complete Play Store translations are kept in a dedicated file under
 
 ## Unreleased
 
+## 4.3.0 - 2026-11-21
+
 - Mr Broccoli now asks before sharing with a new AI or speech provider and
   explains what each one receives. Review or withdraw permissions in
   **Settings → Data & privacy → AI sharing**.
 - Switching reply providers keeps earlier messages private until you share
   them. Send a photo once or remember your choice, and see which providers
   will read a Model Council request. Cancelling keeps your unsent draft.
-
-## 4.3.0 - 2026-11-20
 
 - iPhone Duo uses the familiar phone layout when folded. Open it in portrait
   to see the conversation sidebar, or in landscape to use the input controls

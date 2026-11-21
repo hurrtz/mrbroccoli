@@ -1,95 +1,95 @@
 <en-US>
-Try GPT-6.2 Astra and Sol, Claude Fable 5.2 and Gemini 4, plus new voices and transcription models. Conversations get a title after your first prompt. Voice and text now show who’s searching or replying. The recording ring shows how long you have before auto-send, and paused replies keep their place. You can switch speech providers and retry a failed reply. We also fixed web search settings and encrypted backup recovery.
+Choose what each AI provider can receive in Settings → Data & privacy → AI sharing. Before sharing, you’ll see who receives your messages, photos or Model Council request. You can change your permissions anytime. Also new are GPT-6.2 Astra and Sol, Claude Fable 5.2, Gemini 4, new voices and automatic chat titles. The recording ring shows time until auto-send. Paused replies keep their place, and you can switch speech providers to retry. Web search and backup recovery are more reliable.
 </en-US>
 
 <ar>
-جرّب GPT-6.2 Astra وSol وClaude Fable 5.2 وGemini 4، إلى جانب أصوات ونماذج جديدة لتحويل الكلام إلى نص. تحصل المحادثة على عنوان بعد رسالتك الأولى. أثناء التحدث أو الكتابة، ترى من يبحث أو يجيب. توضّح حلقة التسجيل الوقت المتبقي حتى الإرسال التلقائي، ويُستأنف الرد الصوتي من حيث أوقفته. إذا تعذّر تشغيل الرد، يمكنك تغيير مزوّد الصوت والمحاولة مجددًا. أصلحنا أيضًا إعدادات البحث على الويب واستعادة النسخ الاحتياطية المشفّرة.
+من الإعدادات ← البيانات والخصوصية ← المشاركة مع الذكاء الاصطناعي، اختر ما يمكن لكل مزوّد تلقّيه. قبل الإرسال ترى من سيتلقّى رسائلك أو صورك أو طلب مجلس النماذج. يمكنك تغيير أذوناتك في أي وقت. يشمل التحديث أيضًا GPT-6.2 Astra وSol وClaude Fable 5.2 وGemini 4 وأصواتًا جديدة وعناوين تلقائية للمحادثات. تُظهر حلقة التسجيل الوقت حتى الإرسال، وتُستأنف القراءة من حيث أوقفتها. حسّنّا البحث على الويب واستعادة النسخ الاحتياطية.
 </ar>
 
 <cs-CZ>
-Vyzkoušejte GPT-6.2 Astra a Sol, Claude Fable 5.2 a Gemini 4 i nové hlasy a modely pro přepis řeči. Konverzace dostane název po první zprávě. Při mluvení i psaní vidíte, kdo vyhledává nebo odpovídá. Kruh nahrávání ukazuje čas do automatického odeslání. Pozastavená odpověď pokračuje ze stejného místa. Pokud hlasový výstup selže, můžete změnit poskytovatele a zkusit to znovu. Opravili jsme také nastavení vyhledávání na webu a obnovu šifrovaných záloh.
+V nastavení najdete Data a soukromí → Sdílení s AI. Vyberte, co může každý poskytovatel dostat. Před odesláním uvidíte, kdo dostane zprávy, fotky či dotaz pro Radu modelů. Oprávnění můžete kdykoli změnit. Novinkou jsou také GPT-6.2 Astra a Sol, Claude Fable 5.2, Gemini 4, nové hlasy a automatické názvy konverzací. Kruh nahrávání ukazuje čas do odeslání. Přednes pokračuje od místa pozastavení. Vyhledávání a obnova záloh jsou spolehlivější.
 </cs-CZ>
 
 <de-DE>
-Neu sind GPT-6.2 Astra und Sol, Claude Fable 5.2, Gemini 4 sowie neue Stimmen und Transkriptionsmodelle. Gespräche bekommen nach der ersten Nachricht einen Titel. Beim Sprechen und Tippen siehst du, wer sucht oder antwortet. Der Aufnahmering zeigt die Zeit bis zum automatischen Senden. Die Wiedergabe merkt sich die Pausenposition. Scheitert die Sprachausgabe, kannst du den Anbieter wechseln und es erneut versuchen. Websuche und das Einspielen verschlüsselter Backups sind zuverlässiger.
+Unter Einstellungen → Daten & Datenschutz → KI-Freigaben wählst du, was jeder Anbieter erhalten darf. Vor dem Senden siehst du, wer Nachrichten, Fotos oder Modellrat-Anfragen bekommt. Deine Freigaben kannst du jederzeit ändern. Neu sind auch GPT-6.2 Astra und Sol, Claude Fable 5.2, Gemini 4, neue Stimmen und automatische Gesprächstitel. Der Aufnahmering zeigt die Zeit bis zum Senden. Die Wiedergabe merkt sich die Pausenposition. Websuche und Backup-Wiederherstellung sind zuverlässiger.
 </de-DE>
 
 <en-AU>
-Try GPT-6.2 Astra and Sol, Claude Fable 5.2 and Gemini 4, plus new voices and transcription models. Conversations get a title after your first prompt. Voice and text now show who’s searching or replying. The recording ring shows how long you have before auto-send, and paused replies keep their place. You can switch speech providers and retry a failed reply. We also fixed web search settings and encrypted backup recovery.
+Choose what each AI provider can receive in Settings → Data & privacy → AI sharing. Before sharing, you’ll see who receives your messages, photos or Model Council request. You can change your permissions anytime. Also new are GPT-6.2 Astra and Sol, Claude Fable 5.2, Gemini 4, new voices and automatic chat titles. The recording ring shows time until auto-send. Paused replies keep their place, and you can switch speech providers to retry. Web search and backup recovery are more reliable.
 </en-AU>
 
 <en-CA>
-Try GPT-6.2 Astra and Sol, Claude Fable 5.2 and Gemini 4, plus new voices and transcription models. Conversations get a title after your first prompt. Voice and text now show who’s searching or replying. The recording ring shows how long you have before auto-send, and paused replies keep their place. You can switch speech providers and retry a failed reply. We also fixed web search settings and encrypted backup recovery.
+Choose what each AI provider can receive in Settings → Data & privacy → AI sharing. Before sharing, you’ll see who receives your messages, photos or Model Council request. You can change your permissions anytime. Also new are GPT-6.2 Astra and Sol, Claude Fable 5.2, Gemini 4, new voices and automatic chat titles. The recording ring shows time until auto-send. Paused replies keep their place, and you can switch speech providers to retry. Web search and backup recovery are more reliable.
 </en-CA>
 
 <en-GB>
-Try GPT-6.2 Astra and Sol, Claude Fable 5.2 and Gemini 4, plus new voices and transcription models. Conversations get a title after your first prompt. Voice and text now show who’s searching or replying. The recording ring shows how long you have before auto-send, and paused replies keep their place. You can switch speech providers and retry a failed reply. We also fixed web search settings and encrypted backup recovery.
+Choose what each AI provider can receive in Settings → Data & privacy → AI sharing. Before sharing, you’ll see who receives your messages, photos or Model Council request. You can change your permissions anytime. Also new are GPT-6.2 Astra and Sol, Claude Fable 5.2, Gemini 4, new voices and automatic chat titles. The recording ring shows time until auto-send. Paused replies keep their place, and you can switch speech providers to retry. Web search and backup recovery are more reliable.
 </en-GB>
 
 <es-ES>
-Prueba GPT-6.2 Astra y Sol, Claude Fable 5.2 y Gemini 4, además de nuevas voces y modelos de transcripción. Las conversaciones reciben un título tras tu primer mensaje. Al hablar o escribir, ves quién busca o responde. El anillo indica cuánto falta para el envío automático. Al reanudar el audio, la respuesta sigue donde la pausaste. Si falla la voz, puedes cambiar de proveedor y volver a intentarlo. También hemos corregido los ajustes de búsqueda web y la restauración de copias cifradas.
+En Ajustes → Datos y privacidad → Datos compartidos con la IA, elige qué puede recibir cada proveedor. Antes de enviar, verás quién recibirá tus mensajes, fotos o consulta al Consejo de modelos. Puedes cambiar los permisos cuando quieras. También llegan GPT-6.2 Astra y Sol, Claude Fable 5.2, Gemini 4, nuevas voces y títulos automáticos. El anillo indica cuánto falta para el envío. La lectura continúa donde la pausaste. Hemos mejorado la búsqueda web y la restauración de copias de seguridad.
 </es-ES>
 
 <es-US>
-Prueba GPT-6.2 Astra y Sol, Claude Fable 5.2 y Gemini 4, además de nuevas voces y modelos de transcripción. Cada conversación recibe un título tras tu primer mensaje. Al hablar o escribir, ves quién busca o responde. El anillo indica cuánto falta para el envío automático. El audio continúa donde lo pausaste. Si falla la voz, puedes cambiar de proveedor y volver a intentarlo. También corregimos la configuración de búsqueda web y la restauración de copias de seguridad cifradas.
+En Configuración → Datos y privacidad → Datos compartidos con la IA, elige qué puede recibir cada proveedor. Antes de enviar, verás quién recibirá tus mensajes, fotos o consulta al Consejo de modelos. Puedes cambiar los permisos cuando quieras. También llegan GPT-6.2 Astra y Sol, Claude Fable 5.2, Gemini 4, nuevas voces y títulos automáticos. El anillo indica cuánto falta para el envío. La lectura sigue donde la pausaste. Mejoramos la búsqueda web y la recuperación de copias de seguridad.
 </es-US>
 
 <fr-CA>
-Essayez GPT-6.2 Astra et Sol, Claude Fable 5.2 et Gemini 4, ainsi que de nouvelles voix et de nouveaux modèles de transcription. La première demande donne un titre à la conversation. À l’oral comme à l’écrit, vous voyez qui cherche ou répond. L’anneau indique le temps restant avant l’envoi automatique. La lecture reprend là où vous l’avez suspendue. Si la voix échoue, changez de fournisseur et réessayez. La recherche Web et la restauration des sauvegardes chiffrées ont aussi été corrigées.
+Dans les réglages, ouvrez Données et confidentialité → Partage avec l’IA et choisissez ce que chaque fournisseur peut recevoir. Voyez qui recevra vos messages, photos ou demandes au Conseil des modèles avant l’envoi. Modifiez vos choix en tout temps. Découvrez GPT-6.2 Astra et Sol, Claude Fable 5.2, Gemini 4, de nouvelles voix et des titres automatiques. L’anneau indique le temps avant l’envoi. La lecture reprend à la pause. La recherche Web et la restauration des sauvegardes sont améliorées.
 </fr-CA>
 
 <fr-FR>
-Découvrez GPT-6.2 Astra et Sol, Claude Fable 5.2 et Gemini 4, de nouvelles voix et de nouveaux modèles de transcription. Votre première demande donne un titre à la conversation. À l’oral comme à l’écrit, vous voyez qui cherche ou répond. L’anneau indique le temps restant avant l’envoi automatique. La lecture reprend là où vous l’avez suspendue. En cas d’échec, changez de fournisseur vocal et réessayez. Nous avons aussi corrigé la recherche web et la restauration des sauvegardes chiffrées.
+Dans Réglages → Données et confidentialité → Partage avec l’IA, choisissez ce que chaque fournisseur peut recevoir. Avant l’envoi, voyez qui recevra vos messages, photos ou questions au Conseil des modèles. Modifiez vos autorisations à tout moment. Retrouvez aussi GPT-6.2 Astra et Sol, Claude Fable 5.2, Gemini 4, de nouvelles voix et des titres automatiques. L’anneau indique le temps avant l’envoi et la lecture reprend à la pause. La recherche web et la restauration sont plus fiables.
 </fr-FR>
 
 <hi-IN>
-GPT-6.2 Astra और Sol, Claude Fable 5.2 और Gemini 4 के साथ नई आवाज़ें और बोलकर लिखने के नए मॉडल आज़माएँ। आपके पहले संदेश के बाद बातचीत को शीर्षक मिलता है। बोलते या लिखते समय देखें कि कौन खोज रहा है या जवाब दे रहा है। रिकॉर्डिंग का घेरा दिखाता है कि संदेश अपने आप भेजे जाने में कितना समय बचा है। ऑडियो वहीं से जारी रहता है जहाँ आपने उसे रोका था। आवाज़ न चले तो प्रदाता बदलकर फिर कोशिश करें। वेब खोज की सेटिंग और एन्क्रिप्टेड बैकअप बहाल करने की समस्याएँ भी ठीक की गई हैं।
+सेटिंग्स में डेटा और गोपनीयता → एआई के साथ साझाकरण खोलें और तय करें कि हर प्रदाता को क्या भेजना है। भेजने से पहले देखें कि आपके संदेश, फ़ोटो या मॉडल परिषद का सवाल किसे मिलेगा। अनुमतियाँ कभी भी बदलें। अब GPT-6.2 Astra और Sol, Claude Fable 5.2, Gemini 4, नई आवाज़ें और चैट के लिए अपने आप बनते शीर्षक भी हैं। रिकॉर्डिंग का घेरा भेजने तक बचा समय दिखाता है। आवाज़ वहीं से फिर शुरू होती है जहाँ आपने रोकी थी। वेब खोज और बैकअप बहाली में सुधार हुआ है।
 </hi-IN>
 
 <hu-HU>
-Próbáld ki a GPT-6.2 Astra és Sol, a Claude Fable 5.2 és a Gemini 4 modelleket, az új hangokat és átírómodelleket. Az első üzenet után a beszélgetés címet kap. Beszéd és gépelés közben is látod, ki keres vagy válaszol. A felvételi gyűrű mutatja az automatikus küldésig hátralévő időt. A lejátszás onnan folytatódik, ahol megállítottad. Hanghiba esetén szolgáltatót válthatsz és újrapróbálhatod. Javítottuk a webes keresés beállításait és a titkosított mentések visszaállítását is.
+A beállításokban az Adatok és adatvédelem → Adatmegosztás az MI-vel alatt választhatod ki, mit kaphatnak a szolgáltatók. Küldés előtt látod, ki kapja meg az üzenetet, a fotót vagy a Modelltanácsnak szánt kérdést. Az engedélyek módosíthatók. Új a GPT-6.2 Astra és Sol, a Claude Fable 5.2, a Gemini 4, több hang és az automatikus beszélgetéscím. A felvételi gyűrű jelzi a küldésig hátralévő időt. A felolvasás a szünet helyétől folytatódik. Javult a webes keresés és a mentések visszaállítása.
 </hu-HU>
 
 <it-IT>
-Prova GPT-6.2 Astra e Sol, Claude Fable 5.2 e Gemini 4, con nuove voci e modelli di trascrizione. Le conversazioni ricevono un titolo dopo il primo messaggio. Mentre parli o scrivi, vedi chi cerca o risponde. L’anello indica il tempo rimasto prima dell’invio automatico. L’audio riprende dal punto in cui lo hai messo in pausa. Se la lettura non riesce, puoi cambiare fornitore vocale e riprovare. Corrette anche le impostazioni di ricerca web e il ripristino dei backup cifrati.
+In Impostazioni → Dati e privacy → Condivisione con l’IA scegli cosa può ricevere ogni fornitore. Prima di inviare, vedi chi riceverà i tuoi messaggi, le foto o le domande al Consiglio dei modelli. Puoi modificare i permessi quando vuoi. Arrivano anche GPT-6.2 Astra e Sol, Claude Fable 5.2, Gemini 4, nuove voci e titoli automatici. L’anello indica quanto manca all’invio e la lettura riprende dal punto di pausa. La ricerca web e il ripristino dei backup sono più affidabili.
 </it-IT>
 
 <ja-JP>
-GPT-6.2 Astra／Sol、Claude Fable 5.2、Gemini 4に加え、新しい音声と文字起こしモデルが使えます。最初のメッセージを送ると、会話に自動でタイトルが付きます。音声入力でもテキスト入力でも、どのプロバイダーが検索・回答しているかが分かります。録音中のリングには自動送信までの残り時間が表示されます。読み上げは一時停止した位置から再開できます。読み上げに失敗したときは、音声プロバイダーを変えて再試行できます。ウェブ検索の設定と暗号化バックアップの復元も修正しました。
+設定の「データとプライバシー」→「AIとのデータ共有」で、プロバイダーごとに共有する内容を選べます。送信前に、メッセージや写真、モデル評議会への質問を誰が受け取るか確認できます。許可はいつでも変更できます。GPT-6.2 Astra・Sol、Claude Fable 5.2、Gemini 4、新しい音声、会話の自動タイトルにも対応しました。録音リングには自動送信までの残り時間が表示され、読み上げは一時停止した位置から再開します。ウェブ検索とバックアップの復元も改善しました。
 </ja-JP>
 
 <pl-PL>
-Wypróbuj GPT-6.2 Astra i Sol, Claude Fable 5.2 oraz Gemini 4, a także nowe głosy i modele transkrypcji. Po pierwszej wiadomości rozmowa otrzymuje tytuł. Gdy mówisz lub piszesz, widzisz, kto szuka lub odpowiada. Pierścień nagrywania pokazuje czas do automatycznej wysyłki. Odtwarzanie wraca do miejsca pauzy. Jeśli odczyt się nie uda, możesz zmienić dostawcę głosu i spróbować ponownie. Poprawiliśmy też ustawienia wyszukiwania w sieci i przywracanie zaszyfrowanych kopii zapasowych.
+W ustawieniach otwórz Dane i prywatność → Udostępnianie dostawcom AI. Wybierz, co może otrzymać każdy dostawca. Przed wysłaniem zobaczysz, kto dostanie wiadomość, zdjęcie lub pytanie do Rady modeli. Zgody możesz zmienić w każdej chwili. Nowości to także GPT-6.2 Astra i Sol, Claude Fable 5.2, Gemini 4, nowe głosy i automatyczne tytuły rozmów. Pierścień pokazuje czas do wysłania, a odczyt wraca do miejsca pauzy. Usprawniliśmy wyszukiwanie w sieci i przywracanie kopii zapasowych.
 </pl-PL>
 
 <pt-BR>
-Experimente GPT-6.2 Astra e Sol, Claude Fable 5.2 e Gemini 4, além de novas vozes e modelos de transcrição. A conversa ganha um título após sua primeira mensagem. Ao falar ou digitar, você vê quem está pesquisando ou respondendo. O anel de gravação mostra o tempo até o envio automático. O áudio continua de onde você pausou. Se a leitura falhar, troque o provedor de voz e tente de novo. Também corrigimos as configurações de busca na web e a restauração de backups criptografados.
+Em Configurações → Dados e privacidade → Compartilhamento com IA, escolha o que cada provedor pode receber. Antes de enviar, veja quem receberá suas mensagens, fotos ou perguntas ao Conselho de Modelos. Altere as permissões quando quiser. Chegaram também GPT-6.2 Astra e Sol, Claude Fable 5.2, Gemini 4, novas vozes e títulos automáticos. O anel indica o tempo até o envio e a leitura continua de onde parou. Melhoramos a busca na web e a restauração de backups.
 </pt-BR>
 
 <pt-PT>
-Experimente GPT-6.2 Astra e Sol, Claude Fable 5.2 e Gemini 4, com novas vozes e modelos de transcrição. A conversa recebe um título após a primeira mensagem. Ao falar ou escrever, vê quem está a pesquisar ou a responder. O anel de gravação mostra o tempo até ao envio automático. O áudio recomeça onde fez pausa. Se a leitura falhar, pode mudar de fornecedor de voz e tentar novamente. Corrigimos as definições de pesquisa na web e o restauro de cópias de segurança cifradas.
+Nas definições, abra Dados e privacidade → Partilha com IA e escolha o que cada fornecedor pode receber. Antes de enviar, veja quem recebe as suas mensagens, fotografias ou perguntas ao Conselho de Modelos. Pode alterar as permissões a qualquer momento. Há também GPT-6.2 Astra e Sol, Claude Fable 5.2, Gemini 4, novas vozes e títulos automáticos. O anel indica o tempo até ao envio e a leitura recomeça no ponto de pausa. A pesquisa na web e o restauro de cópias de segurança foram melhorados.
 </pt-PT>
 
 <ru-RU>
-Попробуйте GPT-6.2 Astra и Sol, Claude Fable 5.2 и Gemini 4, новые голоса и модели распознавания речи. После первого сообщения у беседы появляется название. При вводе голосом или текстом видно, кто ищет или отвечает. Кольцо записи показывает время до автоотправки. Воспроизведение продолжается с места паузы. Если озвучить ответ не удалось, можно сменить голосового провайдера и повторить попытку. Исправлены настройки веб-поиска и восстановление зашифрованных резервных копий.
+В настройках откройте «Данные и конфиденциальность» → «Доступ для ИИ» и выберите, что может получать каждый сервис. Перед отправкой видно, кому поступят сообщения, фото или вопрос Совету моделей. Разрешения можно изменить в любой момент. Добавлены GPT-6.2 Astra и Sol, Claude Fable 5.2, Gemini 4, новые голоса и автоматические названия чатов. Кольцо записи показывает время до отправки, озвучивание продолжается с места паузы. Улучшены веб-поиск и восстановление из резервной копии.
 </ru-RU>
 
 <sv-SE>
-Prova GPT-6.2 Astra och Sol, Claude Fable 5.2 och Gemini 4 samt nya röster och modeller för transkribering. Samtalet får en titel efter ditt första meddelande. När du talar eller skriver ser du vem som söker eller svarar. Ringen visar tiden kvar till automatisk sändning. Uppläsningen fortsätter där du pausade. Om den misslyckas kan du byta röstleverantör och försöka igen. Vi har också rättat webbsökningens inställningar och återställning av krypterade säkerhetskopior.
+Under Inställningar → Data och integritet → Delning med AI väljer du vad varje leverantör får ta emot. Före sändning ser du vem som får dina meddelanden, bilder eller frågor till Modellrådet. Du kan ändra behörigheterna när du vill. Nytt är också GPT-6.2 Astra och Sol, Claude Fable 5.2, Gemini 4, fler röster och automatiska samtalsnamn. Ringen visar tiden till automatisk sändning och uppläsningen fortsätter där du pausade. Webbsökning och återställning av säkerhetskopior har förbättrats.
 </sv-SE>
 
 <tr-TR>
-GPT-6.2 Astra ve Sol, Claude Fable 5.2 ve Gemini 4’ün yanı sıra yeni sesleri ve deşifre modellerini deneyin. İlk mesajınızdan sonra sohbete bir başlık verilir. Konuşurken veya yazarken kimin arama yaptığını ya da yanıt verdiğini görebilirsiniz. Kayıt halkası otomatik gönderime kalan süreyi gösterir. Seslendirme duraklattığınız yerden devam eder. Seslendirme başarısız olursa sağlayıcıyı değiştirip tekrar deneyin. Web arama ayarları ve şifreli yedekleri geri yükleme de düzeltildi.
+Ayarlar → Veriler ve gizlilik → Yapay zekâyla paylaşım bölümünde her sağlayıcının neleri alabileceğini seçin. Göndermeden önce mesajlarınızı, fotoğraflarınızı veya Model Konseyine sorunuzu kimin alacağını görün. İzinleri istediğiniz zaman değiştirin. GPT-6.2 Astra ve Sol, Claude Fable 5.2, Gemini 4, yeni sesler ve otomatik sohbet başlıkları da eklendi. Kayıt halkası gönderime kalan süreyi gösterir. Sesli yanıt kaldığı yerden devam eder. Web araması ve yedekten geri yükleme iyileştirildi.
 </tr-TR>
 
 <uk>
-Спробуйте GPT-6.2 Astra й Sol, Claude Fable 5.2 та Gemini 4, нові голоси й моделі розпізнавання мовлення. Після першого повідомлення розмова отримує назву. Коли ви говорите чи пишете, видно, хто шукає або відповідає. Кільце запису показує час до автоматичного надсилання. Відтворення триває з місця паузи. Якщо озвучити відповідь не вдалося, можна змінити постачальника голосу й спробувати знову. Також виправлено налаштування вебпошуку та відновлення зашифрованих резервних копій.
+У налаштуваннях відкрийте «Дані та конфіденційність» → «Доступ для ШІ» й виберіть, що може отримувати кожен постачальник. Перед надсиланням видно, хто отримає повідомлення, фото чи запит до Ради моделей. Дозволи можна змінити будь-коли. Також додано GPT-6.2 Astra і Sol, Claude Fable 5.2, Gemini 4, нові голоси й автоматичні назви розмов. Кільце запису показує час до надсилання, а озвучення триває з місця паузи. Поліпшено вебпошук і відновлення з резервних копій.
 </uk>
 
 <ur>
-GPT-6.2 Astra اور Sol، Claude Fable 5.2 اور Gemini 4 کے ساتھ نئی آوازیں اور گفتگو کو تحریر میں بدلنے والے ماڈل آزمائیں۔ پہلے پیغام کے بعد گفتگو کو عنوان مل جاتا ہے۔ بولتے یا لکھتے وقت دیکھیں کہ کون تلاش کر رہا ہے یا جواب دے رہا ہے۔ ریکارڈنگ کا دائرہ خودکار ارسال تک باقی وقت دکھاتا ہے۔ آواز وہیں سے جاری ہوتی ہے جہاں آپ نے روکی تھی۔ جواب سنانے میں خرابی ہو تو آواز کا فراہم کنندہ بدل کر دوبارہ کوشش کریں۔ ویب تلاش کی ترتیبات اور خفیہ کردہ بیک اپ کی بحالی بھی درست کی گئی ہے۔
+ترتیبات میں ڈیٹا اور رازداری ← اے آئی کے ساتھ اشتراک کھولیں اور طے کریں کہ ہر فراہم کنندہ کو کیا بھیجنا ہے۔ بھیجنے سے پہلے دیکھیں کہ آپ کے پیغامات، تصاویر یا ماڈل کونسل کا سوال کس کو ملے گا۔ اجازتیں کسی بھی وقت بدلیں۔ اب GPT-6.2 Astra اور Sol، Claude Fable 5.2، Gemini 4، نئی آوازیں اور گفتگو کے خودکار عنوان بھی دستیاب ہیں۔ ریکارڈنگ کا دائرہ بھیجنے تک باقی وقت دکھاتا ہے اور آواز وہیں سے چلتی ہے جہاں رکی تھی۔ ویب تلاش اور بیک اپ کی بحالی بہتر ہوئی ہے۔
 </ur>
 
 <zh-CN>
-新增 GPT-6.2 Astra 和 Sol、Claude Fable 5.2、Gemini 4，以及更多语音和转写模型。发送第一条消息后，对话会自动命名。无论说话还是打字，都能看到是谁在搜索或回答。录音圆环显示距离自动发送还有多久。暂停朗读后，可从原处继续。如果朗读失败，可以切换语音服务商并重试。还修复了网页搜索设置和加密备份恢复问题。
+在「设置」→「数据与隐私」→「AI 数据共享」中，可分别选择每家服务商能接收哪些内容。发送前即可查看谁会收到你的消息、照片或提交给模型委员会的问题。授权可随时更改。本次还新增了 GPT-6.2 Astra 和 Sol、Claude Fable 5.2、Gemini 4、更多语音和对话自动命名。录音圆环显示距自动发送的剩余时间，朗读可从暂停处继续。网页搜索和备份恢复也有改进。
 </zh-CN>
