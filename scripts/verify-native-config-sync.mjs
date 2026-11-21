@@ -435,6 +435,11 @@ assertIncludes(
   iosPodfile,
   "ENV['SHERPA_ONNX_DISABLE_FFMPEG'] = '1'",
 );
+assertIncludes(
+  "iOS speech recognition enforces the device-only request on pod installation",
+  iosPodfile.split("post_install do |installer|")[1] ?? "",
+  "enforce_device_only_recognition!",
+);
 assertAllEqual(
   "iOS project deployment target",
   iosDeploymentTargets,

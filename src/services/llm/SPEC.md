@@ -32,6 +32,13 @@ generators.
 
 ## Transport Boundary
 
+OpenRouter requests name the gateway and the inference companies behind the
+chosen models in the consent sheet. Each transport pins the model publisher's
+first-party endpoint(s) with OpenRouter's `provider.only` field. A retry can
+change models within the same approved host. Unknown hosts fail before any
+request. Conversation title generation takes only permitted text and drops
+attachments, provider state and stored conversation summaries.
+
 `requestRouter.ts` maps runtime-manifest transports to concrete adapters:
 
 - OpenAI-compatible JSON chat;

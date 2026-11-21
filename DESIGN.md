@@ -141,6 +141,12 @@ clean up temporary captured audio.
 
 ## Context Layers
 
+The pipeline resolves recipients before transcription or submission. A single
+sheet groups outstanding decisions for the turn. It distinguishes the reply
+provider, Council participants and synthesizer, OpenRouter's inference hosts,
+and speech and search services. Only a confirmed action consumes the draft.
+Cancellation and revocation reach running requests through their abort signals.
+
 Context enters a model request in explicit layers:
 
 1. product and response-style instructions;
@@ -166,6 +172,7 @@ generate the assistant response.
 | Data                                | Authority                             | Storage                                           | Portable backup         |
 | ----------------------------------- | ------------------------------------- | ------------------------------------------------- | ----------------------- |
 | Public settings                     | `Settings` minus `apiKeys`            | AsyncStorage `@mrbroccoli/settings`               | Yes                     |
+| AI sharing decisions and text receipts | AI sharing service | Device-bound SecureStore marker, iOS backup-excluded container marker, local decisions and per-chat fingerprints in AsyncStorage | Never |
 | Provider API keys                   | user-entered secret                   | SecureStore `mrbroccoli.provider_key.<provider>`  | Never                   |
 | Conversation metadata               | conversation hook                     | SQLite `mr-broccoli-conversations.db`             | Rebuilt from records    |
 | Conversation records                | conversation hook                     | SQLite `mr-broccoli-conversations.db`             | Yes                     |

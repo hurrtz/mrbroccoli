@@ -4,6 +4,10 @@
 
 @interface RCT_EXTERN_MODULE(MrBroccoliNativeWaveform, RCTEventEmitter)
 
+RCT_EXTERN_METHOD(supportsOnDeviceRecognition:(NSString *)locale
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+
 RCT_EXTERN_METHOD(startRecording:(NSString *)sessionId
                   outputUri:(NSString * _Nullable)outputUri
                   resolver:(RCTPromiseResolveBlock)resolve

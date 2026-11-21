@@ -3,6 +3,7 @@ import {
   type RuntimeProviderManifestEntry,
 } from "../constants/providers/runtimeManifest";
 import type { Provider } from "../types";
+import { getOpenRouterHost } from "../constants/providers/openRouterHosts";
 
 export type ProviderModelCapability = "llm" | "stt" | "tts";
 
@@ -29,6 +30,7 @@ export function getProviderModelCandidates(params: {
 
   for (const candidate of candidates) {
     const model = candidate.trim();
+    if (params.provider === "openrouter" && getOpenRouterHost(model) !== getOpenRouterHost(requestedModel)) continue;
 
     if (model && (params.isCompatible?.(model) ?? true)) {
       unique.add(model);

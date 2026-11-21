@@ -184,7 +184,7 @@ export async function runPipelineResponse({
           }
         : undefined;
 
-    callbacks.onResponseDone(fullText, combinedUsage, {
+    const persisted = callbacks.onResponseDone(fullText, combinedUsage, {
       ...responseMetadata,
       ...llmMetadata,
       turnReceipt: {
@@ -192,7 +192,7 @@ export async function runPipelineResponse({
         ...llmMetadata?.turnReceipt,
       },
     });
-    await ttsQueue.handleResponseDone(fullText);
+    await Promise.all([persisted, ttsQueue.handleResponseDone(fullText)]);
     completed = true;
   };
 

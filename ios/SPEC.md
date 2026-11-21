@@ -71,6 +71,10 @@ conversation, edition, provider, or fallback policy.
 
 ## Audio and Lifecycle Invariants
 
+- The waveform bridge checks Apple's on-device recognition capability for
+  the selected locale. Pod installation ensures Expo always passes a requested
+  device-only constraint to Speech. Losing support after the probe fails the
+  request locally.
 - Audio-session activation and restoration are balanced across recording,
   synthesis playback, native/system speech, interruption, cancellation, and
   route changes. Recording and ambient monitoring have one native owner:

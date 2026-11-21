@@ -47,7 +47,7 @@ export interface NativeSpeechRecognizerController {
   inputMetering?: number | null;
   inputMeteringSampleId?: number;
   lastError: string | null;
-  startRecognition: () => Promise<void>;
+  startRecognition: (signal?: AbortSignal) => Promise<boolean | void>;
   stopRecognition: () => Promise<string | null>;
 }
 

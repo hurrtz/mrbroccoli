@@ -84,6 +84,7 @@ function renderPage(
           localModels={localModels}
           settings={DEFAULT_SETTINGS}
           onUpdate={overrides.onUpdate ?? jest.fn()}
+          onOpenAiSharing={jest.fn()}
           onOpenArchivedConversations={
             overrides.onOpenArchivedConversations ?? jest.fn()
           }

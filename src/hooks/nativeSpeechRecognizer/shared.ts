@@ -3,8 +3,6 @@ import type {
   ExpoSpeechRecognitionResultEvent,
 } from "expo-speech-recognition";
 import type { useLocalization } from "../../i18n";
-import type { SttLanguage } from "../../types";
-import { getSpeechRecognitionLocale } from "../../utils/speechLanguage";
 
 export const MIN_RECOGNITION_DURATION_MS = 300;
 export const RECOGNITION_METER_INTERVAL_MS = 150;
@@ -16,10 +14,6 @@ export const RECOGNITION_STOP_TIMEOUT_MS = 8_000;
 // File recognition processes a bounded recording; generous ceiling for slow
 // devices and long captures before the session is forcibly released.
 export const RECOGNIZED_FILE_TIMEOUT_MS = 120_000;
-
-export function getRecognitionLocale(language: SttLanguage = "auto") {
-  return getSpeechRecognitionLocale(language);
-}
 
 export function volumeToMetering(value: number) {
   if (value < 0) {

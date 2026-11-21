@@ -84,6 +84,7 @@ export type SettingsPage =
   | "speaking"
   | "search"
   | "data"
+  | "ai-sharing"
   | "app";
 
 export type TextInputFocusHandler = NonNullable<

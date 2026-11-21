@@ -1,6 +1,9 @@
-import type { Message, UsageEstimate } from "../types";
+import type { Message, Provider, UsageEstimate } from "../types";
 import { translate } from "../i18n";
-import { recordDebugLogEvent } from "./debugLogCapture";
+import {
+  recordDebugLogEvent,
+  registerDebugTurnSignal,
+} from "./debugLogCapture";
 import {
   getUlraModeFailureParticipants,
   runUlraModeDeliberation,
@@ -15,6 +18,13 @@ import type { RunVoicePipelineParams } from "./voicePipeline/types";
 import { resolvePipelineWebSearch } from "./voicePipeline/webSearch";
 import { createTurnReceipt } from "./turnReceipt";
 import { retrieveConversationKnowledge } from "./conversationKnowledge";
+import { recordAiSharingMessages } from "./aiSharing";
+import {
+  authorizeTurn,
+  getPermittedTurnHistory,
+  prepareSharedContext,
+} from "./voicePipeline/sharing";
+import { normalizeFallbackRoutes } from "./voicePipeline/ttsQueue/config";
 
 export async function runVoicePipeline(
   params: RunVoicePipelineParams,
@@ -26,7 +36,6 @@ export async function runVoicePipeline(
     transcriptionOverride,
     inputSource = transcriptionOverride ? "text" : "voice",
     attachments,
-    messages,
     model,
     provider,
     providerApiKey,
@@ -48,8 +57,6 @@ export async function runVoicePipeline(
     ttsListenLanguages,
     replyPlayback,
     spokenRepliesEnabled = true,
-    contextSummary,
-    summarizedMessageCount,
     currentConversationId,
     conversationKnowledgeExcludedIds,
     pastConversationKnowledgeEnabled = false,
@@ -64,8 +71,9 @@ export async function runVoicePipeline(
     webSearchOptions,
     ulraMode,
     callbacks,
-    abortSignal,
   } = params;
+  let abortSignal = params.abortSignal;
+  let stopWatchingSharing: (() => void) | undefined;
 
   const recordTurnEvent = (event: Parameters<typeof recordDebugLogEvent>[0]) =>
     recordDebugLogEvent({
@@ -127,6 +135,49 @@ export async function runVoicePipeline(
       },
     });
 
+    if (abortSignal?.aborted || (!transcriptionOverride?.trim() && !audioUri)) {
+      recordRunTerminal(abortSignal?.aborted ? "aborted" : "failed", {
+        reason: "no-input",
+      });
+      return null;
+    }
+    const sharing = await authorizeTurn(params);
+    if (!sharing) {
+      callbacks.onSharingCancelled?.();
+      recordRunTerminal("aborted", { reason: "sharing" });
+      return null;
+    }
+    const { authorization, recipients, guard, openRouterModels } = sharing;
+    stopWatchingSharing = guard.close;
+    abortSignal = guard.signal;
+    registerDebugTurnSignal(abortSignal, turnId);
+    const searchAllowed =
+      webSearchProvider && authorization.allows(webSearchProvider, "search");
+    const knowledgeAllowed =
+      pastConversationKnowledgeEnabled &&
+      recipients.every((recipient) =>
+        authorization.allows(recipient, "knowledge"),
+      );
+    const speechAllowed =
+      spokenRepliesEnabled &&
+      (ttsMode !== "provider" ||
+        !ttsProvider ||
+        authorization.allows(ttsProvider, "speech") ||
+        normalizeFallbackRoutes(ttsMode, ttsFallbackRoutes).length > 0);
+    if (spokenRepliesEnabled && !speechAllowed) {
+      callbacks.onSpeechSkipped?.();
+      turnReceipt.speechOutput = {
+        ...turnReceipt.speechOutput,
+        enabled: false,
+        actualMode: "off",
+      };
+    }
+    if (abortSignal.aborted) {
+      callbacks.onSharingCancelled?.();
+      recordRunTerminal("aborted", { reason: "sharing" });
+      return null;
+    }
+
     const transcriptionStartedAtMs = Date.now();
     try {
       transcription = await resolvePipelineTranscription({
@@ -149,7 +200,8 @@ export async function runVoicePipeline(
       throw error;
     } finally {
       if (!transcriptionOverride?.trim()) {
-        turnReceipt.timing.transcriptionMs = Date.now() - transcriptionStartedAtMs;
+        turnReceipt.timing.transcriptionMs =
+          Date.now() - transcriptionStartedAtMs;
       }
     }
 
@@ -173,11 +225,39 @@ export async function runVoicePipeline(
       return transcription;
     }
 
-    const callbackConversationId = callbacks.onTranscription(transcription);
+    const submitted = callbacks.onTranscription(transcription);
+    const persisted =
+      typeof submitted === "object" && submitted ? submitted : undefined;
     const effectiveCurrentConversationId =
-      typeof callbackConversationId === "string"
-        ? callbackConversationId
-        : currentConversationId;
+      persisted?.conversationId ??
+      (typeof submitted === "string" ? submitted : currentConversationId);
+    const recordReceived = async (
+      providers: readonly Provider[],
+      models: readonly string[],
+      reply?: Message | null | void,
+    ) => {
+      if (!effectiveCurrentConversationId || !providers.length) return;
+      const received = [
+        ...(persisted ? [persisted.message] : []),
+        ...(reply ? [reply] : []),
+      ];
+      if (!received.length) return;
+      try {
+        await recordAiSharingMessages(
+          effectiveCurrentConversationId,
+          received,
+          providers,
+          models,
+        );
+      } catch {
+        // The completed reply stays readable. Without its receipt the next
+        // turn cannot automatically disclose this text as history.
+        recordTurnEvent({
+          event: "ai-sharing-receipt-write-failed",
+          level: "warn",
+        });
+      }
+    };
     if (abortSignal?.aborted) {
       recordTurnEvent({
         event: "voice-pipeline-run-aborted-after-onTranscription",
@@ -187,17 +267,27 @@ export async function runVoicePipeline(
     }
 
     const contextStartedAtMs = Date.now();
+    const sharedContext = await prepareSharedContext(
+      params,
+      effectiveCurrentConversationId,
+      recipients,
+      authorization,
+      openRouterModels,
+    );
+    if (abortSignal.aborted) {
+      recordRunTerminal("aborted", { reason: "sharing" });
+      return transcription;
+    }
     const contextResult = await resolveContextualMessages({
       abortSignal,
-      callbacks,
-      contextSummary,
+      callbacks: { ...callbacks, onContextSummary: sharedContext.saveSummary },
+      contextSummary: sharedContext.summary,
       language,
-      messages,
+      messages: sharedContext.history,
       model,
       provider,
       providerApiKey,
-      skipSummaryUpdate: false,
-      summarizedMessageCount,
+      summarizedMessageCount: sharedContext.covered,
     });
     turnReceipt.timing.contextMs = Date.now() - contextStartedAtMs;
     turnReceipt.context = contextResult.receipt;
@@ -212,16 +302,14 @@ export async function runVoicePipeline(
 
     turnReceipt.context.pastKnowledgeRequested =
       pastConversationKnowledgeEnabled;
-    const pastKnowledgeStartedAtMs = pastConversationKnowledgeEnabled
-      ? Date.now()
-      : null;
+    const pastKnowledgeStartedAtMs = knowledgeAllowed ? Date.now() : null;
     const pastKnowledgeQuery = [
       transcription,
       ...contextResult.contextualMessages
         .slice(-4)
         .map((message) => message.content),
     ].join("\n\n");
-    const pastKnowledgeResult = pastConversationKnowledgeEnabled
+    const pastKnowledgeResult = knowledgeAllowed
       ? await retrieveConversationKnowledge({
           currentConversationId: effectiveCurrentConversationId,
           excludedConversationIds: conversationKnowledgeExcludedIds,
@@ -245,10 +333,22 @@ export async function runVoicePipeline(
       turnId,
       abortSignal,
       callbacks,
-      conversationSummary: contextResult.effectiveSummary || undefined,
+      conversationSummary:
+        searchAllowed &&
+        contextResult.effectiveSummary &&
+        sharedContext.history.length &&
+        getPermittedTurnHistory(
+          effectiveCurrentConversationId,
+          sharedContext.history,
+          [webSearchProvider],
+          authorization,
+        ).length === sharedContext.history.length
+          ? contextResult.effectiveSummary
+          : undefined,
       language,
-      messages,
+      messages: sharedContext.history,
       mode: effectiveWebSearchMode,
+      sharingAllowed: Boolean(searchAllowed),
       provider: webSearchProvider,
       apiKey: webSearchApiKey,
       options: webSearchOptions,
@@ -309,6 +409,16 @@ export async function runVoicePipeline(
         return transcription;
       }
 
+      await recordReceived(
+        [...new Set(deliberation.entries.map((entry) => entry.provider))],
+        deliberation.entries
+          .filter((entry) => entry.provider === "openrouter")
+          .map((entry) => entry.model),
+      );
+      if (abortSignal.aborted) {
+        recordRunTerminal("aborted", { reason: "sharing" });
+        return transcription;
+      }
       additionalUsage = deliberation.estimatedUsage;
       synthesisContext = deliberation.synthesisPrompt;
       if (getProviderCircuitState(provider, "llm")) {
@@ -349,7 +459,9 @@ export async function runVoicePipeline(
             (route) =>
               route.provider === synthesisProvider &&
               route.model === synthesisModel,
-          )?.modeId ?? ulraMode.routes[0]?.modeId ?? "synthesis",
+          )?.modeId ??
+          ulraMode.routes[0]?.modeId ??
+          "synthesis",
         model: synthesisModel,
         provider: synthesisProvider,
         stage: "synthesis",
@@ -451,7 +563,8 @@ export async function runVoicePipeline(
       callbacks,
       language,
       replyPlayback,
-      spokenRepliesEnabled,
+      spokenRepliesEnabled: speechAllowed,
+      speechAuthorization: ttsMode === "provider" ? authorization : undefined,
       ttsApiKey,
       kokoroVoices,
       ttsFallbackRoutes,
@@ -469,7 +582,13 @@ export async function runVoicePipeline(
       abortSignal,
       additionalUsage,
       assistantInstructions,
-      callbacks,
+      callbacks: {
+        ...callbacks,
+        onResponseDone: async (text, usage, metadata) => {
+          const reply = await callbacks.onResponseDone(text, usage, metadata);
+          await recordReceived([synthesisProvider], [synthesisModel], reply);
+        },
+      },
       conversationSummary: contextResult.effectiveSummary || undefined,
       pastConversationKnowledge: pastKnowledgeResult?.context,
       language,
@@ -484,7 +603,7 @@ export async function runVoicePipeline(
       responseMetadata,
       responseTone,
       replyPlayback,
-      spokenRepliesEnabled,
+      spokenRepliesEnabled: speechAllowed,
       synthesisContext,
       ttsQueue,
       turnReceipt,
@@ -526,6 +645,7 @@ export async function runVoicePipeline(
     });
     throw error;
   } finally {
+    stopWatchingSharing?.();
     recordTurnEvent({
       event: "voice-pipeline-run-cleanup",
       payload: {

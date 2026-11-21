@@ -1,9 +1,7 @@
 import { Platform } from "react-native";
-
-import {
-  getSpeechLanguageDefinition,
-  type SpeechLanguage,
-} from "../constants/speechLanguages";
+import type { SttLanguage } from "../constants/speechLanguages";
+import { getSpeechRecognitionLocale } from "../utils/speechLanguage";
+import { supportsNativeOnDeviceRecognition } from "./nativeWaveform";
 
 export interface NativeSpeechCapabilities {
   recognitionAvailable: boolean;
@@ -12,73 +10,95 @@ export interface NativeSpeechCapabilities {
   nativeSttEligible: boolean;
 }
 
-function localeMatches(candidate: string, target: string) {
-  const normalizedCandidate = candidate.replace("_", "-").toLowerCase();
-  const normalizedTarget = target.replace("_", "-").toLowerCase();
+function getSpeechModule() {
   return (
-    normalizedCandidate === normalizedTarget ||
-    normalizedCandidate.split("-")[0] === normalizedTarget.split("-")[0]
-  );
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Settings also runs without a speech module in pure tests
+    require("expo-speech-recognition") as typeof import("expo-speech-recognition")
+  ).ExpoSpeechRecognitionModule;
 }
 
-export async function probeNativeSpeechCapabilities(
-  language: SpeechLanguage,
-): Promise<NativeSpeechCapabilities> {
-  const speechRecognition =
-    // eslint-disable-next-line @typescript-eslint/no-require-imports -- lazy native loading keeps Settings and pure Jest imports safe
-    require("expo-speech-recognition") as typeof import("expo-speech-recognition");
-  const { ExpoSpeechRecognitionModule } = speechRecognition;
+export function probeNativeSpeechCapabilities(language: SttLanguage) {
+  return probeLocale(getSpeechRecognitionLocale(language));
+}
+
+async function probeLocale(locale: string): Promise<NativeSpeechCapabilities> {
+  const speech = getSpeechModule();
   let recognitionAvailable = false;
   let onDeviceRecognitionAvailable = false;
+  let targetLocaleInstalled = false;
   try {
-    recognitionAvailable = ExpoSpeechRecognitionModule.isRecognitionAvailable();
-    onDeviceRecognitionAvailable =
-      ExpoSpeechRecognitionModule.supportsOnDeviceRecognition();
+    recognitionAvailable = speech.isRecognitionAvailable();
+    if (recognitionAvailable && Platform.OS === "ios") {
+      // Expo's iOS locale list includes network-only languages.
+      targetLocaleInstalled = await supportsNativeOnDeviceRecognition(locale);
+      onDeviceRecognitionAvailable = targetLocaleInstalled;
+    } else if (
+      recognitionAvailable &&
+      Platform.OS === "android" &&
+      Number(Platform.Version) >= 33
+    ) {
+      onDeviceRecognitionAvailable = speech.supportsOnDeviceRecognition();
+      if (onDeviceRecognitionAvailable) {
+        const { installedLocales } = await speech.getSupportedLocales({});
+        const normalized = locale.replace(/_/g, "-").toLowerCase();
+        targetLocaleInstalled = installedLocales.some(
+          (entry) => entry.replace(/_/g, "-").toLowerCase() === normalized,
+        );
+      }
+    }
   } catch {
-    return {
-      recognitionAvailable: false,
-      onDeviceRecognitionAvailable: false,
-      targetLocaleInstalled: false,
-      nativeSttEligible: false,
-    };
+    // A missing or failed locale probe cannot prove that audio stays local.
   }
-
-  if (!recognitionAvailable || !onDeviceRecognitionAvailable) {
-    return {
-      recognitionAvailable,
-      onDeviceRecognitionAvailable,
-      targetLocaleInstalled: false,
-      nativeSttEligible: false,
-    };
-  }
-
-  if (Platform.OS !== "android") {
-    return {
-      recognitionAvailable,
-      onDeviceRecognitionAvailable,
-      targetLocaleInstalled: true,
-      nativeSttEligible: true,
-    };
-  }
-
-  try {
-    const targetLocale = getSpeechLanguageDefinition(language).nativeLocale;
-    const supported = await ExpoSpeechRecognitionModule.getSupportedLocales({});
-    const targetLocaleInstalled = supported.installedLocales.some((locale) =>
-      localeMatches(locale, targetLocale),
-    );
-    return {
-      recognitionAvailable,
-      onDeviceRecognitionAvailable,
+  return {
+    recognitionAvailable,
+    onDeviceRecognitionAvailable,
+    targetLocaleInstalled,
+    nativeSttEligible:
+      recognitionAvailable &&
+      onDeviceRecognitionAvailable &&
       targetLocaleInstalled,
-      nativeSttEligible: targetLocaleInstalled,
+  };
+}
+
+export interface NativeRecognitionRoute {
+  lang: string;
+  requiresOnDeviceRecognition: boolean;
+  androidRecognitionServicePackage?: string;
+}
+
+export async function getNativeRecognitionRoute(
+  language: SttLanguage,
+  localOnly: boolean,
+): Promise<{
+  options: NativeRecognitionRoute;
+  recipient?: string;
+} | null> {
+  const lang = getSpeechRecognitionLocale(language);
+  const { recognitionAvailable, nativeSttEligible } = await probeLocale(lang);
+  if (!recognitionAvailable) return null;
+  if (nativeSttEligible)
+    return { options: { lang, requiresOnDeviceRecognition: true } };
+  if (localOnly) return null;
+  if (Platform.OS === "ios")
+    return {
+      options: { lang, requiresOnDeviceRecognition: false },
+      recipient: "apple",
+    };
+  if (Platform.OS !== "android") return null;
+  // Passing the actual package back to Expo binds the request to the named
+  // service even if the default changes while the consent sheet is open.
+  try {
+    const pkg = getSpeechModule().getDefaultRecognitionService().packageName;
+    if (!pkg || !/^[A-Za-z]\w*(?:\.[A-Za-z]\w*)+$/.test(pkg)) return null;
+    return {
+      options: {
+        lang,
+        requiresOnDeviceRecognition: false,
+        androidRecognitionServicePackage: pkg,
+      },
+      recipient: "android." + pkg,
     };
   } catch {
-    return {
-      recognitionAvailable,
-      onDeviceRecognitionAvailable,
-      targetLocaleInstalled: false,
-      nativeSttEligible: false,
-    };
+    return null;
   }
 }

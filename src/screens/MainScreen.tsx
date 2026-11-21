@@ -50,6 +50,9 @@ import { isSpeechInputUnavailable } from "./main/speechInputAvailability";
 import { useMainScreenDataBackup } from "./main/useMainScreenDataBackup";
 import { useMainScreenImageAttachments } from "./main/useMainScreenImageAttachments";
 import { formatMessageForCopy } from "../utils/conversationExport";
+import { isAiSharingOptionalSkipped } from "../services/aiSharing";
+import { useAiSharingSnapshot } from "../features/settings/aiSharingPresentation";
+import { useAiSharingComposerNotice } from "./main/useAiSharingComposerNotice";
 import { useImagePromptSubmission } from "./main/useImagePromptSubmission";
 import { hasProviderCredentialForCapability } from "../utils/providerCredentials";
 import { useStorePromoPresentation } from "../hooks/useStorePromoPresentation";
@@ -184,6 +187,8 @@ export function MainScreen() {
     React.useState<number | null>(null);
   const drawerArchivedRevealSequenceRef = React.useRef(0);
   const {
+    acceptedDraftVersion,
+    handleTextTurnAccepted,
     handleInputSurfaceChange,
     handleTextInputFocusChange,
     handleTextMessageChange,
@@ -236,11 +241,19 @@ export function MainScreen() {
     voiceInputDisabled,
     webSearchActive,
     webSearchApiKey,
-    webSearchMode,
+    webSearchMode: configuredWebSearchMode,
     webSearchOptions,
     webSearchProvider,
     webSearchReady,
   } = routeConfiguration;
+  const sharing = useAiSharingSnapshot();
+  const webPrivacyBlocked = Boolean(
+    webSearchReady && webSearchProvider && (
+      sharing.permissions[webSearchProvider]?.search === "denied" ||
+      isAiSharingOptionalSkipped(webSearchProvider, "search")
+    ),
+  );
+  const webSearchMode = webPrivacyBlocked ? "off" : configuredWebSearchMode;
   const presentationAvailableResponseModes =
     getStorePromoAvailableResponseModes(
       storePromoScene,
@@ -524,6 +537,7 @@ export function MainScreen() {
     handleVoiceCaptureDone: runVoiceCapture,
   } = useVoicePipeline({
     activeConversation,
+    autoNameConversations: runtimeSettings.autoNameConversations && !voiceInputDisabled,
     lockedConversationIds,
     pastConversationKnowledgeEnabled:
       runtimeSettings.pastConversationKnowledgeEnabled,
@@ -676,29 +690,42 @@ export function MainScreen() {
     ],
     [model, provider, ulraModeConfiguration],
   );
+  const openAiSharingSettings = React.useCallback(() => openSettings(undefined, undefined, "ai-sharing"), [openSettings]);
+  const privacy = useAiSharingComposerNotice({
+    conversation: activeConversation,
+    council: Boolean(ulraModeConfiguration),
+    hasImages: pendingImages.attachments.length > 0,
+    model,
+    onOpenSettings: openAiSharingSettings,
+    provider,
+    recipients: imageRoutes,
+    sharing,
+    showToast,
+    sttProvider: runtimeSettings.sttMode === "provider" ? sttProvider : null,
+    blockedSystemSpeech: runtimeSettings.sttMode === "native" ? nativeStt.blockedSystemSpeech : null,
+    t,
+  });
   const imagePromptSubmission = useImagePromptSubmission({
-    activeConversation,
-    imagesEnabled: true,
     imageRoutes,
+    imageSharingBlockedMessage: privacy.blockedImages?.message,
     onAddImage: pendingImages.handleAddImage,
     pendingAttachments: pendingImages.attachments,
     runVoiceCapture,
     showToast,
     t,
-    updateMessage,
   });
   const secondarySurfaceTransitionVisible = false;
   const mainSurfaceVisible = !(
     drawerModalVisible ||
     imageSourceVisible ||
-    Boolean(imagePromptSubmission.consent) ||
+    Boolean(sharing.pending) ||
     routePickerVisible ||
     settingsVisible ||
     styleSheetVisible ||
     transcriptModalVisible
   );
   const promptSubmissionBlockMessage =
-    kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
+    privacy.blockedPrompt?.message ?? kokoroPromptBlockMessage ?? imagePromptSubmission.imageInputBlockMessage;
   const handleVoiceCaptureDone = imagePromptSubmission.handleVoiceCaptureDone;
 
   const handleRepeatMessage = useMainScreenReplyReplay({
@@ -715,7 +742,9 @@ export function MainScreen() {
       handleVoiceCaptureDone,
       isBusy,
       pendingAttachments: pendingImages.attachments,
+      onTextTurnAccepted: handleTextTurnAccepted,
       promptSubmissionBlockMessage,
+      retrySubmissionBlockMessage: privacy.blockedChat?.message ?? kokoroPromptBlockMessage,
       showToast,
     });
 
@@ -784,7 +813,7 @@ export function MainScreen() {
         },
       });
     },
-    promptSubmissionBlockMessage,
+    promptSubmissionBlockMessage: privacy.blockedAudio?.message ?? promptSubmissionBlockMessage,
     providerApiKey,
     providerLabel,
     recorder,
@@ -1063,29 +1092,18 @@ export function MainScreen() {
     presentationAvailableResponseModes.length === 0 &&
     !kokoroPromptBlockMessage;
   const promptBlockedActionEnabled =
-    providerRouteBlocked || Boolean(kokoroPromptBlockMessage);
-  const promptBlockedMessage = providerRouteBlocked
+    Boolean(privacy.blockedPrompt) || providerRouteBlocked || Boolean(kokoroPromptBlockMessage);
+  const promptBlockedMessage = privacy.blockedPrompt?.message ?? (providerRouteBlocked
     ? t("configureCredentialsBeforeVoiceSession")
-    : kokoroPromptBlockMessage;
+    : kokoroPromptBlockMessage);
   const voiceInputUnavailableMessage =
-    speechInputUnavailable && !promptBlockedMessage
+    privacy.blockedAudio?.message ?? (speechInputUnavailable && !promptBlockedMessage
       ? t("speechInputUnavailableHint")
-      : null;
+      : null);
   return (
     <MainScreenPresentation
       colors={colors}
-      imageConsent={{
-        cancelLabel: t("dismiss"),
-        confirmLabel: t("imageProviderConsentConfirm"),
-        message: imagePromptSubmission.consent?.message ?? "",
-        onCancel: imagePromptSubmission.cancelConsent,
-        onConfirm: imagePromptSubmission.confirmConsent,
-        testID: "image-provider-consent-message",
-        title:
-          imagePromptSubmission.consent?.title ??
-          t("imageProviderConsentTitle"),
-        visible: Boolean(imagePromptSubmission.consent),
-      }}
+      aiSharing={sharing.pending ? { pending: sharing.pending, permissions: sharing.permissions } : null}
       isDark={isDark}
       ipadLayout={ipadLayout}
       isLandscape={isLandscape}
@@ -1164,9 +1182,10 @@ export function MainScreen() {
           onChangeCouncilRounds: council.setTotalRounds,
           onToggleCouncilModel: council.toggleMode,
           onToggleHandsFree: handleToggleHandsFree,
-          onToggleWeb: handleToggleWebSearch,
+          onToggleWeb: webPrivacyBlocked ? openAiSharingSettings : handleToggleWebSearch,
           t,
-          webActive: webSearchActive,
+          webActive: webSearchActive && !webPrivacyBlocked,
+          webPrivacyHint: webPrivacyBlocked ? t("aiSharingOpenSettings") : undefined,
           webAvailable: webSearchReady && Boolean(handleToggleWebSearch),
         },
         settingsSummary: {
@@ -1191,6 +1210,7 @@ export function MainScreen() {
           initialInputSurface: inputSurfaceRef.current,
           initialTextInputFocused: textInputFocusedRef.current,
           initialTextMessage: textMessageDraftRef.current,
+          acceptedDraftVersion,
           inputMode: runtimeSettings.inputMode,
           isActive: voiceStageActive,
           handsFreeSilenceCountdownSeconds,
@@ -1210,18 +1230,20 @@ export function MainScreen() {
             ? () => void player.seekParagraph("forward")
             : undefined,
           onStopPlayback: handleStopPlayback,
-          onResolvePromptBlock: providerRouteBlocked
+          onResolvePromptBlock: privacy.blockedPrompt?.onPress ?? (providerRouteBlocked
             ? handleOpenProviderSettings
-            : handleOpenSpeakingSettings,
+            : handleOpenSpeakingSettings),
+          historyNotice: privacy.historyNotice,
+          audioSharingNotice: privacy.blockedAudio,
           onSubmitTextMessage: handleSubmitTextMessage,
           onTextInputFocusChange: handleTextInputFocusChange,
           onTextMessageChange: handleTextMessageChange,
           orbProgressOverride: storePromoOrbPresentation,
           playbackPaused: player.isPlaybackPaused,
           promptBlockedActionEnabled,
-          promptBlockedActionLabel: providerRouteBlocked
+          promptBlockedActionLabel: privacy.blockedPrompt?.action ?? (providerRouteBlocked
             ? t("setupGuideConnectProviderTitle")
-            : kokoroPromptBlockActionLabel,
+            : kokoroPromptBlockActionLabel),
           promptBlockedMessage,
           readingProgress: player.readingProgress,
           readingProgressTiming: player.readingProgressTiming,

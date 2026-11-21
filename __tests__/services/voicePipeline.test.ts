@@ -17,12 +17,17 @@ import {
 import { ProviderRequestError } from "../../src/services/providerErrors";
 import { retrieveConversationKnowledge } from "../../src/services/conversationKnowledge";
 
+jest.mock("../../src/services/aiSharing", () =>
+  require("../test-utils/aiSharingAllowed").createAllowedAiSharingMock(),
+);
+
 jest.mock("expo-file-system/legacy", () => ({
   deleteAsync: jest.fn(() => Promise.resolve()),
 }));
 
 jest.mock("../../src/services/debugLogCapture", () => ({
   recordDebugLogEvent: jest.fn(),
+  registerDebugTurnSignal: jest.fn(),
 }));
 
 jest.mock("../../src/services/whisper", () => ({
@@ -121,6 +126,7 @@ function runVoicePipeline(params: TestVoicePipelineParams) {
   return runVoicePipelineImplementation({
     sttLanguage: "en",
     turnId: "test-turn",
+    currentConversationId: "test-conversation",
     ...params,
   });
 }
@@ -2748,7 +2754,11 @@ describe("runVoicePipeline", () => {
 
     await runVoicePipeline({
       transcriptionOverride: "What is new today?",
-      messages: [],
+      messages: [{
+        id: "council-source", role: "user", content: "Option B",
+        model: null, provider: null, timestamp: "",
+      }],
+      summarizedMessageCount: 1,
       contextSummary:
         "[Conversation response provenance v1]\nThe user previously selected option B.",
       model: "gpt-test",

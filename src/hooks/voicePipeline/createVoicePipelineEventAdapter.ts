@@ -49,6 +49,7 @@ type EventAdapterParams = Pick<
   | "webSearchProvider"
 > & {
   attachments?: MessageImageAttachment[];
+  onTurnAccepted?: () => void;
   existingUserMessageId?: string;
   isActiveRun: () => boolean;
   lastCompletedReplyRef: MutableRefObject<string>;
@@ -93,6 +94,7 @@ export function createVoicePipelineEventAdapter({
   modelEffort,
   onAttachmentsAccepted,
   onPromptSubmitted,
+  onTurnAccepted,
   onError,
   onSpeechTransfer,
   player,
@@ -261,6 +263,12 @@ export function createVoicePipelineEventAdapter({
   };
 
   const callbacks: PipelineCallbacks = {
+    onSharingCancelled: () => {
+      state.sharingCancelled = true;
+    },
+    onSpeechSkipped: () => {
+      state.speechSkipped = true;
+    },
     onTranscription: (text) => {
       if (!isActiveRun()) {
         return;
@@ -280,10 +288,13 @@ export function createVoicePipelineEventAdapter({
       setPipelinePhase("thinking-briefly");
       if (existingUserMessageId) {
         const checkpoint = activeConversation?.messages.find(
-          (message) => message.id === existingUserMessageId && message.role === "user",
+          (message) =>
+            message.id === existingUserMessageId && message.role === "user",
         );
         if (runConversationId && checkpoint) {
+          onTurnAccepted?.();
           onPromptSubmitted?.(runConversationId, checkpoint);
+          return { conversationId: runConversationId, message: checkpoint };
         }
         return runConversationId;
       }
@@ -312,6 +323,10 @@ export function createVoicePipelineEventAdapter({
       messageState.lastUserMessageIdRef.current = userMessage?.id ?? null;
       if (userMessage && attachments?.length) {
         onAttachmentsAccepted?.(attachments.map((attachment) => attachment.id));
+      }
+      if (userMessage && runConversationId) {
+        onTurnAccepted?.();
+        return { conversationId: runConversationId, message: userMessage };
       }
       return runConversationId;
     },
@@ -469,7 +484,7 @@ export function createVoicePipelineEventAdapter({
         },
       });
       latency.finishLatencyProgress("thinking");
-      if (!spokenRepliesEnabled) {
+      if (!spokenRepliesEnabled || state.speechSkipped) {
         latency.finishLatencyProgress("turn");
       } else if (!playbackStartedRef.current) {
         startSynthesisLatency();
@@ -479,7 +494,7 @@ export function createVoicePipelineEventAdapter({
       setPipelinePhase(
         playbackStartedRef.current
           ? "speaking"
-          : spokenRepliesEnabled
+          : spokenRepliesEnabled && !state.speechSkipped
             ? "synthesizing"
             : "thinking",
       );
@@ -494,6 +509,7 @@ export function createVoicePipelineEventAdapter({
       });
       messageState.lastAssistantMessageIdRef.current =
         assistantMessage?.id ?? null;
+      return assistantMessage;
     },
     onAudioReady: (audioData, diagnostics, chunk) => {
       if (!isActiveRun()) {

@@ -4,6 +4,7 @@ import { View } from "react-native";
 import { Colors } from "../../theme/colors";
 import { InputMode, VoiceTimingProgress, VoiceVisualPhase } from "../../types";
 
+import type { ComposerSharingNotice } from "./useAiSharingComposerNotice";
 import { TranslateFn } from "./shared";
 import { styles } from "./styles";
 import { InputSurface, VoiceTextInputPager } from "./VoiceTextInputPager";
@@ -13,12 +14,15 @@ import type { OrbTurnProgress } from "./useOrbTurnProgress";
 interface MainScreenVoiceStageProps {
   colors: Colors;
   compactPromptNotice?: boolean;
+  historyNotice?: ComposerSharingNotice | null;
+  audioSharingNotice?: ComposerSharingNotice | null;
   disabled?: boolean;
   /** Controls centred with the orb/composer as one measured cluster. */
   footer?: React.ReactNode;
   initialInputSurface?: InputSurface;
   initialTextInputFocused?: boolean;
   initialTextMessage?: string;
+  acceptedDraftVersion?: number;
   inputMode: InputMode;
   isActive: boolean;
   handsFreeSilenceCountdownSeconds?: number | null;
@@ -61,11 +65,14 @@ interface MainScreenVoiceStageProps {
 export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
   colors,
   compactPromptNotice = false,
+  historyNotice,
+  audioSharingNotice,
   disabled = false,
   footer,
   initialInputSurface,
   initialTextInputFocused,
   initialTextMessage,
+  acceptedDraftVersion,
   inputMode,
   isActive,
   handsFreeSilenceCountdownSeconds = null,
@@ -123,11 +130,14 @@ export const MainScreenVoiceStage = React.memo(function MainScreenVoiceStage({
         <VoiceTextInputPager
           colors={colors}
           compactPromptNotice={compactPromptNotice}
+          historyNotice={historyNotice}
+          audioSharingNotice={audioSharingNotice}
           disabled={disabled}
           footer={footer}
           initialSurface={initialInputSurface}
           initialTextInputFocused={initialTextInputFocused}
           initialTextMessage={initialTextMessage}
+          acceptedDraftVersion={acceptedDraftVersion}
           inputMode={inputMode}
           isActive={isActive}
           handsFreeSilenceCountdownSeconds={handsFreeSilenceCountdownSeconds}

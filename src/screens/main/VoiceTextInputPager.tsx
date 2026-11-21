@@ -46,11 +46,14 @@ function formatCountdown(seconds: number) {
 export function VoiceTextInputPager({
   colors,
   compactPromptNotice = false,
+  historyNotice,
+  audioSharingNotice,
   disabled,
   footer,
   initialSurface = "voice",
   initialTextInputFocused = false,
   initialTextMessage = "",
+  acceptedDraftVersion = 0,
   inputMode,
   isActive,
   handsFreeSilenceCountdownSeconds = null,
@@ -97,6 +100,7 @@ export function VoiceTextInputPager({
     initialSurface,
     initialTextInputFocused,
     initialTextMessage,
+    acceptedDraftVersion,
     isActive,
     onInputSurfaceChange,
     onSubmitTextMessage,
@@ -134,11 +138,14 @@ export function VoiceTextInputPager({
     : statusLabel;
   const activeOrbInteractive =
     visualPhase === "recording" || visualPhase === "speaking";
-  const showCompactPromptAction =
-    compactPromptNotice &&
-    Boolean(onResolvePromptBlock) &&
-    promptBlockedActionEnabled;
   const textSelected = pager.activeSurface === "text";
+  const privacyNotice = visualPhase === "idle" ? ((!textSelected && audioSharingNotice) || historyNotice) : null;
+  const noticeMessage = promptBlockedMessage ?? privacyNotice?.message;
+  const noticeAction = promptBlockedMessage ? promptBlockedActionLabel ?? t("openSpeakingSettings") : privacyNotice?.action;
+  const onNoticePress = promptBlockedMessage
+    ? (promptBlockedActionEnabled ? onResolvePromptBlock : undefined)
+    : privacyNotice?.onPress;
+  const showCompactPromptAction = compactPromptNotice && Boolean(onNoticePress);
   const reserveActivityRow =
     Boolean(activity) &&
     (visualPhase !== "idle" || !promptBlockedMessage);
@@ -393,78 +400,38 @@ export function VoiceTextInputPager({
         ) : null}
       </View>
 
-      {promptBlockedMessage ? (
+      {noticeMessage ? (
         <TouchableOpacity
-          testID="prompt-blocked-notice"
-          accessibilityLabel={
-            onResolvePromptBlock && promptBlockedActionEnabled
-              ? `${promptBlockedMessage} ${
-                  promptBlockedActionLabel ?? t("openSpeakingSettings")
-                }`
-              : promptBlockedMessage
-          }
-          accessibilityRole={
-            onResolvePromptBlock && promptBlockedActionEnabled
-              ? "button"
-              : "text"
-          }
-          activeOpacity={
-            onResolvePromptBlock && promptBlockedActionEnabled ? 0.76 : 1
-          }
-          disabled={!onResolvePromptBlock || !promptBlockedActionEnabled}
-          onPress={
-            onResolvePromptBlock && promptBlockedActionEnabled
-              ? onResolvePromptBlock
-              : undefined
-          }
-          style={[
-            styles.promptBlockedNotice,
-            {
-              backgroundColor: colors.surfaceAlt,
-              borderColor: colors.border,
-            },
-          ]}
+          testID={promptBlockedMessage ? "prompt-blocked-notice" : "ai-sharing-workspace-notice"}
+          accessibilityLabel={onNoticePress ? `${noticeMessage} ${noticeAction}` : noticeMessage}
+          accessibilityRole={onNoticePress ? "button" : "text"}
+          activeOpacity={onNoticePress ? 0.76 : 1}
+          disabled={!onNoticePress}
+          onPress={onNoticePress}
+          style={[styles.promptBlockedNotice, { backgroundColor: colors.surfaceAlt, borderColor: colors.border }]}
         >
           <PhosphorIcon
-            name="exclamation-circle"
+            name={promptBlockedMessage ? "exclamation-circle" : "safety-certificate"}
             size="compact"
-            color={colors.danger}
+            color={promptBlockedMessage ? colors.danger : colors.textSecondary}
           />
           <View style={styles.promptBlockedCopy}>
             <Text
-              accessibilityLiveRegion="assertive"
-              accessibilityRole="alert"
+              accessibilityLiveRegion={promptBlockedMessage ? "assertive" : "polite"}
+              accessibilityRole={promptBlockedMessage ? "alert" : "text"}
               style={[
-                showCompactPromptAction
-                  ? styles.promptBlockedAction
-                  : styles.promptBlockedText,
-                {
-                  color: showCompactPromptAction
-                    ? colors.accent
-                    : colors.textSecondary,
-                },
+                showCompactPromptAction ? styles.promptBlockedAction : styles.promptBlockedText,
+                { color: showCompactPromptAction ? colors.accent : colors.textSecondary },
               ]}
             >
-              {showCompactPromptAction
-                ? (promptBlockedActionLabel ?? t("openSpeakingSettings"))
-                : promptBlockedMessage}
+              {showCompactPromptAction ? noticeAction : noticeMessage}
             </Text>
-            {!showCompactPromptAction &&
-            onResolvePromptBlock &&
-            promptBlockedActionEnabled ? (
-              <Text
-                style={[styles.promptBlockedAction, { color: colors.accent }]}
-              >
-                {promptBlockedActionLabel ?? t("openSpeakingSettings")}
-              </Text>
+            {!showCompactPromptAction && onNoticePress ? (
+              <Text style={[styles.promptBlockedAction, { color: colors.accent }]}>{noticeAction}</Text>
             ) : null}
           </View>
-          {onResolvePromptBlock && promptBlockedActionEnabled ? (
-            <PhosphorIcon
-              name="right"
-              size="compact"
-              color={colors.textSecondary}
-            />
+          {onNoticePress ? (
+            <PhosphorIcon name={rtl ? "left" : "right"} size="compact" color={colors.textSecondary} />
           ) : null}
         </TouchableOpacity>
       ) : null}

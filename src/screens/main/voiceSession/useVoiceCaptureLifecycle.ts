@@ -63,6 +63,7 @@ export function useVoiceCaptureLifecycle({
   const captureOwnerRef = useRef<{
     mode: SttBackendMode;
     route?: CaptureTranscriptionRoute;
+    pendingNativeConsent?: AbortController;
   } | null>(null);
   const captureGenerationRef = useRef(0);
   const cancelInFlightRef = useRef<Promise<void> | null>(null);
@@ -100,7 +101,8 @@ export function useVoiceCaptureLifecycle({
 
     const captureGeneration = captureGenerationRef.current + 1;
     captureGenerationRef.current = captureGeneration;
-    captureOwnerRef.current = { mode: sttMode, route: captureRoute };
+    const pendingNativeConsent = sttMode === "native" ? new AbortController() : undefined;
+    captureOwnerRef.current = { mode: sttMode, route: captureRoute, pendingNativeConsent };
     recordDebugLogEvent({
       event: "voice-capture-start-requested",
       payload: {
@@ -158,7 +160,7 @@ export function useVoiceCaptureLifecycle({
       });
 
       if (sttMode === "native") {
-        await nativeStt.startRecognition();
+        return (await nativeStt.startRecognition(pendingNativeConsent?.signal)) !== false;
       } else {
         await recorder.startRecording();
       }
@@ -254,6 +256,7 @@ export function useVoiceCaptureLifecycle({
     const startPromise = recordingStartedRef.current;
 
     if (startPromise) {
+      owner?.pendingNativeConsent?.abort();
       try {
         const started = await startPromise;
         if (!started) {
@@ -455,6 +458,7 @@ export function useVoiceCaptureLifecycle({
       }
 
       if (startPromise) {
+        captureOwnerRef.current?.pendingNativeConsent?.abort();
         try {
           const started = await startPromise;
           if (!started) {

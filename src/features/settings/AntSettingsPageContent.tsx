@@ -14,6 +14,7 @@ import { WEB_SEARCH_PROVIDER_IDS } from "../../constants/webSearch";
 import { AntSettingsOverview } from "./AntSettingsOverview";
 import { AppSettingsPage } from "./pages/AppSettingsPage";
 import { ConnectionsSettingsPage } from "./pages/ConnectionsSettingsPage";
+import { AiSharingSettingsPage } from "./pages/AiSharingSettingsPage";
 import { DataPrivacySettingsPage } from "./pages/DataPrivacySettingsPage";
 import { ListeningSettingsPage } from "./pages/ListeningSettingsPage";
 import { SearchSettingsPage } from "./pages/SearchSettingsPage";
@@ -200,10 +201,17 @@ export function AntSettingsPageContent({
           />
         </DrillInPage>
       );
+    case "ai-sharing":
+      return (
+        <DrillInPage page="ai-sharing">
+          <AiSharingSettingsPage settings={settings} />
+        </DrillInPage>
+      );
     case "data":
       return (
         <DrillInPage page="data">
           <DataPrivacySettingsPage
+            onOpenAiSharing={() => onOpenPage("ai-sharing")}
             archivedConversationCount={props.archivedConversationCount}
             localModels={localModels}
             settings={settings}

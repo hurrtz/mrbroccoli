@@ -10,7 +10,7 @@ dependencies:
   - src/services/tts/
   - src/services/whisper/
 validations:
-  - npm test -- --runInBand --watchman=false __tests__/services/voicePipeline.test.ts
+  - npm test -- --runInBand --watchman=false __tests__/services/voicePipeline.test.ts __tests__/services/voicePipelineAiSharing.test.ts
 provenance:
   design: history-backfilled
   validation: test-backed
@@ -23,7 +23,9 @@ last_validated_sha: 7db5c94
 
 ```mermaid
 flowchart TD
-    Start[Turn snapshot] --> Input{Text override?}
+    Start[Turn snapshot] --> Sharing{Required sharing approved?}
+    Sharing -->|no| Stop[Keep the unsent draft]
+    Sharing -->|yes| Input{Text override?}
     Input -->|yes| Normalize[Normalize submitted text]
     Input -->|no| STT[System, local, or provider STT]
     STT --> User[onTranscription persists user message]
@@ -71,12 +73,29 @@ events into the active controller:
 `onTranscription` because the first user turn may create a conversation after
 the pipeline started.
 
+## AI sharing and provenance
+
+The turn constructs a single disclosure from the locked recipient routes before
+STT or prompt persistence. Approved scopes subscribe to revocation and share an
+abort signal with downstream transports. A cloud speech fallback reached after
+local synthesis fails resolves its own permission at that point. Streaming
+chunks share that decision for the playback operation.
+
+The persistence callback returns the accepted message and conversation ID.
+Successful Council contributions establish that their actual providers received
+the current prompt. A completed final response records its provider for that
+prompt and for its own visible reply. OpenRouter receipts include the disclosed
+inference host. Importing a conversation's earlier text explicitly creates
+receipts for that recipient. The runtime filters by exact text and recipient
+before compaction, retrieval, search or the first Council round.
+
 ## Context Planning
 
 ```mermaid
 flowchart LR
-    Messages[Canonical active messages] --> Plan[buildConversationContextPlan]
-    Summary[Provenance-marked summary] --> Plan
+    Messages[Canonical active messages] --> Filter[Allowed text for every recipient]
+    Filter --> Plan[buildConversationContextPlan]
+    Summary[Summary with matching source receipts] --> Plan
     Plan --> Recent[Bounded recent messages]
     Plan --> Update{Needs summary update?}
     Update -->|provider route| Summarizer[Internal provider task]
@@ -85,8 +104,10 @@ flowchart LR
 ```
 
 Only summaries carrying the current provenance marker are reused as generated
-summary state. Older unmarked memory may be displayed/edited but is not silently
-trusted as current compaction output.
+summary state. The exact summary and source-message fingerprint must also match an
+installation-local receipt for each recipient. Edited or restored summaries
+without matching receipts are rebuilt from permitted text. This check protects
+the search and Council payloads as well as the final chat request.
 
 ## Web Search Handoff
 

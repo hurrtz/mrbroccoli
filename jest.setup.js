@@ -24,8 +24,19 @@ jest.mock("expo-speech", () => ({
   getAvailableVoicesAsync: jest.fn(() => Promise.resolve([])),
 }));
 
-jest.mock("@dr.pogodin/react-native-fs", () => ({
-  DocumentDirectoryPath: "/tmp",
-  exists: jest.fn(() => Promise.resolve(false)),
-  unlink: jest.fn(() => Promise.resolve()),
-}));
+jest.mock("@dr.pogodin/react-native-fs", () => {
+  const files = new Map();
+  return {
+    DocumentDirectoryPath: "/tmp",
+    LibraryDirectoryPath: "/test/Library",
+    exists: jest.fn(async (path) => files.has(path)),
+    mkdir: jest.fn(async () => {}),
+    readFile: jest.fn(async (path) => files.get(path)),
+    writeFile: jest.fn(async (path, value) => {
+      files.set(path, value);
+    }),
+    unlink: jest.fn(async (path) => {
+      files.delete(path);
+    }),
+  };
+});

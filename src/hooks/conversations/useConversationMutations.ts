@@ -22,6 +22,11 @@ import type {
   AppDataBackupRestoreResult,
 } from "../../services/appDataBackup";
 import {
+  forgetAiSharingHistory,
+  inheritAiSharingHistory,
+} from "../../services/aiSharing/history";
+import { recordDebugLogEvent } from "../../services/debugLogCapture";
+import {
   buildConversationMetaFromConversation,
   sortConversationMeta,
   normalizeConversationTitle,
@@ -698,6 +703,12 @@ export function useConversationMutations(params: {
         void syncConversationKnowledge(conversation, true);
       }
 
+      try {
+        await inheritAiSharingHistory(currentConversation, conversation);
+      } catch {
+        // The clone is already committed. Missing receipts keep its history
+        // private, and the user can still share it explicitly later.
+      }
       return {
         conversation,
         contextMessages: clonedMessages.slice(0, -1),
@@ -817,6 +828,12 @@ export function useConversationMutations(params: {
       }
       await Promise.all([
         removeConversationKnowledge(id),
+        forgetAiSharingHistory(id).catch(() => {
+          recordDebugLogEvent({
+            event: "ai-sharing-history-removal-failed",
+            level: "warn",
+          });
+        }),
         deleteImageAttachments(attachments),
       ]);
       return true;
@@ -879,7 +896,21 @@ export function useConversationMutations(params: {
           }
 
           let restoredId = originalId;
-          if (usedIds.has(restoredId)) {
+          let needsNewId = usedIds.has(restoredId);
+          if (!needsNewId) {
+            try {
+              // A previous deletion on this device may have left stale receipts
+              // for this ID when its separate storage was unavailable.
+              await forgetAiSharingHistory(restoredId);
+            } catch {
+              needsNewId = true;
+              recordDebugLogEvent({
+                event: "ai-sharing-restore-id-renewed",
+                level: "warn",
+              });
+            }
+          }
+          if (needsNewId) {
             do {
               restoredId = uuid.v4() as string;
             } while (usedIds.has(restoredId));

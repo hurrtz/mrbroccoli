@@ -14,6 +14,9 @@ import type {
 } from "../../../types";
 import { recordSpeechDiagnostic } from "../../speech/diagnostics";
 import { synthesizeSpeech } from "../../tts";
+import { requestAiSharing, type AiSharingAuthorization } from "../../aiSharing";
+import { watchAiSharing } from "../sharing";
+
 import type {
   CreateVoicePipelineTtsQueueParams,
   DiagnosticsForRoute,
@@ -21,6 +24,8 @@ import type {
   TtsChunkContext,
   TtsSynthesisResult,
 } from "./types";
+
+export class SpeechSharingDeclined extends Error {}
 
 interface CreateTtsRouteSelectorParams {
   config: CreateVoicePipelineTtsQueueParams;
@@ -61,6 +66,9 @@ export function createTtsRouteSelector({
     Promise<TtsSynthesisResult>
   >();
   let fallbackNotified = false;
+  // Streaming can schedule two chunks before either resolves. A single decision
+  // covers this playback, including a cloud route reached after a local error.
+  let speechDecision: Promise<AiSharingAuthorization | null> | undefined;
 
   const diagnosticsForRoute: DiagnosticsForRoute = (
     route,
@@ -153,6 +161,23 @@ export function createTtsRouteSelector({
       };
     }
 
+    let sharing: ReturnType<typeof watchAiSharing> | undefined;
+    if (route === "provider" && ttsProvider) {
+      const need = { provider: ttsProvider, purpose: "speech" } as const;
+      let authorization = config.speechAuthorization;
+      if (!authorization) {
+        speechDecision ??= requestAiSharing({ required: [need] }, abortSignal);
+        authorization = (await speechDecision) ?? undefined;
+      }
+      if (!authorization?.allows(ttsProvider, "speech")) {
+        return { kind: "error", error: new SpeechSharingDeclined() };
+      }
+      sharing = watchAiSharing(authorization, [need], abortSignal);
+      if (sharing.signal.aborted) {
+        sharing.close();
+        return { kind: "error", error: new SpeechSharingDeclined() };
+      }
+    }
     try {
       const audio = await synthesizeSpeech({
         onTransferStage: config.callbacks.onSpeechTransfer,
@@ -175,9 +200,12 @@ export function createTtsRouteSelector({
         speechLanguage,
         kokoroVoices,
         diagnostics,
-        abortSignal,
+        abortSignal: sharing?.signal ?? abortSignal,
       });
 
+      if (sharing?.signal.aborted) {
+        return { kind: "error", error: new SpeechSharingDeclined() };
+      }
       return {
         kind: "success",
         result: {
@@ -190,8 +218,14 @@ export function createTtsRouteSelector({
     } catch (error) {
       return {
         kind: "error",
-        error: error instanceof Error ? error : new Error(String(error)),
+        error: sharing?.signal.aborted
+          ? new SpeechSharingDeclined()
+          : error instanceof Error
+            ? error
+            : new Error(String(error)),
       };
+    } finally {
+      sharing?.close();
     }
   };
 
@@ -243,7 +277,11 @@ export function createTtsRouteSelector({
       if (attempt.kind === "success") {
         selectedRoutes.set(speechLanguage, route);
 
-        if (route !== ttsMode && firstError) {
+        if (
+          route !== ttsMode &&
+          firstError &&
+          !(firstError instanceof SpeechSharingDeclined)
+        ) {
           notifyFallback(
             firstError,
             route as TtsFallbackRoute,

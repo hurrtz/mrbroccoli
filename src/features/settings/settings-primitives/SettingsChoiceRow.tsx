@@ -21,30 +21,39 @@ export function SettingsChoiceRow<T extends string>({
   last = false,
   onChange,
   options,
+  supporting,
+  title = label,
   testID,
   value,
+  valueLabel,
 }: {
   icon?: React.ComponentProps<typeof SettingsRow>["icon"];
   label: string;
   last?: boolean;
   onChange: (value: T) => void;
   options: readonly SettingsChoiceOption<T>[];
+  supporting?: string;
+  title?: string;
   testID?: string;
   value: T;
+  valueLabel?: string;
 }) {
   const { colors } = useTheme();
   const [visible, setVisible] = React.useState(false);
   const selected = options.find((option) => option.value === value);
+  const displayValue = valueLabel ?? selected?.label ?? value;
 
   return (
     <>
       <SettingsRow
         testID={testID}
-        accessibilityLabel={`${label}. ${selected?.label ?? value}`}
+        accessibilityLabel={[title, supporting, displayValue].filter(Boolean).join(". ")}
         icon={icon}
         label={label}
+        supporting={supporting}
+        supportingLines={0}
         last={last}
-        value={selected?.label ?? value}
+        value={displayValue}
         onPress={() => setVisible(true)}
       />
       <SettingsSheet
@@ -53,7 +62,7 @@ export function SettingsChoiceRow<T extends string>({
         onClose={() => setVisible(false)}
         scrollable={false}
         testID={testID ? `${testID}-sheet` : undefined}
-        title={label}
+        title={title}
         visible={visible}
       >
         <FlatList

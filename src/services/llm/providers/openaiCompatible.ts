@@ -1,4 +1,5 @@
 import { networkFetch } from "../../networkFetch";
+import { getOpenRouterHost } from "../../../constants/providers/openRouterHosts";
 import {
   buildProviderHttpError,
   normalizeProviderTransportError,
@@ -144,16 +145,19 @@ function getOpenRouterRequestHeaders(
 
 function getOpenRouterRoutingPreferences(
   provider: Provider,
+  model: string,
   modelEffort?: string,
 ) {
-  return provider === "openrouter"
-    ? {
+  if (provider !== "openrouter") return {};
+  const host = getOpenRouterHost(model);
+  if (!host) throw new Error("Unknown OpenRouter inference provider.");
+  return {
         provider: {
+          only: host.slugs,
           data_collection: "deny",
           require_parameters: Boolean(modelEffort),
         },
-      }
-    : {};
+      };
 }
 
 function extractOpenRouterRoutingMetadata(
@@ -285,7 +289,7 @@ export async function requestChatWithOpenAiCompatibleTransport(params: {
       body: JSON.stringify({
         model,
         ...getModelEffortRequestBody(provider, model, modelEffort),
-        ...getOpenRouterRoutingPreferences(provider, modelEffort),
+        ...getOpenRouterRoutingPreferences(provider, model, modelEffort),
         messages: [
           { role: "system", content: systemPrompt },
           ...toOpenAICompatibleMessages(provider, messages),
@@ -382,7 +386,7 @@ export async function requestChatStreamWithOpenAiCompatibleTransport(params: {
       body: JSON.stringify({
         model,
         ...getModelEffortRequestBody(provider, model, modelEffort),
-        ...getOpenRouterRoutingPreferences(provider, modelEffort),
+        ...getOpenRouterRoutingPreferences(provider, model, modelEffort),
         stream: true,
         messages: [
           { role: "system", content: systemPrompt },

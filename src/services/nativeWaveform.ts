@@ -36,6 +36,7 @@ type NativeWaveformEvent =
     };
 
 type NativeWaveformModule = {
+  supportsOnDeviceRecognition?(locale: string): Promise<boolean>;
   startRecording(
     sessionId: string,
     outputUri?: string | null,
@@ -59,6 +60,10 @@ const nativeEmitter = nativeModule
 
 export function isNativeWaveformAvailable() {
   return !!nativeModule;
+}
+
+export async function supportsNativeOnDeviceRecognition(locale: string) {
+  return (await nativeModule?.supportsOnDeviceRecognition?.(locale)) === true;
 }
 
 export function isNativeAmbientMonitoringAvailable() {

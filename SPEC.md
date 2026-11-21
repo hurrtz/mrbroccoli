@@ -169,6 +169,18 @@ precedence, and existing conversations keep their names when opened or restored.
   They must never enter AsyncStorage, backups, diagnostics, fixture data, or a
   distributable bundle.
 - Canonical conversations and public settings stay on the device.
+- On first use, a sheet names each recipient, the data it would receive, and
+  the purpose. This applies to new and upgraded installations. Adding an API
+  key or selecting a route grants no permission. Settings → Data & privacy →
+  AI sharing lets users ask again, allow, or block individual uses.
+- A new reply provider starts with the current prompt. Earlier text must have
+  been shared with that same recipient or explicitly released for this chat.
+  A photo can be shared once or remembered for photos the user attaches.
+  Council members and the final-answer provider receive only common approved
+  context. A roster change requires a fresh decision.
+- Declining cloud replies preserves the draft and access to saved chats,
+  export, deletion, and settings. Cloud transcription, spoken playback,
+  search, title generation, and excerpts from other chats have separate uses.
 - A locked session requires its password or enrolled device authentication
   before its full record can enter the active workspace. Authorization lasts
   only for the current foreground visit; launch and app backgrounding clear it.

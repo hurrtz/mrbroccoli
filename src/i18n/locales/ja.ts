@@ -5,6 +5,7 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
+import { aiSharingTranslations } from "../aiSharingTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -20,6 +21,7 @@ export const ja = {
   ...councilWorkspaceTranslations.ja,
   ...dataBackupTranslations.ja,
   ...conversationKnowledgeTranslations.ja,
+  ...aiSharingTranslations.ja,
   ...imagePromptTranslations.ja,
   ...onDeviceTranslations.ja,
   ...localSpeechTranslations.ja,

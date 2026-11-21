@@ -58,6 +58,7 @@ interface WorkspaceSatellitesProps {
   turnActive: boolean;
   webActive: boolean;
   webAvailable: boolean;
+  webPrivacyHint?: string;
 }
 
 /**
@@ -89,6 +90,7 @@ function WorkspaceSatellites({
   turnActive,
   webActive,
   webAvailable,
+  webPrivacyHint,
 }: WorkspaceSatellitesProps) {
   const { colors } = useTheme();
   const imageAnchorRef = React.useRef<View>(null);
@@ -151,12 +153,12 @@ function WorkspaceSatellites({
   const webSatellite = (
     <OrbSatellite
       accessibilityLabel={t("webSearch")}
-      accessibilityHint={webAvailable ? undefined : t("openWebSearchSettings")}
+      accessibilityHint={webPrivacyHint ?? (webAvailable ? undefined : t("openWebSearchSettings"))}
       active={webActive}
       compact={compact}
       disabled={composingDisabled || !webAvailable}
       icon="search"
-      kind="toggle"
+      kind={webPrivacyHint ? "action" : "toggle"}
       label={t("workspaceWebLabel")}
       onPress={webAvailable ? onToggleWeb : undefined}
       testID="satellite-web"
@@ -413,6 +415,7 @@ export function MainScreenWorkspace({
     t: translateSatellite,
     webActive,
     webAvailable,
+    webPrivacyHint,
   } = satellites;
   const portraitSatellites = React.useMemo(
     () => (
@@ -440,6 +443,7 @@ export function MainScreenWorkspace({
         turnActive={visualPhase !== "idle"}
         webActive={webActive}
         webAvailable={webAvailable}
+        webPrivacyHint={webPrivacyHint}
       />
     ),
     [
@@ -466,6 +470,7 @@ export function MainScreenWorkspace({
       visualPhase,
       webActive,
       webAvailable,
+      webPrivacyHint,
     ],
   );
 

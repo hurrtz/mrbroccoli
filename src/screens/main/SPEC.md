@@ -228,9 +228,17 @@ receive already-derived state and callbacks.
   effective route, not merely the last picker interaction.
 - A user can interrupt or cancel an active turn without a late callback
   restarting recording, playback, or another request.
-- Branch and retry consent uses the exact outbound history and the existing
-  prompt's stored photo grants. The branch checkpoint remains a historical
-  image even when submitted separately from its preceding messages.
+- A named data-sharing sheet opens at the action that first needs permission,
+  including voice previews and transcript retries. Council identifies each
+  recipient, the exchange of drafts and the final writer. Optional sharing and
+  remembering attached photos start switched off. Cancelling leaves typed
+  text and pending photos in the composer. Retrying a row treats its attached
+  photos as this send’s input. Older photos stay out of chat history.
+- A provider entering an existing conversation gets a quiet notice beside
+  the composer. The user can authorize earlier text for that provider in
+  this conversation. Blocking chat messages leaves a persistent link to
+  Settings → Data & privacy → AI sharing while the transcript and local
+  actions remain available. Leaving the search permission off leaves the Web satellite inactive. Its action opens that same permissions page when Search is configured.
 - Text and image submission use the same conversation and route semantics as a
   spoken turn where their capabilities overlap.
 - Pending images live in the Image satellite's fixed-size thumbnail deck and

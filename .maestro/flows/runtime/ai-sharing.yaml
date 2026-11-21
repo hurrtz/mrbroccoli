@@ -1,0 +1,82 @@
+appId: ${APP_ID}
+name: Contextual AI sharing and private draft
+tags:
+  - runtime
+  - privacy
+---
+# This route is restricted to the isolated Maestro bundle and seeds local
+# example chats, Council routes and placeholder credentials.
+- runFlow:
+    when:
+      notVisible:
+        id: store-promo-fixture-ready-conversation
+    commands:
+      - launchApp:
+          clearState: true
+          clearKeychain: true
+          permissions:
+            all: allow
+      - assertVisible:
+          id: main-screen
+      - openLink: "mrbroccoli://store-promos?locale=en&scene=conversation&colorScheme=light&phase=idle&phaseProgress=0&turnProgress=0&overtime=0"
+      - tapOn:
+          text: Open
+          optional: true
+- assertVisible:
+    id: store-promo-fixture-ready-conversation
+- stopApp
+- launchApp
+- setOrientation: PORTRAIT
+- assertVisible:
+    id: main-screen
+- assertNotVisible:
+    id: ai-sharing-consent
+- tapOn:
+    id: pager-chevron-right
+- tapOn:
+    id: voice-text-input
+- inputText: "Local privacy test draft"
+- tapOn:
+    id: voice-text-primary-action
+- assertVisible:
+    id: ai-sharing-header
+- assertVisible:
+    id: ai-sharing-recipient-openai
+- takeScreenshot:
+    path: ${PLATFORM}/privacy/first-send
+- tapOn:
+    text: "Cancel|Don’t allow"
+- assertVisible: "Local privacy test draft"
+- tapOn:
+    id: "main-settings-button|conversation-drawer-settings"
+- scrollUntilVisible:
+    element:
+      id: "settings-overview-row-data|settings-ipad-category-row-data"
+    direction: DOWN
+- tapOn:
+    id: "settings-overview-row-data|settings-ipad-category-row-data"
+- tapOn:
+    id: settings-open-ai-sharing
+- assertVisible:
+    id: ai-sharing-setting-openai-prompt
+- tapOn:
+    id: ai-sharing-setting-openai-prompt
+- tapOn:
+    id: ai-sharing-setting-openai-prompt-option-denied
+- takeScreenshot:
+    path: ${PLATFORM}/privacy/settings
+- tapOn:
+    id: settings-back-button
+- assertVisible:
+    id: settings-open-ai-sharing
+- tapOn:
+    id: settings-close-button
+- waitForAnimationToEnd
+- assertNotVisible:
+    id: settings-modal-title
+- assertVisible:
+    id: prompt-blocked-notice
+- tapOn:
+    id: prompt-blocked-notice
+- assertVisible:
+    id: ai-sharing-setting-openai-prompt

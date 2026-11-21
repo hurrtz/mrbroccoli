@@ -1,4 +1,11 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { hasAiSharingPermission } from "../../../src/services/aiSharing";
+jest.mock("../../../src/services/aiSharing", () => require("../../test-utils/aiSharingAllowed").createAllowedAiSharingMock());
+jest.mock("../../../src/services/aiSharing/titles", () => ({
+  authorizeConversationTitle: jest.fn(async (chat) => ({
+    authorization: { allows: () => true }, messages: chat.messages, usesHistory: true,
+  })),
+}));
 
 import { generateConversationTitle } from "../../../src/services/llm";
 import { useConversationTitleGenerator } from "../../../src/screens/main/useConversationTitleGenerator";
@@ -52,6 +59,16 @@ function createParams(activeConversation: Conversation | null = conversation) {
 describe("useConversationTitleGenerator", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.mocked(hasAiSharingPermission).mockReturnValue(true);
+  });
+
+  it("consumes the first naming opportunity without sending text when titles were declined", async () => {
+    jest.mocked(hasAiSharingPermission).mockImplementation((_provider, purpose) => purpose !== "titles");
+    const claimFirstPrompt = jest.fn(async () => "Initial title");
+    const { result } = renderHook(() => useConversationTitleGenerator({ ...createParams(), claimFirstPrompt }));
+    await act(() => result.current.handlePromptSubmitted(conversation.id, conversation.messages[0]));
+    expect(claimFirstPrompt).toHaveBeenCalledWith(conversation.id);
+    expect(mockGenerateConversationTitle).not.toHaveBeenCalled();
   });
 
   it("names a new session only once using its initial prompt and original title", async () => {
@@ -139,8 +156,9 @@ describe("useConversationTitleGenerator", () => {
       },
     );
 
-    act(() => {
+    await act(async () => {
       void result.current.handleGenerateTitle();
+      await Promise.resolve();
     });
     rerender({
       activeConversation: {

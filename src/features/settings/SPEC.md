@@ -159,7 +159,12 @@ capability healthy. The UI shows the capability that was actually tested.
   routes, with result count, depth, and provider-specific search mode shown
   only for the active route. Nobody
   remains usable without configuring a search provider.
-- Data & privacy: the knowledge opt-in, archived-conversation entry point,
+- Data & privacy includes an AI sharing detail page, also reachable from a
+  blocked composer. It lists configured providers and providers with a sharing
+  decision on this installation. For each supported use the user can allow
+  it, block it, or ask again. The page links to the published privacy policy.
+  Its back action returns to Data & privacy, including in regular-width layouts.
+- Data & privacy also includes the knowledge opt-in, archived-conversation entry point,
   portable archive management, encrypted/readable backup and restore (including
   encrypted envelopes larger than the plaintext limit), and a
   storage janitor that may remove or cancel local models without duplicating

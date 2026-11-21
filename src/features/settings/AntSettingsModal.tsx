@@ -17,7 +17,6 @@ import { resolveIpadLayout } from "../../utils/ipadLayout";
 
 import { AntSettingsPageContent } from "./AntSettingsPageContent";
 import { AntSettingsFrame } from "./AntSettingsFrame";
-import type { SettingsDetailPage } from "./AntSettingsOverview";
 
 function getInitialSettingsPage({
   focusPage,
@@ -236,7 +235,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
   }, [presentedPage, visible]);
 
   const getPageTitle = React.useCallback(
-    (page: SettingsDetailPage) => {
+    (page: Exclude<SettingsPage, "overview">) => {
       switch (page) {
         case "connections":
           return t("settingsConnections");
@@ -250,6 +249,8 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
           return t("settingsSearch");
         case "data":
           return t("settingsDataPrivacy");
+        case "ai-sharing":
+          return t("aiSharingTitle");
         case "app":
           return t("settingsAppDiagnostics");
       }
@@ -288,7 +289,7 @@ export const AntSettingsModal = React.memo(function AntSettingsModal(
       payload: { page: activePage },
     });
     if (activePage !== "overview") {
-      setActivePage("overview");
+      setActivePage(activePage === "ai-sharing" ? "data" : "overview");
       return;
     }
     onClose();

@@ -25,6 +25,19 @@ def append_unique_build_setting_values(existing, values)
   (current_values + values).uniq
 end
 
+# Expo 56 skips Apple's device-only requirement if locale support changes.
+# Always set the requested constraint so Speech fails locally in that case.
+def enforce_device_only_recognition!
+  source = File.join(__dir__, '../node_modules/expo-speech-recognition/ios/ExpoSpeechRecognizer.swift')
+  contents = File.read(source)
+  previous = "    if recognizer.supportsOnDeviceRecognition {\n      request.requiresOnDeviceRecognition = options.requiresOnDeviceRecognition\n    }"
+  enforced = "    request.requiresOnDeviceRecognition = options.requiresOnDeviceRecognition"
+  return if contents.lines.any? { |line| line.chomp == enforced }
+  raise 'Review expo-speech-recognition device-only enforcement after the dependency update.' unless contents.include?(previous)
+
+  File.write(source, contents.sub(previous, enforced))
+end
+
 def configure_fmt_build_settings!(build_configuration)
   build_configuration.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
   build_configuration.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] =
@@ -141,6 +154,7 @@ target 'MrBroccoli' do
     )
 
     patch_fmt_consteval!(installer)
+    enforce_device_only_recognition!
 
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |build_configuration|

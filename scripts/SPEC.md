@@ -200,6 +200,13 @@ the architectural answer for the author.
   device/runtime, source commit, dirty-source fingerprint, and whether the
   artifact was built or reused. A reused artifact is never attributed to the
   current source fingerprint without build evidence.
+- The iOS native configuration check verifies the Pod installation hook that
+  enforces device-only requests in Expo Speech Recognition.
+- Android System speech uses the version- and checksum-verified Expo Speech
+  source patch at dependency install. Expo autolinking builds that module
+  from source. Pre-push checks the installed source fingerprint. The Android
+  instrumentation suite exercises installed voices, network-only voices,
+  missing voice data and language selection.
 - The npm postinstall normalizes Sherpa podspec paths before CocoaPods hashes
   the spec. This and the iOS source guards also run when the optional external
   runtime build is absent.

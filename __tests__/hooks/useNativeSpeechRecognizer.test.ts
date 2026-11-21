@@ -1,4 +1,7 @@
 import React from "react";
+import { Platform } from "react-native";
+import { getAiSharingSnapshot, resolveAiSharing, setSystemSpeechPermission } from "../../src/services/aiSharing";
+import { getNativeRecognitionRoute } from "../../src/services/nativeSpeechCapabilities";
 import { cleanupCapturedAudio } from "../../src/services/voicePipeline/cleanup";
 
 jest.mock("../../src/services/voicePipeline/cleanup", () => ({ cleanupCapturedAudio: jest.fn() }));
@@ -9,6 +12,7 @@ import { useNativeSpeechRecognizer } from "../../src/hooks/useNativeSpeechRecogn
 import { transcribeRecordedFile } from "../../src/hooks/nativeSpeechRecognizer/transcribeRecordedFile";
 import {
   cancelNativeWaveformRecording,
+  supportsNativeOnDeviceRecognition,
   isNativeWaveformAvailable,
   startNativeWaveformRecording,
   stopNativeWaveformRecording,
@@ -30,9 +34,14 @@ function emitNativeWaveformEvent(event: any) {
 jest.mock("expo-speech-recognition", () => ({
   ExpoSpeechRecognitionModule: {
     addListener: jest.fn(),
-    getPermissionsAsync: jest.fn(),
+    getMicrophonePermissionsAsync: jest.fn(),
+    getSpeechRecognizerPermissionsAsync: jest.fn(),
+    requestSpeechRecognizerPermissionsAsync: jest.fn(),
+    getDefaultRecognitionService: jest.fn(),
+    supportsOnDeviceRecognition: jest.fn(),
+    getSupportedLocales: jest.fn(),
     isRecognitionAvailable: jest.fn(),
-    requestPermissionsAsync: jest.fn(),
+    requestMicrophonePermissionsAsync: jest.fn(),
     start: jest.fn(),
     stop: jest.fn(),
     abort: jest.fn(),
@@ -41,6 +50,7 @@ jest.mock("expo-speech-recognition", () => ({
 
 jest.mock("../../src/services/nativeWaveform", () => ({
   cancelNativeWaveformRecording: jest.fn(),
+  supportsNativeOnDeviceRecognition: jest.fn(),
   isNativeWaveformAvailable: jest.fn(),
   startNativeWaveformRecording: jest.fn(),
   stopNativeWaveformRecording: jest.fn(),
@@ -78,10 +88,10 @@ describe("useNativeSpeechRecognizer", () => {
       ExpoSpeechRecognitionModule.isRecognitionAvailable as jest.Mock
     ).mockReturnValue(true);
     (
-      ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock
+      ExpoSpeechRecognitionModule.getMicrophonePermissionsAsync as jest.Mock
     ).mockResolvedValue({ granted: true });
     (
-      ExpoSpeechRecognitionModule.requestPermissionsAsync as jest.Mock
+      ExpoSpeechRecognitionModule.requestMicrophonePermissionsAsync as jest.Mock
     ).mockResolvedValue({ granted: true });
     (ExpoSpeechRecognitionModule.start as jest.Mock).mockImplementation(
       () => undefined,
@@ -93,6 +103,8 @@ describe("useNativeSpeechRecognizer", () => {
       () => undefined,
     );
     (isNativeWaveformAvailable as jest.Mock).mockReturnValue(true);
+    jest.mocked(supportsNativeOnDeviceRecognition).mockResolvedValue(true);
+    (ExpoSpeechRecognitionModule.getSpeechRecognizerPermissionsAsync as jest.Mock).mockResolvedValue({ granted: true });
     (startNativeWaveformRecording as jest.Mock).mockResolvedValue({
       uri: "file://capture.wav",
     });
@@ -114,6 +126,133 @@ describe("useNativeSpeechRecognizer", () => {
     dateNowSpy.mockRestore();
   });
 
+  describe("system speech privacy", () => {
+    const pkg = "org.example.speech";
+
+    beforeEach(async () => {
+      await act(async () => {
+        await setSystemSpeechPermission("apple", null);
+        await setSystemSpeechPermission("android." + pkg, null);
+      });
+      jest.mocked(supportsNativeOnDeviceRecognition).mockResolvedValue(false);
+    });
+
+    it("blocks the iOS live recognizer and leaves the composer idle after a refusal", async () => {
+      jest.mocked(isNativeWaveformAvailable).mockReturnValue(false);
+      const { result } = renderHook(() => useNativeSpeechRecognizer("uk"), { wrapper });
+      let started!: Promise<boolean>;
+      await act(async () => {
+        started = result.current.startRecognition();
+        await new Promise<void>((resolve) => setImmediate(resolve));
+      });
+      const pending = getAiSharingSnapshot().pending!;
+      expect(pending.request.systemSpeech).toBe("apple");
+      expect(supportsNativeOnDeviceRecognition).toHaveBeenCalledWith("uk-UA");
+      expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
+      expect(result.current.isRecording).toBe(false);
+      await act(async () => {
+        await resolveAiSharing(pending.id, null);
+        await expect(started).resolves.toBe(false);
+      });
+      expect(result.current.blockedSystemSpeech).toBe("apple");
+      expect(ExpoSpeechRecognitionModule.getSpeechRecognizerPermissionsAsync).not.toHaveBeenCalled();
+      await act(async () => { await setSystemSpeechPermission("apple", true); });
+      expect(result.current.blockedSystemSpeech).toBeNull();
+    });
+
+    it.each(["cancel", "stop", "unmount"])("withdraws a pending request on %s", async (action) => {
+      const { result, unmount } = renderHook(() => useNativeSpeechRecognizer("en"), { wrapper });
+      let started!: Promise<boolean>;
+      await act(async () => {
+        started = result.current.startRecognition();
+        await new Promise<void>((resolve) => setImmediate(resolve));
+      });
+      expect(getAiSharingSnapshot().pending?.request.systemSpeech).toBe("apple");
+      if (action === "unmount") unmount();
+      await act(async () => {
+        if (action === "cancel") await result.current.abortRecognition();
+        else if (action === "stop") await result.current.stopRecognition();
+        await expect(started).resolves.toBe(false);
+      });
+      expect(getAiSharingSnapshot().pending).toBeNull();
+      expect(startNativeWaveformRecording).not.toHaveBeenCalled();
+    });
+
+    it("fails locally when a required on-device locale is unavailable", async () => {
+      const { result } = renderHook(() => useNativeSpeechRecognizer("de", true), { wrapper });
+      await act(async () => { await expect(result.current.startRecognition()).rejects.toThrow(); });
+      expect(getAiSharingSnapshot().pending).toBeNull();
+      expect(startNativeWaveformRecording).not.toHaveBeenCalled();
+    });
+
+    it("cancels recording when the approved system recipient is revoked", async () => {
+      await setSystemSpeechPermission("apple", true);
+      const { result } = renderHook(() => useNativeSpeechRecognizer("en"), { wrapper });
+      await act(async () => { await expect(result.current.startRecognition()).resolves.toBe(true); });
+      expect(result.current.isRecording).toBe(true);
+      await act(async () => { await setSystemSpeechPermission("apple", false); });
+      expect(result.current.isRecording).toBe(false);
+      expect(cancelNativeWaveformRecording).toHaveBeenCalledTimes(1);
+      expect(ExpoSpeechRecognitionModule.start).not.toHaveBeenCalled();
+    });
+
+    it("settles a live stop without submitting a partial result when permission is revoked", async () => {
+      jest.mocked(isNativeWaveformAvailable).mockReturnValue(false);
+      await setSystemSpeechPermission("apple", true);
+      const { result } = renderHook(() => useNativeSpeechRecognizer("en"), { wrapper });
+      await act(async () => { await result.current.startRecognition(); });
+      expect(ExpoSpeechRecognitionModule.start).toHaveBeenCalledWith(expect.objectContaining({
+        lang: "en-US", requiresOnDeviceRecognition: false,
+      }));
+      dateNowSpy.mockReturnValue(2_000);
+      await act(async () => {
+        emitSpeechEvent("result", {results: [{ transcript: "unfinished" }], isFinal: false});
+        const transcription = result.current.stopRecognition();
+        await setSystemSpeechPermission("apple", false);
+        await expect(transcription).resolves.toBeNull();
+      });
+      expect(ExpoSpeechRecognitionModule.abort).toHaveBeenCalledTimes(1);
+      expect(result.current.isRecording).toBe(false);
+    });
+
+    it("uses the exact Android offline locale and pins a remote file to the approved package", async () => {
+      const os = Object.getOwnPropertyDescriptor(Platform, "OS")!;
+      const version = Object.getOwnPropertyDescriptor(Platform, "Version")!;
+      try {
+        Object.defineProperty(Platform, "OS", { configurable: true, value: "android" });
+        Object.defineProperty(Platform, "Version", { configurable: true, value: 33 });
+        const speech = ExpoSpeechRecognitionModule;
+        jest.mocked(speech.supportsOnDeviceRecognition).mockReturnValue(true);
+        jest.mocked(speech.getDefaultRecognitionService).mockReturnValue({ packageName: pkg });
+        jest.mocked(speech.getSupportedLocales).mockResolvedValue({ locales: ["en-US"], installedLocales: ["en_US"] });
+        await expect(getNativeRecognitionRoute("en", true)).resolves.toEqual({
+          options: { lang: "en-US", requiresOnDeviceRecognition: true },
+        });
+        jest.mocked(speech.getSupportedLocales).mockResolvedValue({ locales: ["en-US"], installedLocales: ["en-GB"] });
+        await expect(getNativeRecognitionRoute("en", true)).resolves.toBeNull();
+        await setSystemSpeechPermission("android." + pkg, true);
+        const { result } = renderHook(() => useNativeSpeechRecognizer("en"), { wrapper });
+        await act(async () => { await result.current.startRecognition(); });
+        jest.mocked(speech.getDefaultRecognitionService).mockReturnValue({ packageName: "org.changed.speech" });
+        dateNowSpy.mockReturnValue(2_000);
+        await act(async () => {
+          const stop = result.current.stopRecognition();
+          await new Promise<void>((resolve) => setImmediate(resolve));
+          expect(speech.start).toHaveBeenCalledWith(expect.objectContaining({
+            audioSource: { uri: "file://capture.wav" }, requiresOnDeviceRecognition: false, androidRecognitionServicePackage: pkg,
+          }));
+          await setSystemSpeechPermission("android." + pkg, false);
+          await expect(stop).resolves.toBeNull();
+        });
+        expect(cleanupCapturedAudio).toHaveBeenCalledWith("file://capture.wav");
+        expect(speech.abort).toHaveBeenCalledTimes(1);
+      } finally {
+        Object.defineProperty(Platform, "OS", os);
+        Object.defineProperty(Platform, "Version", version);
+      }
+    });
+  });
+
   it("starts native waveform recording on iOS", async () => {
     const { result } = renderHook(() => useNativeSpeechRecognizer(), {
       wrapper,
@@ -123,9 +262,9 @@ describe("useNativeSpeechRecognizer", () => {
       await result.current.startRecognition();
     });
 
-    expect(ExpoSpeechRecognitionModule.getPermissionsAsync).toHaveBeenCalled();
+    expect(ExpoSpeechRecognitionModule.getMicrophonePermissionsAsync).toHaveBeenCalled();
     expect(
-      ExpoSpeechRecognitionModule.requestPermissionsAsync,
+      ExpoSpeechRecognitionModule.requestMicrophonePermissionsAsync,
     ).not.toHaveBeenCalled();
     expect(startNativeWaveformRecording).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -135,9 +274,9 @@ describe("useNativeSpeechRecognizer", () => {
     expect(result.current.isRecording).toBe(true);
   });
 
-  it("requests speech permission only when it is not already granted", async () => {
+  it("requests microphone permission only when it is not already granted", async () => {
     (
-      ExpoSpeechRecognitionModule.getPermissionsAsync as jest.Mock
+      ExpoSpeechRecognitionModule.getMicrophonePermissionsAsync as jest.Mock
     ).mockResolvedValue({ granted: false });
 
     const { result } = renderHook(() => useNativeSpeechRecognizer(), {
@@ -149,7 +288,7 @@ describe("useNativeSpeechRecognizer", () => {
     });
 
     expect(
-      ExpoSpeechRecognitionModule.requestPermissionsAsync,
+      ExpoSpeechRecognitionModule.requestMicrophonePermissionsAsync,
     ).toHaveBeenCalledTimes(1);
     expect(startNativeWaveformRecording).toHaveBeenCalledTimes(1);
     expect(result.current.isRecording).toBe(true);
@@ -395,8 +534,7 @@ describe("useNativeSpeechRecognizer", () => {
         fileUri: "file://intro-recording.m4a",
         finalTranscriptRef: { current: "" },
         latestTranscriptRef: { current: "" },
-        requiresOnDeviceRecognition: true,
-        sttLanguage: "en",
+        grant: { options: { requiresOnDeviceRecognition: true, lang: "en-US" }, allowed: () => true },
         t: ((key: string) => key) as any,
       });
 
@@ -502,7 +640,7 @@ describe("useNativeSpeechRecognizer", () => {
       expect.objectContaining({
         lang: "de-DE",
         interimResults: true,
-        requiresOnDeviceRecognition: false,
+        requiresOnDeviceRecognition: true,
         volumeChangeEventOptions: {
           enabled: true,
           intervalMillis: 150,

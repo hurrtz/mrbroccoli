@@ -1,6 +1,7 @@
 import { useCallback, useRef } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
+import { requestAiSharing, subscribeAiSharing } from "../../services/aiSharing";
 import type { SpeechDiagnosticsContext } from "../../services/speech/diagnostics";
 import { createSpeechRequestId } from "../../services/speech/diagnostics";
 import { synthesizeSpeech } from "../../services/tts";
@@ -113,7 +114,21 @@ export function usePreviewVoiceController({
         }
       };
 
+      let unsubscribe: (() => void) | undefined;
       try {
+        if (request.mode === "provider") {
+          if (!settings.apiKeys[request.provider]?.trim()) {
+            showToast(t("chooseTtsToPreviewVoices"));
+            return;
+          }
+          const provider = request.provider;
+          const sharing = await requestAiSharing({ required: [{provider, purpose: "speech"}] }, previewAbortController.signal);
+          if (!sharing?.allows(provider, "speech")) return;
+          unsubscribe = subscribeAiSharing(() => {
+            if (!sharing.allows(provider, "speech")) previewAbortController.abort();
+          });
+        }
+        ensurePreviewActive();
         if (replacesPausedVoiceSession) {
           recordDebugLogEvent({
             event: "voice-preview-replacing-paused-session",
@@ -222,11 +237,6 @@ export function usePreviewVoiceController({
             providerModel: providerModel || null,
           };
 
-          if (!providerApiKey) {
-            showToast(t("chooseTtsToPreviewVoices"));
-            return;
-          }
-
           const audioUri = await synthesizeSpeech({
             text: trimmed,
             voice: request.voice,
@@ -272,6 +282,7 @@ export function usePreviewVoiceController({
         });
         showToast(message, undefined, "danger");
       } finally {
+        unsubscribe?.();
         if (previewAbortRef.current === previewAbortController) {
           previewAbortRef.current = null;
         }

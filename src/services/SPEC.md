@@ -32,6 +32,20 @@ navigation or render UI.
 
 ### Intelligence and provider integration
 
+The AI sharing service stores recipient and purpose choices separately from
+portable settings. A matching device-bound SecureStore marker and local
+installation record are required. On iOS a marker excluded from system backups
+also distinguishes a fresh app container on the same device. A one-time photo
+approval belongs to one dispatch. A content fingerprint includes the local
+installation, message ID, role, text, provider and model. A local branch
+inherits only matching text already released to those recipients. A restored
+conversation begins with its own sharing history.
+Ordinary chat history is sanitized to text before routing. Council requires
+permission for the actual group and its final-answer provider, then takes the
+intersection of the eligible histories. Local traces and diagnostics do not
+contain raw permission payloads. See the broker and pipeline regression tests
+in `__tests__/services/aiSharing.test.ts` and `voicePipelineAiSharing.test.ts`.
+
 OpenAI, Qwen, Gemini, Mistral, and xAI search opt out of provider resource
 storage. Mistral evidence requires a completed web-search execution or a
 provider-issued search citation. Qwen Responses uses `reasoning.effort: none`.
@@ -82,6 +96,10 @@ transcribers keep their existing language and diarization contracts.
 - `voicePipeline.ts` and `voicePipeline/` coordinate the complete turn.
 - `whisper.ts` and `whisper/` route provider STT; native and downloaded STT
   adapters are separate.
+- Native recognition uses verified device-only processing when available for
+  the exact requested locale. Apple and network-capable Android recognizers
+  need per-recipient permission before recording. Android binds the service
+  package selected at consent through both live and file recognition.
 - `tts.ts` and `tts/` route provider TTS and speech chunking; Kokoro, local
   Piper, and native speech use their own adapters.
 - `providerVoiceDirectory.ts` plus provider-specific directory services load

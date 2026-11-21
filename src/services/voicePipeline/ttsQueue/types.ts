@@ -4,6 +4,7 @@ import type {
   SpeechDiagnosticsContext,
 } from "../../speech/diagnostics";
 import type { RunVoicePipelineParams } from "../types";
+import type { AiSharingAuthorization } from "../../aiSharing";
 
 export interface CreateVoicePipelineTtsQueueParams {
   turnId?: string;
@@ -13,6 +14,7 @@ export interface CreateVoicePipelineTtsQueueParams {
   language: RunVoicePipelineParams["language"];
   replyPlayback: RunVoicePipelineParams["replyPlayback"];
   spokenRepliesEnabled?: RunVoicePipelineParams["spokenRepliesEnabled"];
+  speechAuthorization?: AiSharingAuthorization;
   ttsApiKey?: string;
   kokoroVoices?: RunVoicePipelineParams["kokoroVoices"];
   ttsFallbackRoutes?: RunVoicePipelineParams["ttsFallbackRoutes"];

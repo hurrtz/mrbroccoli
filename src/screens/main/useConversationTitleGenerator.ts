@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { recordDebugLogEvent } from "../../services/debugLogCapture";
 import { generateConversationTitle } from "../../services/llm";
+import { aiSharingTextMessage, hasAiSharingPermission, subscribeAiSharing } from "../../services/aiSharing";
+import { authorizeConversationTitle } from "../../services/aiSharing/titles";
 import type { AppLanguage, Conversation, Message, Provider } from "../../types";
 import type { useConversations } from "../../hooks/useConversations";
 import type { ShowToastFn, TranslateFn } from "./shared";
@@ -107,10 +109,8 @@ export function useConversationTitleGenerator({
       requestRef.current?.abort();
       const request = new AbortController();
       let timedOut = false;
-      const timeout = setTimeout(() => {
-        timedOut = true;
-        request.abort();
-      }, CONVERSATION_TITLE_TIMEOUT_MS);
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+      let unsubscribe: (() => void) | undefined;
       requestRef.current = request;
       setIsGeneratingTitle(true);
 
@@ -125,10 +125,18 @@ export function useConversationTitleGenerator({
       });
 
       try {
+        const sharing = await authorizeConversationTitle(conversation, provider, model, request.signal);
+        if (!sharing || request.signal.aborted) return;
+        const checkPermission = () => {
+          if (!sharing.authorization.allows(provider, "titles") ||
+            (sharing.usesHistory && !hasAiSharingPermission(provider, "history", model))) request.abort();
+        };
+        unsubscribe = subscribeAiSharing(checkPermission);
+        checkPermission();
+        if (request.signal.aborted) return;
+        timeout = setTimeout(() => { timedOut = true; request.abort(); }, CONVERSATION_TITLE_TIMEOUT_MS);
         const title = await generateConversationTitle({
-          messages: conversation.messages,
-          contextSummary: conversation.contextSummary,
-          summarizedMessageCount: conversation.summarizedMessageCount,
+          messages: sharing.messages,
           model,
           modelEffort,
           provider,
@@ -184,6 +192,7 @@ export function useConversationTitleGenerator({
           "danger",
         );
       } finally {
+        unsubscribe?.();
         clearTimeout(timeout);
         if (requestRef.current === request) {
           requestRef.current = null;
@@ -217,6 +226,8 @@ export function useConversationTitleGenerator({
         if (
           !autoNameConversations ||
           !providerReady ||
+          !hasAiSharingPermission(provider, "titles", model) ||
+          !hasAiSharingPermission(provider, "prompt", model) ||
           !prompt.content.trim() ||
           automaticRequests.current.has(id)
         ) {
@@ -227,13 +238,19 @@ export function useConversationTitleGenerator({
         automaticRequests.current.set(id, request);
         const expectedTitle = await titleClaim;
         if (expectedTitle === null || request.signal.aborted) return;
+        const checkPermission = () => {
+          if (!hasAiSharingPermission(provider, "titles", model) || !hasAiSharingPermission(provider, "prompt", model)) request.abort();
+        };
+        const unsubscribe = subscribeAiSharing(checkPermission);
         const timeout = setTimeout(
           () => request.abort(),
           CONVERSATION_TITLE_TIMEOUT_MS,
         );
         try {
+          checkPermission();
+          if (request.signal.aborted) return;
           const title = await generateConversationTitle({
-            messages: [{ ...prompt, attachments: undefined }],
+            messages: [aiSharingTextMessage(prompt)],
             model,
             modelEffort,
             provider,
@@ -245,6 +262,7 @@ export function useConversationTitleGenerator({
             await renameConversation(id, title, expectedTitle);
           }
         } finally {
+          unsubscribe();
           clearTimeout(timeout);
         }
       } catch (error) {

@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import React
+import Speech
 
 @objc(MrBroccoliNativeWaveform)
 final class MrBroccoliNativeWaveform: RCTEventEmitter {
@@ -21,6 +22,19 @@ final class MrBroccoliNativeWaveform: RCTEventEmitter {
 
   override func supportedEvents() -> [String]! {
     [Self.eventName]
+  }
+
+  @objc(supportsOnDeviceRecognition:resolver:rejecter:)
+  func supportsOnDeviceRecognition(
+    _ identifier: String,
+    resolver resolve: @escaping RCTPromiseResolveBlock,
+    rejecter _: @escaping RCTPromiseRejectBlock
+  ) {
+    let requested = identifier.replacingOccurrences(of: "_", with: "-")
+    let locale = SFSpeechRecognizer.supportedLocales().first {
+      $0.identifier.replacingOccurrences(of: "_", with: "-").caseInsensitiveCompare(requested) == .orderedSame
+    }
+    resolve(locale.flatMap { SFSpeechRecognizer(locale: $0) }?.supportsOnDeviceRecognition ?? false)
   }
 
   override func startObserving() {

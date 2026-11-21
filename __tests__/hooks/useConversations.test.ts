@@ -1,4 +1,5 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as sharingHistory from "../../src/services/aiSharing/history";
 import * as FileSystem from "expo-file-system/legacy";
 import * as SQLite from "expo-sqlite";
 import * as SecureStore from "expo-secure-store";
@@ -656,6 +657,25 @@ describe("useConversations", () => {
     );
   });
 
+  it("deletes the canonical conversation and avoids stale receipt IDs on restore if privacy storage fails", async () => {
+    const { result } = renderHook(() => useConversations());
+    await waitFor(() => expect(result.current.loaded).toBe(true));
+    await act(async () => { result.current.createConversation("Saved text"); });
+    const original = result.current.activeConversation!;
+    const removal = jest.spyOn(sharingHistory, "forgetAiSharingHistory")
+      .mockRejectedValue(new Error("privacy storage unavailable"));
+    await act(async () => {
+      await result.current.deleteConversation(original.id);
+    });
+    expect(result.current.activeConversation).toBeNull();
+    await act(async () => {
+      await result.current.restoreConversationBackup([{conversation: original, pinned: false}], original.id);
+    });
+    expect(result.current.activeConversation?.title).toBe(original.title);
+    expect(result.current.activeConversation?.id).not.toBe(original.id);
+    expect(removal).toHaveBeenCalledTimes(2);
+  });
+
   it("remaps branch ancestry when a backup family is restored as copies", async () => {
     const stored = new Map<string, string>();
     (AsyncStorage.getItem as jest.Mock).mockImplementation(
@@ -1311,7 +1331,9 @@ describe("useConversations", () => {
     );
   });
 
-  it("creates an alternative-response branch from an unedited user prompt", async () => {
+  it.each([true, false])("keeps an unedited prompt branch usable when its sharing ledger succeeds: %s", async (ledgerAvailable) => {
+    const inherit = jest.spyOn(sharingHistory, "inheritAiSharingHistory");
+    if (!ledgerAvailable) inherit.mockRejectedValueOnce(new Error("device storage unavailable"));
     const { result } = renderHook(() => useConversations());
     let messageId = "";
     await act(async () => {
@@ -1332,6 +1354,7 @@ describe("useConversations", () => {
       branch = await result.current.branchConversationAtMessage(messageId);
     });
 
+    expect(inherit).toHaveBeenCalledTimes(1);
     expect(branch?.conversation.branch?.kind).toBe("alternative-response");
     expect(branch?.contextMessages).toEqual([]);
     expect(branch?.checkpointMessage.role).toBe("user");

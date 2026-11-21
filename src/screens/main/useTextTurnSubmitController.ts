@@ -21,8 +21,10 @@ interface UseTextTurnSubmitControllerParams {
   branchCreatedMessage?: string;
   branchFailureMessage?: string;
   promptSubmissionBlockMessage?: string | null;
+  retrySubmissionBlockMessage?: string | null;
   showToast?: ShowToastFn;
   pendingAttachments?: MessageImageAttachment[];
+  onTextTurnAccepted?: (text: string) => void;
 }
 
 export function useTextTurnSubmitController({
@@ -32,14 +34,17 @@ export function useTextTurnSubmitController({
   branchCreatedMessage,
   branchFailureMessage,
   promptSubmissionBlockMessage,
+  retrySubmissionBlockMessage = promptSubmissionBlockMessage,
   showToast,
   pendingAttachments = [],
+  onTextTurnAccepted,
 }: UseTextTurnSubmitControllerParams) {
   const submissionInFlightRef = useRef(false);
 
   const runTextTurn = useCallback(
     (params: {
       existingUserMessageId?: string;
+      attachments?: MessageImageAttachment[];
       text: string;
       source: "new" | "retry";
     }) => {
@@ -49,8 +54,12 @@ export function useTextTurnSubmitController({
         return;
       }
 
-      if (promptSubmissionBlockMessage) {
-        showToast?.(promptSubmissionBlockMessage, undefined, "danger");
+      const blockedMessage =
+        params.source === "retry"
+          ? retrySubmissionBlockMessage
+          : promptSubmissionBlockMessage;
+      if (blockedMessage) {
+        showToast?.(blockedMessage, undefined, "danger");
         return;
       }
 
@@ -68,10 +77,13 @@ export function useTextTurnSubmitController({
         },
       });
 
+      const attachments =
+        params.source === "retry" ? params.attachments : pendingAttachments;
       void handleVoiceCaptureDone({
-        ...(params.source !== "retry" && pendingAttachments.length > 0
-          ? { attachments: pendingAttachments }
+        ...(params.source === "new" && onTextTurnAccepted
+          ? { onTurnAccepted: () => onTextTurnAccepted(trimmed) }
           : {}),
+        ...(attachments?.length ? { attachments } : {}),
         existingUserMessageId: params.existingUserMessageId,
         transcriptionOverride: trimmed,
         turnId,
@@ -83,8 +95,10 @@ export function useTextTurnSubmitController({
       handleVoiceCaptureDone,
       isBusy,
       promptSubmissionBlockMessage,
+      retrySubmissionBlockMessage,
       showToast,
       pendingAttachments,
+      onTextTurnAccepted,
     ],
   );
 
@@ -99,6 +113,7 @@ export function useTextTurnSubmitController({
     (message: Message) => {
       runTextTurn({
         existingUserMessageId: message.id,
+        attachments: message.attachments,
         source: "retry",
         text: message.content,
       });
@@ -116,8 +131,8 @@ export function useTextTurnSubmitController({
         return false;
       }
 
-      if (message.role === "user" && promptSubmissionBlockMessage) {
-        showToast?.(promptSubmissionBlockMessage, undefined, "danger");
+      if (message.role === "user" && retrySubmissionBlockMessage) {
+        showToast?.(retrySubmissionBlockMessage, undefined, "danger");
         return false;
       }
 
@@ -187,7 +202,7 @@ export function useTextTurnSubmitController({
       branchFailureMessage,
       handleVoiceCaptureDone,
       isBusy,
-      promptSubmissionBlockMessage,
+      retrySubmissionBlockMessage,
       showToast,
     ],
   );

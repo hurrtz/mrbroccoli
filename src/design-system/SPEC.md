@@ -166,6 +166,10 @@ framework or hiding platform behavior behind excessive abstraction.
   width so scripts rendered by fallback fonts have room for their glyphs.
   Enlarged portrait titles and subtitles wrap inside the sheet’s content
   gutter. Landscape headers reserve space for the close button.
+- A contextual privacy decision can opt into `Modal.aboveModals` to keep
+  the invoking transcript or voice picker in place. iOS presents the shared
+  sheet in an accessible full-window overlay. Android uses the same sheet in
+  its native dialog window.
 - `Modal.cardStyle` is the narrow escape hatch for an approved feature canvas
   whose sheet deliberately does not use the generic elevated dialog surface or
   padding. The caller still owns safe-area clearance and must keep the default

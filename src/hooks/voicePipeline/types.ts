@@ -52,6 +52,7 @@ export type CaptureTranscriptionRoute = Pick<
 >;
 
 export interface VoiceCaptureRequest {
+  onTurnAccepted?: () => void;
   captureRoute?: CaptureTranscriptionRoute;
   attachments?: MessageImageAttachment[];
   audioUri?: string;
@@ -80,6 +81,7 @@ export type AudioPlayer = Pick<
 
 export interface UseVoicePipelineParams {
   activeConversation: Conversation | null;
+  autoNameConversations?: boolean;
   lockedConversationIds?: string[];
   pastConversationKnowledgeEnabled?: boolean;
   addMessage: (msg: Omit<Message, "id" | "timestamp">) => Message | null;

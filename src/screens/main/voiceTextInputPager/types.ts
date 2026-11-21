@@ -3,6 +3,7 @@ import {
   VoiceTimingProgress,
   VoiceVisualPhase,
 } from "../../../types";
+import type { ComposerSharingNotice } from "../useAiSharingComposerNotice";
 import type { ReactNode } from "react";
 import { Colors } from "../../../theme/colors";
 import { TranslateFn } from "../shared";
@@ -14,6 +15,8 @@ export type InputSurface = "voice" | "text";
 export interface VoiceTextInputPagerProps {
   /** Show only the actionable blocked-route label in constrained layouts. */
   compactPromptNotice?: boolean;
+  historyNotice?: ComposerSharingNotice | null;
+  audioSharingNotice?: ComposerSharingNotice | null;
   colors: Colors;
   disabled: boolean;
   /** Controls that stay attached to the measured orb/composer slot. */
@@ -21,6 +24,7 @@ export interface VoiceTextInputPagerProps {
   initialSurface?: InputSurface;
   initialTextInputFocused?: boolean;
   initialTextMessage?: string;
+  acceptedDraftVersion?: number;
   inputMode: InputMode;
   isActive: boolean;
   /** Seconds until Hands free submits the current recording after speech. */

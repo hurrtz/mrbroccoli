@@ -337,6 +337,7 @@ describe("streamChat", () => {
         reasoning: { effort: "high" },
         provider: {
           data_collection: "deny",
+          only: ["openai"],
           require_parameters: true,
         },
       }),

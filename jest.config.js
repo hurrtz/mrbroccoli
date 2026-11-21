@@ -20,6 +20,7 @@ module.exports = {
     "^expo-file-system/legacy$":
       "<rootDir>/__mocks__/expoFileSystemLegacy.js",
     "^expo-crypto$": "<rootDir>/__mocks__/expoCrypto.js",
+    "^expo-secure-store$": "<rootDir>/__mocks__/expoSecureStore.js",
     "^expo-document-picker$":
       "<rootDir>/__mocks__/expoDocumentPicker.js",
     "^expo-image-picker$": "<rootDir>/__mocks__/expoImagePicker.js",

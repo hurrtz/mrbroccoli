@@ -1,0 +1,86 @@
+--- a/android/src/main/java/expo/modules/speech/SpeechModule.kt
++++ b/android/src/main/java/expo/modules/speech/SpeechModule.kt
+@@ -19,0 +20,23 @@
++// All System speech, including previews and fallback playback, uses installed
++// embedded voices. Some Android engines also advertise remote voices here.
++object OfflineSpeechVoices {
++  fun installed(voice: Voice): Boolean =
++    !voice.isNetworkConnectionRequired &&
++      voice.features?.contains(TextToSpeech.Engine.KEY_FEATURE_NOT_INSTALLED) == false
++
++  fun select(voices: Collection<Voice>, requested: String?, locale: Locale, defaultName: String?): Voice? {
++    val installed = voices.filter(::installed)
++    if (!requested.isNullOrBlank()) return installed.firstOrNull { it.name == requested }
++    fun normalized(voice: Voice) = Locale.forLanguageTag(LanguageUtils.getISOCode(voice.locale))
++    return installed.filter { normalized(it).language == locale.language }
++      .sortedWith(
++        compareByDescending<Voice> { it.locale.toLanguageTag().equals(locale.toLanguageTag(), ignoreCase = true) }
++          .thenByDescending { locale.script.isNotEmpty() && it.locale.script == locale.script }
++          .thenByDescending { locale.country.isNotEmpty() && normalized(it).country == locale.country }
++          .thenByDescending { it.name == defaultName }
++          .thenByDescending { it.quality }
++          .thenBy { it.name }
++      ).firstOrNull()
++  }
++}
++
+@@ -86 +109 @@
+-      textToSpeech.voices.toList()
++      textToSpeech.voices.orEmpty().filter(OfflineSpeechVoices::installed)
+@@ -106,0 +130 @@
++  @Synchronized
+@@ -108,36 +132,18 @@
+-    options.pitch?.let(textToSpeech::setPitch)
+-    options.rate?.let(textToSpeech::setSpeechRate)
+-
+-    textToSpeech.language = options.language?.let {
+-      val locale = Locale(it)
+-      val languageAvailable = textToSpeech.isLanguageAvailable(locale)
+-
+-      return@let if (
+-        languageAvailable != TextToSpeech.LANG_MISSING_DATA &&
+-        languageAvailable != TextToSpeech.LANG_NOT_SUPPORTED
+-      ) {
+-        locale
+-      } else {
+-        Locale.getDefault()
+-      }
+-    } ?: Locale.getDefault()
+-
+-    options.voice?.let { voiceName ->
+-      textToSpeech.voices
+-        .firstOrNull { it.name == voiceName }
+-        ?.let(textToSpeech::setVoice)
+-    }
+-
+-    val params = Bundle().apply {
+-      options.volume?.let {
+-        val volume = it.coerceAtLeast(0.0f).coerceAtMost(1.0f)
+-        putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, volume)
+-      }
+-    }
+-
+-    textToSpeech.speak(
+-      text,
+-      TextToSpeech.QUEUE_ADD,
+-      params,
+-      id
+-    )
++    val spoken = try {
++      val locale = options.language?.takeIf { it.isNotBlank() }
++        ?.let { Locale.forLanguageTag(it.replace('_', '-')) } ?: Locale.getDefault()
++      val voice = OfflineSpeechVoices.select(textToSpeech.voices.orEmpty(), options.voice, locale, textToSpeech.defaultVoice?.name)
++      options.pitch?.let(textToSpeech::setPitch)
++      options.rate?.let(textToSpeech::setSpeechRate)
++      val params = Bundle().apply {
++        options.volume?.let { putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, it.coerceIn(0.0f, 1.0f)) }
++      }
++      // setLanguage can select a network voice or start a voice download.
++      // Select the installed voice directly and verify the engine's actual choice.
++      voice != null && textToSpeech.setVoice(voice) == TextToSpeech.SUCCESS &&
++        textToSpeech.voice?.let { it.name == voice.name && OfflineSpeechVoices.installed(it) } == true &&
++        textToSpeech.speak(text, TextToSpeech.QUEUE_ADD, params, id) == TextToSpeech.SUCCESS
++    } catch (_: RuntimeException) {
++      false
++    }
++    if (!spoken) sendEvent(speakingErrorEvent, idToMap(id))

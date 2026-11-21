@@ -5,6 +5,7 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
+import { aiSharingTranslations } from "../aiSharingTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -20,6 +21,7 @@ export const ur = {
   ...councilWorkspaceTranslations.ur,
   ...dataBackupTranslations.ur,
   ...conversationKnowledgeTranslations.ur,
+  ...aiSharingTranslations.ur,
   ...imagePromptTranslations.ur,
   ...onDeviceTranslations.ur,
   ...localSpeechTranslations.ur,

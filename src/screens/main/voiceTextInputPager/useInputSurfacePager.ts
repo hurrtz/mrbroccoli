@@ -14,6 +14,7 @@ interface UseInputSurfacePagerParams {
   initialSurface: InputSurface;
   initialTextInputFocused: boolean;
   initialTextMessage: string;
+  acceptedDraftVersion: number;
   isActive: boolean;
   onInputSurfaceChange?: (surface: InputSurface) => void;
   onSubmitTextMessage: (text: string) => void;
@@ -27,6 +28,7 @@ export function useInputSurfacePager({
   initialSurface,
   initialTextInputFocused,
   initialTextMessage,
+  acceptedDraftVersion,
   isActive,
   onInputSurfaceChange,
   onSubmitTextMessage,
@@ -41,6 +43,14 @@ export function useInputSurfacePager({
     React.useState<InputSurface>(initialSurface);
   const [textFocused, setTextFocused] = React.useState(false);
   const [textMessage, setTextMessage] = React.useState(initialTextMessage);
+  const lastAcceptedVersion = React.useRef(acceptedDraftVersion);
+  React.useEffect(() => {
+    if (acceptedDraftVersion !== lastAcceptedVersion.current) {
+      lastAcceptedVersion.current = acceptedDraftVersion;
+      setTextMessage(initialTextMessage);
+    }
+  }, [acceptedDraftVersion, initialTextMessage]);
+
   const pageWidth = viewportWidth || Math.max(1, windowWidth - 32);
   const pageStride = pageWidth + PAGE_GAP;
   const trimmedTextMessage = textMessage.trim();
@@ -131,12 +141,9 @@ export function useInputSurfacePager({
     }
 
     onSubmitTextMessage(trimmedTextMessage);
-    setTextMessage("");
-    onTextMessageChange?.("");
     Keyboard.dismiss();
   }, [
     onSubmitTextMessage,
-    onTextMessageChange,
     textSubmitDisabled,
     trimmedTextMessage,
   ]);

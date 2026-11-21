@@ -3,10 +3,9 @@ import type { TranslationKey } from "../../i18n";
 import {
   applyRecognitionResult,
   buildErrorMessage,
-  getRecognitionLocale,
   RECOGNIZED_FILE_TIMEOUT_MS,
 } from "./shared";
-import type { SttLanguage } from "../../types";
+import type { RecognitionGrant } from "./useRecognitionPrivacy";
 
 interface TranscribeRecordedFileParams {
   abortSignal?: AbortSignal;
@@ -14,8 +13,7 @@ interface TranscribeRecordedFileParams {
   fileUri: string;
   finalTranscriptRef: React.MutableRefObject<string>;
   latestTranscriptRef: React.MutableRefObject<string>;
-  sttLanguage: SttLanguage;
-  requiresOnDeviceRecognition: boolean;
+  grant: RecognitionGrant;
   t: (
     key: TranslationKey,
     params?: Record<string, string | number | undefined>,
@@ -28,12 +26,11 @@ export function transcribeRecordedFile({
   fileUri,
   finalTranscriptRef,
   latestTranscriptRef,
-  sttLanguage,
-  requiresOnDeviceRecognition,
+  grant,
   t,
 }: TranscribeRecordedFileParams) {
   return new Promise<string | null>((resolve, reject) => {
-    if (abortSignal?.aborted) {
+    if (abortSignal?.aborted || !grant.allowed()) {
       resolve(null);
       return;
     }
@@ -144,11 +141,10 @@ export function transcribeRecordedFile({
 
     try {
       ExpoSpeechRecognitionModule.start({
-        lang: getRecognitionLocale(sttLanguage),
+        ...grant.options,
         interimResults: true,
         continuous: false,
         addsPunctuation: true,
-        requiresOnDeviceRecognition,
         audioSource: {
           uri: fileUri,
         },

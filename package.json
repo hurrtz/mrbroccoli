@@ -32,7 +32,7 @@
     "fresh-checkout:test": "node --test scripts/run-fresh-checkout-validation.test.mjs",
     "license:notices:generate": "node scripts/verify-licenses.mjs --write",
     "license:verify": "node scripts/verify-licenses.mjs",
-    "postinstall": "node scripts/install-espeak-free-runtime.mjs --optional",
+    "postinstall": "node scripts/install-android-offline-speech.mjs && node scripts/install-espeak-free-runtime.mjs --optional",
     "espeak-free:install": "node scripts/install-espeak-free-runtime.mjs",
     "espeak-free:verify": "node scripts/install-espeak-free-runtime.mjs --verify-installed",
     "license:test": "node --test scripts/verify-licenses.test.mjs",
@@ -123,6 +123,11 @@
     "yaml": "2.9.0"
   },
   "expo": {
+    "autolinking": {
+      "android": {
+        "buildFromSource": ["expo-speech"]
+      }
+    },
     "doctor": {
       "appConfigFieldsNotSyncedCheck": {
         "enabled": false

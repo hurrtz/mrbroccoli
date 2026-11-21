@@ -85,7 +85,7 @@ export async function resolveContextualMessages({
       if (updatedSummary) {
         effectiveSummary = markConversationSummaryProvenance(updatedSummary);
         summaryUpdated = true;
-        callbacks.onContextSummary?.(
+        await callbacks.onContextSummary?.(
           effectiveSummary,
           contextPlan.targetSummarizedCount,
           usage,

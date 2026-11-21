@@ -18,6 +18,7 @@ interface ResolvePipelineWebSearchParams {
   provider?: RunVoicePipelineParams["webSearchProvider"];
   apiKey?: string;
   options?: RunVoicePipelineParams["webSearchOptions"];
+  sharingAllowed: boolean;
   transcription: string;
   turnReceipt: MessageTurnReceipt;
 }
@@ -34,6 +35,7 @@ export async function resolvePipelineWebSearch({
   apiKey,
   options,
   transcription,
+  sharingAllowed,
   turnReceipt,
 }: ResolvePipelineWebSearchParams): Promise<{
   aborted: boolean;
@@ -61,7 +63,7 @@ export async function resolvePipelineWebSearch({
     ready,
     used: false,
     fellBack: false,
-    decisionReason: decision.reason,
+    decisionReason: decision.shouldSearch && !sharingAllowed ? "sharing-denied" : decision.reason,
   };
 
   recordDebugLogEvent({
@@ -77,7 +79,7 @@ export async function resolvePipelineWebSearch({
     },
   });
 
-  if (!decision.shouldSearch || !provider || !normalizedApiKey) {
+  if (!decision.shouldSearch || !sharingAllowed || !provider || !normalizedApiKey || abortSignal?.aborted) {
     return {
       aborted: false,
       responseMetadata,

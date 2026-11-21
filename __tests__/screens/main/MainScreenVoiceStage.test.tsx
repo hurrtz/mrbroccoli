@@ -899,7 +899,12 @@ describe("MainScreenVoiceStage composer", () => {
     fireEvent.press(screen.getByTestId("voice-text-primary-action"));
     expect(onSubmitTextMessage).toHaveBeenCalledWith("Hello Mr Broccoli");
     expect(dismissKeyboard).toHaveBeenCalledTimes(1);
-    expect(input.props.value).toBe("");
+    expect(input.props.value).toBe("  Hello Mr Broccoli  ");
+    // The capture pipeline signals acceptance after permission and persistence.
+    screen.rerender(
+      <MainScreenVoiceStage {...createProps({ onSubmitTextMessage, acceptedDraftVersion: 1 })} />,
+    );
+    expect(screen.getByPlaceholderText("Type a message").props.value).toBe("");
     dismissKeyboard.mockRestore();
   });
 

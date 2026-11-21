@@ -1,4 +1,5 @@
 import AVFoundation
+import Speech
 import XCTest
 @testable import MrBroccoli
 
@@ -18,6 +19,23 @@ final class MrBroccoliNativeLifecycleTests: XCTestCase {
   ) -> Unmanaged<NSDictionary>
   private static let sherpaArchiveFixture =
     "QlpoOTFBWSZTWXnMkgQAAJJ/2vYQAMBAgf/iOn97oG/v3+ACAAQAGAAAgAEIMAEY2sGqho9Jk0NMEGEaDTJp6mQ00yaNGhtQNVPSe1MKD1DINDQAAA09QANABKJNGIEjaEHogPUAANAPUaB4ppPcNWLCgWZQVwiD1EDLVIBaNRErgIXZOPRIWKYwrFBjyddDrbW0+T8GTfBGRHoePM3LKIWFisBCc3xROnwaRDjHUNHimRnIRSC1z5+FT1iLudpFLMD1AuWCcFw+FIdMc4IINPWoIs210CUFrrSIsz+fU1u7YCySAzOVrOkwn+si2Y8hUjhaC5Q0OYQxCf2CCE8eLFZ0w8xGgjBMCAzacpzv0Wlp+JTpoqDwgEke5jhB4KjfDWBRF0Bh+X0kxtClFQrI8V+abqJTNB5Gbg01s9BQR0m628dA/jXIPHEl7TTKYYM1KJ/i7kinChIPOZJAgA=="
+
+  func testOnDeviceRecognitionProbeUsesTheRequestedLocale() {
+    let module = MrBroccoliNativeWaveform()
+    let language = Locale(identifier: "en-US")
+    let supported = SFSpeechRecognizer(locale: language)?.supportsOnDeviceRecognition ?? false
+    for (identifier, expected) in [("en-US", supported), ("zxx-ZZ", false)] {
+      let checked = expectation(description: "Checked \(identifier)")
+      module.supportsOnDeviceRecognition(identifier, resolver: { result in
+        XCTAssertEqual(result as? Bool, expected)
+        checked.fulfill()
+      }, rejecter: { _, _, _ in
+        XCTFail("Local capability probe failed")
+        checked.fulfill()
+      })
+      wait(for: [checked], timeout: 2)
+    }
+  }
 
   func testWaveformPlaybackStateStartsAndStopsDeterministically() {
     let coordinator = MrBroccoliWaveformCoordinator.shared

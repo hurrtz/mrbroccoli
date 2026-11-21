@@ -26,6 +26,7 @@ flowchart TB
     Main --> Voice[Voice-session controller]
     Main --> Text[Text and image submission]
     Main --> Surfaces[Settings, drawers, status, diagnostics]
+    Main --> Consent[Queued provider sharing sheet]
 
     Voice --> Capture[Capture lifecycle]
     Voice --> HandsFree[Hands-free session state]
@@ -42,6 +43,13 @@ flowchart TB
 The root screen assembles controllers in dependency order and passes a
 presentation model down once. Controller hooks own effects and mutable refs;
 presentation files own layout, gestures, and accessibility labels.
+
+The workspace subscribes to the installation’s sharing policy. A pending
+decision is rendered once above the current surface, including native sheets.
+The pipeline’s acceptance callback clears only the submitted text and photos.
+Explicit permission to use earlier text is recorded for the selected provider
+and conversation. Loading the conversation’s local receipts keeps the notice
+accurate across restarts.
 
 ## Turn State
 

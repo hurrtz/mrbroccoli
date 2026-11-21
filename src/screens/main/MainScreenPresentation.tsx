@@ -16,7 +16,7 @@ import type { AppLanguage } from "../../i18n/localeRegistry";
 import { Colors } from "../../theme/colors";
 import type { IpadLayout } from "../../utils/ipadLayout";
 import { MainScreenWorkspace } from "./MainScreenWorkspace";
-import { DisclosureDialog } from "./DisclosureDialog";
+import { AiSharingSheet } from "./AiSharingSheet";
 import { ImageSourceSheet } from "./ImageSourceSheet";
 import { StyleSheetModal } from "./StyleSheetModal";
 import { styles } from "./styles";
@@ -24,7 +24,7 @@ import { styles } from "./styles";
 interface MainScreenPresentationProps {
   colors: Colors;
   conversationDrawer: React.ComponentProps<typeof ConversationDrawer>;
-  imageConsent: React.ComponentProps<typeof DisclosureDialog>;
+  aiSharing: React.ComponentProps<typeof AiSharingSheet> | null;
   imageSource: React.ComponentProps<typeof ImageSourceSheet>;
   isDark: boolean;
   ipadLayout: IpadLayout;
@@ -40,7 +40,7 @@ interface MainScreenPresentationProps {
 export function MainScreenPresentation({
   colors,
   conversationDrawer,
-  imageConsent,
+  aiSharing,
   imageSource,
   isDark,
   ipadLayout,
@@ -138,7 +138,7 @@ export function MainScreenPresentation({
       ) : null}
 
       <ImageSourceSheet {...imageSource} />
-      <DisclosureDialog {...imageConsent} />
+      {aiSharing ? <AiSharingSheet key={aiSharing.pending.id} {...aiSharing} /> : null}
 
       <StyleSheetModal {...styleSheet} />
       <AntSettingsModal {...settingsModal} />

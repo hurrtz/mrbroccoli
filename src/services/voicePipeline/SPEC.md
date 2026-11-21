@@ -10,7 +10,7 @@ dependencies:
   - src/services/tts/
   - src/services/whisper/
 validations:
-  - npm test -- --runInBand --watchman=false __tests__/services/voicePipeline.test.ts __tests__/services/tts.test.ts __tests__/services/whisper.test.ts
+  - npm test -- --runInBand --watchman=false __tests__/services/voicePipeline.test.ts __tests__/services/voicePipelineAiSharing.test.ts __tests__/services/tts.test.ts __tests__/services/whisper.test.ts
   - npm run typecheck:app
 provenance:
   intent: history-backfilled
@@ -57,7 +57,8 @@ during a long request affect the next turn, not the request already executing.
 
 ## Ordered Stages
 
-1. Transcribe recorded audio or normalize the supplied text override.
+1. Obtain the required AI sharing permissions for the selected recipients.
+   Then transcribe recorded audio or normalize the submitted text.
 2. Persist the user turn through `onTranscription` and resolve the effective
    conversation ID.
 3. Build a bounded active-conversation context and refresh its summary when
@@ -86,10 +87,43 @@ Cleanup always runs.
 empty transcription so recovery remains possible. Otherwise temporary capture
 is deleted.
 
+## AI sharing
+
+Each turn names its reply provider, every Council recipient and the data each
+would receive before a recording, image or prompt leaves the device. A Council
+change requires approval for its roster and final-answer provider. A required
+permission that is declined ends the turn before accepting the text or image
+draft. When automatic naming is enabled, only the first eligible prompt
+offers title generation to the selected final provider. Search, other
+conversations and hosted speech are optional. Revoking
+an active permission aborts later calls, including retries and Council rounds.
+
+Only current attachments can enter a request. Sending a checkpoint photo again
+uses the same image permission as attaching it explicitly. Text history may
+include the visible text of a message previously shared with every recipient,
+or text the user chose to share for that conversation. Earlier photo bytes,
+signed model state and other message metadata stay out of history. On a
+provider switch the new recipient receives only its permitted text. Choosing
+a route alone sends nothing.
+
+Search receives the current query when allowed. It may receive a summary only
+when its own text-history permission covers the source messages. Council
+receives one common set of text, summary and optional knowledge for all
+participants and the final-answer provider; review drafts and fallback
+synthesis inherit that same boundary. Cloud speech requires provider-specific
+permission on the primary route, fallback and replay. Android System speech
+lists and selects only installed voices that the active engine identifies as
+offline. Playing a reply or preview verifies the engine's chosen voice again
+before giving it the text. With no matching installed voice, playback reports
+the normal speech error.
+
 ## Context Rules
 
 Active-conversation compaction starts when estimated content exceeds 2,400
-tokens or an existing summary is active. The recent window targets 1,400 tokens
+tokens or an eligible existing summary is active. Reuse requires a local
+receipt for the exact summary and its covered source text. A summary generated
+from a filtered subset can serve the current turn; only full-transcript
+coverage updates the saved summary. The recent window targets 1,400 tokens
 while retaining at least six and at most ten messages when available.
 
 Historical knowledge excludes the current conversation, explicit family IDs,

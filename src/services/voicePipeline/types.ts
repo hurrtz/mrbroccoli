@@ -30,13 +30,17 @@ import type {
 export type SpeechTransferStage = "sending-text" | "receiving-audio";
 
 export interface PipelineCallbacks {
+  onSharingCancelled?: () => void;
+  onSpeechSkipped?: () => void;
   onSpeechTransfer?: (stage: SpeechTransferStage | null) => void;
-  onTranscription: (text: string) => string | null | void;
+  onTranscription: (
+    text: string,
+  ) => { conversationId: string; message: Message } | string | null | void;
   onContextSummary?: (
     summary: string,
     summarizedMessageCount: number,
     usage?: UsageEstimate,
-  ) => void;
+  ) => void | Promise<void>;
   onWebSearchStart?: () => void;
   onWebSearchComplete?: () => void;
   onWebSearchFallback?: (error: Error) => void;
@@ -53,7 +57,7 @@ export interface PipelineCallbacks {
     fullText: string,
     usage?: UsageEstimate,
     metadata?: MessageMetadata,
-  ) => void;
+  ) => Message | null | void | Promise<Message | null | void>;
   onAudioReady: (
     audioUri: string,
     diagnostics?: SpeechDiagnosticsContext,
@@ -106,6 +110,7 @@ export interface RunVoicePipelineParams {
   contextSummary?: string;
   summarizedMessageCount?: number;
   currentConversationId?: string | null;
+  autoTitleEligible?: boolean;
   conversationKnowledgeExcludedIds?: string[];
   pastConversationKnowledgeEnabled?: boolean;
   assistantInstructions: string;

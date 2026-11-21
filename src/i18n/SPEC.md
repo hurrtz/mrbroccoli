@@ -46,6 +46,15 @@ initial default, but must not permanently couple those settings.
   must implement the same key and value shape.
 - User-visible strings belong in translation dictionaries, not conditional
   language checks inside components.
+- `aiSharingTranslations.ts` names what leaves the device and why for each
+  provider permission. Consent sheets and the AI sharing settings page use the
+  same labels for each type of data. Provider names, including Council members,
+  the final answer provider, and any routing intermediary's model host, are
+  inserted at runtime. RTL copy isolates these names from surrounding text.
+- The copy distinguishes permission to send an image once, an ongoing
+  per-provider permission, and sharing earlier messages in a particular chat.
+  Automatic titles use the first message. A manually requested title can also
+  use chat text already shared with the naming provider.
 - Large shared features may define a typed translation module and spread it
   into every locale. This keeps a feature's copy reviewable without weakening
   dictionary completeness.

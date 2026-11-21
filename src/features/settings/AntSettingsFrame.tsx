@@ -229,7 +229,7 @@ export function AntSettingsFrame({
     panelWidth: modalMaxWidth,
     windowWidth: width,
   });
-  const showsBackButton = !isRegularIpad && activePage !== "overview";
+  const showsBackButton = activePage === "ai-sharing" || (!isRegularIpad && activePage !== "overview");
   const backSwipeEnabled = Platform.OS === "ios" && showsBackButton;
   const backSwipeStateRef = React.useRef({
     enabled: backSwipeEnabled,
@@ -277,7 +277,7 @@ export function AntSettingsFrame({
     }),
   ).current;
   const detailPage: SettingsDetailPage =
-    activePage === "overview" ? "connections" : activePage;
+    activePage === "overview" ? "connections" : activePage === "ai-sharing" ? "data" : activePage;
   const animatedModalStyle = {
     opacity: entrance,
     transform: [
@@ -400,7 +400,7 @@ export function AntSettingsFrame({
                 }
                 style={styles.headerControl}
                 onPress={onBack}
-                accessibilityLabel={t("settingsBackToOverview")}
+                accessibilityLabel={activePage === "ai-sharing" ? t("settingsOpenSection", { section: t("settingsDataPrivacy") }) : t("settingsBackToOverview")}
                 testID="settings-back-button"
               />
             ) : (

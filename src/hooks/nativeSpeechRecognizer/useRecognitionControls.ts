@@ -7,13 +7,13 @@ import {
   stopNativeWaveformRecording,
 } from "../../services/nativeWaveform";
 import {
-  getRecognitionLocale,
   MIN_RECOGNITION_DURATION_MS,
   RECOGNITION_METER_INTERVAL_MS,
   RECOGNITION_STOP_TIMEOUT_MS,
 } from "./shared";
 import { cleanupCapturedAudio } from "../../services/voicePipeline/cleanup";
 import { transcribeRecordedFile } from "./transcribeRecordedFile";
+import { useRecognitionPrivacy } from "./useRecognitionPrivacy";
 import type { RecognitionSession } from "./useRecognitionSession";
 import type { SttLanguage } from "../../types";
 
@@ -55,16 +55,18 @@ export function useRecognitionControls({
 
   const fileRecognitionAbortRef = useRef<AbortController | null>(null);
   useEffect(() => () => fileRecognitionAbortRef.current?.abort(), []);
+  const { active, blockedSystemSpeech, cancelPending, prepare, release } =
+    useRecognitionPrivacy(sttLanguage, requiresOnDeviceRecognition);
 
   const ensurePermissions = useCallback(async () => {
     if (!ExpoSpeechRecognitionModule.isRecognitionAvailable()) {
       throw new Error(t("speechRecognitionUnavailableOnDevice"));
     }
 
-    let permissions = await ExpoSpeechRecognitionModule.getPermissionsAsync();
+    let permissions = await ExpoSpeechRecognitionModule.getMicrophonePermissionsAsync();
 
     if (!permissions.granted) {
-      permissions = await ExpoSpeechRecognitionModule.requestPermissionsAsync();
+      permissions = await ExpoSpeechRecognitionModule.requestMicrophonePermissionsAsync();
     }
 
     if (!permissions.granted) {
@@ -72,85 +74,17 @@ export function useRecognitionControls({
     }
   }, [t]);
 
-  const startRecognition = useCallback(async () => {
-    if (isRecordingRef.current) {
-      return;
-    }
-
+  const ensureRecognitionPermissions = useCallback(async (recipient?: string) => {
     await ensurePermissions();
-
-    setLastError(null);
-    setInputMetering(null);
-    completedLiveTranscriptRef.current = null;
-    latestTranscriptRef.current = "";
-    finalTranscriptRef.current = "";
-    clearPendingResolution();
-    startedAtRef.current = Date.now();
-    isRecordingRef.current = true;
-    setIsRecording(true);
-
-    if (usingNativeRecorder) {
-      const sessionId = `native-stt-${Date.now()}-${Math.random()
-        .toString(36)
-        .slice(2, 8)}`;
-
-      nativeSessionIdRef.current = sessionId;
-
-      try {
-        await startNativeWaveformRecording({ sessionId });
-      } catch (error) {
-        nativeSessionIdRef.current = null;
-        isRecordingRef.current = false;
-        setIsRecording(false);
-        setInputMetering(null);
-        throw error instanceof Error
-          ? error
-          : new Error(t("couldntStartNativeSpeechRecognition"));
-      }
-      return;
-    }
-
-    try {
-      ExpoSpeechRecognitionModule.start({
-        lang: getRecognitionLocale(sttLanguage),
-        interimResults: true,
-        continuous: false,
-        addsPunctuation: true,
-        requiresOnDeviceRecognition,
-        iosTaskHint: "dictation",
-        iosVoiceProcessingEnabled: true,
-        volumeChangeEventOptions: {
-          enabled: true,
-          intervalMillis: RECOGNITION_METER_INTERVAL_MS,
-        },
-      });
-    } catch (error) {
-      isRecordingRef.current = false;
-      setIsRecording(false);
-      setInputMetering(null);
-      throw error instanceof Error
-        ? error
-        : new Error(t("couldntStartNativeSpeechRecognition"));
-    }
-  }, [
-    clearPendingResolution,
-    completedLiveTranscriptRef,
-    ensurePermissions,
-    finalTranscriptRef,
-    isRecordingRef,
-    latestTranscriptRef,
-    nativeSessionIdRef,
-    setIsRecording,
-    setInputMetering,
-    setLastError,
-    startedAtRef,
-    sttLanguage,
-    requiresOnDeviceRecognition,
-    t,
-    usingNativeRecorder,
-  ]);
+    if (recipient !== "apple") return;
+    let permission = await ExpoSpeechRecognitionModule.getSpeechRecognizerPermissionsAsync();
+    if (!permission.granted) permission = await ExpoSpeechRecognitionModule.requestSpeechRecognizerPermissionsAsync();
+    if (!permission.granted) throw new Error(t("speechRecognitionPermissionNotGranted"));
+  }, [ensurePermissions, t]);
 
   const abortRecognition = useCallback(async () => {
+    cancelPending();
+    release();
     fileRecognitionAbortRef.current?.abort();
     if (completedLiveTranscriptRef.current !== null) {
       completedLiveTranscriptRef.current = null;
@@ -179,6 +113,14 @@ export function useRecognitionControls({
     abortRequestedRef.current = true;
     stopRequestedRef.current = false;
 
+    if (stopResolverRef.current) {
+      try {
+        ExpoSpeechRecognitionModule.abort();
+      } finally {
+        resolvePendingStop(null);
+      }
+      return;
+    }
     await new Promise<void>((resolve) => {
       let watchdog: ReturnType<typeof setTimeout> | null = null;
       const settle = () => {
@@ -201,6 +143,8 @@ export function useRecognitionControls({
     });
   }, [
     abortRequestedRef,
+    cancelPending,
+    release,
     clearPendingResolution,
     completedLiveTranscriptRef,
     isRecordingRef,
@@ -214,14 +158,104 @@ export function useRecognitionControls({
     usingNativeRecorder,
   ]);
 
+  const startRecognition = useCallback(async (signal?: AbortSignal) => {
+    if (isRecordingRef.current) {
+      return active.current?.allowed() === true;
+    }
+
+    const grant = await prepare(ensureRecognitionPermissions, () => { void abortRecognition().catch(() => resolvePendingStop(null)); },
+      t("speechRecognitionUnavailableForDeviceLanguage"), signal);
+    if (!grant?.allowed()) return false;
+
+    setLastError(null);
+    setInputMetering(null);
+    completedLiveTranscriptRef.current = null;
+    latestTranscriptRef.current = "";
+    finalTranscriptRef.current = "";
+    clearPendingResolution();
+    startedAtRef.current = Date.now();
+    isRecordingRef.current = true;
+    setIsRecording(true);
+
+    if (usingNativeRecorder) {
+      const sessionId = `native-stt-${Date.now()}-${Math.random()
+        .toString(36)
+        .slice(2, 8)}`;
+
+      nativeSessionIdRef.current = sessionId;
+
+      try {
+        await startNativeWaveformRecording({ sessionId });
+      } catch (error) {
+        release(grant);
+        nativeSessionIdRef.current = null;
+        isRecordingRef.current = false;
+        setIsRecording(false);
+        setInputMetering(null);
+        throw error instanceof Error
+          ? error
+          : new Error(t("couldntStartNativeSpeechRecognition"));
+      }
+      return grant.allowed() && nativeSessionIdRef.current === sessionId;
+    }
+
+    try {
+      ExpoSpeechRecognitionModule.start({
+        ...grant.options,
+        interimResults: true,
+        continuous: false,
+        addsPunctuation: true,
+        iosTaskHint: "dictation",
+        iosVoiceProcessingEnabled: true,
+        volumeChangeEventOptions: {
+          enabled: true,
+          intervalMillis: RECOGNITION_METER_INTERVAL_MS,
+        },
+      });
+    } catch (error) {
+      release(grant);
+      isRecordingRef.current = false;
+      setIsRecording(false);
+      setInputMetering(null);
+      throw error instanceof Error
+        ? error
+        : new Error(t("couldntStartNativeSpeechRecognition"));
+    }
+    return true;
+  }, [
+    abortRecognition,
+    active,
+    clearPendingResolution,
+    completedLiveTranscriptRef,
+    ensureRecognitionPermissions,
+    finalTranscriptRef,
+    isRecordingRef,
+    latestTranscriptRef,
+    nativeSessionIdRef,
+    setIsRecording,
+    setInputMetering,
+    setLastError,
+    startedAtRef,
+    prepare,
+    release,
+    resolvePendingStop,
+    t,
+    usingNativeRecorder,
+  ]);
+
   const stopRecognition = useCallback(async (): Promise<string | null> => {
+    cancelPending();
+    const grant = active.current;
+    if (!grant?.allowed()) return null;
     const completed = completedLiveTranscriptRef.current;
     if (completed !== null) {
+      release(grant);
       completedLiveTranscriptRef.current = null;
       resolvePendingStop(completed);
       return completed;
     }
     if (!isRecordingRef.current) {
+      if (!fileRecognitionAbortRef.current) release(grant);
       return null;
     }
 
@@ -233,6 +267,7 @@ export function useRecognitionControls({
     if (usingNativeRecorder) {
       const sessionId = nativeSessionIdRef.current;
       if (!sessionId) {
+        release(grant);
         isRecordingRef.current = false;
         setIsRecording(false);
         setInputMetering(null);
@@ -251,7 +286,7 @@ export function useRecognitionControls({
       try {
         const recording = await stopNativeWaveformRecording(sessionId);
         fileUri = recording.uri;
-        if (controller.signal.aborted) return null;
+        if (controller.signal.aborted || !grant.allowed()) return null;
         if (!fileUri) throw new Error(t("couldntProcessVoiceInput"));
 
         const transcription = await transcribeRecordedFile({
@@ -260,8 +295,7 @@ export function useRecognitionControls({
           fileUri,
           finalTranscriptRef,
           latestTranscriptRef,
-          sttLanguage,
-          requiresOnDeviceRecognition,
+          grant,
           t,
         });
         if (!transcription && !controller.signal.aborted) {
@@ -269,6 +303,7 @@ export function useRecognitionControls({
         }
         return transcription;
       } finally {
+        release(grant);
         if (fileRecognitionAbortRef.current === controller) {
           fileRecognitionAbortRef.current = null;
         }
@@ -314,8 +349,11 @@ export function useRecognitionControls({
         }
       }, RECOGNITION_STOP_TIMEOUT_MS);
       ExpoSpeechRecognitionModule.stop();
-    });
+    }).finally(() => release(grant));
   }, [
+    active,
+    cancelPending,
+    release,
     abortRecognition,
     abortRequestedRef,
     completedLiveTranscriptRef,
@@ -330,13 +368,12 @@ export function useRecognitionControls({
     stopRejectRef,
     stopRequestedRef,
     stopResolverRef,
-    sttLanguage,
-    requiresOnDeviceRecognition,
     t,
     usingNativeRecorder,
   ]);
 
   return {
+    blockedSystemSpeech,
     ensurePermissions,
     startRecognition,
     abortRecognition,

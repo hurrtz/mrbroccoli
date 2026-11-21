@@ -141,6 +141,7 @@ ios-native-test:
 pre-push:
 	@$(MAKE) worktree-check
 	@node --test scripts/makefile-contract.test.mjs
+	@node scripts/install-android-offline-speech.mjs --check
 	@node --test scripts/espeak-free-runtime-patch.test.mjs
 	@npm run spec-review:test
 	@node --test scripts/pre-push-hook.test.mjs

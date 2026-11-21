@@ -1,4 +1,5 @@
 import React from "react";
+jest.mock("../../src/services/aiSharing", () => require("../test-utils/aiSharingAllowed").createAllowedAiSharingMock());
 import { PipelineNotices } from "../../src/components/chatBubble/PipelineNotices";
 import { renderWithProviders } from "../test-utils/renderWithProviders";
 import { act, fireEvent, renderHook, waitFor } from "@testing-library/react-native";
@@ -952,6 +953,26 @@ describe("useVoicePipeline", () => {
       }));
     },
   );
+
+  it.each([
+    { newChat: true, awaitingFirstPrompt: false, enabled: true, eligible: true },
+    { newChat: false, awaitingFirstPrompt: true, enabled: true, eligible: true },
+    { newChat: false, awaitingFirstPrompt: false, enabled: true, eligible: false },
+    { newChat: true, awaitingFirstPrompt: false, enabled: false, eligible: false },
+  ])("applies the title disclosure to the first eligible dispatch ($newChat, $awaitingFirstPrompt, $enabled)", async (setting) => {
+    const params = createParams({
+      activeConversation: setting.newChat ? null : {
+        id: "session", title: "Session", createdAt: "", updatedAt: "", messages: [],
+        awaitingFirstPrompt: setting.awaitingFirstPrompt,
+      },
+      autoNameConversations: setting.enabled,
+      onPromptSubmitted: jest.fn(),
+    });
+    jest.mocked(runVoicePipeline).mockResolvedValueOnce("My question");
+    const {result} = renderHook(() => useVoicePipeline(params));
+    await act(async () => { await result.current.handleVoiceCaptureDone({transcriptionOverride: "My question"}); });
+    expect(jest.mocked(runVoicePipeline).mock.lastCall?.[0].autoTitleEligible).toBe(setting.eligible);
+  });
 
   it("passes the first submitted prompt to naming even when context is cancelled before the model starts", async () => {
     const prompt: Message = {

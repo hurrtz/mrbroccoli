@@ -1,4 +1,5 @@
 import React from "react";
+import { FullWindowOverlay } from "react-native-screens";
 import {
   AccessibilityInfo,
   ActivityIndicator,
@@ -312,7 +313,24 @@ export function shouldDismissSheetDrag({ dy, vy }: { dy: number; vy: number }) {
   return dy > SHEET_DISMISS_DISTANCE || vy > SHEET_DISMISS_VELOCITY;
 }
 
+function DialogHost({
+  aboveModals,
+  children,
+  ...props
+}: React.ComponentProps<typeof ReactNativeModal> & { aboveModals: boolean }) {
+  if (aboveModals && Platform.OS === "ios") {
+    return props.visible ? (
+      <FullWindowOverlay unstable_accessibilityContainerViewIsModal>
+        {children}
+      </FullWindowOverlay>
+    ) : null;
+  }
+  return <ReactNativeModal {...props}>{children}</ReactNativeModal>;
+}
+
 interface DialogProps {
+  /** Allows a decision from an already-presented native sheet to stay in place. */
+  aboveModals?: boolean;
   cardStyle?: StyleProp<ViewStyle>;
   children?: React.ReactNode;
   footer?: DialogAction[];
@@ -332,6 +350,7 @@ interface DialogProps {
 }
 
 export function Modal({
+  aboveModals = false,
   cardStyle,
   children,
   footer = [],
@@ -473,7 +492,8 @@ export function Modal({
   }, [isSheet, reduceMotion, sheetDragY, sheetProgress, visible]);
 
   return (
-    <ReactNativeModal
+    <DialogHost
+      aboveModals={aboveModals}
       animationType={isSheet ? "none" : "fade"}
       onDismiss={onDismiss}
       onRequestClose={onClose}
@@ -495,6 +515,7 @@ export function Modal({
         <Animated.View
           testID="native-dialog-overlay"
           accessibilityViewIsModal
+          onAccessibilityEscape={onClose}
           style={[
             controlStyles.dialogOverlay,
             isSheet ? controlStyles.sheetOverlay : null,
@@ -626,7 +647,7 @@ export function Modal({
           </Animated.View>
         </Animated.View>
       </KeyboardAvoidingView>
-    </ReactNativeModal>
+    </DialogHost>
   );
 }
 

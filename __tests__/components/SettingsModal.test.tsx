@@ -277,6 +277,14 @@ describe("SettingsModal", () => {
     },
   );
 
+  it("opens AI sharing from Data & privacy and returns to its parent", async () => {
+    const screen = renderSettingsModal({ focusPage: "data" });
+    fireEvent.press(screen.getByTestId("settings-open-ai-sharing"));
+    await waitFor(() => expect(screen.getByTestId("settings-page-ai-sharing")).toBeTruthy());
+    fireEvent.press(screen.getByTestId("settings-back-button"));
+    expect(screen.getByTestId("settings-page-data")).toBeTruthy();
+  });
+
   it("uses full-window master-detail Settings on a regular-width iPad", async () => {
     Object.defineProperty(Platform, "isPad", {
       configurable: true,

@@ -104,6 +104,11 @@ truncating the original.
   cloned checkpoint, branch kind, and creation time.
 - Existing per-conversation settings are copied.
 - Summary state is not copied because the new path may diverge.
+- After a successful local fork, cloned text with the same role and content
+  may inherit its source row's device-local sharing receipts, but only for
+  previously entitled recipients and inference hosts. Edited rows, photos and
+  summaries gain no permissions. The canonical fork is usable even if the
+  local receipt store fails.
 - Every member of a branch family excludes its siblings from
   past-conversation retrieval, avoiding duplicated shared history as apparently
   independent evidence.
@@ -139,7 +144,9 @@ Backup restore is non-destructive:
 - identical records with matching pin state are skipped;
 - archive state implies an unpinned record, so stale pinned metadata in an
   archived backup cannot create a duplicate of identical conversation data;
-- a conflicting conversation ID is restored under a new UUID;
+- a conflicting conversation ID is restored under a new UUID. A newly
+  restored record starts with no sharing receipts. If the old local receipt
+  store cannot be cleared for an unused ID, restore assigns a fresh UUID;
 - staged attachment files transfer to the branch or import only on a successful database commit;
 - encrypted imports use the envelope size limit before format detection and the plaintext limit after decryption;
 - branch root/parent references and knowledge exclusions are remapped across

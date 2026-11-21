@@ -33,6 +33,7 @@ export function useNativeSpeechRecognizer(
   });
 
   const {
+    blockedSystemSpeech,
     ensurePermissions,
     startRecognition,
     stopRecognition,
@@ -46,6 +47,7 @@ export function useNativeSpeechRecognizer(
   });
 
   return {
+    blockedSystemSpeech,
     isAvailable: ExpoSpeechRecognitionModule.isRecognitionAvailable(),
     isRecording: session.isRecording,
     inputMetering: session.inputMetering,

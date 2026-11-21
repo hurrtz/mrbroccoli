@@ -35,6 +35,10 @@ independently.
 
 ## Runtime Provider Set
 
+Every selectable OpenRouter model publisher maps to a named inference
+company and its allowed OpenRouter provider slugs in `openRouterHosts.ts`.
+Both the consent sheet and request builder use that mapping.
+
 The runtime contains nine provider IDs:
 
 - LLM-capable: `openai`, `openrouter`, `anthropic`, `gemini`, `xai`,

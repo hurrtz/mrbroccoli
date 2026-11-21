@@ -42,6 +42,7 @@ type VoiceCaptureHandlerParams = Omit<UseVoicePipelineParams, "isRecording"> & {
 export function useVoiceCaptureHandler({
   abortRef,
   activeConversation,
+  autoNameConversations = false,
   addMessage,
   assistantInstructions,
   createConversation,
@@ -133,6 +134,7 @@ export function useVoiceCaptureHandler({
       conversationOverride,
       existingUserMessageId,
       messagesOverride,
+      onTurnAccepted,
       transcriptionOverride,
       inputSource = transcriptionOverride ? "text" : "voice",
       turnId: requestedTurnId,
@@ -146,9 +148,12 @@ export function useVoiceCaptureHandler({
       };
       // A recording keeps its input route. Re-read credentials at submission so
       // removing a key in Settings also revokes it for an in-progress capture.
-      const captureApiKey = route.sttProvider && getSttApiKeyForProvider
-        ? getSttApiKeyForProvider(route.sttProvider)
-        : route.sttProvider === sttProvider ? sttApiKey : "";
+      const captureApiKey =
+        route.sttProvider && getSttApiKeyForProvider
+          ? getSttApiKeyForProvider(route.sttProvider)
+          : route.sttProvider === sttProvider
+            ? sttApiKey
+            : "";
       const previousAbortController = abortRef.current;
       const runId = activeCaptureRunRef.current + 1;
       activeCaptureRunRef.current = runId;
@@ -164,6 +169,15 @@ export function useVoiceCaptureHandler({
       const isActiveRun = () =>
         isCurrentRun() && !abortController.signal.aborted;
       const conversationForRun = conversationOverride ?? activeConversation;
+      const conversationMessages = conversationForRun?.messages ?? [];
+      const checkpointIndex = existingUserMessageId
+        ? conversationMessages.findIndex(
+            (message) => message.id === existingUserMessageId,
+          )
+        : conversationMessages.length;
+      const turnHistory =
+        messagesOverride ??
+        conversationMessages.slice(0, Math.max(0, checkpointIndex));
 
       setCouncilProgress(null);
       onSpeechTransfer?.(null);
@@ -267,6 +281,7 @@ export function useVoiceCaptureHandler({
         model,
         modelEffort,
         onAttachmentsAccepted,
+        onTurnAccepted,
         onPromptSubmitted,
         onError: errorHandlers.handlePipelineError,
         onSpeechTransfer,
@@ -316,10 +331,15 @@ export function useVoiceCaptureHandler({
           inputSource,
           transcriptionOverride,
           attachments,
-          messages: messagesOverride ?? conversationForRun?.messages ?? [],
+          messages: turnHistory,
           contextSummary: conversationForRun?.contextSummary,
           summarizedMessageCount: conversationForRun?.summarizedMessageCount,
           currentConversationId: conversationForRun?.id ?? null,
+          autoTitleEligible:
+            autoNameConversations &&
+            Boolean(onPromptSubmitted) &&
+            (!conversationForRun ||
+              conversationForRun.awaitingFirstPrompt === true),
           conversationKnowledgeExcludedIds: [
             ...(conversationForRun?.knowledgeExcludedConversationIds ?? []),
             ...lockedConversationIds,
@@ -363,7 +383,7 @@ export function useVoiceCaptureHandler({
           player.sealPlaybackReel?.();
         }
 
-        if (!transcription && isActiveRun()) {
+        if (!transcription && isActiveRun() && !state.sharingCancelled) {
           errorHandlers.handleNoTranscription();
         }
       } catch (error) {
@@ -418,7 +438,9 @@ export function useVoiceCaptureHandler({
           !abortController.signal.aborted &&
           state.replyCompleted &&
           !state.turnFailed &&
-          (!spokenRepliesEnabled || playbackStartedRef.current);
+          (!spokenRepliesEnabled ||
+            state.speechSkipped ||
+            playbackStartedRef.current);
         if (completedSuccessfully) {
           finishLatencyProgress("turn");
         } else {
@@ -459,6 +481,7 @@ export function useVoiceCaptureHandler({
     [
       abortRef,
       activeConversation,
+      autoNameConversations,
       addMessage,
       assistantInstructions,
       beginStreamingRender,

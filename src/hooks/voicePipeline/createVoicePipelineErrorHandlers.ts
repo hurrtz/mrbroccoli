@@ -21,6 +21,8 @@ import {
 } from "./useVoiceTurnMessageState";
 
 export interface VoiceTurnRunState {
+  sharingCancelled?: boolean;
+  speechSkipped?: boolean;
   llmStarted: boolean;
   replyCompleted: boolean;
   transcriptionReady: boolean;

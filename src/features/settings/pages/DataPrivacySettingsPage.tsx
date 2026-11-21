@@ -174,6 +174,7 @@ export function DataPrivacySettingsPage({
   localModels,
   onCreateAppDataBackup,
   onOpenArchivedConversations,
+  onOpenAiSharing,
   onRestoreAppDataBackup,
   settings,
   onUpdate,
@@ -186,6 +187,7 @@ export function DataPrivacySettingsPage({
     backup: AppDataBackup,
   ) => Promise<AppDataBackupRestoreResult>;
   onOpenArchivedConversations: () => void;
+  onOpenAiSharing: () => void;
   settings: Settings;
   onUpdate: (partial: Partial<Settings>) => void;
 }) {
@@ -578,6 +580,17 @@ export function DataPrivacySettingsPage({
 
   return (
     <View testID="data-privacy-settings-page" style={styles.sectionPageStack}>
+      <SettingsGroup>
+        <SettingsRow
+          icon="safety-certificate"
+          label={t("aiSharingTitle")}
+          onPress={onOpenAiSharing}
+          supporting={t("aiSharingSettingsDescription")}
+          supportingLines={0}
+          testID="settings-open-ai-sharing"
+          last
+        />
+      </SettingsGroup>
       <ConversationKnowledgeGroup
         onUpdate={onUpdate}
         settings={settings}

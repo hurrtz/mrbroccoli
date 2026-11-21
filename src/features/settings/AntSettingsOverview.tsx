@@ -24,7 +24,7 @@ import {
 import { SettingsGroup } from "./settings-primitives/SettingsGroup";
 import { SettingsRow } from "./settings-primitives/SettingsRow";
 
-export type SettingsDetailPage = Exclude<SettingsPage, "overview">;
+export type SettingsDetailPage = Exclude<SettingsPage, "overview" | "ai-sharing">;
 
 export type SettingsOverviewRow = {
   page: SettingsDetailPage;

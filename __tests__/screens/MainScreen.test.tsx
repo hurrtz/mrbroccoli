@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { act, fireEvent, waitFor, within } from "@testing-library/react-native";
 
+import { getAiSharingSnapshot, requestAiSharing, resolveAiSharing, setAiSharingPermission } from "../../src/services/aiSharing";
 import { MainScreen } from "../../src/screens/MainScreen";
 import { DEFAULT_SETTINGS, type Settings } from "../../src/types";
 import { getDefaultModelForProvider } from "../../src/utils/responseModes";
@@ -738,6 +739,37 @@ describe("MainScreen", () => {
     fireEvent.press(control);
     expect(shared.updateSettings).not.toHaveBeenCalled();
     expect(useVoicePipeline).toHaveBeenCalledWith(expect.objectContaining({ webSearchMode: "off" }));
+  });
+
+  it.each(["denied", "skipped"])("reflects a %s search permission on the workspace and links to Settings", async (decision) => {
+    const shared = createSharedSettingsValue({
+      apiKeys: { ...DEFAULT_SETTINGS.apiKeys, openai: "fixture" },
+      webSearchMode: "on",
+      webSearchProvider: "openai",
+      homeWebSearchEnabled: true,
+    });
+    useSharedSettings.mockReturnValue(shared);
+    if (decision === "denied") {
+      await setAiSharingPermission("openai", "search", false);
+    } else {
+      const choice = requestAiSharing({ required: [], optional: [{ provider: "openai", purpose: "search" }] });
+      await waitFor(() => expect(getAiSharingSnapshot().pending).toBeTruthy());
+      await resolveAiSharing(getAiSharingSnapshot().pending!.id, { optional: [] });
+      await choice;
+    }
+    const screen = renderWithProviders(<MainScreen />);
+    try {
+      const control = screen.getByTestId("satellite-web");
+      expect(control.props.accessibilityRole).toBe("button");
+      expect(control.props.accessibilityHint).toBe("Open AI sharing");
+      expect(useVoicePipeline).toHaveBeenCalledWith(expect.objectContaining({ webSearchMode: "off" }));
+      fireEvent.press(control);
+      expect(screen.getByText("settings:open")).toBeTruthy();
+      expect(shared.updateSettings).not.toHaveBeenCalled();
+    } finally {
+      screen.unmount();
+      await setAiSharingPermission("openai", "search", null);
+    }
   });
 
   it("turns an active automatic web-search route off from the main switch", () => {

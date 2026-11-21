@@ -11,7 +11,7 @@ import {
   getTtsChunkTargetChars,
   normalizeFallbackRoutes,
 } from "./ttsQueue/config";
-import { createTtsRouteSelector } from "./ttsQueue/routeSelector";
+import { createTtsRouteSelector, SpeechSharingDeclined } from "./ttsQueue/routeSelector";
 import type {
   CreateVoicePipelineTtsQueueParams,
   TtsChunkContext,
@@ -219,6 +219,10 @@ export function createVoicePipelineTtsQueue(
       }
 
       fatalTtsErrorNotified = true;
+      if (error instanceof SpeechSharingDeclined) {
+        callbacks.onSpeechSkipped?.();
+        return;
+      }
       await callbacks.onError(
         error instanceof Error ? error : new Error(String(error)),
       );

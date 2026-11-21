@@ -237,3 +237,20 @@ describe("useTextTurnSubmitController", () => {
     );
   });
 });
+
+it("retries an existing text row independently of photos blocked in the unsent draft", () => {
+  const capture = jest.fn(async () => undefined);
+  const { result } = renderHook(() => useTextTurnSubmitController({
+    handleVoiceCaptureDone: capture,
+    isBusy: false,
+    promptSubmissionBlockMessage: "The draft photo cannot be shared.",
+    retrySubmissionBlockMessage: null,
+  }));
+  act(() => result.current.handleRetryMessage({
+    id: "previous", role: "user", content: "Retry text only", timestamp: "", model: null, provider: null,
+  }));
+  expect(capture).toHaveBeenCalledWith(expect.objectContaining({
+    existingUserMessageId: "previous", transcriptionOverride: "Retry text only",
+  }));
+  expect(capture.mock.calls[0]).not.toHaveProperty("0.attachments");
+});

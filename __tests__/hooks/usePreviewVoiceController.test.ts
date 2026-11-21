@@ -1,4 +1,6 @@
 import { act, renderHook } from "@testing-library/react-native";
+import { requestAiSharing } from "../../src/services/aiSharing";
+jest.mock("../../src/services/aiSharing", () => require("../test-utils/aiSharingAllowed").createAllowedAiSharingMock());
 
 import { usePreviewVoiceController } from "../../src/screens/main/usePreviewVoiceController";
 
@@ -27,6 +29,20 @@ describe("usePreviewVoiceController", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockSynthesizeSpeech.mockResolvedValue("file://preview.m4a");
+  });
+
+  it("keeps custom preview text and voice instructions on device when speech sharing is declined", async () => {
+    jest.mocked(requestAiSharing).mockResolvedValueOnce(null);
+    const stopVoiceSession = jest.fn(async () => undefined);
+    const player = { enqueueAudio: jest.fn(), isPlaybackPaused: true, isPlaying: true, resetCancellation: jest.fn(),
+      speakText:jest.fn(), stopPlayback:jest.fn(async () => {}), waitForDrain:jest.fn(async () => {}) };
+    const {result} = renderHook(() => usePreviewVoiceController({isRecording:false,language:"en",pipelinePhase:"speaking",
+      settings:{apiKeys:{openai:"dummy"} as never,providerTtsModels:{} as never}, player,stopVoiceSession,showToast:jest.fn(),t:(key)=>key}));
+    await act(() => result.current.handlePreviewVoice({mode:"provider",provider:"openai",voice:"alloy",
+      previewLanguage:"en",text:"Private preview",instructions:"Private voice directions"}));
+    expect(requestAiSharing).toHaveBeenCalledWith({required:[{provider:"openai",purpose:"speech"}]},expect.anything());
+    expect(mockSynthesizeSpeech).not.toHaveBeenCalled();
+    expect(stopVoiceSession).not.toHaveBeenCalled();
   });
 
   it("blocks provider previews when the provider key is missing", async () => {

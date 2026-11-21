@@ -5,6 +5,7 @@ import { conversationArtifactTranslations } from "../conversationArtifactTransla
 import { interruptionTranslations } from "../interruptionTranslations";
 import { ulraAuditTranslations } from "../ulraAuditTranslations";
 import { councilWorkspaceTranslations } from "../councilWorkspaceTranslations";
+import { aiSharingTranslations } from "../aiSharingTranslations";
 import { imagePromptTranslations } from "../imagePromptTranslations";
 import { onDeviceTranslations } from "../onDeviceTranslations";
 import { localSpeechTranslations } from "../localSpeechTranslations";
@@ -20,6 +21,7 @@ export const zhCN = {
   ...councilWorkspaceTranslations["zh-CN"],
   ...dataBackupTranslations.zhCN,
   ...conversationKnowledgeTranslations.zhCN,
+  ...aiSharingTranslations.zhCN,
   ...imagePromptTranslations.zhCN,
   ...onDeviceTranslations["zh-CN"],
   ...localSpeechTranslations["zh-CN"],
