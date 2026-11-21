@@ -64,6 +64,7 @@ jest.mock("react-native", () => {
 });
 
 const mockUseWindowDimensions = jest.mocked(useWindowDimensions);
+let mockSafeAreaInsets = { top: 0, bottom: 0, left: 0, right: 0 };
 
 jest.mock("react-native-safe-area-context", () => ({
   initialWindowMetrics: null,
@@ -75,7 +76,7 @@ jest.mock("react-native-safe-area-context", () => ({
     const { View } = require("react-native");
     return React.createElement(View, props, children);
   },
-  useSafeAreaInsets: () => ({ top: 0, bottom: 0, left: 0, right: 0 }),
+  useSafeAreaInsets: () => mockSafeAreaInsets,
 }));
 
 jest.mock("react-native-reanimated", () => {
@@ -240,6 +241,7 @@ describe("SettingsModal", () => {
       writable: true,
     });
     setViewport(430, 932);
+    mockSafeAreaInsets = { top: 0, bottom: 0, left: 0, right: 0 };
   });
 
   afterEach(async () => {
@@ -251,6 +253,29 @@ describe("SettingsModal", () => {
     jest.mocked(getLocalModelBenchmarkResults).mockResolvedValue({});
     jest.restoreAllMocks();
   });
+
+  it.each([
+    ["en", 466, 678, 22, 100],
+    ["ar", 466, 678, 100, 22],
+    ["en", 900, 400, 10, 88],
+    ["ar", 900, 400, 88, 10],
+    ["en", 1200, 500, 0, 0],
+  ] as const)(
+    "keeps compact %s Settings inside physical insets at %s×%s",
+    async (language, width, height, paddingStart, paddingEnd) => {
+      setViewport(width, height);
+      mockSafeAreaInsets = { top: 0, bottom: 0, left: 22, right: 100 };
+      const screen = renderSettingsModal({ focusPage: "app" }, language);
+      await waitFor(() => {
+        expect(screen.getByTestId("settings-back-button")).toBeTruthy();
+      });
+      expect(screen.getByTestId("settings-close-button")).toBeTruthy();
+      const pane = screen.getByTestId("settings-compact-detail-pane");
+      expect(StyleSheet.flatten(pane.props.style)).toMatchObject({
+        paddingStart, paddingEnd,
+      });
+    },
+  );
 
   it("uses full-window master-detail Settings on a regular-width iPad", async () => {
     Object.defineProperty(Platform, "isPad", {

@@ -63,6 +63,10 @@ overview's exact seven pages, icons, and Conversation / Voice / Privacy & app
 groups, marks one row selected, and has no chevrons or back action because
 nothing is pushed. A plain regular open selects Connections; a deep link
 selects its requested page directly. The detail body remains capped at 760pt.
+Compact Settings keeps its panel background edge to edge. Its header and
+scrolling content fit inside the physical left and right safe edges in both
+reading directions. A landscape panel's existing outside gutters count toward
+those insets.
 
 Resizing preserves the selected detail. Entering regular width from the compact
 overview selects Connections; returning to compact keeps the current detail
@@ -71,8 +75,8 @@ leading right edge and mirrors each row's leading/trailing arrangement without
 changing page ownership.
 
 On iOS, compact detail pages also expose the native leading-edge back gesture:
-swiping inward from the left in LTR or the right in RTL returns to the Settings
-overview. The gesture is deliberately edge-bound and horizontally dominant so
+swiping inward from the usable panel's left edge in LTR or right edge in RTL
+returns to the Settings overview. The gesture is edge-bound and horizontally dominant so
 vertical Settings scrolling and controls away from that edge keep ownership of
 their touches. Android keeps its system-back behavior and regular iPad keeps
 the persistent category rail instead of a back gesture.

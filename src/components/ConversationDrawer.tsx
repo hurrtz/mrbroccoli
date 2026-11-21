@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { resolveHorizontalPanelInsets } from "../utils/horizontalPanelInsets";
 import { APP_MODAL_ORIENTATIONS } from "../constants/layout";
 import { useLocalization } from "../i18n";
 import { useTheme } from "../theme/ThemeContext";
@@ -57,7 +58,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   onDismissToast,
 }: ConversationDrawerProps) {
   const { colors } = useTheme();
-  const { t } = useLocalization();
+  const { isRtl, t } = useLocalization();
   const { height, width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = width > height;
@@ -104,6 +105,13 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
     [conversations, onSelect, openLockDialog],
   );
   const drawerMaxWidth = isLandscape ? Math.min(width * 0.44, 520) : width;
+  const panelBounds = resolveHorizontalPanelInsets({
+    insets,
+    isRtl,
+    panelLeft: isRtl ? width - drawerMaxWidth : 0,
+    panelWidth: drawerMaxWidth,
+    windowWidth: width,
+  });
   const controller = useConversationDrawerController({
     visible: isSidebar || visible,
     dismissAfterAction: !isSidebar,
@@ -220,7 +228,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
   const drawerSurface = (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      testID={isSidebar ? "conversation-sidebar-surface" : undefined}
+      testID={isSidebar ? "conversation-sidebar-surface" : "conversation-drawer-panel"}
       style={
         isSidebar
           ? [
@@ -236,6 +244,7 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
             ]
           : [
               styles.drawer,
+              panelBounds.padding,
               {
                 maxWidth: drawerMaxWidth,
                 width: isLandscape ? "44%" : "100%",
@@ -356,7 +365,10 @@ export const ConversationDrawer = React.memo(function ConversationDrawer({
       onRequestClose={onClose}
       supportedOrientations={APP_MODAL_ORIENTATIONS}
     >
-      <View accessibilityViewIsModal style={styles.modalRoot}>
+      <View
+        accessibilityViewIsModal
+        style={[styles.modalRoot, { direction: isRtl ? "rtl" : "ltr" }]}
+      >
         <View style={styles.container}>
           {drawerSurface}
           {isLandscape ? (

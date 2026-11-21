@@ -301,6 +301,9 @@ receive already-derived state and callbacks.
   New control as the phone drawer. It has no backdrop, close action, or menu
   button; selection and New keep it mounted. Its header also retains the global
   Settings entry.
+- The compact conversation drawer keeps its header, list and search inside
+  the safe window edges that its panel overlaps. The persistent sidebar
+  inherits those insets from the workspace once.
 - The drawer and sidebar search field displays its full translated hint from
   the locale’s leading edge across as many lines as needed. Entering a query
   uses the native single-line field and its Search key.

@@ -10,8 +10,9 @@ describe("compact Settings back swipe", () => {
         dx: 24,
         dy: 3,
         isRtl: false,
-        width: 390,
-        x0: 12,
+        left: 0,
+        right: 390,
+        moveX: 36,
       }),
     ).toBe(true);
     expect(
@@ -19,8 +20,9 @@ describe("compact Settings back swipe", () => {
         dx: 24,
         dy: 3,
         isRtl: false,
-        width: 390,
-        x0: 48,
+        left: 0,
+        right: 390,
+        moveX: 72,
       }),
     ).toBe(false);
     expect(
@@ -28,8 +30,9 @@ describe("compact Settings back swipe", () => {
         dx: 12,
         dy: 24,
         isRtl: false,
-        width: 390,
-        x0: 8,
+        left: 0,
+        right: 390,
+        moveX: 20,
       }),
     ).toBe(false);
   });
@@ -40,8 +43,9 @@ describe("compact Settings back swipe", () => {
         dx: -24,
         dy: 2,
         isRtl: true,
-        width: 390,
-        x0: 380,
+        left: 0,
+        right: 390,
+        moveX: 356,
       }),
     ).toBe(true);
     expect(
@@ -49,11 +53,30 @@ describe("compact Settings back swipe", () => {
         dx: 24,
         dy: 2,
         isRtl: true,
-        width: 390,
-        x0: 380,
+        left: 0,
+        right: 390,
+        moveX: 404,
       }),
     ).toBe(false);
   });
+
+  it.each([
+    [false, 7, false], [false, 26, true], [false, 60, false],
+    [true, 344, true], [true, 320, false], [true, 405, false],
+  ] as const)(
+    "uses the panel’s leading edge in window coordinates (RTL %s, x %s)",
+    (isRtl, startX, claim) => {
+      const dx = isRtl ? -24 : 24;
+      expect(shouldClaimSettingsBackSwipe({
+        left: 20,
+        right: 366,
+        dx,
+        dy: 2,
+        isRtl,
+        moveX: startX + dx,
+      })).toBe(claim);
+    },
+  );
 
   it("completes for either sufficient distance or an inward flick", () => {
     expect(

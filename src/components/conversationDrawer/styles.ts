@@ -202,6 +202,8 @@ export const styles = StyleSheet.create({
     fontFamily: fonts.body,
   },
   searchHint: {
+    alignSelf: "flex-start",
+    maxWidth: "100%",
     paddingVertical: 8,
   },
   searchInput: {

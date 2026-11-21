@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Alert,
+  Dimensions,
   FlatList,
   KeyboardAvoidingView,
   Modal,
@@ -135,9 +136,31 @@ describe("ConversationDrawer", () => {
     expect(screen.UNSAFE_queryByType(Modal)).toBeNull();
   });
 
+  it.each([
+    ["en", 466, 678, 22, 100],
+    ["ar", 466, 678, 100, 22],
+    ["en", 1000, 400, 22, 0],
+    ["ar", 1000, 400, 100, 0],
+  ] as const)(
+    "protects the compact %s drawer content at %s×%s",
+    (language, width, height, paddingStart, paddingEnd) => {
+      jest.spyOn(Dimensions, "get").mockReturnValue({
+        width, height, fontScale: 1, scale: 3,
+      });
+      mockSafeAreaInsets = { top: 0, bottom: 0, left: 22, right: 100 };
+      const screen = renderConversationDrawer({}, language);
+      const panel = screen.getByTestId("conversation-drawer-panel");
+      expect(StyleSheet.flatten(panel.props.style)).toMatchObject({
+        paddingStart, paddingEnd,
+      });
+      expect(screen.getByTestId("conversation-drawer-close")).toBeTruthy();
+      expect(screen.getByTestId("conversation-drawer-new-session")).toBeTruthy();
+    },
+  );
+
   it("renders the persistent sidebar inline while modal visibility is false", () => {
     const onOpenSettings = jest.fn();
-    mockSafeAreaInsets = { top: 24, bottom: 34, left: 0, right: 0 };
+    mockSafeAreaInsets = { top: 24, bottom: 34, left: 22, right: 100 };
     const screen = renderConversationDrawer({
       onOpenSettings,
       presentation: "sidebar",
@@ -146,6 +169,11 @@ describe("ConversationDrawer", () => {
     });
 
     expect(screen.UNSAFE_queryByType(Modal)).toBeNull();
+    const surface = StyleSheet.flatten(
+      screen.getByTestId("conversation-sidebar-surface").props.style,
+    );
+    expect(surface.paddingStart).toBeUndefined();
+    expect(surface.paddingEnd).toBeUndefined();
     expect(
       StyleSheet.flatten(
         screen.getByTestId("conversation-drawer-sidebar").props.style,
@@ -382,6 +410,10 @@ describe("ConversationDrawer", () => {
       expect(input.props.returnKeyType).toBe("search");
       expect(hintText.props.numberOfLines).toBeUndefined();
       expect(hintText.props.accessibilityElementsHidden).toBe(true);
+      expect(StyleSheet.flatten(hintText.props.style)).toMatchObject({
+        alignSelf: "flex-start",
+        maxWidth: "100%",
+      });
       for (const element of [hintText, input]) {
         const { textAlign } = StyleSheet.flatten(element.props.style);
         expect(textAlign ?? "auto").toBe("auto");

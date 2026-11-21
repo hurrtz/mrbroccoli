@@ -15,6 +15,7 @@ import { Toast } from "../../components/Toast";
 import { IconButton } from "../../design-system/IconButton";
 import { useLocalization } from "../../i18n";
 import { useTheme } from "../../theme/ThemeContext";
+import { resolveHorizontalPanelInsets } from "../../utils/horizontalPanelInsets";
 import type { SettingsPage } from "../settings-core/types";
 import {
   SETTINGS_OVERVIEW_GROUPS,
@@ -50,8 +51,9 @@ interface SettingsBackSwipeGesture {
   dx: number;
   dy: number;
   isRtl: boolean;
-  width: number;
-  x0: number;
+  left: number;
+  right: number;
+  moveX: number;
 }
 
 /** Compact iOS Settings follows the platform's leading-edge back gesture. */
@@ -59,12 +61,17 @@ export function shouldClaimSettingsBackSwipe({
   dx,
   dy,
   isRtl,
-  width,
-  x0,
+  left,
+  right,
+  moveX,
 }: SettingsBackSwipeGesture) {
-  const beganAtLeadingEdge = isRtl
-    ? x0 >= width - SETTINGS_BACK_SWIPE_EDGE
-    : x0 <= SETTINGS_BACK_SWIPE_EDGE;
+  // PanResponder sets x0 only after the responder grant. Capture runs earlier.
+  const startX = moveX - dx;
+  const distanceFromEdge = isRtl ? right - startX : startX - left;
+  const beganAtLeadingEdge =
+    startX >= left &&
+    startX <= right &&
+    distanceFromEdge <= SETTINGS_BACK_SWIPE_EDGE;
   const leadingDistance = isRtl ? -dx : dx;
 
   return (
@@ -215,19 +222,26 @@ export function AntSettingsFrame({
   const { colors } = useTheme();
   const { isRtl, t } = useLocalization();
   const { width } = useWindowDimensions();
+  const panelBounds = resolveHorizontalPanelInsets({
+    insets,
+    isRtl,
+    panelLeft: (width - modalMaxWidth) / 2,
+    panelWidth: modalMaxWidth,
+    windowWidth: width,
+  });
   const showsBackButton = !isRegularIpad && activePage !== "overview";
   const backSwipeEnabled = Platform.OS === "ios" && showsBackButton;
   const backSwipeStateRef = React.useRef({
     enabled: backSwipeEnabled,
     isRtl,
     onBack,
-    width,
+    panelBounds,
   });
   backSwipeStateRef.current = {
     enabled: backSwipeEnabled,
     isRtl,
     onBack,
-    width,
+    panelBounds,
   };
   const backSwipeResponder = React.useRef(
     PanResponder.create({
@@ -235,12 +249,14 @@ export function AntSettingsFrame({
         const state = backSwipeStateRef.current;
         return (
           state.enabled &&
+          gesture.numberActiveTouches === 1 &&
           shouldClaimSettingsBackSwipe({
             dx: gesture.dx,
             dy: gesture.dy,
             isRtl: state.isRtl,
-            width: state.width,
-            x0: gesture.x0,
+            left: state.panelBounds.left,
+            right: state.panelBounds.right,
+            moveX: gesture.moveX,
           })
         );
       },
@@ -280,6 +296,7 @@ export function AntSettingsFrame({
       accessibilityViewIsModal
       style={[
         styles.overlay,
+        { direction: isRtl ? "rtl" : "ltr" },
         isRegularIpad
           ? styles.ipadOverlay
           : {
@@ -350,9 +367,13 @@ export function AntSettingsFrame({
         ) : null}
         <View
           style={
-            isRegularIpad ? styles.ipadDetailPane : styles.compactDetailPane
+            isRegularIpad
+              ? styles.ipadDetailPane
+              : [styles.compactDetailPane, panelBounds.padding]
           }
-          testID={isRegularIpad ? "settings-ipad-detail-pane" : undefined}
+          testID={
+            isRegularIpad ? "settings-ipad-detail-pane" : "settings-compact-detail-pane"
+          }
         >
           <View
             style={[
